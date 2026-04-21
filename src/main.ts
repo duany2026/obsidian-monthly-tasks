@@ -24,8 +24,8 @@ import { MonthlyView, VIEW_TYPE_MONTHLY } from './MonthlyView';
  * 以 JSON 格式持久化存储在插件的 data.json 中。
  */
 interface MonthlyTasksSettings {
-	/** 是否在月历中显示已完成的任务（带删除线样式） */
-	showCompletedTasks: boolean;
+	/** 已完成任务的显示方式：strike=带删除线, normal=普通文字, hide=隐藏 */
+	completedTaskStyle: 'strike' | 'normal' | 'hide';
 	/** 新建任务时是否默认为全天任务（不指定具体时间） */
 	defaultAllDayTask: boolean;
 	/** 每周起始日：0 = 周日，1 = 周一 */
@@ -48,7 +48,7 @@ interface MonthlyTasksSettings {
  * 当用户首次安装插件或重置设置时使用这些默认值。
  */
 const DEFAULT_SETTINGS: MonthlyTasksSettings = {
-	showCompletedTasks: true,
+	completedTaskStyle: 'strike',
 	defaultAllDayTask: true,
 	firstDayOfWeek: 1,        // 周一起始
 	showLunar: true,
@@ -248,24 +248,22 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		// ── 使用说明区域 ───────────────────────────────
 		containerEl.createEl('h2', { text: '📖 使用说明' });
-		const usageEl = containerEl.createDiv('setting-item-description');
-		usageEl.style.cssText = 'margin-bottom: 20px; padding: 16px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; border-left: 4px solid #3b82f6;';
+		const usageEl = containerEl.createDiv('setting-item-description mt-settings-usage');
 		usageEl.innerHTML = `
-			<div style="font-size: 13px; line-height: 1.8; color: #334155;">
+			<div class="mt-settings-text">
 				<p style="margin: 0 0 10px 0;"><strong>🎯 快速开始</strong></p>
 				<p style="margin: 0 0 8px 0;">1. 点击左侧边栏的 <strong>日历图标</strong> 或运行命令「打开月历任务视图」</p>
 				<p style="margin: 0 0 8px 0;">2. 在月历中 <strong>点击任意日期</strong> 即可创建任务</p>
 				<p style="margin: 0 0 8px 0;">3. <strong>点击任务</strong> 可标记完成/未完成</p>
-				<p style="margin: 0;">4. 任务自动保存在 <code style="background: #e0f2fe; padding: 2px 6px; border-radius: 4px;">任务/年份月份任务.md</code></p>
+				<p style="margin: 0;">4. 任务自动保存在 <code>任务/年份月份任务.md</code></p>
 			</div>
 		`;
 
 		// ── 功能特性 ───────────────────────────────────
 		containerEl.createEl('h3', { text: '✨ 功能特性', cls: 'setting-heading' });
-		const featuresEl = containerEl.createDiv('setting-item-description');
-		featuresEl.style.cssText = 'margin-bottom: 20px; padding: 14px; background: #f8fafc; border-radius: 10px;';
+		const featuresEl = containerEl.createDiv('setting-item-description mt-settings-features');
 		featuresEl.innerHTML = `
-			<div style="font-size: 12px; line-height: 1.7; color: #475569;">
+			<div class="mt-settings-text">
 				<p style="margin: 0 0 6px 0;">• <strong>月历视图</strong> - 直观查看整月任务分布</p>
 				<p style="margin: 0 0 6px 0;">• <strong>农历显示</strong> - 自动显示农历日期和节气</p>
 				<p style="margin: 0 0 6px 0;">• <strong>节假日标注</strong> - 法定节假日和调休提示</p>
@@ -278,12 +276,15 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 		containerEl.createEl('h2', { text: '🔧 显示设置' });
 
 		new Setting(containerEl)
-			.setName('显示已完成任务')
-			.setDesc('在月历中显示已完成的任务（带删除线）')
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.showCompletedTasks)
-				.onChange(async (value) => {
-					this.plugin.settings.showCompletedTasks = value;
+			.setName('已完成任务显示方式')
+			.setDesc('选择已完成的任务在月历中的展示样式')
+			.addDropdown(dropdown => dropdown
+				.addOption('strike', '显示（带删除线）')
+				.addOption('normal', '显示（普通文字）')
+				.addOption('hide', '隐藏不显示')
+				.setValue(this.plugin.settings.completedTaskStyle)
+				.onChange(async (value: string) => {
+					this.plugin.settings.completedTaskStyle = value as any;
 					await this.plugin.saveSettings();
 					this.plugin.refreshView();
 				}));
@@ -308,6 +309,26 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 					this.plugin.settings.showHoliday = value;
 					await this.plugin.saveSettings();
 					this.plugin.refreshView();
+				}));
+
+		new Setting(containerEl)
+			.setName('刷新节假日数据')
+			.setDesc('从网络 API 重新获取当年节假日和调休数据（数据来源：timor.tech）')
+			.addButton(button => button
+				.setButtonText('刷新')
+				.onClick(async () => {
+					button.buttonEl.textContent = '刷新中...';
+					button.buttonEl.disabled = true;
+					try {
+						const { holidayManager } = await import('./HolidayManager');
+						await holidayManager.updateFromNetwork(new Date().getFullYear());
+						this.plugin.refreshView();
+						new Notice('节假日数据已刷新');
+					} catch (e) {
+						new Notice('刷新失败: ' + (e as Error).message);
+					}
+					button.buttonEl.textContent = '刷新';
+					button.buttonEl.disabled = false;
 				}));
 
 		// ── 任务设置 ───────────────────────────────────
