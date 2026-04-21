@@ -2629,3 +2629,63 @@
 	color: #d4a017;
 }
 
+/* ── 已完成任务显示方式：分段选择器 ── */
+.mt-completed-style-setting .setting-item-control {
+	display: none; /* 隐藏 Obsidian 原生控件区域，用自定义的替代 */
+}
+
+.mt-segmented-control {
+	display: inline-flex;
+	gap: 2px;
+	padding: 3px;
+	background: #e5e7eb;
+	border-radius: 10px;
+	margin-top: 8px;
+	box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.mt-seg-btn {
+	flex: 1;
+	min-width: 0;
+	padding: 7px 14px;
+	border: none;
+	border-radius: 8px;
+	background: transparent;
+	font-size: 12.5px;
+	line-height: 1.3;
+	letter-spacing: 0.01em;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: all 0.2s ease;
+	position: relative;
+	overflow: hidden;
+}
+
+.mt-seg-btn:hover:not(.selected) {
+	background: rgba(255,255,255,0.6);
+}
+
+.mt-seg-btn.selected {
+	background: #ffffff;
+	color: #2563eb;
+	font-weight: 600;
+	box-shadow: 0 1px 3px rgba(37,99,235,0.18), 0 1px 2px rgba(0,0,0,0.06);
+	transform: translateY(-0.5px);
+}
+
+/* 暗色模式：分段选择器 */
+.theme-dark .mt-segmented-control {
+	background: #334155;
+	box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.theme-dark .mt-seg-btn:hover:not(.selected) {
+	background: rgba(255,255,255,0.08);
+}
+
+.theme-dark .mt-seg-btn.selected {
+	background: #475569;
+	color: #93c5fd;
+	box-shadow: 0 1px 3px rgba(148,163,184,0.15), 0 1px 2px rgba(0,0,0,0.2);
+}
+

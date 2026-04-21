@@ -284,16 +284,36 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('已完成任务显示方式')
 			.setDesc('选择已完成的任务在月历中的展示样式')
-			.addDropdown(dropdown => dropdown
-				.addOption('strike', '显示（带删除线）')
-				.addOption('normal', '显示（普通文字）')
-				.addOption('hide', '隐藏不显示')
-				.setValue(this.plugin.settings.completedTaskStyle)
-				.onChange(async (value: string) => {
-					this.plugin.settings.completedTaskStyle = value as any;
-					await this.plugin.saveSettings();
-					this.plugin.refreshView();
-				}));
+			.setClass('mt-completed-style-setting');
+
+		// ── 已完成任务显示方式：分段选择器 ──
+		{
+			const styleSetting = containerEl.querySelector('.mt-completed-style-setting');
+			if (styleSetting) {
+				const ctrl = styleSetting.createDiv('mt-segmented-control');
+				const options = [
+					{ value: 'strike', label: '📏 删除线', desc: '带删除线显示' },
+					{ value: 'normal', label: '📝 普通', desc: '普通文字' },
+					{ value: 'hide', label: '🙈 隐藏', desc: '不显示' },
+				];
+				options.forEach(opt => {
+					const btn = ctrl.createEl('button', {
+						type: 'button',
+						text: opt.label,
+						cls: `mt-seg-btn${this.plugin.settings.completedTaskStyle === opt.value ? ' selected' : ''}`,
+					});
+					btn.dataset.value = opt.value;
+					btn.setAttribute('aria-label', opt.desc);
+					btn.addEventListener('click', async () => {
+						this.plugin.settings.completedTaskStyle = opt.value as any;
+						await this.plugin.saveSettings();
+						ctrl.querySelectorAll('.mt-seg-btn').forEach(b => b.classList.remove('selected'));
+						btn.classList.add('selected');
+						this.plugin.refreshView();
+					});
+				});
+			}
+		}
 
 		new Setting(containerEl)
 			.setName('显示农历')
