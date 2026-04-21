@@ -256,16 +256,16 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 		const tipEl = containerEl.createDiv('setting-item-description mt-settings-tip');
 		tipEl.innerHTML = `
 			<div class="mt-settings-text">
-				📅 点击月历日期创建任务 · 📜 数据自动存入 <code>任务/</code> 目录 · Ctrl/Cmd+P 搜索「月历任务」
+				点击月历日期创建任务 · 数据自动存入 <code>任务/</code> 目录 · Ctrl/Cmd+P 搜索「月历任务」· Markdown 格式，兼容 Obsidian Tasks 插件
 			</div>
 		`;
 
 		// ── 显示设置 ───────────────────────────────────
-		containerEl.createEl('h2', { text: '🔧 显示设置' });
+		containerEl.createEl('h2', { text: '显示设置' });
 
 		new Setting(containerEl)
 			.setName('已完成任务显示方式')
-			.setDesc('已完成任务的展示样式')
+			.setDesc('月历中已完成的任务如何展示')
 			.setClass('mt-completed-style-setting');
 
 		// ── 已完成任务显示方式：分段选择器 ──
@@ -274,9 +274,9 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 			if (styleSetting) {
 				const ctrl = styleSetting.createDiv('mt-segmented-control');
 				const options = [
-					{ value: 'strike', label: '📏 删除线', desc: '带删除线显示' },
-					{ value: 'normal', label: '📝 普通', desc: '普通文字' },
-					{ value: 'hide', label: '🙈 隐藏', desc: '不显示' },
+					{ value: 'strike', label: '带删除线', desc: '保留在列表中，加删除线标记' },
+					{ value: 'normal', label: '正常显示', desc: '和未完成任务一样正常显示' },
+					{ value: 'hide', label: '隐藏不显示', desc: '从月历视图中完全隐藏' },
 				];
 				options.forEach(opt => {
 					const btn = ctrl.createEl('button', {
@@ -299,7 +299,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('显示农历')
-			.setDesc('在日期下方显示农历和节气')
+			.setDesc('日期下方显示农历和节气')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showLunar)
 				.onChange(async (value) => {
@@ -321,7 +321,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('刷新节假日数据')
-			.setDesc('从网络重新获取当年节假日')
+			.setDesc('从网络重新获取当年节假日信息')
 			.addButton(button => button
 				.setButtonText('刷新')
 				.onClick(async () => {
@@ -340,7 +340,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 				}));
 
 		// ── 任务设置 ───────────────────────────────────
-		containerEl.createEl('h2', { text: '📝 任务设置' });
+		containerEl.createEl('h2', { text: '任务设置' });
 
 		new Setting(containerEl)
 			.setName('默认全天任务')
@@ -368,7 +368,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('每日任务显示数量')
-			.setDesc('每个格子最多显示的任务数')
+			.setDesc('每个日期格子最多显示的任务数')
 			.addDropdown(dropdown => dropdown
 				.addOption('3', '3个')
 				.addOption('4', '4个')
@@ -384,13 +384,5 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 					this.plugin.refreshView();
 				}));
-
-		// ── 底部信息条 ───────────────────────────────────
-		const footerEl = containerEl.createDiv('setting-item-description mt-settings-footer');
-		footerEl.innerHTML = `
-			<div class="mt-settings-text">
-				Markdown 格式 · 兼容 Obsidian Tasks 插件
-			</div>
-		`;
 	}
 }

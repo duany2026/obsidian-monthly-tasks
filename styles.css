@@ -2550,18 +2550,8 @@
 	color: #2563eb;
 }
 
-/* ── 底部信息条（极简） ── */
-.mt-settings-footer {
-	margin-top: 16px;
-	padding: 8px 12px;
-	text-align: center;
-}
 
-.mt-settings-footer .mt-settings-text {
-	font-size: 11.5px;
-	line-height: 1.4;
-	color: #94a3b8;
-}
+
 /* 通用文本样式 */
 .mt-settings-text {
 	font-size: 13px;
@@ -2582,10 +2572,6 @@
 .theme-dark .mt-settings-tip code {
 	background: rgba(96,165,250,0.15);
 	color: #93c5fd;
-}
-
-.theme-dark .mt-settings-footer .mt-settings-text {
-	color: #475569;
 }
 
 .theme-dark .mt-settings-text {
