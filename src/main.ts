@@ -50,7 +50,7 @@ interface MonthlyTasksSettings {
 const DEFAULT_SETTINGS: MonthlyTasksSettings = {
 	completedTaskStyle: 'strike',
 	defaultAllDayTask: true,
-	firstDayOfWeek: 1,        // 周一起始
+	firstDayOfWeek: 0,        // 周日起始
 	showLunar: true,
 	showHoliday: true,
 	tasksPerDayLimit: 5,
@@ -89,6 +89,12 @@ export default class MonthlyTasksPlugin extends Plugin {
 	async onload(): Promise<void> {
 		// 1. 加载/初始化设置
 		await this.loadSettings();
+
+		// 1.5 自动刷新当年节假日数据（后台静默执行，不阻塞插件加载）
+		const { holidayManager } = await import('./HolidayManager');
+		holidayManager.updateFromNetwork(new Date().getFullYear()).catch(() => {
+			// 静默失败，不影响插件正常使用
+		});
 
 		// 2. 初始化任务解析器（传入 App 实例以访问 Vault）
 		this.taskParser = new TaskParser(this.app);
@@ -379,10 +385,9 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		// ── 快捷键说明 ─────────────────────────────────
 		containerEl.createEl('h2', { text: '⌨️ 快捷键' });
-		const shortcutEl = containerEl.createDiv('setting-item-description');
-		shortcutEl.style.cssText = 'padding: 14px; background: #f8fafc; border-radius: 10px;';
+		const shortcutEl = containerEl.createDiv('setting-item-description mt-settings-shortcuts');
 		shortcutEl.innerHTML = `
-			<div style="font-size: 12px; line-height: 1.7; color: #475569;">
+			<div class="mt-settings-text">
 				<p style="margin: 0 0 6px 0;">• <strong>Ctrl/Cmd + P</strong> → 输入「月历任务」查看所有命令</p>
 				<p style="margin: 0;">• <strong>点击日期</strong> → 打开创建任务弹窗</p>
 			</div>
@@ -390,11 +395,10 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		// ── 数据存储说明 ───────────────────────────────
 		containerEl.createEl('h2', { text: '💾 数据存储' });
-		const storageEl = containerEl.createDiv('setting-item-description');
-		storageEl.style.cssText = 'padding: 14px; background: #fefce8; border-radius: 10px; border-left: 4px solid #eab308;';
+		const storageEl = containerEl.createDiv('setting-item-description mt-settings-storage');
 		storageEl.innerHTML = `
-			<div style="font-size: 12px; line-height: 1.7; color: #713f12;">
-				<p style="margin: 0 0 6px 0;"><strong>任务文件位置：</strong> <code style="background: #fef9c3; padding: 2px 6px; border-radius: 4px;">任务/年份月份任务.md</code></p>
+			<div class="mt-settings-text">
+				<p style="margin: 0 0 6px 0;"><strong>任务文件位置：</strong> <code>任务/年份月份任务.md</code></p>
 				<p style="margin: 0;">任务按年月自动归类存储，以 Markdown 格式保存，可直接编辑。格式兼容 Obsidian Tasks 插件。</p>
 			</div>
 		`;

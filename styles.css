@@ -441,6 +441,26 @@
 	color: var(--gray-400);
 }
 
+/* 已完成任务 - 普通文字模式（无删除线） */
+.task-item.completed-normal {
+	opacity: 0.5;
+}
+
+.task-item.completed-normal .task-content {
+	color: var(--gray-500);
+}
+
+/* 跨天任务条 - 已完成（带删除线） */
+.multiday-task-bar.completed {
+	opacity: 0.4;
+	text-decoration: line-through;
+}
+
+/* 跨天任务条 - 已完成（普通文字模式） */
+.multiday-task-bar.completed-normal {
+	opacity: 0.5;
+}
+
 .task-item.overdue::before {
 	content: '';
 	position: absolute;
@@ -2503,5 +2523,109 @@
 		padding: 11px 20px;
 		font-size: 14px;
 	}
+}
+
+/* ========== 设置面板样式 ========== */
+
+/* 使用说明卡片 */
+.mt-settings-usage {
+	margin-bottom: 20px;
+	padding: 16px;
+	background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+	border-radius: 12px;
+	border-left: 4px solid #3b82f6;
+}
+
+/* 功能特性卡片 */
+.mt-settings-features {
+	margin-bottom: 20px;
+	padding: 14px;
+	background: #f8fafc;
+	border-radius: 10px;
+}
+
+/* 通用文本样式 */
+.mt-settings-text {
+	font-size: 13px;
+	line-height: 1.8;
+	color: #334155;
+}
+.mt-settings-features .mt-settings-text {
+	font-size: 12px;
+	line-height: 1.7;
+	color: #475569;
+}
+
+/* 设置面板中的 code 标签 */
+.mt-settings-usage code {
+	background: #e0f2fe;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+
+/* ── 暗色模式覆盖 ── */
+.theme-dark .mt-settings-usage {
+	background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+	border-left-color: #3b82f6;
+}
+
+.theme-dark .mt-settings-features {
+	background: #1e293b;
+}
+
+.theme-dark .mt-settings-text {
+	color: #cbd5e1;
+}
+
+.theme-dark .mt-settings-features .mt-settings-text {
+	color: #94a3b8;
+}
+
+.theme-dark .mt-settings-usage code {
+	background: #1e3a5f;
+	color: #93c5fd;
+}
+
+/* 快捷键卡片 */
+.mt-settings-shortcuts {
+	margin-bottom: 20px;
+	padding: 14px;
+	background: #f8fafc;
+	border-radius: 10px;
+}
+
+/* 数据存储卡片（黄色调） */
+.mt-settings-storage {
+	margin-bottom: 20px;
+	padding: 14px;
+	background: #fefce8;
+	border-radius: 10px;
+	border-left: 4px solid #eab308;
+}
+
+.mt-settings-storage .mt-settings-text {
+	color: #713f12;
+}
+
+.mt-settings-storage code {
+	background: #fef9c3;
+	padding: 2px 6px;
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+
+/* ── 暗色模式覆盖：快捷键和存储说明 ── */
+.theme-dark .mt-settings-shortcuts {
+	background: #1e293b;
+}
+
+.theme-dark .mt-settings-storage {
+	background: #292520;
+	border-left-color: #ca8a04;
+}
+
+.theme-dark .mt-settings-storage .mt-settings-text {
+	color: #d4a017;
 }
 
