@@ -1,0 +1,2507 @@
+/**
+ * 月历任务插件样式
+ * 移动端优先，美观精致的设计
+ */
+
+/* ========== CSS 变量 ========== */
+.monthly-tasks-container {
+	--primary-50: #EFF6FF;
+	--primary-100: #DBEAFE;
+	--primary-500: #3B82F6;
+	--primary-600: #2563EB;
+	--primary-700: #1D4ED8;
+	
+	--success: #10B981;
+	--warning: #F59E0B;
+	--danger: #EF4444;
+	--info: #06B6D4;
+	
+	/* 休息日配色 - 更醒目的红色系 */
+	--holiday-bg: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+	--holiday-text: #DC2626;
+	--holiday-border: #FCA5A5;
+	
+	/* 调休上班日配色 - 醒目的蓝色系 */
+	--workday-bg: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+	--workday-text: #2563EB;
+	--workday-border: #93C5FD;
+	--workday-badge: #3B82F6;
+	
+	/* 周末配色 - 温和的蓝色 */
+	--weekend-bg: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+	--weekend-text: #0369A1;
+	--weekend-border: #7DD3FC;
+	
+	/* 普通工作日 - 干净的白色 */
+	--weekday-bg: #FFFFFF;
+	
+	--gray-50: #F9FAFB;
+	--gray-100: #F3F4F6;
+	--gray-200: #E5E7EB;
+	--gray-400: #9CA3AF;
+	--gray-600: #4B5563;
+	--gray-700: #374151;
+	--gray-900: #111827;
+	
+	--bg-primary: #FFFFFF;
+	--bg-secondary: #F8FAFC;
+	--bg-tertiary: #F1F5F9;
+	
+	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	
+	--radius-sm: 6px;
+	--radius: 12px;
+	--radius-lg: 16px;
+	
+	--transition: all 0.2s ease;
+}
+
+/* ========== 容器 ========== */
+.monthly-tasks-container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: 12px;
+	background: var(--bg-secondary);
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ========== 头部导航 ========== */
+.monthly-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px;
+	margin-bottom: 12px;
+	background: var(--bg-primary);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-sm);
+}
+
+.header-btn-group {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.nav-btn {
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--gray-600);
+	background: var(--bg-secondary);
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	transition: var(--transition);
+	user-select: none;
+}
+
+.nav-btn svg {
+	stroke-width: 2;
+}
+
+.nav-btn:hover {
+	background: var(--primary-100);
+	color: var(--primary-600);
+	transform: scale(1.05);
+}
+
+.nav-btn:active {
+	transform: scale(0.95);
+}
+
+.nav-btn.close-btn {
+	color: var(--gray-400);
+}
+
+.nav-btn.close-btn:hover {
+	background: #fee2e2;
+	color: #ef4444;
+}
+
+.month-title {
+	font-size: 17px;
+	font-weight: 600;
+	color: var(--gray-900);
+	text-align: center;
+	flex: 1;
+	cursor: pointer;
+	padding: 6px 16px;
+	border-radius: var(--radius-sm);
+	transition: var(--transition);
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+	background: var(--bg-secondary);
+	margin: 0 8px;
+}
+
+.month-title.clickable:hover {
+	background: var(--primary-50);
+	color: var(--primary-600);
+}
+
+.today-btn {
+	display: flex;
+	align-items: center;
+	padding: 6px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--primary-600);
+	background: var(--primary-50);
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	transition: var(--transition);
+	border: 1px solid var(--primary-100);
+}
+
+.today-btn:hover {
+	background: var(--primary-100);
+	border-color: var(--primary-200);
+	transform: translateY(-1px);
+}
+
+.today-btn:active {
+	transform: translateY(0);
+}
+
+/* ========== 星期标题 ========== */
+.weekday-header {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+.weekday-cell {
+	text-align: center;
+	padding: 8px 4px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--gray-600);
+	background: var(--bg-primary);
+	border-radius: var(--radius-sm);
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.weekday-cell.weekend {
+	color: var(--danger);
+	background: var(--holiday-bg);
+}
+
+/* ========== 日历网格 ========== */
+.calendar-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	grid-template-rows: repeat(6, 1fr);
+	gap: 4px;
+	flex: 1;
+	min-height: 0;
+}
+
+/* ========== 日期格子 ========== */
+.day-cell {
+	display: flex;
+	flex-direction: column;
+	padding: 4px 5px;
+	background: var(--bg-primary);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-sm);
+	cursor: pointer;
+	transition: var(--transition);
+	min-height: 95px;
+	position: relative;
+	overflow: hidden;
+}
+
+.day-cell:hover {
+	box-shadow: var(--shadow-md);
+	transform: translateY(-2px);
+}
+
+.day-cell:active {
+	transform: scale(0.98);
+}
+
+/* 其他月份 */
+.day-cell.other-month {
+	opacity: 0.4;
+}
+
+/* 今天 - 简洁高亮显示 */
+.day-cell.today {
+	border: 2px solid var(--primary-500);
+	box-shadow: 0 0 0 3px var(--primary-100), 0 4px 12px rgba(59, 130, 246, 0.25);
+	position: relative;
+	z-index: 10;
+	background: linear-gradient(135deg, var(--primary-50) 0%, #dbeafe 100%);
+}
+
+.day-cell.today .day-number {
+	color: var(--primary-700);
+	font-weight: 600;
+	font-size: 15px;
+}
+
+/* 当日高亮优先级最高，覆盖节假日样式 */
+.day-cell.today.holiday .day-number,
+.day-cell.today.weekend .day-number {
+	font-weight: 600;
+}
+
+/* 普通工作日 */
+.day-cell.weekday {
+	background: var(--weekday-bg);
+}
+
+.day-cell.weekday .day-number {
+	color: var(--gray-900);
+}
+
+/* 周末 - 温和蓝色 */
+.day-cell.weekend {
+	background: var(--weekend-bg);
+	border: 1px solid var(--weekend-border);
+}
+
+.day-cell.weekend .day-number {
+	color: var(--weekend-text);
+	font-weight: 600;
+}
+
+/* 节假日 - 醒目红色 */
+.day-cell.holiday {
+	background: var(--holiday-bg);
+	border: 1px solid var(--holiday-border);
+}
+
+.day-cell.holiday .day-number {
+	color: var(--holiday-text);
+	font-weight: 700;
+}
+
+/* 调休上班日 - 醒目蓝色 */
+.day-cell.workday {
+	background: var(--workday-bg);
+	border: 1px solid var(--workday-border);
+}
+
+.day-cell.workday .day-number {
+	color: var(--workday-text);
+	font-weight: 600;
+}
+
+/* 调休标识 - 左下角 */
+.day-cell.workday::after {
+	content: '班';
+	position: absolute;
+	bottom: 4px;
+	left: 4px;
+	width: 16px;
+	height: 16px;
+	font-size: 9px;
+	font-weight: 700;
+	color: white;
+	background: var(--workday-badge);
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* ========== 日期头部 ========== */
+.day-header {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 2px;
+	position: relative;
+	gap: 2px;
+}
+
+.day-header-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.day-number {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--gray-900);
+	line-height: 1.2;
+	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* 农历信息 - 优化字体，单行显示 */
+.lunar-info {
+	font-size: 10px;
+	color: var(--gray-400);
+	line-height: 1.2;
+	font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+	letter-spacing: 0.2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 50px;
+	flex-shrink: 0;
+}
+
+.lunar-info.special-lunar {
+	color: var(--primary-600);
+	font-weight: 500;
+}
+
+/* 节假日名称（如"春节"、"国庆"） */
+.holiday-name {
+	font-size: 10px;
+	font-weight: 500;
+	color: var(--holiday-text);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: 1.2;
+	margin-top: 1px;
+}
+
+/* ========== 任务列表 ========== */
+.day-tasks {
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: thin;
+	scrollbar-color: var(--gray-200) transparent;
+}
+
+/* 自定义滚动条 */
+.day-tasks::-webkit-scrollbar {
+	width: 3px;
+}
+
+.day-tasks::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.day-tasks::-webkit-scrollbar-thumb {
+	background: var(--gray-200);
+	border-radius: 2px;
+}
+
+.day-tasks::-webkit-scrollbar-thumb:hover {
+	background: var(--gray-400);
+}
+
+.task-item {
+	display: flex;
+	align-items: center;
+	padding: 2px 4px;
+	background: rgba(255, 255, 255, 0.8);
+	border-radius: var(--radius-sm);
+	font-size: 10px;
+	line-height: 1.3;
+	cursor: pointer;
+	transition: var(--transition);
+	position: relative;
+	min-height: 15px;
+	flex-shrink: 0;
+}
+
+.task-time {
+	font-size: 9px;
+	color: #64748b;
+	white-space: nowrap;
+	margin-left: 4px;
+	font-weight: 600;
+	letter-spacing: 0.2px;
+	flex-shrink: 0;
+}
+
+.task-content {
+	flex: 1;
+	min-width: 0;
+	word-break: break-word;
+	line-height: 1.3;
+}
+
+.task-item:hover {
+	background: var(--primary-50);
+}
+
+.task-item.completed {
+	opacity: 0.4;
+}
+
+.task-item.completed .task-content {
+	text-decoration: line-through;
+	color: var(--gray-400);
+}
+
+.task-item.overdue::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 2px;
+	bottom: 2px;
+	width: 2px;
+	background: var(--danger);
+	border-radius: 1px;
+}
+
+/* 优先级背景色 - 整个任务（更紧凑） */
+/* 0=普通(绿), 2=中(黄), 3=高(红) */
+.task-item.priority-bg-0 {
+	background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+	border-left: 2px solid #22c55e;
+}
+
+.task-item.priority-bg-0 .task-content {
+	color: #15803d;
+}
+
+.task-item.priority-bg-2 {
+	background: linear-gradient(135deg, #fffbeb, #fef3c7);
+	border-left: 2px solid var(--warning);
+}
+
+.task-item.priority-bg-2 .task-content {
+	color: #92400e;
+}
+
+.task-item.priority-bg-3 {
+	background: linear-gradient(135deg, #fef2f2, #fee2e2);
+	border-left: 2px solid var(--danger);
+}
+
+.task-item.priority-bg-3 .task-content {
+	color: #991b1b;
+}
+
+/* 深色模式适配 */
+.theme-dark .task-item.priority-bg-0 {
+	background: rgba(34, 197, 94, 0.15);
+}
+
+.theme-dark .task-item.priority-bg-0 .task-content {
+	color: #86efac;
+}
+
+.theme-dark .task-item.priority-bg-2 {
+	background: rgba(217, 119, 6, 0.15);
+}
+
+.theme-dark .task-item.priority-bg-2 .task-content {
+	color: #fcd34d;
+}
+
+.theme-dark .task-item.priority-bg-3 {
+	background: rgba(220, 38, 38, 0.15);
+}
+
+.theme-dark .task-item.priority-bg-3 .task-content {
+	color: #fca5a5;
+}
+
+/* 任务内容 - 支持多行显示 */
+.task-content {
+	flex: 1;
+	color: var(--gray-700);
+	padding-left: 1px;
+	font-size: 10px;
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+	line-height: 1.3;
+	word-break: break-word;
+}
+
+/* 更多任务 */
+.more-tasks {
+	text-align: center;
+	font-size: 10px;
+	color: var(--gray-400);
+	padding: 2px;
+}
+
+/* 跨天任务样式 */
+.task-item.multi-day-task {
+	position: relative;
+	border-left: 3px solid var(--primary-500);
+}
+
+.task-item.multi-day-task::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	width: 3px;
+	background: linear-gradient(180deg, var(--primary-500) 0%, var(--primary-400) 100%);
+}
+
+.task-item.multi-day-task .task-content {
+	font-weight: 600;
+	color: var(--primary-700);
+}
+
+/* 跨天任务 - 深色模式 */
+.theme-dark .task-item.multi-day-task .task-content {
+	color: var(--primary-400);
+}
+
+/* 空状态 */
+.empty-hint {
+	text-align: center;
+	font-size: 16px;
+	color: var(--gray-300);
+	opacity: 0;
+	transition: opacity 0.2s;
+}
+
+.day-cell:hover .empty-hint {
+	opacity: 1;
+}
+
+/* 遮罩层 */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 1000;
+	animation: fadeIn 0.2s ease;
+	backdrop-filter: blur(6px);
+}
+
+/* 弹窗容器 - 优化设计 */
+.create-task-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: var(--background-primary);
+	padding: 0;
+	border-radius: 20px;
+	box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.05);
+	z-index: 1001;
+	width: 420px;
+	max-width: 92vw;
+	animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	overflow: visible;
+}
+
+@keyframes modalSlideIn {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.9);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, -50%) scale(1);
+	}
+}
+
+/* 日期信息 - 作为弹窗头部 */
+.modal-date-info {
+	font-size: 14px;
+	color: var(--text-normal);
+	text-align: center;
+	padding: 32px 24px 24px;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+	position: relative;
+}
+
+.modal-date-info .date-main {
+	font-size: 22px;
+	font-weight: 600;
+	color: #1e293b;
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+	letter-spacing: -0.5px;
+}
+
+.modal-date-info .date-lunar {
+	font-size: 13px;
+	color: #64748b;
+	margin-top: 6px;
+	font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	font-weight: 400;
+}
+
+/* 输入框 - 全面优化样式 */
+.task-input-wrapper {
+	margin: 24px 24px 16px;
+	position: relative;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	padding: 4px;
+	border-radius: 16px;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.task-input {
+	width: 100%;
+	padding: 16px;
+	font-size: 16px;
+	border: 2px solid transparent;
+	border-radius: 12px;
+	background: #ffffff;
+	color: var(--text-normal);
+	outline: none;
+	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	box-sizing: border-box;
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.task-input:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.task-input:focus {
+	border-color: #3b82f6;
+	background: #ffffff;
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 8px 24px rgba(59, 130, 246, 0.12);
+	transform: translateY(-1px);
+}
+
+.task-input::placeholder {
+	color: #94a3b8;
+	font-weight: 400;
+}
+
+/* 按钮组 */
+.modal-buttons {
+	display: flex;
+	gap: 12px;
+	justify-content: center;
+	padding: 0 24px 24px;
+}
+
+.btn-cancel,
+.btn-confirm {
+	padding: 12px 24px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	border: none;
+	min-width: 90px;
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.btn-cancel {
+	background: #f1f5f9;
+	color: #64748b;
+}
+
+.btn-cancel:hover {
+	background: #e2e8f0;
+	color: #475569;
+	transform: translateY(-1px);
+}
+
+.btn-confirm {
+	background: linear-gradient(135deg, #3b82f6, #2563eb);
+	color: white;
+	box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+.btn-confirm:hover {
+	background: linear-gradient(135deg, #2563eb, #1d4ed8);
+	transform: translateY(-1px);
+	box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
+}
+
+.btn-confirm:active,
+.btn-cancel:active {
+	transform: translateY(0);
+}
+
+/* 时间选择器 - 全新设计 */
+.modal-time-container {
+	margin: 0 24px 16px;
+	padding: 18px 20px;
+	background: linear-gradient(135deg, #f0f4ff 0%, #eef2ff 50%, #f8fafc 100%);
+	border-radius: 16px;
+	border: 1px solid #dbeafe;
+	position: relative;
+	overflow: hidden;
+}
+.modal-time-container::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+	opacity: 0.6;
+}
+
+.time-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #6366f1;
+	margin-bottom: 14px;
+	display: block;
+	text-align: center;
+	letter-spacing: 1.5px;
+	text-transform: uppercase;
+}
+
+.time-input-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	justify-content: center;
+	flex-wrap: nowrap;
+	overflow-x: hidden;
+}
+
+/* 时间分组：开始时间和结束时间 */
+.time-input-wrapper > * {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+}
+
+.time-select {
+	box-sizing: border-box;
+	padding: 6px 2px;
+	border: 1.5px solid #e0e7ff;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #1e293b;
+	background: white;
+	cursor: pointer;
+	outline: none;
+	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	text-align: center;
+	line-height: 1.25;
+	min-width: 44px;
+	max-width: 54px;
+	width: auto;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 1px 3px rgba(99, 102, 241, 0.08);
+	flex: 1 1 0;
+}
+.time-select-hour { min-width: 46px; max-width: 56px; flex-grow: 1.2; }
+.time-select-min { min-width: 44px; max-width: 52px; flex-grow: 1; }
+.time-select:hover {
+	border-color: #818cf8;
+	box-shadow: 0 2px 8px rgba(99, 102, 241, 0.18), 0 0 0 3px rgba(99, 102, 241, 0.1);
+	transform: translateY(-1px);
+}
+.time-select:focus {
+	border-color: #6366f1;
+	box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.time-select:disabled {
+	opacity: 0.38;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.time-colon {
+	font-size: 16px;
+	font-weight: 700;
+	color: #a5b4fc;
+	margin: 0 0px;
+	user-select: none;
+	text-shadow: 0 1px 2px rgba(99, 102, 241, 0.15);
+	flex-shrink: 0;
+}
+
+.time-separator {
+	font-size: 12px;
+	color: #818cf8;
+	font-weight: 600;
+	margin: 0 3px;
+	user-select: none;
+	padding: 0 1px;
+	flex-shrink: 0;
+}
+
+.all-day-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	cursor: pointer;
+	padding: 6px 8px;
+	background: linear-gradient(135deg, #fff 0%, #fafbff 100%);
+	border-radius: 20px;
+	border: 1.5px solid #e0e7ff;
+	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 1px 3px rgba(99, 102, 241, 0.08);
+	margin-left: 2px;
+	flex-shrink: 0;
+}
+
+.all-day-toggle:hover {
+	background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+	border-color: #a78bfa;
+	box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+	transform: translateY(-1px);
+}
+
+.all-day-toggle input[type="checkbox"] {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	accent-color: #6366f1;
+}
+
+.all-day-toggle span {
+	font-size: 13px;
+	font-weight: 600;
+	color: #6366f1;
+	letter-spacing: 0.3px;
+}
+
+/* 深色模式 - 时间选择器 */
+.theme-dark .modal-time-container {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(17, 24, 39, 0.5) 100%);
+	border-color: rgba(99, 102, 241, 0.2);
+}
+.theme-dark .modal-time-container::before {
+	opacity: 0.8;
+}
+
+.theme-dark .time-label {
+	color: #a5b4fc;
+}
+
+.theme-dark .time-select {
+	background-color: rgba(30, 41, 59, 0.9);
+	border-color: rgba(99, 102, 241, 0.3);
+	color: #e2e8f0;
+}
+.theme-dark .time-select:hover { border-color: rgba(129, 140, 248, 0.6); box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2); }
+.theme-dark .time-select:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2); }
+.theme-dark .time-select:disabled { opacity: 0.38; cursor: not-allowed; }
+
+.theme-dark .time-colon { color: #6366f1; }
+
+.theme-dark .time-separator { color: #818cf8; }
+
+.theme-dark .all-day-toggle {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(17, 24, 39, 0.6) 100%);
+	border-color: rgba(99, 102, 241, 0.25);
+}
+.theme-dark .all-day-toggle:hover {
+	background: linear-gradient(135deg, rgba(49, 46, 129, 0.6) 0%, rgba(30, 27, 75, 0.5) 100%);
+	border-color: rgba(139, 92, 246, 0.4);
+}
+.theme-dark .all-day-toggle span { color: #a5b4fc; }
+
+
+/* 优先级选择 - 颜色块样式 */
+/* 已有任务列表 */
+.modal-existing-tasks {
+	margin: 16px 24px 16px;
+	padding: 12px 14px 10px;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border-radius: 12px;
+	border: 1px solid #e2e8f0;
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.existing-tasks-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #e2e8f0;
+}
+
+.existing-tasks-title {
+	font-size: 12px;
+	font-weight: 600;
+	color: #64748b;
+}
+
+.existing-tasks-list {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.existing-task-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	color: #334155;
+	padding: 7px 10px;
+	background: white;
+	border-radius: 8px;
+	border-left: 3px solid #cbd5e1;
+	transition: background 0.15s, box-shadow 0.15s;
+	position: relative;
+}
+
+.existing-task-item:hover {
+	background: #f8fafc;
+	box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.existing-task-item:hover .task-item-actions {
+	opacity: 1;
+}
+
+/* 勾选框 */
+.task-check-icon {
+	flex-shrink: 0;
+	width: 14px;
+	height: 14px;
+	cursor: pointer;
+	accent-color: #6366f1;
+}
+
+/* 任务文本 */
+.existing-task-item .task-text {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	line-height: 1.4;
+}
+
+/* 操作按钮组 */
+.task-item-actions {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	flex-shrink: 0;
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+
+/* 通用操作按钮 */
+.task-action-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 6px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s;
+	padding: 0;
+	color: #94a3b8;
+}
+
+/* 跳转按钮 */
+.task-goto-btn:hover {
+	background: #eff6ff;
+	color: #3b82f6;
+}
+
+/* 删除按钮 */
+.task-delete-btn:hover {
+	background: #fef2f2;
+	color: #ef4444;
+}
+
+.existing-task-item.completed .task-text {
+	opacity: 0.45;
+	text-decoration: line-through;
+	color: #94a3b8;
+}
+
+.existing-task-item.completed .task-check-icon {
+	opacity: 0.5;
+}
+
+/* 删除动画 */
+.existing-task-item.task-deleting {
+	opacity: 0;
+	transform: translateX(8px);
+	transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.existing-task-item.priority-3 {
+	border-left-color: #ef4444;
+	background: linear-gradient(90deg, #fef2f2, white);
+}
+
+.existing-task-item.priority-2 {
+	border-left-color: #f59e0b;
+	background: linear-gradient(90deg, #fffbeb, white);
+}
+
+.existing-tasks-more {
+	font-size: 11px;
+	color: #6366f1;
+	text-align: center;
+	padding: 5px 0 2px;
+	cursor: pointer;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	transition: color 0.12s;
+}
+
+.existing-tasks-more:hover {
+	color: #4f46e5;
+}
+
+
+
+/* 结束日期选择 */
+.modal-end-date {
+	margin: 0 24px 16px;
+	padding: 16px 20px;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border-radius: 14px;
+	border: 1px solid #e2e8f0;
+	overflow: visible;
+}
+
+.end-date-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #475569;
+	margin-bottom: 12px;
+	display: block;
+	text-align: center;
+	letter-spacing: 0.5px;
+}
+
+.end-date-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	align-items: center;
+	position: relative;
+	overflow: visible;
+}
+
+.multi-day-toggle {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	padding: 8px 16px;
+	background: white;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+	transition: all 0.2s ease;
+}
+
+.multi-day-toggle:hover {
+	background: #f8fafc;
+	border-color: #cbd5e1;
+}
+
+.multi-day-toggle input[type="checkbox"] {
+	width: 18px;
+	height: 18px;
+	cursor: pointer;
+	accent-color: #3b82f6;
+}
+
+.multi-day-toggle span {
+	font-size: 13px;
+	font-weight: 500;
+	color: #475569;
+}
+
+.end-date-input {
+	padding: 10px 14px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #334155;
+	background: white;
+	border: 2px solid #e2e8f0;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	outline: none;
+	width: 100%;
+	max-width: 200px;
+}
+
+.end-date-input:hover {
+	border-color: #cbd5e1;
+}
+
+.end-date-input:focus {
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* 深色模式 - 结束日期 */
+.theme-dark .modal-end-date {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
+	border-color: rgba(71, 85, 105, 0.4);
+}
+
+.theme-dark .end-date-label {
+	color: #94a3b8;
+}
+
+.theme-dark .multi-day-toggle {
+	background: rgba(30, 41, 59, 0.6);
+	border-color: rgba(71, 85, 105, 0.4);
+}
+
+.theme-dark .multi-day-toggle:hover {
+	background: rgba(30, 41, 59, 0.8);
+}
+
+.theme-dark .multi-day-toggle span {
+	color: #cbd5e1;
+}
+
+.theme-dark .end-date-input {
+	background: rgba(30, 41, 59, 0.9);
+	border-color: rgba(71, 85, 105, 0.5);
+	color: #e2e8f0;
+}
+
+.theme-dark .end-date-input:hover {
+	border-color: rgba(71, 85, 105, 0.7);
+}
+
+.theme-dark .end-date-input:focus {
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* 自定义日期选择器触发按钮 */
+.end-date-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 18px;
+	background: white;
+	border: 2px solid #e2e8f0;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	color: #334155;
+	transition: all 0.2s ease;
+	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	user-select: none;
+}
+.end-date-trigger:hover {
+	border-color: #3b82f6;
+	color: #3b82f6;
+	background: #f0f7ff;
+}
+.end-date-trigger::before {
+	content: '📅 ';
+	margin-right: 6px;
+}
+
+/* 日期选择器弹出层 - 精美设计 */
+.date-picker-popup {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+	border-radius: 18px;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08),
+	            0 0 0 1px rgba(99, 102, 241, 0.08);
+	padding: 18px;
+	min-width: 320px;
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	border: 1px solid #e0e7ff;
+	animation: pickerSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	overflow: visible;
+}
+@keyframes pickerSlideIn {
+	from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.96); }
+	to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+/* 导航行：年月切换 */
+.date-picker-nav {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin-bottom: 14px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f1f5f9;
+}
+.picker-nav-btn {
+	background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+	border: 1px solid #e0e7ff;
+	cursor: pointer;
+	font-size: 13px;
+	color: #6366f1;
+	padding: 6px 10px;
+	border-radius: 10px;
+	transition: all 0.2s ease;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 32px;
+	height: 32px;
+	flex-shrink: 0;
+}
+.picker-nav-btn:hover {
+	background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+	border-color: #a78bfa;
+	box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2);
+	transform: scale(1.05);
+}
+.picker-select {
+	padding: 6px 10px;
+	border: 1.5px solid #e0e7ff;
+	border-radius: 10px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #3730a3;
+	background: linear-gradient(135deg, #fff 0%, #fafbff 100%);
+	cursor: pointer;
+	outline: none;
+	font-family: inherit;
+	transition: all 0.2s ease;
+	box-shadow: 0 1px 3px rgba(99, 102, 241, 0.06);
+	flex-shrink: 0;
+}
+.picker-select:hover {
+	border-color: #a78bfa;
+	box-shadow: 0 2px 6px rgba(139, 92, 246, 0.15);
+}
+
+/* 星期标题行 */
+.date-picker-week {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	margin-bottom: 8px;
+}
+.picker-week-day {
+	text-align: center;
+	font-size: 11px;
+	font-weight: 700;
+	color: #a5b4fc;
+	padding: 6px 0;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+}
+
+/* 日期网格 */
+.date-picker-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 3px;
+}
+.picker-cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 10px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #334155;
+	cursor: pointer;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.picker-cell:hover:not(.picker-cell-disabled) {
+	background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+	color: white;
+	transform: scale(1.08);
+	box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+}
+.picker-cell.picker-empty {
+	cursor: default;
+}
+.picker-cell.picker-cell-disabled {
+	color: #cbd5e1;
+	cursor: not-allowed;
+	opacity: 0.45;
+}
+.picker-cell.picker-cell-today {
+	color: #6366f1;
+	font-weight: 800;
+	background: linear-gradient(135deg, #ede9fe 0%, #eef2ff 100%);
+	box-shadow: inset 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+.picker-cell.picker-cell-today:hover {
+	background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+	color: white;
+}
+
+/* 深色模式 - 日期选择器 */
+.theme-dark .date-picker-popup {
+	background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+	border-color: rgba(99, 102, 241, 0.15);
+	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.08);
+}
+.theme-dark .picker-nav-btn {
+	background: linear-gradient(135deg, rgba(49, 46, 129, 0.5) 0%, rgba(30, 27, 75, 0.5) 100%);
+	border-color: rgba(139, 92, 246, 0.2);
+	color: #a5b4fc;
+}
+.theme-dark .picker-nav-btn:hover {
+	background: linear-gradient(135deg, rgba(76, 29, 149, 0.6) 0%, rgba(49, 46, 129, 0.6) 100%);
+	border-color: rgba(167, 139, 250, 0.4);
+	box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+.theme-dark .picker-select {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(17, 24, 39, 0.8) 100%);
+	border-color: rgba(99, 102, 241, 0.2);
+	color: #c7d2fe;
+}
+.theme-dark .picker-select:hover {
+	border-color: rgba(129, 140, 248, 0.5);
+	box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+}
+.theme-dark .picker-week-day { color: #6366f1; }
+.theme-dark .picker-cell { color: #e2e8f0; }
+.theme-dark .picker-cell:hover:not(.picker-cell-disabled) { background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3); }
+.theme-dark .picker-cell.picker-cell-disabled { color: #334155; opacity: 0.4; }
+.theme-dark .picker-cell.picker-cell-today { color: #a5b4fc; background: linear-gradient(135deg, rgba(49, 46, 129, 0.4) 0%, rgba(30, 27, 75, 0.3) 100%); border-color: rgba(129, 140, 248, 0.2); }
+.theme-dark .picker-cell.picker-cell-today:hover { background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: white; }
+
+/* 深色模式 - 结束日期触发按钮 */
+.theme-dark .end-date-trigger {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(17, 24, 39, 0.8) 100%);
+	border-color: rgba(99, 102, 241, 0.2);
+	color: #c7d2fe;
+}
+.theme-dark .end-date-trigger:hover {
+	border-color: #818cf8;
+	color: #a5b4fc;
+	background: linear-gradient(135deg, rgba(49, 46, 129, 0.4) 0%, rgba(30, 27, 75, 0.3) 100%);
+}
+
+.theme-dark .task-time { color: #a5b4fc; }
+
+.modal-priority {
+	margin: 0 24px 20px;
+	padding: 18px 20px;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border-radius: 14px;
+	border: 1px solid #e2e8f0;
+}
+
+.priority-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #475569;
+	margin-bottom: 14px;
+	display: block;
+	text-align: center;
+	letter-spacing: 0.5px;
+}
+
+.priority-group {
+	display: flex;
+	gap: 20px;
+	justify-content: center;
+}
+
+.priority-btn-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+}
+
+.priority-btn {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	border: 3px solid transparent;
+	cursor: pointer;
+	transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	position: relative;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.priority-btn:hover {
+	transform: scale(1.12);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.priority-btn.selected {
+	transform: scale(1.08);
+}
+
+.priority-btn.selected::after {
+	content: '✓';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 18px;
+	font-weight: bold;
+	color: white;
+	text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.priority-btn-text {
+	font-size: 11px;
+	font-weight: 500;
+	color: #64748b;
+	transition: color 0.2s ease;
+}
+
+.priority-btn-wrapper:hover .priority-btn-text {
+	color: #475569;
+}
+
+.priority-btn-wrapper.selected .priority-btn-text {
+	color: #334155;
+	font-weight: 600;
+}
+
+.priority-btn.priority-none {
+	background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+	border: 2px solid #22c55e;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.priority-btn.priority-none.selected {
+	border-color: #15803d;
+	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.priority-btn.priority-none.selected::after {
+	color: #15803d;
+	text-shadow: none;
+}
+
+.priority-btn.priority-high {
+	background: linear-gradient(135deg, #ef4444, #dc2626);
+	border-color: #fca5a5;
+}
+
+.priority-btn.priority-high.selected {
+	border-color: #991b1b;
+	box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+}
+
+.priority-btn.priority-medium {
+	background: linear-gradient(135deg, #f59e0b, #d97706);
+	border-color: #fcd34d;
+}
+
+.priority-btn.priority-medium.selected {
+	border-color: #92400e;
+	box-shadow: 0 4px 16px rgba(217, 119, 6, 0.4);
+}
+
+/* ========== 响应式设计 ========== */
+
+/* 平板端 */
+@media (min-width: 768px) {
+	.monthly-tasks-container {
+		padding: 16px;
+	}
+	
+	.monthly-header {
+		padding: 10px 12px;
+	}
+	
+	.nav-btn {
+		width: 36px;
+		height: 36px;
+	}
+	
+	.nav-btn svg {
+		width: 22px;
+		height: 22px;
+	}
+	
+	.month-title {
+		font-size: 18px;
+		padding: 8px 20px;
+	}
+	
+	.today-btn {
+		padding: 8px 14px;
+		font-size: 13px;
+	}
+	
+	.weekday-cell {
+		padding: 10px 6px;
+		font-size: 13px;
+	}
+	
+	.calendar-grid {
+		gap: 6px;
+	}
+	
+	.day-cell {
+		padding: 6px 8px;
+		min-height: 115px;
+	}
+	
+	.day-number {
+		font-size: 17px;
+	}
+	
+	.lunar-info {
+		font-size: 11px;
+	}
+	
+	.task-item {
+		padding: 3px 5px;
+		font-size: 11px;
+	}
+}
+
+/* 桌面端 */
+@media (min-width: 1024px) {
+	.monthly-tasks-container {
+		padding: 20px;
+	}
+	
+	.monthly-header {
+		padding: 12px 16px;
+		margin-bottom: 16px;
+	}
+	
+	.nav-btn {
+		width: 40px;
+		height: 40px;
+	}
+	
+	.nav-btn svg {
+		width: 24px;
+		height: 24px;
+	}
+	
+	.month-title {
+		font-size: 20px;
+		padding: 10px 24px;
+	}
+	
+	.today-btn {
+		padding: 8px 16px;
+		font-size: 13px;
+	}
+	
+	.weekday-cell {
+		padding: 12px 8px;
+		font-size: 14px;
+	}
+	
+	.calendar-grid {
+		gap: 8px;
+	}
+	
+	.day-cell {
+		min-height: 160px;
+		padding: 10px 12px;
+		border-radius: 14px;
+	}
+	
+	.day-number {
+		font-size: 19px;
+	}
+	
+	.lunar-info {
+		font-size: 12px;
+	}
+	
+	.task-item {
+		padding: 4px 6px;
+		font-size: 12px;
+		min-height: 20px;
+	}
+	
+	.task-content {
+		font-size: 12px;
+		line-height: 1.4;
+	}
+	
+	.day-tasks {
+		gap: 2px;
+	}
+}
+
+/* ========== 动画 ========== */
+/* 网格切换动画 - 更柔和的淡入效果 */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.calendar-grid {
+	animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes checkPop {
+	0% { transform: scale(1); }
+	50% { transform: scale(1.2); }
+	100% { transform: scale(1); }
+}
+
+.task-checkbox.checked {
+	animation: checkPop 0.2s ease;
+}
+
+/* ========== 深色模式适配 ========== */
+.theme-dark .monthly-tasks-container {
+	--bg-primary: #1e1e1e;
+	--bg-secondary: #141414;
+	--bg-tertiary: #2d2d2d;
+	--gray-50: #2d2d2d;
+	--gray-100: #3d3d3d;
+	--gray-200: #4d4d4d;
+	--gray-400: #888888;
+	--gray-600: #b0b0b0;
+	--gray-900: #ffffff;
+	
+	/* 深色模式 - 降低饱和度，更柔和 */
+	--weekend-bg: #1a2332;
+	--holiday-bg: #2d1f1f;
+	--workday-bg: #1e293b;
+	
+	/* 深色模式 - 日期格子边框降低对比度 */
+	--weekend-border: #334155;
+	--holiday-border: #5c3a3a;
+	--workday-border: #334155;
+	--workday-badge: #3b82f6;
+}
+
+.theme-dark .task-item {
+	background: rgba(255, 255, 255, 0.03);
+	border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+.theme-dark .task-item:hover {
+	background: rgba(59, 130, 246, 0.1);
+}
+
+.theme-dark .task-input {
+	background: var(--background-primary);
+	border-color: var(--background-modifier-border);
+	color: var(--text-normal);
+}
+
+.theme-dark .task-input::placeholder {
+	color: var(--text-faint);
+}
+
+/* 深色模式 - 日期格子 */
+.theme-dark .day-cell {
+	background: var(--bg-primary);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.theme-dark .day-cell:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.theme-dark .day-cell.weekend {
+	background: var(--weekend-bg);
+	border: 1px solid var(--weekend-border);
+}
+
+.theme-dark .day-cell.weekend .day-number {
+	color: #60a5fa;
+}
+
+.theme-dark .day-cell.holiday {
+	background: var(--holiday-bg);
+	border: 1px solid var(--holiday-border);
+}
+
+.theme-dark .day-cell.holiday .day-number {
+	color: #f87171;
+}
+
+.theme-dark .day-cell.workday {
+	background: var(--workday-bg);
+	border: 1px solid var(--workday-border);
+}
+
+.theme-dark .day-cell.workday .day-number {
+	color: #60a5fa;
+}
+
+.theme-dark .day-cell.other-month {
+	opacity: 0.25;
+}
+
+/* 深色模式 - 今天高亮 */
+.theme-dark .day-cell.today {
+	border: 2px solid #3b82f6;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.3);
+	background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
+}
+
+.theme-dark .day-cell.today .day-number {
+	color: #60a5fa;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+/* 深色模式 - 当日高亮覆盖节假日 */
+.theme-dark .day-cell.today.holiday .day-number,
+.theme-dark .day-cell.today.weekend .day-number {
+	font-weight: 600;
+}
+
+/* 深色模式 - 星期标题 */
+.theme-dark .weekday-cell {
+	background: var(--bg-primary);
+	color: #9ca3af;
+}
+
+.theme-dark .weekday-cell.weekend {
+	background: rgba(220, 38, 38, 0.1);
+	color: #f87171;
+}
+
+/* 深色模式 - 头部导航 */
+.theme-dark .monthly-header {
+	background: var(--bg-primary);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.theme-dark .nav-btn {
+	background: var(--bg-secondary);
+	color: #9ca3af;
+}
+
+.theme-dark .nav-btn:hover {
+	background: rgba(59, 130, 246, 0.15);
+	color: #60a5fa;
+}
+
+.theme-dark .nav-btn.close-btn {
+	color: #6b7280;
+}
+
+.theme-dark .nav-btn.close-btn:hover {
+	background: rgba(239, 68, 68, 0.15);
+	color: #f87171;
+}
+
+.theme-dark .month-title {
+	background: var(--bg-secondary);
+	color: #e5e7eb;
+}
+
+.theme-dark .month-title.clickable:hover {
+	background: rgba(59, 130, 246, 0.15);
+	color: #60a5fa;
+}
+
+.theme-dark .today-btn {
+	background: rgba(59, 130, 246, 0.1);
+	border-color: rgba(59, 130, 246, 0.2);
+	color: #60a5fa;
+}
+
+.theme-dark .today-btn:hover {
+	background: rgba(59, 130, 246, 0.2);
+	border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* 深色模式 - 农历信息 */
+.theme-dark .lunar-info {
+	color: #6b7280;
+}
+
+.theme-dark .lunar-info.special-lunar {
+	color: #60a5fa;
+}
+
+.theme-dark .holiday-name {
+	color: #f87171;
+}
+
+/* 深色模式 - 任务内容 */
+.theme-dark .task-content {
+	color: #d1d5db;
+}
+
+.theme-dark .task-item.completed .task-content {
+	color: #6b7280;
+}
+
+/* 深色模式 - 更多任务 */
+.theme-dark .more-tasks {
+	color: #6b7280;
+}
+
+/* 深色模式 - 优先级按钮 */
+.theme-dark .priority-btn.priority-high {
+	background: linear-gradient(135deg, #dc2626, #b91c1c);
+	border-color: #fca5a5;
+}
+
+.theme-dark .priority-btn.priority-high.selected {
+	border-color: #7f1d1d;
+	box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+}
+
+.theme-dark .priority-btn.priority-medium {
+	background: linear-gradient(135deg, #d97706, #b45309);
+	border-color: #fcd34d;
+}
+
+.theme-dark .priority-btn.priority-medium.selected {
+	border-color: #78350f;
+	box-shadow: 0 4px 12px rgba(217, 119, 6, 0.5);
+}
+
+.theme-dark .priority-btn.priority-none {
+	background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.15));
+	border: 2px solid #22c55e;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .priority-btn.priority-none.selected {
+	border-color: #4ade80;
+	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 深色模式 - 日期头部 */
+.theme-dark .modal-date-info {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.5) 100%);
+	border-bottom-color: rgba(71, 85, 105, 0.3);
+}
+
+.theme-dark .modal-date-info::before {
+	background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.theme-dark .modal-date-info .date-main {
+	color: #e2e8f0;
+}
+
+.theme-dark .modal-date-info .date-lunar {
+	color: #94a3b8;
+}
+
+/* 深色模式 - 输入框 */
+.theme-dark .task-input-wrapper {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.5) 100%);
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .task-input {
+	background: rgba(30, 41, 59, 0.9);
+	border-color: transparent;
+	color: #e2e8f0;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .task-input:hover {
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.theme-dark .task-input:focus {
+	background: rgba(30, 41, 59, 1);
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.theme-dark .task-input::placeholder {
+	color: #64748b;
+}
+
+/* 深色模式 - 优先级 */
+.theme-dark .modal-existing-tasks {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
+	border-color: rgba(71, 85, 105, 0.4);
+}
+
+.theme-dark .existing-tasks-title-row {
+	border-bottom-color: rgba(71, 85, 105, 0.4);
+}
+
+.theme-dark .existing-tasks-title {
+	color: #94a3b8;
+}
+
+.theme-dark .existing-task-item {
+	background: rgba(30, 41, 59, 0.6);
+	color: #e2e8f0;
+	border-left-color: #475569;
+}
+
+.theme-dark .existing-task-item:hover {
+	background: rgba(51, 65, 85, 0.7);
+}
+
+.theme-dark .existing-task-item.completed .task-text {
+	color: #64748b;
+}
+
+.theme-dark .existing-task-item.priority-3 {
+	border-left-color: #ef4444;
+	background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(30, 41, 59, 0.6));
+}
+
+.theme-dark .existing-task-item.priority-2 {
+	border-left-color: #f59e0b;
+	background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), rgba(30, 41, 59, 0.6));
+}
+
+.theme-dark .task-action-btn {
+	color: #64748b;
+}
+
+.theme-dark .task-goto-btn:hover {
+	background: rgba(59, 130, 246, 0.15);
+	color: #60a5fa;
+}
+
+.theme-dark .task-delete-btn:hover {
+	background: rgba(239, 68, 68, 0.15);
+	color: #f87171;
+}
+
+.theme-dark .existing-tasks-more {
+	color: #818cf8;
+}
+
+.theme-dark .existing-tasks-more:hover {
+	color: #a5b4fc;
+}
+
+
+
+.theme-dark .modal-priority {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
+	border-color: rgba(71, 85, 105, 0.4);
+}
+
+.theme-dark .priority-label {
+	color: #94a3b8;
+}
+
+.theme-dark .priority-btn-text {
+	color: #94a3b8;
+}
+
+.theme-dark .priority-btn-wrapper:hover .priority-btn-text {
+	color: #cbd5e1;
+}
+
+.theme-dark .priority-btn-wrapper.selected .priority-btn-text {
+	color: #e2e8f0;
+}
+
+/* 深色模式 - 按钮 */
+.theme-dark .btn-cancel {
+	background: rgba(71, 85, 105, 0.4);
+	color: #94a3b8;
+}
+
+.theme-dark .btn-cancel:hover {
+	background: rgba(71, 85, 105, 0.6);
+	color: #e2e8f0;
+}
+
+/* 深色模式 - 日期选择器 */
+.theme-dark .date-picker-modal {
+	background: var(--background-primary);
+	box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.theme-dark .section-label {
+	color: #94a3b8;
+	font-weight: 600;
+}
+
+.theme-dark .month-btn {
+	color: #cbd5e1;
+	background: rgba(51, 65, 85, 0.5);
+	border: 2px solid transparent;
+}
+
+.theme-dark .month-btn:hover {
+	background: rgba(71, 85, 105, 0.7);
+	transform: translateY(-2px);
+}
+
+.theme-dark .month-btn.current {
+	color: #ffffff !important;
+	background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+	border: 2px solid #60a5fa !important;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(59, 130, 246, 0.4) !important;
+	font-weight: 700 !important;
+	transform: scale(1.05);
+}
+
+/* ========== 日期选择器弹窗 - 美化版 ========== */
+.date-picker-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: var(--background-primary);
+	padding: 28px;
+	border-radius: 24px;
+	box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.05);
+	z-index: 1001;
+	width: 400px;
+	max-width: 92vw;
+	max-height: 90vh;
+	overflow-y: auto;
+	animation: modalSlideIn 0.3s ease;
+}
+
+/* 日期选择器标题 */
+.date-picker-modal .modal-title {
+	font-size: 18px;
+	font-weight: 700;
+	text-align: center;
+	margin-bottom: 20px;
+	color: var(--text-normal);
+	padding-bottom: 16px;
+	border-bottom: 2px solid var(--background-modifier-border);
+}
+
+/* 选择区域 */
+.picker-section {
+	margin-bottom: 24px;
+}
+
+.section-label {
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--gray-500);
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	margin-bottom: 12px;
+	padding-left: 4px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.section-label::before {
+	content: '';
+	width: 4px;
+	height: 16px;
+	background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+	border-radius: 2px;
+}
+
+/* 年份输入框样式 */
+.year-input-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	padding: 12px;
+	background: var(--gray-50);
+	border-radius: 16px;
+	border: 2px solid var(--gray-200);
+}
+
+.year-nav-btn {
+	width: 44px;
+	height: 44px;
+	font-size: 20px;
+	font-weight: 600;
+	color: var(--gray-700);
+	background: white;
+	border: 2px solid var(--gray-200);
+	border-radius: 12px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.year-nav-btn:hover {
+	background: var(--primary-50);
+	border-color: var(--primary-300);
+	color: var(--primary-600);
+	transform: scale(1.05);
+}
+
+.year-nav-btn:active {
+	transform: scale(0.95);
+}
+
+.year-input {
+	width: 120px;
+	padding: 12px 16px;
+	font-size: 22px;
+	font-weight: 700;
+	text-align: center;
+	color: var(--gray-900);
+	background: white;
+	border: 2px solid var(--gray-300);
+	border-radius: 12px;
+	outline: none;
+	transition: all 0.2s ease;
+	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.year-input:hover {
+	border-color: var(--gray-400);
+}
+
+.year-input:focus {
+	border-color: var(--primary-500);
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+/* 隐藏数字输入框的箭头 */
+.year-input::-webkit-outer-spin-button,
+.year-input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.year-input[type=number] {
+	-moz-appearance: textfield;
+}
+
+.current-year-hint {
+	text-align: center;
+	font-size: 12px;
+	color: var(--gray-500);
+	margin-top: 8px;
+	font-weight: 500;
+}
+
+/* 深色模式 - 年份输入 */
+.theme-dark .year-input-wrapper {
+	background: rgba(51, 65, 85, 0.5);
+	border-color: rgba(71, 85, 105, 0.5);
+}
+
+.theme-dark .year-nav-btn {
+	background: rgba(30, 41, 59, 0.8);
+	border-color: rgba(71, 85, 105, 0.5);
+	color: #cbd5e1;
+}
+
+.theme-dark .year-nav-btn:hover {
+	background: rgba(59, 130, 246, 0.2);
+	border-color: rgba(59, 130, 246, 0.5);
+	color: #60a5fa;
+}
+
+.theme-dark .year-input {
+	background: rgba(30, 41, 59, 0.9);
+	border-color: rgba(71, 85, 105, 0.5);
+	color: #e2e8f0;
+}
+
+.theme-dark .year-input:hover {
+	border-color: rgba(71, 85, 105, 0.7);
+}
+
+.theme-dark .year-input:focus {
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.theme-dark .current-year-hint {
+	color: #94a3b8;
+}
+
+/* 月份网格 */
+.month-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 10px;
+}
+
+.month-btn {
+	padding: 14px 6px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--gray-700);
+	background: var(--gray-50);
+	border: 2px solid transparent;
+	border-radius: 12px;
+	cursor: pointer;
+	transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.month-btn:hover {
+	background: var(--gray-100);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.month-btn.selected {
+	color: white;
+	background: linear-gradient(135deg, #10b981, #059669);
+	border-color: #34d399;
+	box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35);
+	font-weight: 700;
+	transform: scale(1.05);
+}
+
+.month-btn.selected:hover {
+	background: linear-gradient(135deg, #059669, #047857);
+	transform: scale(1.08) translateY(-2px);
+}
+
+.month-btn.current {
+	color: white;
+	background: linear-gradient(135deg, #3b82f6, #2563eb);
+	border-color: #60a5fa;
+	font-weight: 700;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35);
+	transform: scale(1.05);
+}
+
+.month-btn.current:hover {
+	background: linear-gradient(135deg, #2563eb, #1d4ed8);
+	transform: scale(1.08) translateY(-2px);
+}
+
+/* 同时是current和selected时，优先显示current（蓝色） */
+.month-btn.current.selected {
+	background: linear-gradient(135deg, #3b82f6, #2563eb);
+	border-color: #60a5fa;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+/* ========== 移动端优化 ========== */
+@media (max-width: 480px) {
+	.monthly-tasks-container {
+		padding: 8px;
+	}
+	
+	.monthly-header {
+		padding: 6px 8px;
+		margin-bottom: 8px;
+	}
+	
+	.header-btn-group {
+		gap: 4px;
+	}
+	
+	.nav-btn {
+		width: 28px;
+		height: 28px;
+	}
+	
+	.nav-btn svg {
+		width: 16px;
+		height: 16px;
+	}
+	
+	.month-title {
+		font-size: 15px;
+		padding: 4px 8px;
+		margin: 0 4px;
+	}
+	
+	.today-btn {
+		padding: 4px 8px;
+		font-size: 11px;
+	}
+	
+	.weekday-cell {
+		padding: 6px 2px;
+		font-size: 11px;
+	}
+	
+	.calendar-grid {
+		gap: 2px;
+	}
+	
+	.day-cell {
+		padding: 3px 4px;
+		min-height: 80px;
+		border-radius: 8px;
+	}
+	
+	.day-number {
+		font-size: 13px;
+	}
+	
+	.lunar-info {
+		font-size: 9px;
+	}
+	
+	.task-item {
+		padding: 1px 2px;
+		font-size: 9px;
+	}
+
+	/* 移动端 - 创建任务弹窗优化 */
+	.create-task-modal {
+		max-width: 95vw;
+		width: 380px;
+	}
+
+	.modal-date-info {
+		padding: 24px 16px 18px;
+	}
+
+	.modal-date-info .date-main {
+		font-size: 19px;
+	}
+
+	.modal-time-container {
+		margin: 0 12px 12px;
+		padding: 10px 12px;
+	}
+
+	.time-label {
+		font-size: 11px;
+		margin-bottom: 8px;
+		letter-spacing: 1px;
+	}
+
+	.time-input-wrapper {
+		gap: 2px;
+		flex-wrap: nowrap;
+		justify-content: center;
+		overflow-x: hidden;
+	}
+
+	.time-select {
+		box-sizing: border-box;
+		font-size: 13px;
+		padding: 5px 1px;
+		min-width: 34px;
+		max-width: 44px;
+		width: auto;
+		border-radius: 7px;
+		line-height: 1.25;
+	}
+	.time-select-hour { min-width: 36px; max-width: 46px; flex-grow: 1.15; }
+	.time-select-min { min-width: 34px; max-width: 42px; flex-grow: 1; }
+
+	.time-colon {
+		font-size: 14px;
+		margin: 0;
+	}
+
+	.time-separator {
+		font-size: 11px;
+		margin: 0 2px;
+		padding: 0;
+	}
+
+	.all-day-toggle {
+		padding: 5px 7px;
+		font-size: 11px;
+		flex-shrink: 0;
+		gap: 4px;
+		border-radius: 16px;
+	}
+
+	.all-day-toggle span {
+		font-size: 11px;
+	}
+
+	.task-input-wrapper {
+		margin: 18px 16px 12px;
+	}
+
+	.task-input {
+		font-size: 15px;
+		padding: 12px 14px;
+	}
+
+	/* 结束日期/跨天任务 */
+	.modal-end-date {
+		margin: 0 16px 14px;
+	}
+
+	.end-date-trigger {
+		font-size: 13px;
+	}
+
+	.multi-day-toggle span {
+		font-size: 12px;
+	}
+
+	/* 日期选择器弹出层 - 移动端适配 */
+	.date-picker-popup {
+		min-width: 0;
+		width: calc(100vw - 80px);
+		max-width: 320px;
+		padding: 14px;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.date-picker-nav {
+		gap: 6px;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+	}
+
+	.picker-nav-btn {
+		min-width: 28px;
+		height: 28px;
+		font-size: 12px;
+		padding: 4px 8px;
+		border-radius: 8px;
+	}
+
+	.picker-select {
+		font-size: 12px;
+		padding: 5px 6px;
+		border-radius: 8px;
+	}
+
+	.picker-week-day {
+		font-size: 10px;
+		padding: 4px 0;
+	}
+
+	.picker-cell {
+		width: 32px;
+		height: 32px;
+		font-size: 12px;
+		border-radius: 8px;
+	}
+
+	/* 优先级 */
+	.modal-priority {
+		margin: 0 16px 16px;
+	}
+
+	.priority-btn-text {
+		font-size: 12px;
+	}
+
+	/* 按钮 */
+	.modal-buttons {
+		margin: 0 16px 20px;
+		padding-top: 14px;
+	}
+
+	.btn-confirm, .btn-cancel {
+		padding: 11px 20px;
+		font-size: 14px;
+	}
+}
+
