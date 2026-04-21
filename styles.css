@@ -2585,15 +2585,16 @@
 
 .mt-segmented-control {
 	display: inline-flex;
-	gap: 0;
+	gap: 8px;
 	margin-top: 6px;
 }
 
 .mt-seg-btn {
 	flex: 1;
 	min-width: 0;
-	padding: 6px 16px;
+	padding: 6px 14px;
 	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
 	background: transparent;
 	font-size: 13px;
 	line-height: 1.4;
@@ -2601,20 +2602,8 @@
 	cursor: pointer;
 	white-space: nowrap;
 	user-select: none;
-	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 	position: relative;
-}
-
-.mt-seg-btn:first-child {
-	border-radius: 6px 0 0 6px;
-}
-
-.mt-seg-btn:last-child {
-	border-radius: 0 6px 6px 0;
-}
-
-.mt-seg-btn + .mt-seg-btn {
-	border-left: none;
 }
 
 .mt-seg-btn:hover:not(.selected) {
@@ -2629,6 +2618,7 @@
 	font-weight: 500;
 	border-color: var(--interactive-accent);
 	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
 }
 
 /* 暗色模式补充微调 */
