@@ -2527,106 +2527,69 @@
 
 /* ========== 设置面板样式 ========== */
 
-/* 使用说明卡片 */
-.mt-settings-usage {
-	margin-bottom: 20px;
-	padding: 16px;
+/* ── 顶部提示条（精简） ── */
+.mt-settings-tip {
+	margin-bottom: 16px;
+	padding: 10px 14px;
 	background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-	border-radius: 12px;
-	border-left: 4px solid #3b82f6;
+	border-radius: 8px;
+	border-left: 3px solid #3b82f6;
 }
 
-/* 功能特性卡片 */
-.mt-settings-features {
-	margin-bottom: 20px;
-	padding: 14px;
-	background: #f8fafc;
-	border-radius: 10px;
+.mt-settings-tip .mt-settings-text {
+	font-size: 12.5px;
+	line-height: 1.6;
+	color: #334155;
 }
 
+.mt-settings-tip code {
+	background: rgba(59,130,246,0.12);
+	padding: 1px 5px;
+	border-radius: 3px;
+	font-size: 0.92em;
+	color: #2563eb;
+}
+
+/* ── 底部信息条（极简） ── */
+.mt-settings-footer {
+	margin-top: 16px;
+	padding: 8px 12px;
+	text-align: center;
+}
+
+.mt-settings-footer .mt-settings-text {
+	font-size: 11.5px;
+	line-height: 1.4;
+	color: #94a3b8;
+}
 /* 通用文本样式 */
 .mt-settings-text {
 	font-size: 13px;
-	line-height: 1.8;
+	line-height: 1.6;
 	color: #334155;
-}
-.mt-settings-features .mt-settings-text {
-	font-size: 12px;
-	line-height: 1.7;
-	color: #475569;
-}
-
-/* 设置面板中的 code 标签 */
-.mt-settings-usage code {
-	background: #e0f2fe;
-	padding: 2px 6px;
-	border-radius: 4px;
-	font-size: 0.9em;
 }
 
 /* ── 暗色模式覆盖 ── */
-.theme-dark .mt-settings-usage {
+.theme-dark .mt-settings-tip {
 	background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-	border-left-color: #3b82f6;
+	border-left-color: #60a5fa;
 }
 
-.theme-dark .mt-settings-features {
-	background: #1e293b;
+.theme-dark .mt-settings-tip .mt-settings-text {
+	color: #94a3b8;
+}
+
+.theme-dark .mt-settings-tip code {
+	background: rgba(96,165,250,0.15);
+	color: #93c5fd;
+}
+
+.theme-dark .mt-settings-footer .mt-settings-text {
+	color: #475569;
 }
 
 .theme-dark .mt-settings-text {
 	color: #cbd5e1;
-}
-
-.theme-dark .mt-settings-features .mt-settings-text {
-	color: #94a3b8;
-}
-
-.theme-dark .mt-settings-usage code {
-	background: #1e3a5f;
-	color: #93c5fd;
-}
-
-/* 快捷键卡片 */
-.mt-settings-shortcuts {
-	margin-bottom: 20px;
-	padding: 14px;
-	background: #f8fafc;
-	border-radius: 10px;
-}
-
-/* 数据存储卡片（黄色调） */
-.mt-settings-storage {
-	margin-bottom: 20px;
-	padding: 14px;
-	background: #fefce8;
-	border-radius: 10px;
-	border-left: 4px solid #eab308;
-}
-
-.mt-settings-storage .mt-settings-text {
-	color: #713f12;
-}
-
-.mt-settings-storage code {
-	background: #fef9c3;
-	padding: 2px 6px;
-	border-radius: 4px;
-	font-size: 0.9em;
-}
-
-/* ── 暗色模式覆盖：快捷键和存储说明 ── */
-.theme-dark .mt-settings-shortcuts {
-	background: #1e293b;
-}
-
-.theme-dark .mt-settings-storage {
-	background: #292520;
-	border-left-color: #ca8a04;
-}
-
-.theme-dark .mt-settings-storage .mt-settings-text {
-	color: #d4a017;
 }
 
 /* ── 已完成任务显示方式：分段选择器 ── */

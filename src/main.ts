@@ -252,29 +252,11 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		// ── 使用说明区域 ───────────────────────────────
-		containerEl.createEl('h2', { text: '📖 使用说明' });
-		const usageEl = containerEl.createDiv('setting-item-description mt-settings-usage');
-		usageEl.innerHTML = `
+		// ── 顶部提示条 ───────────────────────────────────
+		const tipEl = containerEl.createDiv('setting-item-description mt-settings-tip');
+		tipEl.innerHTML = `
 			<div class="mt-settings-text">
-				<p style="margin: 0 0 10px 0;"><strong>🎯 快速开始</strong></p>
-				<p style="margin: 0 0 8px 0;">1. 点击左侧边栏的 <strong>日历图标</strong> 或运行命令「打开月历任务视图」</p>
-				<p style="margin: 0 0 8px 0;">2. 在月历中 <strong>点击任意日期</strong> 即可创建任务</p>
-				<p style="margin: 0 0 8px 0;">3. <strong>点击任务</strong> 可标记完成/未完成</p>
-				<p style="margin: 0;">4. 任务自动保存在 <code>任务/年份月份任务.md</code></p>
-			</div>
-		`;
-
-		// ── 功能特性 ───────────────────────────────────
-		containerEl.createEl('h3', { text: '✨ 功能特性', cls: 'setting-heading' });
-		const featuresEl = containerEl.createDiv('setting-item-description mt-settings-features');
-		featuresEl.innerHTML = `
-			<div class="mt-settings-text">
-				<p style="margin: 0 0 6px 0;">• <strong>月历视图</strong> - 直观查看整月任务分布</p>
-				<p style="margin: 0 0 6px 0;">• <strong>农历显示</strong> - 自动显示农历日期和节气</p>
-				<p style="margin: 0 0 6px 0;">• <strong>节假日标注</strong> - 法定节假日和调休提示</p>
-				<p style="margin: 0 0 6px 0;">• <strong>优先级标记</strong> - 高/中/普通三级优先级</p>
-				<p style="margin: 0;">• <strong>任务状态</strong> - 完成/逾期/进行中一目了然</p>
+				📅 点击月历日期创建任务 · 📜 数据自动存入 <code>任务/</code> 目录 · Ctrl/Cmd+P 搜索「月历任务」
 			</div>
 		`;
 
@@ -283,7 +265,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('已完成任务显示方式')
-			.setDesc('选择已完成的任务在月历中的展示样式')
+			.setDesc('已完成任务的展示样式')
 			.setClass('mt-completed-style-setting');
 
 		// ── 已完成任务显示方式：分段选择器 ──
@@ -317,7 +299,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('显示农历')
-			.setDesc('在日期下方显示农历日期和节气')
+			.setDesc('在日期下方显示农历和节气')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showLunar)
 				.onChange(async (value) => {
@@ -328,7 +310,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('显示节假日')
-			.setDesc('标注法定节假日和调休信息')
+			.setDesc('标注法定节假日和调休')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showHoliday)
 				.onChange(async (value) => {
@@ -339,7 +321,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('刷新节假日数据')
-			.setDesc('从网络 API 重新获取当年节假日和调休数据（数据来源：timor.tech）')
+			.setDesc('从网络重新获取当年节假日')
 			.addButton(button => button
 				.setButtonText('刷新')
 				.onClick(async () => {
@@ -362,7 +344,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('默认全天任务')
-			.setDesc('新创建的任务默认为全天任务（不带具体时间）')
+			.setDesc('新建任务默认不带具体时间')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.defaultAllDayTask)
 				.onChange(async (value) => {
@@ -373,7 +355,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('每周第一天')
-			.setDesc('设置日历中每周的起始日')
+			.setDesc('日历每周起始日')
 			.addDropdown(dropdown => dropdown
 				.addOption('1', '周一')
 				.addOption('0', '周日')
@@ -386,7 +368,7 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('每日任务显示数量')
-			.setDesc('每个日期格子最多显示的任务数量（超出显示"更多"）')
+			.setDesc('每个格子最多显示的任务数')
 			.addDropdown(dropdown => dropdown
 				.addOption('3', '3个')
 				.addOption('4', '4个')
@@ -403,23 +385,11 @@ class MonthlyTasksSettingTab extends PluginSettingTab {
 					this.plugin.refreshView();
 				}));
 
-		// ── 快捷键说明 ─────────────────────────────────
-		containerEl.createEl('h2', { text: '⌨️ 快捷键' });
-		const shortcutEl = containerEl.createDiv('setting-item-description mt-settings-shortcuts');
-		shortcutEl.innerHTML = `
+		// ── 底部信息条 ───────────────────────────────────
+		const footerEl = containerEl.createDiv('setting-item-description mt-settings-footer');
+		footerEl.innerHTML = `
 			<div class="mt-settings-text">
-				<p style="margin: 0 0 6px 0;">• <strong>Ctrl/Cmd + P</strong> → 输入「月历任务」查看所有命令</p>
-				<p style="margin: 0;">• <strong>点击日期</strong> → 打开创建任务弹窗</p>
-			</div>
-		`;
-
-		// ── 数据存储说明 ───────────────────────────────
-		containerEl.createEl('h2', { text: '💾 数据存储' });
-		const storageEl = containerEl.createDiv('setting-item-description mt-settings-storage');
-		storageEl.innerHTML = `
-			<div class="mt-settings-text">
-				<p style="margin: 0 0 6px 0;"><strong>任务文件位置：</strong> <code>任务/年份月份任务.md</code></p>
-				<p style="margin: 0;">任务按年月自动归类存储，以 Markdown 格式保存，可直接编辑。格式兼容 Obsidian Tasks 插件。</p>
+				Markdown 格式 · 兼容 Obsidian Tasks 插件
 			</div>
 		`;
 	}
