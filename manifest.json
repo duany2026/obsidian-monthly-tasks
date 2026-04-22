@@ -1,7 +1,11 @@
 {
 	"id": "monthly-tasks",
 	"name": "月历任务",
-	"version": "1.2.4",
+<<<<<<< HEAD
+	"version": "1.2.5",
+=======
+	"version": "1.2.1",
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 	"minAppVersion": "0.15.0",
 	"description": "滴答清单风格的月视图任务管理插件，支持农历、节假日和调休显示",
 	"author": "duany",

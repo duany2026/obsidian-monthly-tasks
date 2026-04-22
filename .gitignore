@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 插件构建产物
 *.zip
 *.tar.gz
@@ -14,3 +15,40 @@ Thumbs.db
 
 # Obsidian 本地数据
 .data/
+=======
+# ============================================
+# obsidian-monthly-tasks .gitignore
+# ============================================
+
+# 构建输出（由 esbuild 生成）
+main.js
+*.js.map
+
+# 依赖目录
+node_modules/
+
+# Obsidian 插件数据
+data.json
+
+# 编辑器配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 工作区临时文件
+.workbuddy/
+
+# 打包分发产物（不需要纳入版本管理）
+*.zip
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf

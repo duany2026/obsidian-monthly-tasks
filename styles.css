@@ -1,4 +1,5 @@
 /**
+<<<<<<< HEAD
  * ============================================================
  * 月历任务插件样式 (Monthly Tasks Plugin)
  * ============================================================
@@ -15,6 +16,10 @@
  * - 深色模式：自动适配 Obsidian 主题
  *
  * ============================================================
+=======
+ * 月历任务插件样式
+ * 移动端优先，美观精致的设计
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
  */
 
 /* ========== CSS 变量 ========== */
@@ -455,6 +460,29 @@
 	color: var(--gray-400);
 }
 
+<<<<<<< HEAD
+=======
+/* 已完成任务 - 普通文字模式（无删除线） */
+.task-item.completed-normal {
+	opacity: 0.5;
+}
+
+.task-item.completed-normal .task-content {
+	color: var(--gray-500);
+}
+
+/* 跨天任务条 - 已完成（带删除线） */
+.multiday-task-bar.completed {
+	opacity: 0.4;
+	text-decoration: line-through;
+}
+
+/* 跨天任务条 - 已完成（普通文字模式） */
+.multiday-task-bar.completed-normal {
+	opacity: 0.5;
+}
+
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 .task-item.overdue::before {
 	content: '';
 	position: absolute;
@@ -605,7 +633,11 @@
 	width: 420px;
 	max-width: 92vw;
 	animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+<<<<<<< HEAD
 	overflow: hidden;
+=======
+	overflow: visible;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 @keyframes modalSlideIn {
@@ -624,6 +656,7 @@
 	font-size: 14px;
 	color: var(--text-normal);
 	text-align: center;
+<<<<<<< HEAD
 	padding: 24px;
 	position: relative;
 }
@@ -632,6 +665,14 @@
 	display: none;
 }
 
+=======
+	padding: 32px 24px 24px;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+	position: relative;
+}
+
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 .modal-date-info .date-main {
 	font-size: 22px;
 	font-weight: 600;
@@ -652,11 +693,14 @@
 	font-weight: 400;
 }
 
+<<<<<<< HEAD
 .modal-date-info .date-lunar::before {
 	content: '';
 	display: none;
 }
 
+=======
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 /* 输入框 - 全面优化样式 */
 .task-input-wrapper {
 	margin: 24px 24px 16px;
@@ -747,6 +791,7 @@
 	transform: translateY(0);
 }
 
+<<<<<<< HEAD
 /* 时间选择器 */
 .modal-time-container {
 	margin: 0 24px 16px;
@@ -764,11 +809,44 @@
 	display: block;
 	text-align: center;
 	letter-spacing: 0.5px;
+=======
+/* 时间选择器 - 全新设计 */
+.modal-time-container {
+	margin: 0 24px 16px;
+	padding: 18px 20px;
+	background: linear-gradient(135deg, #f0f4ff 0%, #eef2ff 50%, #f8fafc 100%);
+	border-radius: 16px;
+	border: 1px solid #dbeafe;
+	position: relative;
+	overflow: hidden;
+}
+.modal-time-container::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+	opacity: 0.6;
+}
+
+.time-label {
+	font-size: 12px;
+	font-weight: 600;
+	color: #6366f1;
+	margin-bottom: 14px;
+	display: block;
+	text-align: center;
+	letter-spacing: 1.5px;
+	text-transform: uppercase;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 .time-input-wrapper {
 	display: flex;
 	align-items: center;
+<<<<<<< HEAD
 	gap: 6px;
 	justify-content: center;
 	flex-wrap: nowrap;
@@ -868,23 +946,128 @@
 .all-day-toggle:hover {
 	background: #f0f7ff;
 	border-color: #3b82f6;
+=======
+	gap: 4px;
+	justify-content: center;
+	flex-wrap: nowrap;
+	overflow-x: hidden;
+}
+
+/* 时间分组：开始时间和结束时间 */
+.time-input-wrapper > * {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+}
+
+.time-select {
+	box-sizing: border-box;
+	padding: 6px 2px;
+	border: 1.5px solid #e0e7ff;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	color: #1e293b;
+	background: white;
+	cursor: pointer;
+	outline: none;
+	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+	text-align: center;
+	line-height: 1.25;
+	min-width: 44px;
+	max-width: 54px;
+	width: auto;
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 1px 3px rgba(99, 102, 241, 0.08);
+	flex: 1 1 0;
+}
+.time-select-hour { min-width: 46px; max-width: 56px; flex-grow: 1.2; }
+.time-select-min { min-width: 44px; max-width: 52px; flex-grow: 1; }
+.time-select:hover {
+	border-color: #818cf8;
+	box-shadow: 0 2px 8px rgba(99, 102, 241, 0.18), 0 0 0 3px rgba(99, 102, 241, 0.1);
+	transform: translateY(-1px);
+}
+.time-select:focus {
+	border-color: #6366f1;
+	box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+.time-select:disabled {
+	opacity: 0.38;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.time-colon {
+	font-size: 16px;
+	font-weight: 700;
+	color: #a5b4fc;
+	margin: 0 0px;
+	user-select: none;
+	text-shadow: 0 1px 2px rgba(99, 102, 241, 0.15);
+	flex-shrink: 0;
+}
+
+.time-separator {
+	font-size: 12px;
+	color: #818cf8;
+	font-weight: 600;
+	margin: 0 3px;
+	user-select: none;
+	padding: 0 1px;
+	flex-shrink: 0;
+}
+
+.all-day-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	cursor: pointer;
+	padding: 6px 8px;
+	background: linear-gradient(135deg, #fff 0%, #fafbff 100%);
+	border-radius: 20px;
+	border: 1.5px solid #e0e7ff;
+	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+	box-shadow: 0 1px 3px rgba(99, 102, 241, 0.08);
+	margin-left: 2px;
+	flex-shrink: 0;
+}
+
+.all-day-toggle:hover {
+	background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+	border-color: #a78bfa;
+	box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+	transform: translateY(-1px);
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 .all-day-toggle input[type="checkbox"] {
 	width: 16px;
 	height: 16px;
 	cursor: pointer;
+<<<<<<< HEAD
 	accent-color: #3b82f6;
+=======
+	accent-color: #6366f1;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 .all-day-toggle span {
 	font-size: 13px;
+<<<<<<< HEAD
 	font-weight: 500;
 	color: #475569;
+=======
+	font-weight: 600;
+	color: #6366f1;
+	letter-spacing: 0.3px;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 /* 深色模式 - 时间选择器 */
 .theme-dark .modal-time-container {
+<<<<<<< HEAD
 	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
 	border-color: rgba(71, 85, 105, 0.4);
 }
@@ -957,6 +1140,41 @@
 .theme-dark .all-day-toggle span {
 	color: #cbd5e1;
 }
+=======
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(17, 24, 39, 0.5) 100%);
+	border-color: rgba(99, 102, 241, 0.2);
+}
+.theme-dark .modal-time-container::before {
+	opacity: 0.8;
+}
+
+.theme-dark .time-label {
+	color: #a5b4fc;
+}
+
+.theme-dark .time-select {
+	background-color: rgba(30, 41, 59, 0.9);
+	border-color: rgba(99, 102, 241, 0.3);
+	color: #e2e8f0;
+}
+.theme-dark .time-select:hover { border-color: rgba(129, 140, 248, 0.6); box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2); }
+.theme-dark .time-select:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.2); }
+.theme-dark .time-select:disabled { opacity: 0.38; cursor: not-allowed; }
+
+.theme-dark .time-colon { color: #6366f1; }
+
+.theme-dark .time-separator { color: #818cf8; }
+
+.theme-dark .all-day-toggle {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(17, 24, 39, 0.6) 100%);
+	border-color: rgba(99, 102, 241, 0.25);
+}
+.theme-dark .all-day-toggle:hover {
+	background: linear-gradient(135deg, rgba(49, 46, 129, 0.6) 0%, rgba(30, 27, 75, 0.5) 100%);
+	border-color: rgba(139, 92, 246, 0.4);
+}
+.theme-dark .all-day-toggle span { color: #a5b4fc; }
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 
 
 /* 优先级选择 - 颜色块样式 */
@@ -1122,6 +1340,10 @@
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 	border-radius: 14px;
 	border: 1px solid #e2e8f0;
+<<<<<<< HEAD
+=======
+	overflow: visible;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 .end-date-label {
@@ -1140,6 +1362,10 @@
 	gap: 12px;
 	align-items: center;
 	position: relative;
+<<<<<<< HEAD
+=======
+	overflow: visible;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 .multi-day-toggle {
@@ -1262,6 +1488,7 @@
 	margin-right: 6px;
 }
 
+<<<<<<< HEAD
 /* 日期选择器弹出层 */
 .date-picker-popup {
 	position: fixed;
@@ -1275,6 +1502,30 @@
 	padding: 16px;
 	min-width: 280px;
 	border: 1px solid #e2e8f0;
+=======
+/* 日期选择器弹出层 - 精美设计 */
+.date-picker-popup {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 9999;
+	background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+	border-radius: 18px;
+	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08),
+	            0 0 0 1px rgba(99, 102, 241, 0.08);
+	padding: 18px;
+	min-width: 320px;
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	border: 1px solid #e0e7ff;
+	animation: pickerSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	overflow: visible;
+}
+@keyframes pickerSlideIn {
+	from { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.96); }
+	to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 /* 导航行：年月切换 */
@@ -1283,6 +1534,7 @@
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
+<<<<<<< HEAD
 	margin-bottom: 12px;
 }
 .picker-nav-btn {
@@ -1316,29 +1568,92 @@
 .picker-select:hover {
 	border-color: #3b82f6;
 	background: white;
+=======
+	margin-bottom: 14px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #f1f5f9;
+}
+.picker-nav-btn {
+	background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+	border: 1px solid #e0e7ff;
+	cursor: pointer;
+	font-size: 13px;
+	color: #6366f1;
+	padding: 6px 10px;
+	border-radius: 10px;
+	transition: all 0.2s ease;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 32px;
+	height: 32px;
+	flex-shrink: 0;
+}
+.picker-nav-btn:hover {
+	background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+	border-color: #a78bfa;
+	box-shadow: 0 2px 6px rgba(139, 92, 246, 0.2);
+	transform: scale(1.05);
+}
+.picker-select {
+	padding: 6px 10px;
+	border: 1.5px solid #e0e7ff;
+	border-radius: 10px;
+	font-size: 13px;
+	font-weight: 600;
+	color: #3730a3;
+	background: linear-gradient(135deg, #fff 0%, #fafbff 100%);
+	cursor: pointer;
+	outline: none;
+	font-family: inherit;
+	transition: all 0.2s ease;
+	box-shadow: 0 1px 3px rgba(99, 102, 241, 0.06);
+	flex-shrink: 0;
+}
+.picker-select:hover {
+	border-color: #a78bfa;
+	box-shadow: 0 2px 6px rgba(139, 92, 246, 0.15);
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 /* 星期标题行 */
 .date-picker-week {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
+<<<<<<< HEAD
 	margin-bottom: 4px;
+=======
+	margin-bottom: 8px;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 .picker-week-day {
 	text-align: center;
 	font-size: 11px;
+<<<<<<< HEAD
 	font-weight: 600;
 	color: #94a3b8;
 	padding: 4px 0;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
+=======
+	font-weight: 700;
+	color: #a5b4fc;
+	padding: 6px 0;
+	text-transform: uppercase;
+	letter-spacing: 1.5px;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
 /* 日期网格 */
 .date-picker-grid {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
+<<<<<<< HEAD
 	gap: 2px;
+=======
+	gap: 3px;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 .picker-cell {
 	display: flex;
@@ -1346,16 +1661,30 @@
 	justify-content: center;
 	width: 36px;
 	height: 36px;
+<<<<<<< HEAD
 	border-radius: 50%;
+=======
+	border-radius: 10px;
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 	font-size: 13px;
 	font-weight: 500;
 	color: #334155;
 	cursor: pointer;
+<<<<<<< HEAD
 	transition: all 0.15s;
 }
 .picker-cell:hover:not(.picker-cell-disabled) {
 	background: #3b82f6;
 	color: white;
+=======
+	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.picker-cell:hover:not(.picker-cell-disabled) {
+	background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+	color: white;
+	transform: scale(1.08);
+	box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 .picker-cell.picker-empty {
 	cursor: default;
@@ -1363,6 +1692,7 @@
 .picker-cell.picker-cell-disabled {
 	color: #cbd5e1;
 	cursor: not-allowed;
+<<<<<<< HEAD
 }
 .picker-cell.picker-cell-today {
 	color: #3b82f6;
@@ -1370,10 +1700,23 @@
 }
 .picker-cell.picker-cell-today:hover {
 	background: #3b82f6;
+=======
+	opacity: 0.45;
+}
+.picker-cell.picker-cell-today {
+	color: #6366f1;
+	font-weight: 800;
+	background: linear-gradient(135deg, #ede9fe 0%, #eef2ff 100%);
+	box-shadow: inset 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+.picker-cell.picker-cell-today:hover {
+	background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 	color: white;
 }
 
 /* 深色模式 - 日期选择器 */
+<<<<<<< HEAD
 .theme-dark .end-date-trigger {
 	background: rgba(30, 41, 59, 0.9);
 	border-color: rgba(71, 85, 105, 0.5);
@@ -1401,6 +1744,52 @@
 .theme-dark .picker-cell.picker-cell-today:hover { background: #3b82f6; }
 
 .theme-dark .task-time { color: #94a3b8; }
+=======
+.theme-dark .date-picker-popup {
+	background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+	border-color: rgba(99, 102, 241, 0.15);
+	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(99, 102, 241, 0.08);
+}
+.theme-dark .picker-nav-btn {
+	background: linear-gradient(135deg, rgba(49, 46, 129, 0.5) 0%, rgba(30, 27, 75, 0.5) 100%);
+	border-color: rgba(139, 92, 246, 0.2);
+	color: #a5b4fc;
+}
+.theme-dark .picker-nav-btn:hover {
+	background: linear-gradient(135deg, rgba(76, 29, 149, 0.6) 0%, rgba(49, 46, 129, 0.6) 100%);
+	border-color: rgba(167, 139, 250, 0.4);
+	box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+.theme-dark .picker-select {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(17, 24, 39, 0.8) 100%);
+	border-color: rgba(99, 102, 241, 0.2);
+	color: #c7d2fe;
+}
+.theme-dark .picker-select:hover {
+	border-color: rgba(129, 140, 248, 0.5);
+	box-shadow: 0 2px 6px rgba(99, 102, 241, 0.15);
+}
+.theme-dark .picker-week-day { color: #6366f1; }
+.theme-dark .picker-cell { color: #e2e8f0; }
+.theme-dark .picker-cell:hover:not(.picker-cell-disabled) { background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3); }
+.theme-dark .picker-cell.picker-cell-disabled { color: #334155; opacity: 0.4; }
+.theme-dark .picker-cell.picker-cell-today { color: #a5b4fc; background: linear-gradient(135deg, rgba(49, 46, 129, 0.4) 0%, rgba(30, 27, 75, 0.3) 100%); border-color: rgba(129, 140, 248, 0.2); }
+.theme-dark .picker-cell.picker-cell-today:hover { background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%); color: white; }
+
+/* 深色模式 - 结束日期触发按钮 */
+.theme-dark .end-date-trigger {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(17, 24, 39, 0.8) 100%);
+	border-color: rgba(99, 102, 241, 0.2);
+	color: #c7d2fe;
+}
+.theme-dark .end-date-trigger:hover {
+	border-color: #818cf8;
+	color: #a5b4fc;
+	background: linear-gradient(135deg, rgba(49, 46, 129, 0.4) 0%, rgba(30, 27, 75, 0.3) 100%);
+}
+
+.theme-dark .task-time { color: #a5b4fc; }
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 
 .modal-priority {
 	margin: 0 24px 20px;
@@ -2016,6 +2405,7 @@
 	color: #cbd5e1;
 }
 
+<<<<<<< HEAD
 /* 移动端适配 */
 @media (max-width: 600px) {
 	/* 时间选择器适配 */
@@ -2086,6 +2476,8 @@
 	}
 }
 
+=======
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 .theme-dark .priority-btn-wrapper.selected .priority-btn-text {
 	color: #e2e8f0;
 }
@@ -2101,6 +2493,7 @@
 	color: #e2e8f0;
 }
 
+<<<<<<< HEAD
 /* 深色模式+移动端 - 时间选择器 */
 @media (max-width: 600px) {
 	.theme-dark .time-native-input {
@@ -2109,6 +2502,8 @@
 	}
 }
 
+=======
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 /* 深色模式 - 日期选择器 */
 .theme-dark .date-picker-modal {
 	background: var(--background-primary);
@@ -2437,5 +2832,261 @@
 		padding: 1px 2px;
 		font-size: 9px;
 	}
+<<<<<<< HEAD
+=======
+
+	/* 移动端 - 创建任务弹窗优化 */
+	.create-task-modal {
+		max-width: 95vw;
+		width: 380px;
+	}
+
+	.modal-date-info {
+		padding: 24px 16px 18px;
+	}
+
+	.modal-date-info .date-main {
+		font-size: 19px;
+	}
+
+	.modal-time-container {
+		margin: 0 12px 12px;
+		padding: 10px 12px;
+	}
+
+	.time-label {
+		font-size: 11px;
+		margin-bottom: 8px;
+		letter-spacing: 1px;
+	}
+
+	.time-input-wrapper {
+		gap: 2px;
+		flex-wrap: nowrap;
+		justify-content: center;
+		overflow-x: hidden;
+	}
+
+	.time-select {
+		box-sizing: border-box;
+		font-size: 13px;
+		padding: 5px 1px;
+		min-width: 34px;
+		max-width: 44px;
+		width: auto;
+		border-radius: 7px;
+		line-height: 1.25;
+	}
+	.time-select-hour { min-width: 36px; max-width: 46px; flex-grow: 1.15; }
+	.time-select-min { min-width: 34px; max-width: 42px; flex-grow: 1; }
+
+	.time-colon {
+		font-size: 14px;
+		margin: 0;
+	}
+
+	.time-separator {
+		font-size: 11px;
+		margin: 0 2px;
+		padding: 0;
+	}
+
+	.all-day-toggle {
+		padding: 5px 7px;
+		font-size: 11px;
+		flex-shrink: 0;
+		gap: 4px;
+		border-radius: 16px;
+	}
+
+	.all-day-toggle span {
+		font-size: 11px;
+	}
+
+	.task-input-wrapper {
+		margin: 18px 16px 12px;
+	}
+
+	.task-input {
+		font-size: 15px;
+		padding: 12px 14px;
+	}
+
+	/* 结束日期/跨天任务 */
+	.modal-end-date {
+		margin: 0 16px 14px;
+	}
+
+	.end-date-trigger {
+		font-size: 13px;
+	}
+
+	.multi-day-toggle span {
+		font-size: 12px;
+	}
+
+	/* 日期选择器弹出层 - 移动端适配 */
+	.date-picker-popup {
+		min-width: 0;
+		width: calc(100vw - 80px);
+		max-width: 320px;
+		padding: 14px;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	.date-picker-nav {
+		gap: 6px;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+	}
+
+	.picker-nav-btn {
+		min-width: 28px;
+		height: 28px;
+		font-size: 12px;
+		padding: 4px 8px;
+		border-radius: 8px;
+	}
+
+	.picker-select {
+		font-size: 12px;
+		padding: 5px 6px;
+		border-radius: 8px;
+	}
+
+	.picker-week-day {
+		font-size: 10px;
+		padding: 4px 0;
+	}
+
+	.picker-cell {
+		width: 32px;
+		height: 32px;
+		font-size: 12px;
+		border-radius: 8px;
+	}
+
+	/* 优先级 */
+	.modal-priority {
+		margin: 0 16px 16px;
+	}
+
+	.priority-btn-text {
+		font-size: 12px;
+	}
+
+	/* 按钮 */
+	.modal-buttons {
+		margin: 0 16px 20px;
+		padding-top: 14px;
+	}
+
+	.btn-confirm, .btn-cancel {
+		padding: 11px 20px;
+		font-size: 14px;
+	}
+}
+
+/* ========== 设置面板样式 ========== */
+
+/* ── 顶部提示条（精简） ── */
+.mt-settings-tip {
+	margin-bottom: 16px;
+	padding: 10px 14px;
+	background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+	border-radius: 8px;
+	border-left: 3px solid #3b82f6;
+}
+
+.mt-settings-tip .mt-settings-text {
+	font-size: 12.5px;
+	line-height: 1.6;
+	color: #334155;
+}
+
+.mt-settings-tip code {
+	background: rgba(59,130,246,0.12);
+	padding: 1px 5px;
+	border-radius: 3px;
+	font-size: 0.92em;
+	color: #2563eb;
+}
+
+
+
+/* 通用文本样式 */
+.mt-settings-text {
+	font-size: 13px;
+	line-height: 1.6;
+	color: #334155;
+}
+
+/* ── 暗色模式覆盖 ── */
+.theme-dark .mt-settings-tip {
+	background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+	border-left-color: #60a5fa;
+}
+
+.theme-dark .mt-settings-tip .mt-settings-text {
+	color: #94a3b8;
+}
+
+.theme-dark .mt-settings-tip code {
+	background: rgba(96,165,250,0.15);
+	color: #93c5fd;
+}
+
+.theme-dark .mt-settings-text {
+	color: #cbd5e1;
+}
+
+/* ── 已完成任务显示方式：分段选择器 ── */
+.mt-completed-style-setting .setting-item-control {
+	display: none; /* 隐藏 Obsidian 原生控件区域，用自定义的替代 */
+}
+
+.mt-segmented-control {
+	display: inline-flex;
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.mt-seg-btn {
+	flex: 1;
+	min-width: 0;
+	padding: 6px 14px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background: transparent;
+	font-size: 13px;
+	line-height: 1.4;
+	color: var(--text-muted);
+	cursor: pointer;
+	white-space: nowrap;
+	user-select: none;
+	transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+	position: relative;
+}
+
+.mt-seg-btn:hover:not(.selected) {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--background-modifier-border-hover);
+}
+
+.mt-seg-btn.selected {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	font-weight: 500;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+}
+
+/* 暗色模式补充微调 */
+.theme-dark .mt-seg-btn.selected {
+	box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+>>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
 }
 
