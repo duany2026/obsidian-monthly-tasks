@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.2.4
+ * 版本：1.3.2
  * 作者：duany
  * 许可证：MIT
  *
@@ -225,9 +225,21 @@ function groupTasksByDate(tasks) {
   }
   return map;
 }
+/**
+ * 判断是否为跨天任务
+ * 跨天任务有开始日期（🛫）且与截止日期不同
+ * @param task - 任务对象
+ * @returns 是否为跨天任务
+ */
 function isMultiDayTask(task) {
   return !!task.startDate && task.startDate !== task.dueDate;
 }
+
+/**
+ * 获取跨天任务的天数
+ * @param task - 任务对象
+ * @returns 任务跨越的天数（最小为1）
+ */
 function getMultiDayDuration(task) {
   if (!isMultiDayTask(task))
     return 1;
@@ -236,6 +248,12 @@ function getMultiDayDuration(task) {
   const diffTime = end.getTime() - start.getTime();
   return Math.ceil(diffTime / (1e3 * 60 * 60 * 24)) + 1;
 }
+
+/**
+ * 判断任务是否已过期
+ * @param dateStr - 日期字符串 YYYY-MM-DD
+ * @returns 是否已过期
+ */
 function isOverdue(dateStr) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -272,6 +290,8 @@ var TaskParser = class {
     this.lastParseTime = 0;
     this.CACHE_DURATION = 5e3;
     this.app = app;
+    // 任务文件路径缓存：{ year: filePath }
+    this.taskFileCache = /* @__PURE__ */ new Map();
   }
   /**
    * 解析所有文件中的任务
@@ -447,8 +467,13 @@ var TaskParser = class {
         : "";
       let timeMarker = time && !isAllDay ? `\u23F0 ${time} ` : "";
       let taskLine = `- [ ] ${content} ${priorityMarker}${dateMarker}${timeMarker}\u{1F4C5} ${dueDate}`;
-      if (dueDate) {
-        const [y, m] = dueDate.split("-");
+      
+      // 确定用于排序和插入的日期：跨天任务用开始日期，普通任务用截止日期
+      const isMultiDay = startDate && startDate !== dueDate;
+      const sortDate = isMultiDay ? startDate : dueDate;
+      
+      if (sortDate) {
+        const [y, m] = sortDate.split("-");
         const monthSection = `## ${y}\u5E74${m}\u6708`;
         // 查找月份section位置
         const sectionIdx = fileContent.indexOf(monthSection);
@@ -487,14 +512,16 @@ var TaskParser = class {
           for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line.startsWith("- [")) continue;
+            // 获取任务的排序日期：跨天任务取开始日期，普通任务取截止日期
+            const startMatch = line.match(/🛫\s*(\d{4}-\d{2}-\d{2})/);
             const dueMatch = line.match(/📅\s*(\S+)/);
-            if (!dueMatch) continue;
-            const due = dueMatch[1];
-            if (due > dueDate) {
+            const existingSortDate = startMatch ? startMatch[1] : (dueMatch ? dueMatch[1] : null);
+            if (!existingSortDate) continue;
+            if (existingSortDate > sortDate) {
               insertIdx = i;
               break;
             }
-            if (due === dueDate) {
+            if (existingSortDate === sortDate) {
               const timeMatch = line.match(/⏰\s*(\S+)/);
               const taskTime = timeMatch ? timeMatch[1].split("~")[0] : null;
               if (newTime && taskTime && newTime < taskTime) {
@@ -524,14 +551,14 @@ var TaskParser = class {
   /**
    * 在指定日期创建任务（自动选择或创建按年月归类的文件）
    */
-  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate) {
+  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath) {
     const dateStr = this.formatDate(date);
     const endDateStr = endDate ? this.formatDate(endDate) : dateStr;
     const dailyNotePath = this.findDailyNotePath(date);
     if (dailyNotePath) {
       return this.createTask(dailyNotePath, content, endDateStr, isAllDay, time, priority, dateStr);
     }
-    const defaultFile = await this.getOrCreateDefaultTaskFile(date);
+    const defaultFile = await this.getOrCreateDefaultTaskFile(date, customFolderPath);
     if (defaultFile) {
       return this.createTask(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr);
     }
@@ -557,16 +584,24 @@ var TaskParser = class {
   }
   /**
    * 获取或创建默认任务文件（统一存储在年度任务列表）
+   * 优先在整个库中查找已存在的年度任务文件，支持文件被移动后的场景
+   * @param date - 日期对象
+   * @param customFolderPath - 自定义任务文件夹路径（可选）
    */
-  async getOrCreateDefaultTaskFile(date) {
+  async getOrCreateDefaultTaskFile(date, customFolderPath) {
     const now = date || new Date();
     const year = String(now.getFullYear());
-    const folderPath = `\u4EFB\u52A1`;
-    const filePath = `${folderPath}/${year}\u5E74\u4EFB\u52A1\u5217\u8868.md`;
-    let file = this.app.vault.getAbstractFileByPath(filePath);
-    if (file instanceof import_obsidian.TFile) {
-      return filePath;
+    const targetFileName = `${year}\u5E74\u4EFB\u52A1\u5217\u8868.md`;
+    
+    // 1. 使用缓存查找已存在的年度任务文件
+    const existingPath = this.findTaskFile(year);
+    if (existingPath) {
+      return existingPath;
     }
+    
+    // 2. 如果没找到，在指定位置或默认位置创建
+    const folderPath = customFolderPath || `\u4EFB\u52A1`;
+    const filePath = `${folderPath}/${targetFileName}`;
     try {
       await this.ensureFolderExists(folderPath);
       const initialContent = `# ${year}\u5E74\u4EFB\u52A1\u5217\u8868
@@ -575,6 +610,8 @@ var TaskParser = class {
 
 `;
       await this.app.vault.create(filePath, initialContent);
+      // 缓存新创建的文件路径
+      this.taskFileCache.set(year, filePath);
       return filePath;
     } catch (error) {
       console.error("\u521B\u5EFA\u9ED8\u8BA4\u4EFB\u52A1\u6587\u4EF6\u5931\u8D25:", error);
@@ -601,6 +638,39 @@ var TaskParser = class {
   invalidateCache() {
     this.cache = null;
     this.lastParseTime = 0;
+    // 清除任务文件路径缓存
+    this.taskFileCache.clear();
+  }
+  /**
+   * 查找年度任务文件（使用缓存）
+   * @param year - 年份
+   * @returns 文件路径或 null
+   */
+  findTaskFile(year) {
+    const yearStr = String(year);
+    const targetFileName = `${yearStr}年任务列表.md`;
+    
+    // 1. 检查缓存
+    if (this.taskFileCache.has(yearStr)) {
+      const cachedPath = this.taskFileCache.get(yearStr);
+      const file = this.app.vault.getAbstractFileByPath(cachedPath);
+      if (file instanceof import_obsidian.TFile) {
+        return cachedPath;
+      }
+      // 缓存的文件不存在，清除缓存
+      this.taskFileCache.delete(yearStr);
+    }
+    
+    // 2. 在整个库中搜索
+    const files = this.app.vault.getMarkdownFiles();
+    for (const file of files) {
+      if (file.name === targetFileName) {
+        this.taskFileCache.set(yearStr, file.path);
+        return file.path;
+      }
+    }
+    
+    return null;
   }
   /**
    * 格式化日期
@@ -1683,7 +1753,6 @@ var HolidayManager = class {
     });
   }
 };
-var holidayManager = new HolidayManager();
 
 // src/MonthlyView.ts
 var VIEW_TYPE_MONTHLY = "monthly-tasks-view";
@@ -1835,7 +1904,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 渲染月历网格
    */
   async renderCalendarGrid() {
-    await holidayManager.ensureYearData(this.currentYear);
+    await this.plugin.holidayManager.ensureYearData(this.currentYear);
     const titleEl = this.headerEl.querySelector(".month-title");
     if (titleEl) {
       titleEl.textContent = getMonthTitle(this.currentYear, this.currentMonth);
@@ -1860,7 +1929,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     if (day.isToday) {
       cellEl.addClass("today");
     }
-    const holidayInfo = this.plugin.settings.showHoliday ? holidayManager.getHolidayInfo(day.date) : null;
+    const holidayInfo = this.plugin.settings.showHoliday ? this.plugin.holidayManager.getHolidayInfo(day.date) : null;
     if (holidayInfo) {
       if (holidayInfo.type === "legal" /* LEGAL */) {
         cellEl.addClass("holiday");
@@ -1982,7 +2051,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    */
   openCreateTaskModal(date, existingTasks = []) {
     const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate) => {
-      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate);
+      const customFolderPath = this.plugin.settings.customTaskFolder || void 0;
+      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath);
       if (success) {
         new import_obsidian2.Notice("\u4EFB\u52A1\u5DF2\u521B\u5EFA");
         await this.refresh(true);
@@ -2049,9 +2119,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
  * - dp-day.disabled：禁用日期
  * ============================================================
  */
-var DatePickerModal = class {
+var DatePickerModal = class extends import_obsidian3.Modal {
   constructor(app, currentYear, currentMonth, onSubmit) {
-    this.app = app;
+    super(app);
     this.year = currentYear;
     this.month = currentMonth;
     this.onSubmit = onSubmit;
@@ -2059,23 +2129,107 @@ var DatePickerModal = class {
     this.currentYear = now.getFullYear();
     this.currentMonth = now.getMonth();
   }
-  open() {
-    const overlay = document.createElement("div");
-    overlay.className = "modal-overlay";
-    document.body.appendChild(overlay);
-    this.modalEl = document.createElement("div");
-    this.modalEl.className = "date-picker-modal";
-    const titleEl = this.modalEl.createDiv("modal-title");
+  
+  // 检测是否为暗色模式
+  isDarkMode() {
+    return document.body.classList.contains('theme-dark');
+  }
+  
+  onOpen() {
+    const { contentEl, modalEl } = this;
+    const isDark = this.isDarkMode();
+    
+    modalEl.addClass("date-picker-modal");
+    modalEl.style.background = "var(--background-primary)";
+    modalEl.style.padding = "32px";
+    modalEl.style.borderRadius = "24px";
+    modalEl.style.width = "420px";
+    modalEl.style.maxWidth = "92vw";
+    modalEl.style.border = "none";
+    modalEl.style.boxShadow = isDark 
+      ? "0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)"
+      : "0 25px 80px rgba(0, 0, 0, 0.35)";
+    modalEl.style.margin = "auto";
+    contentEl.empty();
+    
+    // 颜色配置
+    const colors = isDark ? {
+      text: '#e2e8f0',
+      textMuted: '#94a3b8',
+      bg: '#1e293b',
+      bgLight: '#334155',
+      border: '#475569',
+      inputBg: '#1e293b',
+      inputBorder: '#475569',
+      btnBg: '#334155',
+      btnHover: '#475569',
+      btnCancel: '#334155',
+      btnCancelHover: '#475569',
+      wrapperBg: '#334155',
+      wrapperBorder: '#475569'
+    } : {
+      text: '#374151',
+      textMuted: '#6B7280',
+      bg: '#F9FAFB',
+      bgLight: '#F3F4F6',
+      border: '#E5E7EB',
+      inputBg: 'white',
+      inputBorder: '#D1D5DB',
+      btnBg: '#F9FAFB',
+      btnHover: '#F3F4F6',
+      btnCancel: '#F1F5F9',
+      btnCancelHover: '#E2E8F0',
+      wrapperBg: '#F9FAFB',
+      wrapperBorder: '#E5E7EB'
+    };
+    
+    // 标题
+    const titleEl = contentEl.createDiv("modal-title");
     titleEl.textContent = "\u9009\u62E9\u65E5\u671F";
-    const yearSection = this.modalEl.createDiv("picker-section");
-    yearSection.createEl("div", { cls: "section-label", text: "\u5E74\u4EFD" });
+    titleEl.style.fontSize = "20px";
+    titleEl.style.fontWeight = "700";
+    titleEl.style.textAlign = "center";
+    titleEl.style.marginBottom = "28px";
+    titleEl.style.paddingBottom = "20px";
+    titleEl.style.borderBottom = "2px solid var(--background-modifier-border)";
+    titleEl.style.color = "var(--text-normal)";
+    
+    // 年份区域
+    const yearSection = contentEl.createDiv("picker-section");
+    yearSection.style.marginBottom = "28px";
+    
+    const yearLabel = yearSection.createEl("div", { text: "\u5E74\u4EFD" });
+    yearLabel.style.fontSize = "13px";
+    yearLabel.style.fontWeight = "600";
+    yearLabel.style.color = colors.textMuted;
+    yearLabel.style.textAlign = "center";
+    yearLabel.style.marginBottom = "16px";
+    
     const yearInputWrapper = yearSection.createDiv("year-input-wrapper");
-    const yearDecBtn = yearInputWrapper.createEl("button", {
-      cls: "year-nav-btn",
-      text: "\u2212"
-    });
+    yearInputWrapper.style.display = "flex";
+    yearInputWrapper.style.alignItems = "center";
+    yearInputWrapper.style.justifyContent = "center";
+    yearInputWrapper.style.gap = "16px";
+    yearInputWrapper.style.padding = "8px";
+    
+    const yearDecBtn = yearInputWrapper.createEl("button", { text: "\u2212" });
+    yearDecBtn.style.width = "40px";
+    yearDecBtn.style.height = "40px";
+    yearDecBtn.style.fontSize = "18px";
+    yearDecBtn.style.fontWeight = "600";
+    yearDecBtn.style.color = colors.text;
+    yearDecBtn.style.background = colors.inputBg;
+    yearDecBtn.style.border = `2px solid ${colors.inputBorder}`;
+    yearDecBtn.style.borderRadius = "10px";
+    yearDecBtn.style.cursor = "pointer";
+    yearDecBtn.style.display = "flex";
+    yearDecBtn.style.alignItems = "center";
+    yearDecBtn.style.justifyContent = "center";
+    yearDecBtn.style.transition = "all 0.2s ease";
+    yearDecBtn.style.outline = "none";
+    yearDecBtn.style.boxShadow = "none";
+    
     const yearInput = yearInputWrapper.createEl("input", {
-      cls: "year-input",
       attr: {
         type: "number",
         value: String(this.year),
@@ -2083,14 +2237,62 @@ var DatePickerModal = class {
         max: "2100"
       }
     });
-    const yearIncBtn = yearInputWrapper.createEl("button", {
-      cls: "year-nav-btn",
-      text: "+"
-    });
+    yearInput.style.width = "120px";
+    yearInput.style.height = "40px";
+    yearInput.style.padding = "0 14px";
+    yearInput.style.fontSize = "20px";
+    yearInput.style.fontWeight = "700";
+    yearInput.style.textAlign = "center";
+    yearInput.style.color = colors.text;
+    yearInput.style.background = colors.inputBg;
+    yearInput.style.border = `2px solid ${colors.inputBorder}`;
+    yearInput.style.borderRadius = "10px";
+    yearInput.style.outline = "none";
+    yearInput.style.transition = "all 0.2s ease";
+    yearInput.style.boxSizing = "border-box";
+    
+    const yearIncBtn = yearInputWrapper.createEl("button", { text: "+" });
+    yearIncBtn.style.width = "40px";
+    yearIncBtn.style.height = "40px";
+    yearIncBtn.style.fontSize = "18px";
+    yearIncBtn.style.fontWeight = "600";
+    yearIncBtn.style.color = colors.text;
+    yearIncBtn.style.background = colors.inputBg;
+    yearIncBtn.style.border = `2px solid ${colors.inputBorder}`;
+    yearIncBtn.style.borderRadius = "10px";
+    yearIncBtn.style.cursor = "pointer";
+    yearIncBtn.style.display = "flex";
+    yearIncBtn.style.alignItems = "center";
+    yearIncBtn.style.justifyContent = "center";
+    yearIncBtn.style.transition = "all 0.2s ease";
+    yearIncBtn.style.outline = "none";
+    yearIncBtn.style.boxShadow = "none";
+    
     const currentYearHint = yearSection.createEl("div", {
-      cls: "current-year-hint",
       text: `\u5F53\u524D\u5E74\u4EFD: ${this.currentYear}`
     });
+    currentYearHint.style.textAlign = "center";
+    currentYearHint.style.fontSize = "12px";
+    currentYearHint.style.color = colors.textMuted;
+    currentYearHint.style.marginTop = "12px";
+    currentYearHint.style.fontWeight = "500";
+    
+    // 按钮悬停效果
+    const btnHoverStyle = (btn) => {
+      btn.addEventListener("mouseenter", () => {
+        btn.style.background = isDark ? "rgba(59, 130, 246, 0.2)" : "#EFF6FF";
+        btn.style.borderColor = isDark ? "rgba(59, 130, 246, 0.5)" : "#93C5FD";
+        btn.style.color = "#60a5fa";
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.style.background = colors.inputBg;
+        btn.style.borderColor = colors.inputBorder;
+        btn.style.color = colors.text;
+      });
+    };
+    btnHoverStyle(yearDecBtn);
+    btnHoverStyle(yearIncBtn);
+    
     yearDecBtn.addEventListener("click", () => {
       this.year = Math.max(1900, this.year - 1);
       yearInput.value = String(this.year);
@@ -2101,47 +2303,169 @@ var DatePickerModal = class {
     });
     yearInput.addEventListener("change", () => {
       let val = parseInt(yearInput.value);
-      if (isNaN(val))
-        val = this.currentYear;
+      if (isNaN(val)) val = this.currentYear;
       val = Math.max(1900, Math.min(2100, val));
       this.year = val;
       yearInput.value = String(val);
     });
-    const monthSection = this.modalEl.createDiv("picker-section");
-    monthSection.createEl("div", { cls: "section-label", text: "\u6708\u4EFD" });
+    
+    // 月份区域
+    const monthSection = contentEl.createDiv("picker-section");
+    monthSection.style.marginBottom = "28px";
+    
+    const monthLabel = monthSection.createEl("div", { text: "\u6708\u4EFD" });
+    monthLabel.style.fontSize = "13px";
+    monthLabel.style.fontWeight = "600";
+    monthLabel.style.color = colors.textMuted;
+    monthLabel.style.textAlign = "center";
+    monthLabel.style.marginBottom = "16px";
+    
     const monthGrid = monthSection.createDiv("month-grid");
+    monthGrid.style.display = "grid";
+    monthGrid.style.gridTemplateColumns = "repeat(4, 1fr)";
+    monthGrid.style.gap = "12px";
+    
     const monthNames = ["1\u6708", "2\u6708", "3\u6708", "4\u6708", "5\u6708", "6\u6708", "7\u6708", "8\u6708", "9\u6708", "10\u6708", "11\u6708", "12\u6708"];
+    
     for (let m = 0; m < 12; m++) {
-      const monthBtn = monthGrid.createEl("button", {
-        cls: `month-btn ${m === this.month ? "selected" : ""} ${m === this.currentMonth ? "current" : ""}`,
-        text: monthNames[m]
+      const monthBtn = monthGrid.createEl("button", { text: monthNames[m] });
+      monthBtn.style.padding = "16px 8px";
+      monthBtn.style.fontSize = "14px";
+      monthBtn.style.fontWeight = "600";
+      monthBtn.style.borderRadius = "12px";
+      monthBtn.style.cursor = "pointer";
+      monthBtn.style.border = "2px solid transparent";
+      monthBtn.style.transition = "all 0.2s ease";
+      monthBtn.style.display = "flex";
+      monthBtn.style.alignItems = "center";
+      monthBtn.style.justifyContent = "center";
+      monthBtn.style.outline = "none";
+      monthBtn.style.boxShadow = "none";
+      
+      if (m === this.currentMonth) {
+        // 当前月份 - 蓝色
+        monthBtn.style.color = "white";
+        monthBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+        monthBtn.style.borderColor = "#60a5fa";
+        monthBtn.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35)";
+        monthBtn.style.transform = "scale(1.05)";
+      } else if (m === this.month) {
+        // 选中月份 - 绿色
+        monthBtn.style.color = "white";
+        monthBtn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+        monthBtn.style.borderColor = "#34d399";
+        monthBtn.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35)";
+        monthBtn.style.transform = "scale(1.05)";
+      } else {
+        // 普通月份
+        monthBtn.style.color = colors.text;
+        monthBtn.style.background = colors.wrapperBg;
+      }
+      
+      monthBtn.addEventListener("mouseenter", () => {
+        if (m !== this.currentMonth && m !== this.month) {
+          monthBtn.style.background = colors.btnHover;
+          monthBtn.style.transform = "translateY(-2px)";
+          monthBtn.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+        }
       });
+      
+      monthBtn.addEventListener("mouseleave", () => {
+        if (m !== this.currentMonth && m !== this.month) {
+          monthBtn.style.background = colors.wrapperBg;
+          monthBtn.style.transform = "none";
+          monthBtn.style.boxShadow = "none";
+        }
+      });
+      
       monthBtn.addEventListener("click", () => {
-        monthGrid.querySelectorAll(".month-btn").forEach((btn) => btn.removeClass("selected"));
-        monthBtn.addClass("selected");
+        // 重置所有按钮
+        monthGrid.querySelectorAll("button").forEach((btn, idx) => {
+          btn.style.color = colors.text;
+          btn.style.background = colors.wrapperBg;
+          btn.style.borderColor = "transparent";
+          btn.style.boxShadow = "none";
+          btn.style.transform = "none";
+          // 如果是当前月份，恢复蓝色
+          if (idx === this.currentMonth) {
+            btn.style.color = "white";
+            btn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+            btn.style.borderColor = "#60a5fa";
+            btn.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35)";
+            btn.style.transform = "scale(1.05)";
+          }
+        });
+        
+        // 设置选中样式 - 绿色
+        monthBtn.style.color = "white";
+        monthBtn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+        monthBtn.style.borderColor = "#34d399";
+        monthBtn.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35)";
+        monthBtn.style.transform = "scale(1.05)";
         this.month = m;
       });
     }
-    const btnGroup = this.modalEl.createDiv("modal-buttons");
-    const cancelBtn = btnGroup.createEl("button", {
-      cls: "btn-cancel",
-      text: "\u53D6\u6D88"
+    
+    // 按钮组
+    const btnGroup = contentEl.createDiv("modal-buttons");
+    btnGroup.style.display = "flex";
+    btnGroup.style.gap = "16px";
+    btnGroup.style.justifyContent = "center";
+    btnGroup.style.marginTop = "8px";
+    
+    const cancelBtn = btnGroup.createEl("button", { text: "\u53D6\u6D88" });
+    cancelBtn.style.padding = "14px 32px";
+    cancelBtn.style.fontSize = "15px";
+    cancelBtn.style.fontWeight = "600";
+    cancelBtn.style.borderRadius = "12px";
+    cancelBtn.style.cursor = "pointer";
+    cancelBtn.style.border = "none";
+    cancelBtn.style.minWidth = "100px";
+    cancelBtn.style.background = colors.btnCancel;
+    cancelBtn.style.color = isDark ? "#94a3b8" : "#64748B";
+    cancelBtn.style.transition = "all 0.2s ease";
+    
+    cancelBtn.addEventListener("mouseenter", () => {
+      cancelBtn.style.background = colors.btnCancelHover;
+      cancelBtn.style.color = isDark ? "#e2e8f0" : "#475569";
     });
-    cancelBtn.addEventListener("click", () => this.close(overlay));
-    const confirmBtn = btnGroup.createEl("button", {
-      cls: "btn-confirm",
-      text: "\u786E\u5B9A"
+    cancelBtn.addEventListener("mouseleave", () => {
+      cancelBtn.style.background = colors.btnCancel;
+      cancelBtn.style.color = isDark ? "#94a3b8" : "#64748B";
+    });
+    cancelBtn.addEventListener("click", () => this.close());
+    
+    const confirmBtn = btnGroup.createEl("button", { text: "\u786E\u5B9A" });
+    confirmBtn.style.padding = "14px 32px";
+    confirmBtn.style.fontSize = "15px";
+    confirmBtn.style.fontWeight = "600";
+    confirmBtn.style.borderRadius = "12px";
+    confirmBtn.style.cursor = "pointer";
+    confirmBtn.style.border = "none";
+    confirmBtn.style.minWidth = "100px";
+    confirmBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+    confirmBtn.style.color = "white";
+    confirmBtn.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
+    confirmBtn.style.transition = "all 0.2s ease";
+    
+    confirmBtn.addEventListener("mouseenter", () => {
+      confirmBtn.style.background = "linear-gradient(135deg, #2563eb, #1d4ed8)";
+      confirmBtn.style.transform = "translateY(-1px)";
+      confirmBtn.style.boxShadow = "0 6px 20px rgba(59, 130, 246, 0.45)";
+    });
+    confirmBtn.addEventListener("mouseleave", () => {
+      confirmBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+      confirmBtn.style.transform = "none";
+      confirmBtn.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
     });
     confirmBtn.addEventListener("click", () => {
       this.onSubmit(this.year, this.month);
-      this.close(overlay);
+      this.close();
     });
-    document.body.appendChild(this.modalEl);
-    overlay.addEventListener("click", () => this.close(overlay));
   }
-  close(overlay) {
-    overlay.remove();
-    this.modalEl.remove();
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
   }
 };
 
@@ -2182,7 +2506,7 @@ var CreateTaskModal = class {
     this.modalEl.className = "create-task-modal";
     const dateInfoEl = this.modalEl.createDiv("modal-date-info");
     const weekday = ["\u5468\u65E5", "\u5468\u4E00", "\u5468\u4E8C", "\u5468\u4E09", "\u5468\u56DB", "\u5468\u4E94", "\u5468\u516D"][this.date.getDay()];
-    const holidayInfo = holidayManager.getHolidayInfo(this.date);
+    const holidayInfo = this.plugin.holidayManager.getHolidayInfo(this.date);
     const holidayText = holidayInfo ? ` \xB7 ${holidayInfo.name}` : "";
     dateInfoEl.innerHTML = `
 			<div class="date-main">${this.date.getMonth() + 1}\u6708${this.date.getDate()}\u65E5 \xB7 ${weekday}${holidayText}</div>
@@ -2334,21 +2658,18 @@ var CreateTaskModal = class {
         const cell = grid.createDiv("picker-cell");
         cell.textContent = String(d);
         const cellDate = new Date(pickerYear, pickerMonth, d);
-        const isPast = cellDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        if (isPast) cell.addClass("picker-cell-disabled");
         const cellKey = `${pickerYear}-${pickerMonth}-${d}`;
         if (cellKey === todayStr) cell.addClass("picker-cell-today");
-        if (!isPast) {
-          cell.addEventListener("click", () => {
-            endDate = new Date(pickerYear, pickerMonth, d);
-            const m = String(pickerMonth + 1).padStart(2, "0");
-            const dd = String(d).padStart(2, "0");
-            endDateTrigger.textContent = formatDisplayDate(pickerYear, pickerMonth, d);
-            endDateTrigger.setAttribute("data-value", `${pickerYear}-${m}-${dd}`);
-            popup.remove();
-            closeHandler = null;
-          });
-        }
+        // 允许选择任意日期（包括过去的日期）
+        cell.addEventListener("click", () => {
+          endDate = new Date(pickerYear, pickerMonth, d);
+          const m = String(pickerMonth + 1).padStart(2, "0");
+          const dd = String(d).padStart(2, "0");
+          endDateTrigger.textContent = formatDisplayDate(pickerYear, pickerMonth, d);
+          endDateTrigger.setAttribute("data-value", `${pickerYear}-${m}-${dd}`);
+          popup.remove();
+          closeHandler = null;
+        });
       }
     }
     function syncSelects(popup) {
@@ -2498,6 +2819,11 @@ var CreateTaskModal = class {
     overlay.remove();
     this.modalEl.remove();
   }
+  /**
+   * 格式化日期为 YYYY-MM-DD 格式（用于日期输入框）
+   * @param date - 日期对象
+   * @returns YYYY-MM-DD 格式的日期字符串
+   */
   formatDateForInput(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -2507,6 +2833,19 @@ var CreateTaskModal = class {
 };
 
 // src/main.ts
+
+/**
+ * 默认设置配置
+ * @property {boolean} showCompletedTasks - 是否显示已完成任务
+ * @property {boolean} showCompletedStrike - 已完成任务是否显示删除线
+ * @property {boolean} defaultAllDayTask - 新建任务默认是否为全天任务
+ * @property {number} firstDayOfWeek - 每周第一天（0=周日，1=周一）
+ * @property {boolean} showLunar - 是否显示农历
+ * @property {boolean} showHoliday - 是否显示节假日标注
+ * @property {number} tasksPerDayLimit - 每日显示任务数量上限
+ * @property {string} customTaskFolder - 自定义任务文件夹路径（为空则使用默认"任务"）
+ * @property {Object} holidaysData - 节假日数据缓存（按年份存储）
+ */
 var DEFAULT_SETTINGS = {
   showCompletedTasks: true,
   showCompletedStrike: true,
@@ -2515,6 +2854,7 @@ var DEFAULT_SETTINGS = {
   showLunar: true,
   showHoliday: true,
   tasksPerDayLimit: 5,
+  customTaskFolder: "",
   holidaysData: {}
 };
 
@@ -2551,17 +2891,20 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
    * 插件加载
    */
   async onload() {
+    // 初始化节假日管理器（每个插件实例独立）
+    this.holidayManager = new HolidayManager();
+    
     await this.loadSettings();
     // 启用插件时默认刷新节假日数据（异步执行，不阻塞）
     (async () => {
       const currentYear = new Date().getFullYear();
       await Promise.all([
-        holidayManager.updateFromNetwork(currentYear - 1),
-        holidayManager.updateFromNetwork(currentYear),
-        holidayManager.updateFromNetwork(currentYear + 1)
+        this.holidayManager.updateFromNetwork(currentYear - 1),
+        this.holidayManager.updateFromNetwork(currentYear),
+        this.holidayManager.updateFromNetwork(currentYear + 1)
       ]);
       this.settings.holidaysData = {};
-      for (const [year, holidays] of holidayManager.cache.entries()) {
+      for (const [year, holidays] of this.holidayManager.cache.entries()) {
         this.settings.holidaysData[year] = holidays;
       }
       await this.saveSettings();
@@ -2594,6 +2937,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         this.refreshView();
       }, 500);
     };
+    // 监听文件修改
     this.registerEvent(
       this.app.vault.on("modify", (file) => {
         if (file instanceof import_obsidian3.TFile && file.extension === "md") {
@@ -2601,6 +2945,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         }
       })
     );
+    // 监听文件创建
     this.registerEvent(
       this.app.vault.on("create", (file) => {
         if (file instanceof import_obsidian3.TFile && file.extension === "md") {
@@ -2608,14 +2953,26 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         }
       })
     );
+    // 监听文件删除
     this.registerEvent(
       this.app.vault.on("delete", () => {
         debouncedRefresh();
       })
     );
+    // 监听文件重命名（移动）
     this.registerEvent(
       this.app.vault.on("rename", () => {
         debouncedRefresh();
+      })
+    );
+    // 监听元数据缓存变化 - 确保文件移动后能正确刷新任务
+    // 这是最关键的修复：当文件被移动时，metadataCache 需要时间更新
+    // 监听 changed 事件可以确保在缓存更新完成后再刷新视图
+    this.registerEvent(
+      this.app.metadataCache.on("changed", (file) => {
+        if (file instanceof import_obsidian3.TFile && file.extension === "md") {
+          debouncedRefresh();
+        }
       })
     );
   }
@@ -2626,8 +2983,8 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
     if (this.settings.holidaysData) {
       for (const [year, holidays] of Object.entries(this.settings.holidaysData)) {
-        if (!holidayManager.cache.has(parseInt(year))) {
-          holidayManager.cache.set(parseInt(year), holidays);
+        if (!this.holidayManager.cache.has(parseInt(year))) {
+          this.holidayManager.cache.set(parseInt(year), holidays);
         }
       }
     }
@@ -2743,6 +3100,21 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
+    // 自定义任务文件夹设置
+    const folderOptions = this.getFolderOptions();
+    new import_obsidian3.Setting(containerEl).setName("任务文件夹").setDesc("选择任务文件的存储位置。如果已有年度任务文件，插件会优先使用它。").addDropdown((dropdown) => {
+      dropdown.addOption("", "默认（任务）");
+      for (const [path, name] of Object.entries(folderOptions)) {
+        dropdown.addOption(path, name);
+      }
+      dropdown.setValue(this.plugin.settings.customTaskFolder);
+      dropdown.onChange(async (value) => {
+        this.plugin.settings.customTaskFolder = value;
+        await this.plugin.saveSettings();
+        // 清除缓存，以便下次创建任务时重新查找
+        this.plugin.taskParser.invalidateCache();
+      });
+    });
     new import_obsidian3.Setting(containerEl).setName("刷新节假日数据").setDesc("从 timor.tech API 获取最新节假日数据").addButton((button) => {
       button.setButtonText("刷新");
       button.buttonEl.addEventListener("click", async () => {
@@ -2750,12 +3122,12 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
         button.setDisabled(true);
         button.setButtonText("加载中...");
         await Promise.all([
-          holidayManager.updateFromNetwork(currentYear - 1),
-          holidayManager.updateFromNetwork(currentYear),
-          holidayManager.updateFromNetwork(currentYear + 1)
+          this.plugin.holidayManager.updateFromNetwork(currentYear - 1),
+          this.plugin.holidayManager.updateFromNetwork(currentYear),
+          this.plugin.holidayManager.updateFromNetwork(currentYear + 1)
         ]);
         this.plugin.settings.holidaysData = {};
-        for (const [year, holidays] of holidayManager.cache.entries()) {
+        for (const [year, holidays] of this.plugin.holidayManager.cache.entries()) {
           this.plugin.settings.holidaysData[year] = holidays;
         }
         await this.plugin.saveSettings();
@@ -2766,5 +3138,35 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       });
     });
 
+  }
+
+  /**
+   * 获取库中所有文件夹选项
+   * @returns {Object} 文件夹路径 -> 显示名称的映射
+   */
+  getFolderOptions() {
+    const options = {};
+    const folders = /* @__PURE__ */ new Set();
+    
+    // 遍历所有文件，收集文件夹路径
+    const files = this.app.vault.getAllLoadedFiles();
+    for (const file of files) {
+      if (file.parent) {
+        // 收集所有父文件夹路径
+        let current = file.parent;
+        while (current && current.path !== "/") {
+          folders.add(current.path);
+          current = current.parent;
+        }
+      }
+    }
+    
+    // 排序并添加到选项
+    const sortedFolders = Array.from(folders).sort();
+    for (const folder of sortedFolders) {
+      options[folder] = folder;
+    }
+    
+    return options;
   }
 };
