@@ -70,7 +70,7 @@
 	--radius: 12px;
 	--radius-lg: 16px;
 	
-	--transition: all 0.2s ease;
+	--transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
 /* ========== 容器 ========== */
@@ -81,6 +81,8 @@
 	padding: 12px;
 	background: var(--bg-secondary);
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 /* ========== 头部导航 ========== */
@@ -122,7 +124,6 @@
 .nav-btn:hover {
 	background: var(--primary-100);
 	color: var(--primary-600);
-	transform: scale(1.05);
 }
 
 .nav-btn:active {
@@ -226,14 +227,14 @@
 	box-shadow: var(--shadow-sm);
 	cursor: pointer;
 	transition: var(--transition);
-	min-height: 95px;
+	min-height: 70px;
 	position: relative;
 	overflow: hidden;
+	contain: content;
 }
 
 .day-cell:hover {
 	box-shadow: var(--shadow-md);
-	transform: translateY(-2px);
 }
 
 .day-cell:active {
@@ -361,6 +362,13 @@
 	text-overflow: ellipsis;
 	max-width: 50px;
 	flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+	.lunar-info {
+		max-width: 32px;
+		font-size: 8px;
+	}
 }
 
 .lunar-info.special-lunar {
@@ -591,6 +599,12 @@
 	backdrop-filter: blur(6px);
 }
 
+@media (max-width: 768px) {
+	.modal-overlay {
+		backdrop-filter: none;
+	}
+}
+
 /* 弹窗容器 - 优化设计 */
 .create-task-modal {
 	position: fixed;
@@ -604,8 +618,34 @@
 	z-index: 1001;
 	width: 420px;
 	max-width: 92vw;
+	max-height: 90vh;
+	overflow-y: auto;
 	animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-	overflow: hidden;
+	-webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 600px) {
+	.create-task-modal {
+		top: auto;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		transform: none;
+		width: 100%;
+		max-width: 100%;
+		max-height: 85vh;
+		border-radius: 20px 20px 0 0;
+		animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+}
+
+@keyframes modalSlideUp {
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0);
+	}
 }
 
 @keyframes modalSlideIn {
@@ -1277,6 +1317,19 @@
 	border: 1px solid #e2e8f0;
 }
 
+@media (max-width: 600px) {
+	.date-picker-popup {
+		top: auto;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		transform: none;
+		min-width: unset;
+		width: 100%;
+		border-radius: 16px 16px 0 0;
+	}
+}
+
 /* 导航行：年月切换 */
 .date-picker-nav {
 	display: flex;
@@ -1561,7 +1614,7 @@
 	
 	.day-cell {
 		padding: 6px 8px;
-		min-height: 115px;
+		min-height: 90px;
 	}
 	
 	.day-number {
@@ -1619,7 +1672,7 @@
 	}
 	
 	.day-cell {
-		min-height: 160px;
+		min-height: 120px;
 		padding: 10px 12px;
 		border-radius: 14px;
 	}
@@ -1659,7 +1712,7 @@
 	}
 }
 
-.calendar-grid {
+.calendar-grid.calendar-grid-init {
 	animation: fadeIn 0.2s ease-out;
 }
 
@@ -2150,7 +2203,7 @@
 	
 	.day-cell {
 		padding: 3px 4px;
-		min-height: 80px;
+		min-height: 58px;
 		border-radius: 8px;
 	}
 	

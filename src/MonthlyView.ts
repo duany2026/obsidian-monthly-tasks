@@ -119,10 +119,9 @@ export class MonthlyView extends ItemView {
 	 */
 	async render(): Promise<void> {
 		if (this.rootEl.childElementCount === 0) {
-			// 首次渲染：创建所有静态结构
 			this.renderHeader();
 			this.renderWeekdayHeader();
-			this.gridEl = this.rootEl.createDiv('calendar-grid');
+			this.gridEl = this.rootEl.createDiv('calendar-grid calendar-grid-init');
 		}
 		await this.renderCalendarGrid();
 	}
@@ -225,14 +224,13 @@ export class MonthlyView extends ItemView {
 	 * 5. 在顶层渲染跨天任务条
 	 */
 	private async renderCalendarGrid(): Promise<void> {
-		// 1. 更新标题
 		const titleEl = this.headerEl.querySelector('.month-title');
 		if (titleEl) titleEl.textContent = getMonthTitle(this.currentYear, this.currentMonth);
 
-		// 2. 清空旧内容并生成新的日历数据
+		const taskMap = await this.taskParser.parseAllTasks();
+
 		this.gridEl.empty();
 		const calendar = generateMonthCalendar(this.currentYear, this.currentMonth, this.plugin.settings.firstDayOfWeek);
-		const taskMap = await this.taskParser.parseAllTasks(true);  // 强制刷新
 
 		// 3. 分离单日任务和跨天任务
 		const singleDayTasks = new Map<string, Task[]>();

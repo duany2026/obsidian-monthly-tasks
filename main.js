@@ -1370,7 +1370,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     if (this.rootEl.childElementCount === 0) {
       this.renderHeader();
       this.renderWeekdayHeader();
-      this.gridEl = this.rootEl.createDiv("calendar-grid");
+      this.gridEl = this.rootEl.createDiv("calendar-grid calendar-grid-init");
     }
     await this.renderCalendarGrid();
   }
@@ -1461,9 +1461,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const titleEl = this.headerEl.querySelector(".month-title");
     if (titleEl)
       titleEl.textContent = getMonthTitle(this.currentYear, this.currentMonth);
+    const taskMap = await this.taskParser.parseAllTasks();
     this.gridEl.empty();
     const calendar = generateMonthCalendar(this.currentYear, this.currentMonth, this.plugin.settings.firstDayOfWeek);
-    const taskMap = await this.taskParser.parseAllTasks(true);
     const singleDayTasks = /* @__PURE__ */ new Map();
     const multiDayTasks = [];
     for (const [dateStr, tasks] of taskMap.taskMap) {
