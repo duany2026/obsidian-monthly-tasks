@@ -57,7 +57,7 @@ export class MonthlyView extends ItemView {
 	/** 当前显示的月份 (0-based) */
 	private currentMonth: number;
 	/** 视图根容器 DOM 元素 */
-	private containerEl: HTMLElement;
+	private rootEl: HTMLElement;
 	/** 头部导航区域 */
 	private headerEl: HTMLElement;
 	/** 日历网格容器 */
@@ -98,7 +98,7 @@ export class MonthlyView extends ItemView {
 	 * 创建容器元素并执行首次渲染。
 	 */
 	async onOpen(): Promise<void> {
-		this.containerEl = this.contentEl.createDiv('monthly-tasks-container');
+		this.rootEl = this.contentEl.createDiv('monthly-tasks-container');
 		await this.render();
 	}
 
@@ -108,7 +108,7 @@ export class MonthlyView extends ItemView {
 	 * 清理 DOM 以防止内存泄漏。
 	 */
 	async onClose(): Promise<void> {
-		this.containerEl.empty();
+		this.rootEl.empty();
 	}
 
 	/**
@@ -118,11 +118,11 @@ export class MonthlyView extends ItemView {
 	 * 后续刷新时只更新数据不重建结构（提升性能）。
 	 */
 	async render(): Promise<void> {
-		if (this.containerEl.childElementCount === 0) {
+		if (this.rootEl.childElementCount === 0) {
 			// 首次渲染：创建所有静态结构
 			this.renderHeader();
 			this.renderWeekdayHeader();
-			this.gridEl = this.containerEl.createDiv('calendar-grid');
+			this.gridEl = this.rootEl.createDiv('calendar-grid');
 		}
 		await this.renderCalendarGrid();
 	}
@@ -135,7 +135,7 @@ export class MonthlyView extends ItemView {
 	 * 包含：上/下月按钮、月份标题（可点击跳转）、今天按钮、关闭按钮
 	 */
 	private renderHeader(): void {
-		this.headerEl = this.containerEl.createDiv('monthly-header');
+		this.headerEl = this.rootEl.createDiv('monthly-header');
 
 		// 左侧组：上一月 + 标题
 		const leftGroup = this.headerEl.createDiv('header-btn-group');
@@ -204,7 +204,7 @@ export class MonthlyView extends ItemView {
 	 * 根据设置中的 firstDayOfWeek 决定排列顺序。
 	 */
 	private renderWeekdayHeader(): void {
-		const weekdayEl = this.containerEl.createDiv('weekday-header');
+		const weekdayEl = this.rootEl.createDiv('weekday-header');
 		const firstDayOfWeek = this.plugin.settings.firstDayOfWeek;
 
 		for (let i = 0; i < 7; i++) {
@@ -333,7 +333,7 @@ export class MonthlyView extends ItemView {
 
 			// 应用优先级和完成状态样式
 			barEl.addClass(`multiday-priority-${span.task.priority}`);
-			if (span.task.completed) barEl.addClass('completed');
+			if (span.task.completed && this.plugin.settings.completedTaskStyle === 'strike') barEl.addClass('completed');
 
 			// 百分比定位：适应不同屏幕宽度
 			const colWidth = 100 / 7;
@@ -414,8 +414,10 @@ export class MonthlyView extends ItemView {
 		// ── 任务列表 ───────────────────────
 		const tasksEl = cellEl.createDiv('day-tasks');
 
-		// 过滤已完成的任务（根据设置决定是否隐藏）
-		const displayTasksList = this.plugin.settings.showCompletedTasks ? tasks : tasks.filter(t => !t.completed);
+		// 过滤已完成的任务（根据 completedTaskStyle 设置决定是否隐藏）
+		const displayTasksList = this.plugin.settings.completedTaskStyle === 'hide'
+			? tasks.filter(t => !t.completed)
+			: tasks;
 
 		// 限制显示数量（超出折叠为 "+N"）
 		const limit = this.plugin.settings.tasksPerDayLimit;
@@ -446,8 +448,12 @@ export class MonthlyView extends ItemView {
 	private renderTaskItem(container: HTMLElement, task: Task, dayDate?: Date): void {
 		const taskEl = container.createDiv('task-item');
 
-		// 状态样式
-		if (task.completed) taskEl.addClass('completed');
+		// 状态样式：仅在 completedTaskStyle 为 strike 时显示删除线
+		if (task.completed) {
+			if (this.plugin.settings.completedTaskStyle === 'strike') {
+				taskEl.addClass('completed');
+			}
+		}
 		if (task.dueDate && isOverdue(task.dueDate) && !task.completed) taskEl.addClass('overdue');
 		taskEl.addClass(`priority-bg-${task.priority}`);
 

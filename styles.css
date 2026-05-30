@@ -2036,12 +2036,6 @@
 		margin: 14px auto 0;
 	}
 	.all-day-toggle span {
-		font-size: 15px;
-	}
-	.all-day-toggle input[type="checkbox"] {
-		width: 20px;
-		height: 20px;
-	.all-day-toggle span {
 		font-size: 14px;
 	}
 	.all-day-toggle input[type="checkbox"] {

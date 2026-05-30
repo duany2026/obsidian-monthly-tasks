@@ -12,7 +12,7 @@
  * @see     https://github.com/duanydev/obsidian-monthly-tasks
  */
 
-import { Plugin, WorkspaceLeaf, TFile, App, PluginSettingTab, Setting } from 'obsidian';
+import { Plugin, WorkspaceLeaf, TFile, App, PluginSettingTab, Setting, Notice } from 'obsidian';
 import { TaskParser } from './TaskParser';
 import { MonthlyView, VIEW_TYPE_MONTHLY } from './MonthlyView';
 
@@ -40,6 +40,8 @@ interface MonthlyTasksSettings {
 	highPriorityColor: string;
 	/** 中优先级任务的自定义颜色（十六进制色值） */
 	mediumPriorityColor: string;
+	/** 是否显示已完成任务 */
+	showCompletedTasks: boolean;
 }
 
 /**
@@ -55,7 +57,8 @@ const DEFAULT_SETTINGS: MonthlyTasksSettings = {
 	showHoliday: true,
 	tasksPerDayLimit: 5,
 	highPriorityColor: '#ef4444',
-	mediumPriorityColor: '#f59e0b'
+	mediumPriorityColor: '#f59e0b',
+	showCompletedTasks: true
 };
 
 /**
