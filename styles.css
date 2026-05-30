@@ -716,7 +716,7 @@
 	background: #ffffff;
 	color: var(--text-normal);
 	outline: none;
-	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+	transition: border-color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 	box-sizing: border-box;
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -753,7 +753,7 @@
 	font-weight: 600;
 	border-radius: 10px;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 	border: none;
 	min-width: 90px;
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -823,7 +823,7 @@
 	border: 2px solid #e2e8f0;
 	border-radius: 10px;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	outline: none;
 }
@@ -900,7 +900,7 @@
 	background: white;
 	border-radius: 8px;
 	border: 1px solid #e2e8f0;
-	transition: all 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 	margin: 12px auto 0;
 	width: fit-content;
 }
@@ -1191,7 +1191,7 @@
 	background: white;
 	border-radius: 8px;
 	border: 1px solid #e2e8f0;
-	transition: all 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
 .multi-day-toggle:hover {
@@ -1221,7 +1221,7 @@
 	border: 2px solid #e2e8f0;
 	border-radius: 10px;
 	cursor: pointer;
-	transition: all 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	outline: none;
 	width: 100%;
@@ -1288,7 +1288,7 @@
 	font-size: 14px;
 	font-weight: 500;
 	color: #334155;
-	transition: all 0.2s ease;
+	transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	user-select: none;
 }
@@ -1346,7 +1346,7 @@
 	color: #64748b;
 	padding: 6px 12px;
 	border-radius: 6px;
-	transition: all 0.15s;
+	transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 	font-family: inherit;
 }
 .picker-nav-btn:hover {
@@ -1404,7 +1404,7 @@
 	font-weight: 500;
 	color: #334155;
 	cursor: pointer;
-	transition: all 0.15s;
+	transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .picker-cell:hover:not(.picker-cell-disabled) {
 	background: #3b82f6;
@@ -1493,7 +1493,7 @@
 	border-radius: 50%;
 	border: 3px solid transparent;
 	cursor: pointer;
-	transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 	position: relative;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
