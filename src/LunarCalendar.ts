@@ -240,23 +240,22 @@ export function solarToLunar(date: Date): LunarDate {
 	while (true) {
 		let daysInMonth = getLunarMonthDays(lunarYear, lunarMonth);
 
-		// 处理闰月逻辑
-		if (leapMonth === lunarMonth && !isLeap) {
-			if (offset >= daysInMonth) {
-				offset -= daysInMonth;
-				lunarMonth++;
-			} else {
-				isLeap = true;  // 进入闰月
-				break;
-			}
-		} else {
-			if (offset >= daysInMonth) {
-				offset -= daysInMonth;
-				lunarMonth++;
-			} else {
-				break;
-			}
+		if (offset < daysInMonth) {
+			isLeap = false;
+			break;
 		}
+		offset -= daysInMonth;
+
+		if (leapMonth === lunarMonth) {
+			let leapDays = getLeapDays(lunarYear);
+			if (offset < leapDays) {
+				isLeap = true;
+				break;
+			}
+			offset -= leapDays;
+		}
+
+		lunarMonth++;
 	}
 
 	const lunarDay = offset + 1;

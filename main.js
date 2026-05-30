@@ -1258,22 +1258,20 @@ function solarToLunar(date) {
   let lunarMonth = 1;
   while (true) {
     let daysInMonth = getLunarMonthDays(lunarYear, lunarMonth);
-    if (leapMonth === lunarMonth && !isLeap) {
-      if (offset >= daysInMonth) {
-        offset -= daysInMonth;
-        lunarMonth++;
-      } else {
+    if (offset < daysInMonth) {
+      isLeap = false;
+      break;
+    }
+    offset -= daysInMonth;
+    if (leapMonth === lunarMonth) {
+      let leapDays = getLeapDays(lunarYear);
+      if (offset < leapDays) {
         isLeap = true;
         break;
       }
-    } else {
-      if (offset >= daysInMonth) {
-        offset -= daysInMonth;
-        lunarMonth++;
-      } else {
-        break;
-      }
+      offset -= leapDays;
     }
+    lunarMonth++;
   }
   const lunarDay = offset + 1;
   const ganIndex = (lunarYear - 4) % 10;
