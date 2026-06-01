@@ -1,33 +1,14 @@
-<<<<<<< HEAD
-# 插件构建产物
-*.zip
-*.tar.gz
-
-# 临时文件
-.DS_Store
-Thumbs.db
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Obsidian 本地数据
-.data/
-=======
 # ============================================
 # obsidian-monthly-tasks .gitignore
 # ============================================
 
-# 构建输出（由 esbuild 生成）
-main.js
+# 构建输出（由 esbuild 生成，sourcemap 不需要追踪）
 *.js.map
 
 # 依赖目录
 node_modules/
 
-# Obsidian 插件数据
+# Obsidian 插件数据（用户本地配置，不应纳入版本管理）
 data.json
 
 # 编辑器配置
@@ -49,6 +30,9 @@ npm-debug.log*
 # 工作区临时文件
 .workbuddy/
 
-# 打包分发产物（不需要纳入版本管理）
+# 打包分发产物
 *.zip
->>>>>>> c44686cb5c0ac69b2b268b66a7f18590a64b58bf
+*.tar.gz
+
+# Obsidian 本地数据
+.data/
