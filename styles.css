@@ -3,7 +3,7 @@
  * 月历任务插件样式 (Monthly Tasks Plugin)
  * ============================================================
  *
- * 版本：1.3.2
+ * 版本：1.4.0
  * 作者：duany
  *
  * 样式架构：
@@ -21,6 +21,8 @@
 .monthly-tasks-container {
 	--primary-50: #EFF6FF;
 	--primary-100: #DBEAFE;
+	--primary-200: #BFDBFE;
+	--primary-400: #60A5FA;
 	--primary-500: #3B82F6;
 	--primary-600: #2563EB;
 	--primary-700: #1D4ED8;
@@ -52,6 +54,7 @@
 	--gray-50: #F9FAFB;
 	--gray-100: #F3F4F6;
 	--gray-200: #E5E7EB;
+	--gray-300: #D1D5DB;
 	--gray-400: #9CA3AF;
 	--gray-600: #4B5563;
 	--gray-700: #374151;
@@ -78,9 +81,25 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	/* height:100% + padding 在默认 content-box 下会渲染成 100%+24px，容器恒溢出
+	   view-content 24px（被裁切的幽灵溢出）；border-box 让高度口径与 100% 一致 */
+	box-sizing: border-box;
 	padding: 12px;
 	background: var(--bg-secondary);
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	/* 矮面板（右侧栏/矮视口）下 6 行网格整体可滚，最后若干周不再被裁切不可达 */
+	overflow-y: auto;
+	min-height: 0;
+	/* 切换到其他视图再切回时，Obsidian 对 .view-content 的高度约束在重新挂载后才异步生效，
+	   期间容器按自然内容高度布局会瞬间溢出 → 滚动条闪现又消失，经典滚动条占用宽度导致
+	   网格左右抖动。固定预留滚动条槽位，滚动条出现/消失不再改变内容宽度。 */
+	scrollbar-gutter: stable;
+}
+
+/* 本视图的滚动由 .monthly-tasks-container 自行管理，view-content 永远无需自身滚动；
+   overflow:hidden 消除重挂载瞬间高度链未就绪时它在右侧闪现的滚动条 */
+.workspace-leaf-content[data-type="monthly-tasks-view"] .view-content {
+	overflow: hidden;
 }
 
 /* ========== 头部导航 ========== */
@@ -134,7 +153,7 @@
 }
 
 .nav-btn.close-btn:hover {
-	background: #fee2e2;
+	background: rgba(239, 68, 68, 0.15);
 	color: #ef4444;
 }
 
@@ -180,6 +199,9 @@
 
 .today-btn:active {
 	transform: translateY(0);
+	/* 按下时的深色反馈（触屏修复 hover 粘滞后，按压反馈由 :active 承担，不会粘住） */
+	background: var(--primary-100);
+	border-color: var(--primary-200);
 }
 
 /* ========== 星期标题 ========== */
@@ -210,7 +232,8 @@
 .calendar-grid {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
-	grid-template-rows: repeat(6, 1fr);
+	/* 行数随实际渲染的周数（5 或 6 周）生成，配合 generateMonthCalendar 不再固定 6 行 */
+	grid-auto-rows: 1fr;
 	gap: 4px;
 	flex: 1;
 	min-height: 0;
@@ -245,12 +268,10 @@
 	opacity: 0.4;
 }
 
-/* 今天 - 简洁高亮显示 */
+/* 今天 - 简洁高亮显示（描边 + 轻投影，不再用外圈光晕强调） */
 .day-cell.today {
 	border: 2px solid var(--primary-500);
-	box-shadow: 0 0 0 3px var(--primary-100), 0 4px 12px rgba(59, 130, 246, 0.25);
-	position: relative;
-	z-index: 10;
+	box-shadow: 0 1px 4px rgba(59, 130, 246, 0.15);
 	background: linear-gradient(135deg, var(--primary-50) 0%, #dbeafe 100%);
 }
 
@@ -352,7 +373,7 @@
 /* 农历信息 - 优化字体，单行显示 */
 .lunar-info {
 	font-size: 10px;
-	color: var(--gray-400);
+	color: var(--gray-600);
 	line-height: 1.2;
 	font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
 	letter-spacing: 0.2px;
@@ -560,62 +581,102 @@
 	color: var(--primary-700);
 }
 
+/* 跨天任务首日：内容尾部续接箭头，提示任务延续到后续日期 */
+.task-item.multi-day-start .task-content::after {
+	content: ' →';
+	color: var(--primary-500);
+	font-weight: 400;
+}
+
+/* 跨天任务尾日：左侧渐变条改浅收尾，与首日形成首尾区分 */
+.task-item.multi-day-end::before {
+	background: linear-gradient(180deg, var(--primary-200) 0%, var(--primary-100) 100%);
+}
+
 /* 跨天任务 - 深色模式 */
 .theme-dark .task-item.multi-day-task .task-content {
 	color: var(--primary-400);
 }
 
-/* 空状态 */
-.empty-hint {
-	text-align: center;
-	font-size: 16px;
-	color: var(--gray-300);
-	opacity: 0;
-	transition: opacity 0.2s;
+.theme-dark .task-item.multi-day-start .task-content::after {
+	color: var(--primary-400);
 }
 
-.day-cell:hover .empty-hint {
-	opacity: 1;
+.theme-dark .task-item.multi-day-end::before {
+	background: linear-gradient(180deg, var(--primary-600) 0%, var(--primary-400) 100%);
 }
 
-/* 遮罩层 */
-.modal-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background: rgba(0, 0, 0, 0.5);
-	z-index: 1000;
-	animation: fadeIn 0.2s ease;
+/* 遮罩层：由 Obsidian Modal 基类的 .modal-bg 提供，这里仅补充与原设计一致的模糊效果 */
+.modal-container .modal-bg {
 	backdrop-filter: blur(6px);
 }
 
-/* 弹窗容器 - 优化设计 */
-.create-task-modal {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+/* 收掉框架自带元素：右上角关闭按钮、空的标题/内容占位（移动端会撑出弹窗顶部空白）。
+   用 !important 压过框架/移动端样式，且不依赖 JS 时序 */
+.modal-container:has(.create-task-modal) .modal-close-button {
+	display: none !important;
+}
+
+/* 不依赖 :has 的兜底：关闭按钮作为弹窗直接子元素的情况（main.js 侧已直接 remove 元素） */
+.modal.create-task-modal > .modal-close-button {
+	display: none !important;
+}
+
+/* 新版 Obsidian 弹窗结构（真机调试确认）：.modal > .modal-header-button(X) + .modal-header(>.modal-title) + .modal-content
+   本弹窗全部不用这些框架装饰；display:none 使 flex 布局中它们不占位，与 JS 移除互为双保险 */
+.modal.create-task-modal .modal-header-button,
+.modal.create-task-modal .modal-header,
+.modal.create-task-modal .modal-title,
+.modal.create-task-modal .modal-content {
+	display: none !important;
+}
+
+/* 兜底：极少数主题用伪元素绘制关闭符号——伪元素不在 DOM 里，JS 无法移除，只能 CSS 禁掉 */
+.modal.create-task-modal::before,
+.modal.create-task-modal::after {
+	content: none !important;
+	display: none !important;
+}
+
+.modal.create-task-modal {
+	padding: 0 !important;
+	min-height: 0 !important;
+}
+
+/* DatePickerModal 同样收掉框架自带元素：X 关闭钮 + 空头部占位
+   （其内容构建在自身使用的 .modal-content 内，故不隐藏 .modal-content/.modal-title） */
+.modal.date-picker-modal > .modal-close-button,
+.modal.date-picker-modal .modal-header-button,
+.modal.date-picker-modal .modal-header {
+	display: none !important;
+}
+
+/* 弹窗容器 - 优化设计（宿主于 Obsidian Modal 容器内，居中/遮罩由框架负责） */
+.modal-container .create-task-modal {
+	position: relative;
+	top: auto;
+	left: auto;
+	transform: none;
 	background: var(--background-primary);
 	padding: 0;
 	border-radius: 20px;
 	box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.05);
-	z-index: 1001;
 	width: 420px;
 	max-width: 92vw;
+	max-height: 90vh;
 	animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	overflow: hidden;
+	overflow-y: auto;
 }
 
 @keyframes modalSlideIn {
 	from {
 		opacity: 0;
-		transform: translate(-50%, -50%) scale(0.9);
+		transform: scale(0.9);
 	}
 	to {
 		opacity: 1;
-		transform: translate(-50%, -50%) scale(1);
+		transform: scale(1);
 	}
 }
 
@@ -624,12 +685,8 @@
 	font-size: 14px;
 	color: var(--text-normal);
 	text-align: center;
-	padding: 24px;
+	padding: 24px 24px 4px;
 	position: relative;
-}
-
-.modal-date-info::before {
-	display: none;
 }
 
 .modal-date-info .date-main {
@@ -640,31 +697,12 @@
 	letter-spacing: -0.5px;
 }
 
-.modal-date-info .date-lunar {
-	font-size: 13px;
-	color: #64748b;
-	margin-top: 6px;
-	font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 6px;
-	font-weight: 400;
-}
-
-.modal-date-info .date-lunar::before {
-	content: '';
-	display: none;
-}
-
 /* 输入框 - 全面优化样式 */
 .task-input-wrapper {
-	margin: 24px 24px 16px;
+	margin: 16px 24px 16px;
 	position: relative;
-	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 	padding: 4px;
 	border-radius: 16px;
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .task-input {
@@ -673,23 +711,18 @@
 	font-size: 16px;
 	border: 2px solid transparent;
 	border-radius: 12px;
-	background: #ffffff;
+	background: var(--background-primary);
 	color: var(--text-normal);
 	outline: none;
 	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 	box-sizing: border-box;
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.task-input:hover {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .task-input:focus {
 	border-color: #3b82f6;
-	background: #ffffff;
-	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15), 0 8px 24px rgba(59, 130, 246, 0.12);
+	background: var(--background-primary);
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 	transform: translateY(-1px);
 }
 
@@ -774,34 +807,6 @@
 	flex-wrap: nowrap;
 }
 
-.time-input {
-	padding: 10px 14px;
-	font-size: 16px;
-	font-weight: 500;
-	color: #334155;
-	background: white;
-	border: 2px solid #e2e8f0;
-	border-radius: 10px;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-	outline: none;
-}
-
-.time-input:hover {
-	border-color: #cbd5e1;
-}
-
-.time-input:focus {
-	border-color: #3b82f6;
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-}
-
-.time-input:disabled {
-	background: #f1f5f9;
-	cursor: not-allowed;
-}
-
 .time-separator {
 	font-size: 14px;
 	color: #9ca3af;
@@ -817,7 +822,7 @@
 	font-size: 15px;
 	font-weight: 500;
 	color: #1f2937;
-	background: white;
+	background: var(--background-primary);
 	cursor: pointer;
 	outline: none;
 	font-family: inherit;
@@ -857,7 +862,7 @@
 	gap: 8px;
 	cursor: pointer;
 	padding: 8px 14px;
-	background: white;
+	background: var(--background-primary);
 	border-radius: 8px;
 	border: 1px solid #e2e8f0;
 	transition: all 0.2s ease;
@@ -891,25 +896,6 @@
 
 .theme-dark .time-label {
 	color: #94a3b8;
-}
-
-.theme-dark .time-input {
-	background: rgba(30, 41, 59, 0.9);
-	border-color: rgba(71, 85, 105, 0.5);
-	color: #e2e8f0;
-}
-
-.theme-dark .time-input:hover {
-	border-color: rgba(71, 85, 105, 0.7);
-}
-
-.theme-dark .time-input:focus {
-	border-color: #3b82f6;
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.theme-dark .time-input:disabled {
-	background: rgba(15, 23, 42, 0.6);
 }
 
 .theme-dark .time-separator {
@@ -954,11 +940,6 @@
 	color: #cbd5e1;
 }
 
-.theme-dark .all-day-toggle span {
-	color: #cbd5e1;
-}
-
-
 /* 优先级选择 - 颜色块样式 */
 /* 已有任务列表 */
 .modal-existing-tasks {
@@ -999,7 +980,7 @@
 	font-size: 12px;
 	color: #334155;
 	padding: 7px 10px;
-	background: white;
+	background: var(--background-primary);
 	border-radius: 8px;
 	border-left: 3px solid #cbd5e1;
 	transition: background 0.15s, box-shadow 0.15s;
@@ -1148,7 +1129,7 @@
 	gap: 8px;
 	cursor: pointer;
 	padding: 8px 16px;
-	background: white;
+	background: var(--background-primary);
 	border-radius: 8px;
 	border: 1px solid #e2e8f0;
 	transition: all 0.2s ease;
@@ -1170,31 +1151,6 @@
 	font-size: 13px;
 	font-weight: 500;
 	color: #475569;
-}
-
-.end-date-input {
-	padding: 10px 14px;
-	font-size: 14px;
-	font-weight: 500;
-	color: #334155;
-	background: white;
-	border: 2px solid #e2e8f0;
-	border-radius: 10px;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-	outline: none;
-	width: 100%;
-	max-width: 200px;
-}
-
-.end-date-input:hover {
-	border-color: #cbd5e1;
-}
-
-.end-date-input:focus {
-	border-color: #3b82f6;
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 /* 深色模式 - 结束日期 */
@@ -1220,28 +1176,13 @@
 	color: #cbd5e1;
 }
 
-.theme-dark .end-date-input {
-	background: rgba(30, 41, 59, 0.9);
-	border-color: rgba(71, 85, 105, 0.5);
-	color: #e2e8f0;
-}
-
-.theme-dark .end-date-input:hover {
-	border-color: rgba(71, 85, 105, 0.7);
-}
-
-.theme-dark .end-date-input:focus {
-	border-color: #3b82f6;
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
 /* 自定义日期选择器触发按钮 */
 .end-date-trigger {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	padding: 10px 18px;
-	background: white;
+	background: var(--background-primary);
 	border: 2px solid #e2e8f0;
 	border-radius: 10px;
 	cursor: pointer;
@@ -1263,17 +1204,18 @@
 }
 
 /* 日期选择器弹出层 */
+/* 挂载在 document.body 下、由 JS 按触发器位置定位（避免 modal 的 transform
+   成为 fixed 后代的包含块、以及被 modal 的 overflow:hidden 裁切） */
 .date-picker-popup {
 	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
 	z-index: 9999;
-	background: white;
+	background: var(--background-primary);
 	border-radius: 16px;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
 	padding: 16px;
 	min-width: 280px;
+	max-height: calc(100vh - 24px);
+	overflow-y: auto;
 	border: 1px solid #e2e8f0;
 }
 
@@ -1353,16 +1295,12 @@
 	cursor: pointer;
 	transition: all 0.15s;
 }
-.picker-cell:hover:not(.picker-cell-disabled) {
+.picker-cell:hover {
 	background: #3b82f6;
 	color: white;
 }
 .picker-cell.picker-empty {
 	cursor: default;
-}
-.picker-cell.picker-cell-disabled {
-	color: #cbd5e1;
-	cursor: not-allowed;
 }
 .picker-cell.picker-cell-today {
 	color: #3b82f6;
@@ -1395,8 +1333,7 @@
 .theme-dark .picker-select:hover { border-color: #3b82f6; background: rgba(51, 65, 85, 0.9); }
 .theme-dark .picker-week-day { color: #64748b; }
 .theme-dark .picker-cell { color: #e2e8f0; }
-.theme-dark .picker-cell:hover:not(.picker-cell-disabled) { background: #3b82f6; }
-.theme-dark .picker-cell.picker-cell-disabled { color: #475569; }
+.theme-dark .picker-cell:hover { background: #3b82f6; }
 .theme-dark .picker-cell.picker-cell-today { color: #60a5fa; }
 .theme-dark .picker-cell.picker-cell-today:hover { background: #3b82f6; }
 
@@ -1642,10 +1579,55 @@
 		font-size: 12px;
 		line-height: 1.4;
 	}
-	
+
 	.day-tasks {
 		gap: 2px;
 	}
+}
+
+/* ========== 侧栏窄面板适配 ========== */
+/* 视口宽 ≠ 面板宽：视图固定开在右侧栏（300~450px）时，上方按视口宽度生效的
+   平板/桌面级放大规则（min-height 115/160px、大 padding、大 gap）会把 7 列挤爆。
+   媒体查询以视口为键，无法感知面板宽度，这里用 Obsidian 侧栏容器的稳定类名
+   显式回落基础尺寸，保证窄面板下格子内容可见、网格可完整滚动。 */
+.workspace-split.mod-right-split .monthly-tasks-container,
+.workspace-split.mod-left-split .monthly-tasks-container {
+	padding: 12px;
+}
+
+.workspace-split.mod-right-split .monthly-tasks-container .calendar-grid,
+.workspace-split.mod-left-split .monthly-tasks-container .calendar-grid {
+	gap: 4px;
+}
+
+.workspace-split.mod-right-split .monthly-tasks-container .day-cell,
+.workspace-split.mod-left-split .monthly-tasks-container .day-cell {
+	min-height: 95px;
+	padding: 4px 5px;
+	border-radius: var(--radius);
+}
+
+.workspace-split.mod-right-split .monthly-tasks-container .day-number,
+.workspace-split.mod-left-split .monthly-tasks-container .day-number {
+	font-size: 15px;
+}
+
+.workspace-split.mod-right-split .monthly-tasks-container .lunar-info,
+.workspace-split.mod-left-split .monthly-tasks-container .lunar-info {
+	font-size: 10px;
+}
+
+.workspace-split.mod-right-split .monthly-tasks-container .task-item,
+.workspace-split.mod-left-split .monthly-tasks-container .task-item {
+	padding: 2px 4px;
+	font-size: 11px;
+	min-height: 0;
+}
+
+.workspace-split.mod-right-split .monthly-tasks-container .weekday-cell,
+.workspace-split.mod-left-split .monthly-tasks-container .weekday-cell {
+	padding: 8px 4px;
+	font-size: 12px;
 }
 
 /* ========== 动画 ========== */
@@ -1661,16 +1643,6 @@
 
 .calendar-grid {
 	animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes checkPop {
-	0% { transform: scale(1); }
-	50% { transform: scale(1.2); }
-	100% { transform: scale(1); }
-}
-
-.task-checkbox.checked {
-	animation: checkPop 0.2s ease;
 }
 
 /* ========== 深色模式适配 ========== */
@@ -1704,16 +1676,6 @@
 
 .theme-dark .task-item:hover {
 	background: rgba(59, 130, 246, 0.1);
-}
-
-.theme-dark .task-input {
-	background: var(--background-primary);
-	border-color: var(--background-modifier-border);
-	color: var(--text-normal);
-}
-
-.theme-dark .task-input::placeholder {
-	color: var(--text-faint);
 }
 
 /* 深色模式 - 日期格子 */
@@ -1760,7 +1722,7 @@
 /* 深色模式 - 今天高亮 */
 .theme-dark .day-cell.today {
 	border: 2px solid #3b82f6;
-	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.3);
+	box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2);
 	background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
 }
 
@@ -1833,9 +1795,14 @@
 	border-color: rgba(59, 130, 246, 0.3);
 }
 
+.theme-dark .today-btn:active {
+	background: rgba(59, 130, 246, 0.2);
+	border-color: rgba(59, 130, 246, 0.3);
+}
+
 /* 深色模式 - 农历信息 */
 .theme-dark .lunar-info {
-	color: #6b7280;
+	color: #9ca3af;
 }
 
 .theme-dark .lunar-info.special-lunar {
@@ -1892,45 +1859,27 @@
 	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* 深色模式 - 日期头部 */
-.theme-dark .modal-date-info {
-	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.5) 100%);
-	border-bottom-color: rgba(71, 85, 105, 0.3);
+/* 深色底上亮绿勾：沿用亮色的 #15803d 几乎不可见 */
+.theme-dark .priority-btn.priority-none.selected::after {
+	color: #4ade80;
 }
 
-.theme-dark .modal-date-info::before {
-	background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-}
-
+/* 深色模式 - 日期头部（不设背景带，与亮色的干净头部保持一致） */
 .theme-dark .modal-date-info .date-main {
 	color: #e2e8f0;
 }
 
-.theme-dark .modal-date-info .date-lunar {
-	color: #94a3b8;
-}
-
 /* 深色模式 - 输入框 */
-.theme-dark .task-input-wrapper {
-	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.5) 100%);
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
 .theme-dark .task-input {
 	background: rgba(30, 41, 59, 0.9);
 	border-color: transparent;
 	color: #e2e8f0;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.theme-dark .task-input:hover {
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .theme-dark .task-input:focus {
 	background: rgba(30, 41, 59, 1);
 	border-color: #3b82f6;
-	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 8px 24px rgba(0, 0, 0, 0.3);
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
 .theme-dark .task-input::placeholder {
@@ -2018,9 +1967,33 @@
 
 /* 移动端适配 */
 @media (max-width: 600px) {
+	/* 弹窗内区块左右边距统一收窄（原 24px，与时间选择器的 12px 不一致） */
+	.modal-date-info {
+		padding: 24px 16px 4px;
+	}
+	.task-input-wrapper {
+		margin: 16px;
+	}
+	.modal-existing-tasks {
+		margin: 16px;
+	}
+	.modal-time-container {
+		margin: 0 16px 16px;
+		padding: 14px;
+	}
+	.modal-end-date {
+		margin: 0 16px 16px;
+	}
+	.modal-priority {
+		margin: 0 16px 20px;
+	}
+	.modal-buttons {
+		padding: 0 16px 20px;
+	}
+
 	/* 时间选择器适配 */
 	.modal-time-container {
-		margin: 0 12px 12px;
+		margin: 0 16px 16px;
 		padding: 14px;
 	}
 	.time-input-wrapper {
@@ -2041,12 +2014,6 @@
 	.all-day-toggle input[type="checkbox"] {
 		width: 20px;
 		height: 20px;
-	.all-day-toggle span {
-		font-size: 14px;
-	}
-	.all-day-toggle input[type="checkbox"] {
-		width: 18px;
-		height: 18px;
 	}
 	.time-label {
 		font-size: 13px;
@@ -2174,3 +2141,75 @@
 	}
 }
 
+/* ========== 触屏设备适配（无悬停能力） ========== */
+/* 触屏 tap 后 :hover 会保持到下一次点击：上浮/放大/变深的样式看起来像「按住没弹起」
+   （如「回到本月」按钮点按后一直停留在按下外观）。在无 hover 设备上还原这些效果，
+   桌面端不受影响；同时把原本仅 hover 可见的元素改为常显。 */
+@media (hover: none) {
+	.day-cell:hover {
+		transform: none;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.theme-dark .day-cell:hover {
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+
+	.nav-btn:hover,
+	.today-btn:hover,
+	.month-title.clickable:hover,
+	.priority-btn:hover,
+	.btn-confirm:hover,
+	.btn-cancel:hover {
+		transform: none;
+	}
+
+	.today-btn:hover {
+		background: var(--primary-50);
+		border-color: var(--primary-100);
+	}
+
+	.theme-dark .today-btn:hover {
+		background: rgba(59, 130, 246, 0.1);
+		border-color: rgba(59, 130, 246, 0.2);
+	}
+
+	.month-title.clickable:hover {
+		background: var(--bg-secondary);
+		color: var(--gray-900);
+	}
+
+	.theme-dark .month-title.clickable:hover {
+		background: var(--bg-secondary);
+		color: #e5e7eb;
+	}
+
+	/* 已有任务列表的操作按钮（跳转/删除）触屏上常显：此前仅 hover 可见，手机上无法触及 */
+	.task-item-actions {
+		opacity: 1;
+	}
+}
+
+
+/* ========== 设置页使用提示 ========== */
+.mt-settings-tips {
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	padding: 10px 14px;
+	margin-bottom: 16px;
+}
+
+.mt-settings-tips h3 {
+	margin: 0 0 6px;
+	font-size: 14px;
+	color: var(--text-normal);
+}
+
+.mt-settings-tips ul {
+	margin: 0;
+	padding-left: 18px;
+	color: var(--text-muted);
+	font-size: 13px;
+	line-height: 1.8;
+}
