@@ -1,5 +1,16 @@
 # 月历任务插件 (Monthly Tasks)
 
+## 📥 下载安装（小白版）
+
+1. 打开本仓库的 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases)，下载最新版本的 `monthly-tasks-1.4.0.zip`
+2. 解压，得到文件夹 `monthly-tasks`
+3. 打开你的 Obsidian 笔记库文件夹，进入隐藏目录 `.obsidian/plugins/`（如果没见过这个目录：在 Obsidian 里点左下角仓库图标 →「在系统资源管理器中显示仓库」，进去就能看到 `.obsidian`）
+4. 把解压出的 `monthly-tasks` 文件夹整个放进去，变成 `.obsidian/plugins/monthly-tasks/`（里面应有 `main.js`、`manifest.json`、`styles.css`）
+5. 重启 Obsidian → 设置 → 第三方插件 → 关闭「安全模式」→ 在已安装插件列表中启用「月历任务」
+
+> 进阶：也可以安装 [BRAT](https://github.com/TfTHacker/obsidian42-brat) 插件，添加仓库地址 `https://github.com/duany2026/obsidian-monthly-tasks`，以后可自动更新。
+
+
 一款为 Obsidian 打造的滴答清单风格月视图任务管理插件，支持农历显示、节假日标注和调休信息展示。
 
 ---
