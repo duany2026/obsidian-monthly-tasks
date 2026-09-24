@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.4.0
+ * 版本：1.4.1
  * 作者：duany
  * 许可证：MIT
  *
@@ -33,7 +33,6 @@
  *    - 解析Obsidian库中的任务
  *    - 缓存管理：parseAllTasks, invalidateCache
  *    - 文件操作：createTask, createTaskForDate, getOrCreateDefaultTaskFile
- *    - 任务搜索：findDailyNotePath
  *
  * 3. Calendar
  *    - 生成月历网格数据（5-6周动态行数）
@@ -359,7 +358,6 @@ function isOverdue(dateStr) {
  * - parseAllTasks()：解析所有任务（带5秒缓存）
  * - createTask()：创建新任务，自动按月份分组到年度任务列表
  * - createTaskForDate()：在指定日期创建任务
- * - findDailyNotePath()：查找日记文件路径
  * - getOrCreateDefaultTaskFile()：获取或创建年度任务列表文件
  * 
  * 任务文件格式：
@@ -380,6 +378,8 @@ var TaskParser = class {
     this.taskFileCache = /* @__PURE__ */ new Map();
     // 写操作串行化队列：避免 createTask/toggleTask/deleteTask 并发读写导致后写覆盖先写丢失任务
     this.writeQueue = Promise.resolve();
+    // 进行中的全库解析 Promise：供并发调用复用，避免缓存失效窗口内重复全库扫描
+    this.parsingPromise = null;
   }
   /**
    * 解析所有文件中的任务
@@ -389,26 +389,38 @@ var TaskParser = class {
     if (!forceRefresh && this.cache && Date.now() - this.lastParseTime < this.CACHE_DURATION) {
       return this.cache;
     }
-    const tasks = [];
-    const files = this.app.vault.getMarkdownFiles();
-    for (const file of files) {
-      // 单文件错误隔离：单个文件解析失败（如已被删除、内容异常）不应导致整个任务列表为空
-      try {
-        const fileTasks = await this.parseFile(file);
-        tasks.push(...fileTasks);
-      } catch (e) {
-        console.error(`\u89E3\u6790\u6587\u4EF6\u5931\u8D25: ${file.path}`, e);
-      }
+    // in-flight 去重：缓存失效后的短暂窗口内，视图渲染与文件变更事件可能并发触发
+    // 多次全库遍历 + 全文读取（大库/移动端明显卡顿），并发调用复用同一次解析
+    if (this.parsingPromise) {
+      return this.parsingPromise;
     }
-    const taskMap = groupTasksByDate(tasks);
-    const now = Date.now();
-    this.cache = {
-      tasks,
-      taskMap,
-      parseTime: now
-    };
-    this.lastParseTime = now;
-    return this.cache;
+    this.parsingPromise = (async () => {
+      try {
+        const tasks = [];
+        const files = this.app.vault.getMarkdownFiles();
+        for (const file of files) {
+          // 单文件错误隔离：单个文件解析失败（如已被删除、内容异常）不应导致整个任务列表为空
+          try {
+            const fileTasks = await this.parseFile(file);
+            tasks.push(...fileTasks);
+          } catch (e) {
+            console.error(`解析文件失败: ${file.path}`, e);
+          }
+        }
+        const taskMap = groupTasksByDate(tasks);
+        const now = Date.now();
+        this.cache = {
+          tasks,
+          taskMap,
+          parseTime: now
+        };
+        this.lastParseTime = now;
+        return this.cache;
+      } finally {
+        this.parsingPromise = null;
+      }
+    })();
+    return this.parsingPromise;
   }
   /**
    * 解析单个文件中的任务
@@ -623,7 +635,9 @@ var TaskParser = class {
         ? `\u{1F6EB} ${startDate} `
         : "";
       let timeMarker = time && !isAllDay ? `\u23F0 ${time} ` : "";
-      let taskLine = `- [ ] ${content} ${priorityMarker}${dateMarker}${timeMarker}\u{1F4C5} ${dueDate}`;
+      // dueDate 缺失时不写 📅 标记（防御：当前调用链恒传有效日期，但本方法是公共入队入口）
+      const dueMarker = dueDate ? `\u{1F4C5} ${dueDate}` : "";
+      let taskLine = `- [ ] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}`.trimEnd();
       
       // 确定用于排序和插入的日期：跨天任务用开始日期，普通任务用截止日期
       const isMultiDay = startDate && startDate !== dueDate;
@@ -659,14 +673,15 @@ var TaskParser = class {
           // 行尾跟随文件主行尾（CRLF 库不混入裸 \n）；空行按需补齐，相邻已有空行不再追加
           const eol = fileContent.includes("\r\n") ? "\r\n" : "\n";
           // 插入点前已有分隔符（下一月份section的前置---，或文件尾悬挂的---）时复用它，
-          // 不再自带---前缀，避免产生连续两个分隔符；此时若插入点在文件中部，
-          // 新section尾部补---供下一月份使用，否则后续追加的任务会被算进下月section
+          // 不再自带---前缀，避免产生连续两个分隔符；插入点在文件中部时（仅当用户手工删过
+          // 分隔符），新section尾部都要补---供下一月份使用，否则后续追加的任务会被算进下月section
           const before = fileContent.slice(0, insertPos);
           const sepBefore = /(?:^|\n)---[ \t]*$/.test(before.replace(/(?:[ \t]*\r?\n)+$/, ""));
           const leadBlank = /(?:^|\n)[ \t]*\r?\n$/.test(before) ? "" : eol;
+          const tailSep = insertPos < fileContent.length ? `---${eol}${eol}` : "";
           const newSection = sepBefore
-            ? `${leadBlank}${monthSection}${eol}${eol}${taskLine}${eol}${eol}${insertPos < fileContent.length ? `---${eol}${eol}` : ""}`
-            : `${leadBlank}---${eol}${eol}${monthSection}${eol}${eol}${taskLine}${eol}${eol}`;
+            ? `${leadBlank}${monthSection}${eol}${eol}${taskLine}${eol}${eol}${tailSep}`
+            : `${leadBlank}---${eol}${eol}${monthSection}${eol}${eol}${taskLine}${eol}${eol}${tailSep}`;
           fileContent = fileContent.slice(0, insertPos) + newSection + fileContent.slice(insertPos);
         } else {
           // 月份section已存在，按日期时间排序插入
@@ -763,42 +778,6 @@ var TaskParser = class {
     return false;
   }
   /**
-   * 查找日记文件路径
-   */
-  findDailyNotePath(date) {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    const formats = [
-      `${yyyy}-${mm}-${dd}.md`,
-      `${yyyy}/${mm}/${dd}.md`,
-      `\u65E5\u8BB0/${yyyy}-${mm}-${dd}.md`,
-      `Daily/${yyyy}-${mm}-${dd}.md`
-    ];
-    // 优先读取 Obsidian 内置「日记」插件配置，按用户实际的格式与文件夹构造路径
-    try {
-      const dailyNotesPlugin = this.app.internalPlugins && this.app.internalPlugins.getPluginById && this.app.internalPlugins.getPluginById("daily-notes");
-      const inst = dailyNotesPlugin && dailyNotesPlugin.instance;
-      if (inst && inst.options && inst.options.enabled !== false) {
-        const opts = inst.options;
-        const folder = (opts.folder || "").replace(/\/+$/, "");
-        const fmt = opts.format || "YYYY-MM-DD";
-        const tokenized = fmt.replace(/YYYY/g, String(yyyy)).replace(/MM/g, mm).replace(/DD/g, dd);
-        const candidate = folder ? `${folder}/${tokenized}.md` : `${tokenized}.md`;
-        formats.unshift(candidate);
-      }
-    } catch (e) {
-      // 读取配置失败时回退到默认格式列表，不影响主流程
-    }
-    for (const format of formats) {
-      const file = this.app.vault.getAbstractFileByPath(format);
-      if (file instanceof import_obsidian.TFile) {
-        return format;
-      }
-    }
-    return null;
-  }
-  /**
    * 获取或创建默认任务文件（统一存储在年度任务列表）
    * 优先在整个库中查找已存在的年度任务文件，支持文件被移动后的场景
    * @param date - 日期对象
@@ -823,11 +802,21 @@ var TaskParser = class {
       const filePath = `${folderPath}/${targetFileName}`;
       try {
         await this.ensureFolderExists(folderPath);
-        const initialContent = `# ${year}\u5E74\u4EFB\u52A1\u5217\u8868
+        // 行尾跟随库内已有年度任务文件（CRLF 库首文件即混行尾的源头）；无参照文件时用 LF
+        let fileEol = "\n";
+        for (const cachedPath of this.taskFileCache.values()) {
+          const sibling = this.app.vault.getAbstractFileByPath(cachedPath);
+          if (sibling instanceof import_obsidian.TFile) {
+            const head = await this.app.vault.cachedRead(sibling);
+            if (head.includes("\r\n")) fileEol = "\r\n";
+            break;
+          }
+        }
+        const initialContent = `# ${year}年任务列表
 
-> \u7531\u300C\u6708\u5386\u4EFB\u52A1\u300D\u63D2\u4EF6\u81EA\u52A8\u521B\u5EFA\u3002
+> 由「月历任务」插件自动创建。
 
-`;
+`.replace(/\n/g, fileEol);
         await this.app.vault.create(filePath, initialContent);
         // 缓存新创建的文件路径
         this.taskFileCache.set(year, filePath);
@@ -1340,17 +1329,13 @@ function isSpecialLunarDay(date) {
  * 主要功能：
  * - getHolidayInfo(date)：获取指定日期的节假日信息（类型+名称）
  * - fetchYearFromSources(year)：按源顺序从网络获取
- * - ensureYearData(year)：按需取数并缓存（builtin 来源允许一次网络升级）
+ * - ensureYearData(year)：无缓存年份按需取数（浏览触发，不升级已有数据）
  * - updateFromNetwork(year)：启动/手动刷新入口
  * ============================================================
  */
 var HolidayManager = class {
   constructor() {
     this.cache = /* @__PURE__ */ new Map();
-    // 缓存来源：year -> "builtin"（内置静态数据或上次会话存的 holidaysData）| "api"（本会话网络取回）。
-    // builtin 来源允许一次网络升级，否则 loadSettings 把 2022-2026 灌入 cache 后，
-    // 「API 数据优先于内置」只在真正刷新过一次后才成立（F5）
-    this.cacheSources = /* @__PURE__ */ new Map();
     // 失败缓存：year -> 失败时间戳，TTL 内不重试，过期后允许重新请求
     this.failureCache = /* @__PURE__ */ new Map();
     this.FAILURE_TTL = 5 * 60 * 1e3;
@@ -1362,13 +1347,21 @@ var HolidayManager = class {
    * @returns 是否实际取回并写入了新数据：缓存已就绪 / 获取失败 / TTL 内跳过均为 false。
    * 调用方（renderCalendarGrid）据此决定是否补刷，false 时补刷无意义且会形成重入。
    */
-  async ensureYearData(year, allowUpgrade = true) {
-    // 已有本会话网络取回的数据直接返回；builtin 数据仅在 allowUpgrade（启动预取/手动刷新）时
-    // 重新获取——浏览触发的按需获取不升级内置年份，避免「默认不联网」变成每次浏览都请求
-    if (this.cache.has(year) && (this.cacheSources.get(year) !== "builtin" || !allowUpgrade)) return false;
+  async ensureYearData(year) {
+    // 已有缓存（内置/持久化/本会话取回）直接返回——浏览触发的按需获取不升级已有数据，
+    // 避免「默认不联网」变成每次浏览都请求；升级只走启动预取/手动刷新（updateFromNetwork）
+    if (this.cache.has(year)) return false;
     // 失败缓存未过期则跳过，避免网络故障时每月导航都重发 8s 请求
     const failedAt = this.failureCache.get(year);
     if (failedAt && Date.now() - failedAt < this.FAILURE_TTL) return false;
+    return this._requestYear(year);
+  }
+  /**
+   * 发起某年的网络获取（ensureYearData 与 updateFromNetwork 共用通道）：
+   * 并发调用复用同一 Promise；成功/失败都记账 failureCache，保持缓存状态一致。
+   * @returns 是否实际取回并写入了新数据
+   */
+  _requestYear(year) {
     // 复用进行中的 Promise，避免并发重复请求
     const existing = this.fetchingYears.get(year);
     if (existing) return existing;
@@ -1377,7 +1370,6 @@ var HolidayManager = class {
         const apiData = await this.fetchYearFromSources(year);
         if (apiData && apiData.length > 0) {
           this.cache.set(year, apiData);
-          this.cacheSources.set(year, "api");
           this.failureCache.delete(year);
           return true;
         } else {
@@ -1404,47 +1396,56 @@ var HolidayManager = class {
       return this._doFetchOnce(year);
     }
   }
-  async _doFetchOnce(year) {
-    const url = `https://timor.tech/api/holiday/year/${year}`;
-    // 加 8 秒超时控制，避免 timor.tech 不可达时长时间挂起，
-    // 同时确保 fetchingYears 锁能尽快释放，不影响后续获取。
-    // 超时覆盖整个 fetch + response.json() 流程，防止响应体停滞时永久挂起。
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8e3);
+  /**
+   * 统一 JSON 请求：走 Obsidian requestUrl 而非浏览器 fetch——
+   * 移动端 WebView 下 fetch 受目标站 CORS 头限制，requestUrl 由宿主转发不受此限，
+   * 也是插件审核规范要求。requestUrl 无超时参数，用 Promise.race 包一层 8s 超时，
+   * 覆盖整个请求流程；race 已为落后方挂好结算处理，不会产生未捕获的 Promise 拒绝
+   */
+  async _fetchJson(url, timeoutMs, timeoutLabel) {
+    let timeoutId;
     try {
-      const response = await fetch(url, { signal: controller.signal });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const json = await response.json();
-      if (json.code !== 0 || !json.holiday) throw new Error("API格式错误");
-      const holidays = [];
-      for (const [key, info] of Object.entries(json.holiday)) {
-        // 不依赖 key 的形状（timor.tech 现为 MM-DD 长度 5，属隐式契约）：
-        // 直接按 info.date 是否为合法 YYYY-MM-DD 判断，键格式变化时条目不会被静默丢弃
-        if (info && /^\d{4}-\d{2}-\d{2}$/.test(info.date)) {
-          if (info.holiday === true) {
-            // 节假日命名归一化：timor.tech API 对春节假期每日返回「初一」「初二」…「初七」，
-            // 与 2022-2024 年统一标注「春节」的风格不一致，这里统一改为「春节」。
-            // 「除夕」单独保留，与历史数据保持一致。
-            let name = info.name || key;
-            if (/^初(?:[一二三四五六七八九]|十)$/.test(name)) {
-              name = "春节";
-            }
-            holidays.push({ date: info.date, name, type: "legal" /* LEGAL */, isOff: true });
-          } else if (info.holiday === false) {
-            holidays.push({ date: info.date, name: "班", type: "workday" /* WORKDAY */, isOff: false });
-          }
-        }
-      }
-      if (holidays.length === 0) {
-        console.warn(`节假日数据：${year} 年 API 返回了 holiday 字段但未解析出任何有效条目，响应结构可能已变化`, json);
-      }
-      return holidays.sort((a, b) => a.date.localeCompare(b.date));
-    } catch (e) {
-      if (e.name === "AbortError") throw new Error(`请求超时（8s）：${year}年节假日数据`);
-      throw e;
+      const res = await Promise.race([
+        import_obsidian2.requestUrl({ url }),
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error(timeoutLabel)), timeoutMs);
+        })
+      ]);
+      if (res.status < 200 || res.status >= 300) throw new Error(`HTTP ${res.status}`);
+      return res.json;
     } finally {
       clearTimeout(timeoutId);
     }
+  }
+  async _doFetchOnce(year) {
+    const url = `https://timor.tech/api/holiday/year/${year}`;
+    // 8 秒超时（见 _fetchJson）：避免 timor.tech 不可达时长时间挂起，
+    // 同时确保 fetchingYears 锁能尽快释放，不影响后续获取
+    const json = await this._fetchJson(url, 8e3, `请求超时（8s）：${year}年节假日数据`);
+    if (json.code !== 0 || !json.holiday) throw new Error("API格式错误");
+    const holidays = [];
+    for (const [key, info] of Object.entries(json.holiday)) {
+      // 不依赖 key 的形状（timor.tech 现为 MM-DD 长度 5，属隐式契约）：
+      // 直接按 info.date 是否为合法 YYYY-MM-DD 判断，键格式变化时条目不会被静默丢弃
+      if (info && /^\d{4}-\d{2}-\d{2}$/.test(info.date)) {
+        if (info.holiday === true) {
+          // 节假日命名归一化：timor.tech API 对春节假期每日返回「初一」「初二」…「初七」，
+          // 与 2022-2024 年统一标注「春节」的风格不一致，这里统一改为「春节」。
+          // 「除夕」单独保留，与历史数据保持一致。
+          let name = info.name || key;
+          if (/^初(?:[一二三四五六七八九]|十)$/.test(name)) {
+            name = "春节";
+          }
+          holidays.push({ date: info.date, name, type: "legal" /* LEGAL */, isOff: true });
+        } else if (info.holiday === false) {
+          holidays.push({ date: info.date, name: "班", type: "workday" /* WORKDAY */, isOff: false });
+        }
+      }
+    }
+    if (holidays.length === 0) {
+      console.warn(`节假日数据：${year} 年 API 返回了 holiday 字段但未解析出任何有效条目，响应结构可能已变化`, json);
+    }
+    return holidays.sort((a, b) => a.date.localeCompare(b.date));
   }
   /**
    * 按源顺序从网络获取某年节假日数据：holiday-cn（社区维护，2007 年至今）→ timor.tech。
@@ -1470,29 +1471,19 @@ var HolidayManager = class {
    */
   async _fetchHolidayCN(year) {
     const url = `https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/${year}.json`;
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 8e3);
-    try {
-      const response = await fetch(url, { signal: controller.signal });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const json = await response.json();
-      if (!json || !Array.isArray(json.days)) throw new Error("holiday-cn 数据格式错误");
-      const holidays = [];
-      for (const d of json.days) {
-        if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d.date)) continue;
-        if (d.isOffDay === true) {
-          holidays.push({ date: d.date, name: d.name || "假日", type: "legal" /* LEGAL */, isOff: true });
-        } else if (d.isOffDay === false) {
-          holidays.push({ date: d.date, name: "班", type: "workday" /* WORKDAY */, isOff: false });
-        }
+    // 同样走 requestUrl + 8s 超时（见 _fetchJson）
+    const json = await this._fetchJson(url, 8e3, `请求超时（8s）：${year}年 holiday-cn 数据`);
+    if (!json || !Array.isArray(json.days)) throw new Error("holiday-cn 数据格式错误");
+    const holidays = [];
+    for (const d of json.days) {
+      if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d.date)) continue;
+      if (d.isOffDay === true) {
+        holidays.push({ date: d.date, name: d.name || "假日", type: "legal" /* LEGAL */, isOff: true });
+      } else if (d.isOffDay === false) {
+        holidays.push({ date: d.date, name: "班", type: "workday" /* WORKDAY */, isOff: false });
       }
-      return holidays.sort((a, b) => a.date.localeCompare(b.date));
-    } catch (e) {
-      if (e.name === "AbortError") throw new Error(`请求超时（8s）：${year}年 holiday-cn 数据`);
-      throw e;
-    } finally {
-      clearTimeout(timeoutId);
     }
+    return holidays.sort((a, b) => a.date.localeCompare(b.date));
   }
   /**
    * 获取指定日期的节假日信息
@@ -1519,23 +1510,12 @@ var HolidayManager = class {
     return `${year}-${month}-${day}`;
   }
   /**
-   * 更新节假日数据（从网络）
-   * 实际使用时可以调用外部API获取最新数据
+   * 更新节假日数据（从网络）——启动预取/手动刷新入口
    */
   async updateFromNetwork(year) {
-    try {
-      const apiData = await this.fetchYearFromSources(year);
-      if (apiData && apiData.length > 0) {
-        this.cache.set(year, apiData);
-        this.cacheSources.set(year, "api");
-        // 成功后清除失败缓存，保持 cache/failureCache 状态一致
-        this.failureCache.delete(year);
-        return true;
-      }
-    } catch (e) {
-      console.warn(`\u8282\u5047\u65E5\u6570\u636E\uFF1A${year}\u5E74 API\u8C03\u7528\u5931\u8D25`, e);
-    }
-    return false;
+    // 与浏览触发的获取共用 _requestYear 通道（并发去重 + failureCache 记账）：
+    // 此前独立发请求，手动刷新与浏览触发可能并发重复请求同一源
+    return this._requestYear(year);
   }
 };
 
@@ -1729,10 +1709,10 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
     // 按需获取不阻塞渲染：网格先按现有缓存画出来（浏览到的年份若无缓存数据，
     // 如 2022 年以前、2027 年以后，从数据源拉取该年），取回后若视图仍在本月
-    // 仅补刷一次网格。已有内置/缓存数据的年份不发起请求（allowUpgrade=false），
+    // 仅补刷一次网格。已有内置/缓存数据的年份不发起请求，
     // 保持「默认不联网」的浏览体验；ensureYearData 返回是否实际取回新数据，
     // 缓存已就绪/获取失败时均为 false，不会触发补刷（无重入循环）
-    const ensured = Promise.all(Array.from(yearsToEnsure).map((y) => this.plugin.holidayManager.ensureYearData(y, false)));
+    const ensured = Promise.all(Array.from(yearsToEnsure).map((y) => this.plugin.holidayManager.ensureYearData(y)));
     ensured.then((fetched) => {
       if (fetched.some(Boolean) && myRequestId === this.renderRequestId && this.rootEl && this.rootEl.isConnected) {
         this.renderCalendarGrid();
@@ -2209,10 +2189,12 @@ var DatePickerModal = class extends import_obsidian3.Modal {
     yearDecBtn.addEventListener("click", () => {
       this.year = Math.max(1900, this.year - 1);
       yearInput.value = String(this.year);
+      refreshMonthStyles();
     });
     yearIncBtn.addEventListener("click", () => {
       this.year = Math.min(2100, this.year + 1);
       yearInput.value = String(this.year);
+      refreshMonthStyles();
     });
     yearInput.addEventListener("change", () => {
       let val = parseInt(yearInput.value);
@@ -2220,6 +2202,7 @@ var DatePickerModal = class extends import_obsidian3.Modal {
       val = Math.max(1900, Math.min(2100, val));
       this.year = val;
       yearInput.value = String(val);
+      refreshMonthStyles();
     });
     
     // 月份区域
@@ -2240,6 +2223,34 @@ var DatePickerModal = class extends import_obsidian3.Modal {
     
     const monthNames = ["1\u6708", "2\u6708", "3\u6708", "4\u6708", "5\u6708", "6\u6708", "7\u6708", "8\u6708", "9\u6708", "10\u6708", "11\u6708", "12\u6708"];
     
+    // 月份按钮着色集中在这里：绿色=当前选中，蓝色=今天所在月（仅当年）。
+    // 年份 +/- 、输入变化、点击选中后都调用它整体重绘，
+    // 否则旧高亮会残留在已切换走的年份视图上
+    const refreshMonthStyles = () => {
+      monthGrid.querySelectorAll("button").forEach((btn, idx) => {
+        btn.style.color = colors.text;
+        btn.style.background = colors.wrapperBg;
+        btn.style.borderColor = "transparent";
+        btn.style.boxShadow = "none";
+        btn.style.transform = "none";
+        if (idx === this.month) {
+          // 选中月份 - 绿色（与今天所在月重合时优先显示选中）
+          btn.style.color = "white";
+          btn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+          btn.style.borderColor = "#34d399";
+          btn.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35)";
+          btn.style.transform = "scale(1.05)";
+        } else if (this.year === this.currentYear && idx === this.currentMonth) {
+          // 今天所在月（须同年）- 蓝色
+          btn.style.color = "white";
+          btn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+          btn.style.borderColor = "#60a5fa";
+          btn.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35)";
+          btn.style.transform = "scale(1.05)";
+        }
+      });
+    };
+
     for (let m = 0; m < 12; m++) {
       const monthBtn = monthGrid.createEl("button", { text: monthNames[m] });
       monthBtn.style.padding = "16px 8px";
@@ -2255,28 +2266,8 @@ var DatePickerModal = class extends import_obsidian3.Modal {
       monthBtn.style.outline = "none";
       monthBtn.style.boxShadow = "none";
       
-      if (this.year === this.currentYear && m === this.currentMonth) {
-        // 当前月份（须同年同月）- 蓝色
-        monthBtn.style.color = "white";
-        monthBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
-        monthBtn.style.borderColor = "#60a5fa";
-        monthBtn.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35)";
-        monthBtn.style.transform = "scale(1.05)";
-      } else if (m === this.month) {
-        // 选中月份 - 绿色
-        monthBtn.style.color = "white";
-        monthBtn.style.background = "linear-gradient(135deg, #10b981, #059669)";
-        monthBtn.style.borderColor = "#34d399";
-        monthBtn.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35)";
-        monthBtn.style.transform = "scale(1.05)";
-      } else {
-        // 普通月份
-        monthBtn.style.color = colors.text;
-        monthBtn.style.background = colors.wrapperBg;
-      }
-      
       monthBtn.addEventListener("mouseenter", () => {
-        if (m !== this.currentMonth && m !== this.month) {
+        if (!(this.year === this.currentYear && m === this.currentMonth) && m !== this.month) {
           monthBtn.style.background = colors.btnHover;
           monthBtn.style.transform = "translateY(-2px)";
           monthBtn.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
@@ -2292,32 +2283,11 @@ var DatePickerModal = class extends import_obsidian3.Modal {
       });
       
       monthBtn.addEventListener("click", () => {
-        // 重置所有按钮
-        monthGrid.querySelectorAll("button").forEach((btn, idx) => {
-          btn.style.color = colors.text;
-          btn.style.background = colors.wrapperBg;
-          btn.style.borderColor = "transparent";
-          btn.style.boxShadow = "none";
-          btn.style.transform = "none";
-          // 如果是当前月份（须同年），恢复蓝色
-          if (this.year === this.currentYear && idx === this.currentMonth) {
-            btn.style.color = "white";
-            btn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
-            btn.style.borderColor = "#60a5fa";
-            btn.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35)";
-            btn.style.transform = "scale(1.05)";
-          }
-        });
-        
-        // 设置选中样式 - 绿色
-        monthBtn.style.color = "white";
-        monthBtn.style.background = "linear-gradient(135deg, #10b981, #059669)";
-        monthBtn.style.borderColor = "#34d399";
-        monthBtn.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35)";
-        monthBtn.style.transform = "scale(1.05)";
         this.month = m;
+        refreshMonthStyles();
       });
     }
+    refreshMonthStyles();
     
     // 按钮组
     const btnGroup = contentEl.createDiv("modal-buttons");
@@ -2592,10 +2562,11 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     let endTimeEl = null;
     let isAllDay = this.plugin.settings.defaultAllDayTask;
     if (!this.plugin.settings.defaultAllDayTask) {
-      // 计算默认时间：系统时间取整到下一小时（跨 24 点回绕），结束时间+4小时
-      // 结束时间跨午夜时截断到 23:59，避免生成 "22:00~02:00" 被结束时间校验拒绝
+      // 计算默认时间：系统时间取整到下一小时，结束时间+4小时（结束跨午夜截断到 23:59，
+      // 避免 "22:00~02:00" 被结束时间校验拒绝）；23 点后开始时间不再 %24 回绕——
+      // 回绕会生成已过去的「当天 00:00~04:00」，截断为 23:00~23:59
       const now = new Date();
-      const defaultStartHour = (now.getMinutes() > 0 ? now.getHours() + 1 : now.getHours()) % 24;
+      const defaultStartHour = Math.min(now.getMinutes() > 0 ? now.getHours() + 1 : now.getHours(), 23);
       const startPlus4 = defaultStartHour + 4;
       const defaultEndHour = startPlus4 > 23 ? 23 : startPlus4;
       const defaultEndMinute = startPlus4 > 23 ? 59 : 0;
@@ -2645,7 +2616,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const existingGrid = popup.querySelector(".date-picker-grid");
       if (existingGrid) existingGrid.remove();
       const grid = popup.createDiv("date-picker-grid");
-      const firstDay = new Date(pickerYear, pickerMonth, 1).getDay();
+      // 起始空格按设置「每周第一天」偏移，与主月历及上方星期标题保持一致
+      const fdow = self.plugin.settings.firstDayOfWeek || 0;
+      const firstDay = (new Date(pickerYear, pickerMonth, 1).getDay() - fdow + 7) % 7;
       const daysInMonth = new Date(pickerYear, pickerMonth + 1, 0).getDate();
       const today = new Date();
       const todayStr = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
@@ -2744,9 +2717,11 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       });
       yearSelect.addEventListener("change", () => { pickerYear = parseInt(yearSelect.value); updateGrid(popup); });
       monthSelect.addEventListener("change", () => { pickerMonth = parseInt(monthSelect.value); updateGrid(popup); });
-      // 星期标题
+      // 星期标题（跟随设置「每周第一天」轮转，与主月历一致）
       const weekRow = popup.createDiv("date-picker-week");
-      ["\u65E5", "\u4E00", "\u4E8C", "\u4E09", "\u56DB", "\u4E94", "\u516D"].forEach(d => {
+      const fdowHeader = self.plugin.settings.firstDayOfWeek || 0;
+      const weekLabels = ["日", "一", "二", "三", "四", "五", "六"];
+      weekLabels.slice(fdowHeader).concat(weekLabels.slice(0, fdowHeader)).forEach(d => {
         weekRow.createDiv("picker-week-day").textContent = d;
       });
       // 日期网格（首次渲染）
@@ -2926,17 +2901,6 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       }
     }
   }
-  /**
-   * 格式化日期为 YYYY-MM-DD 格式（用于日期输入框）
-   * @param date - 日期对象
-   * @returns YYYY-MM-DD 格式的日期字符串
-   */
-  formatDateForInput(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
 };
 
 
@@ -3081,11 +3045,15 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         }
       })
     );
-    // 监听文件创建
+    // 监听文件创建；文件夹（TFolder）创建不触发整库刷新，但也要清设置面板的
+    // 文件夹列表缓存——否则新建文件夹后「任务文件夹」下拉要等 TTL 到期才能看到
     this.registerEvent(
       this.app.vault.on("create", (file) => {
         if (file instanceof import_obsidian3.TFile && file.extension === "md" && this.isPossibleTaskFile(file)) {
           debouncedRefresh();
+        } else if (file instanceof import_obsidian3.TFolder && this.settingTab) {
+          this.settingTab.folderOptionsCache = null;
+          this.settingTab.folderOptionsCacheTime = 0;
         }
       })
     );
@@ -3236,6 +3204,12 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       this.settings.holidaysData = {};
     } else {
       for (const year of Object.keys(this.settings.holidaysData)) {
+        // 非四位数字年份键（脏数据，如 "abc"/"2024abc"）会把垃圾灌进 HolidayManager 缓存，直接剔除
+        if (!/^\d{4}$/.test(year)) {
+          delete this.settings.holidaysData[year];
+          console.warn(`月历任务：holidaysData 中键「${year}」不是合法年份，已忽略`);
+          continue;
+        }
         const holidays = this.settings.holidaysData[year];
         if (!Array.isArray(holidays) || !holidays.every((h) => h && typeof h.date === "string")) {
           delete this.settings.holidaysData[year];
@@ -3247,8 +3221,6 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       for (const [year, holidays] of Object.entries(this.settings.holidaysData)) {
         if (!this.holidayManager.cache.has(parseInt(year))) {
           this.holidayManager.cache.set(parseInt(year), holidays);
-          // 存量数据可能是旧会话保存的过期 API 数据，标为 builtin 允许本会话升级一次
-          this.holidayManager.cacheSources.set(parseInt(year), "builtin");
         }
       }
     }
@@ -3272,7 +3244,6 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         }
         if (!this.holidayManager.cache.has(y)) {
           this.holidayManager.cache.set(y, holidays);
-          this.holidayManager.cacheSources.set(y, "builtin");
         }
       }
     } catch (e) {
@@ -3408,7 +3379,13 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       for (const [path, name] of Object.entries(folderOptions)) {
         dropdown.addOption(path, name);
       }
-      dropdown.setValue(this.plugin.settings.customTaskFolder);
+      // 已保存的文件夹可能已被删除：补一个「已失效」占位项回显原路径——
+      // 否则 setValue 选不中任何项，界面空白但旧值仍留在设置里，用户难以察觉
+      const savedFolder = this.plugin.settings.customTaskFolder;
+      if (savedFolder && !(savedFolder in folderOptions)) {
+        dropdown.addOption(savedFolder, `${savedFolder}（已失效）`);
+      }
+      dropdown.setValue(savedFolder);
       dropdown.onChange(async (value) => {
         this.plugin.settings.customTaskFolder = value;
         await this.plugin.saveSettings();

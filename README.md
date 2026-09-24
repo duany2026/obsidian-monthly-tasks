@@ -2,7 +2,7 @@
 
 ## 📥 下载安装（小白版）
 
-1. 打开本仓库的 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases)，下载最新版本的 `monthly-tasks-1.4.0.zip`
+1. 打开本仓库的 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases)，下载最新版本的 `monthly-tasks-1.4.1.zip`
 2. 解压，得到文件夹 `monthly-tasks`
 3. 打开你的 Obsidian 笔记库文件夹，进入隐藏目录 `.obsidian/plugins/`（如果没见过这个目录：在 Obsidian 里点左下角仓库图标 →「在系统资源管理器中显示仓库」，进去就能看到 `.obsidian`）
 4. 把解压出的 `monthly-tasks` 文件夹整个放进去，变成 `.obsidian/plugins/monthly-tasks/`（里面应有 `main.js`、`manifest.json`、`styles.css`）
@@ -46,7 +46,7 @@
 
 ### 方式二：手动安装
 
-1. 下载最新版本的 `monthly-tasks-1.4.0.zip`
+1. 下载最新版本的 `monthly-tasks-1.4.1.zip`
 2. 解压到 Obsidian 插件目录 `.obsidian/plugins/monthly-tasks/`
 3. 重启 Obsidian 并启用插件
 
@@ -194,7 +194,19 @@
 
 查看完整的版本更新历史，请参阅 [CHANGELOG.md](./CHANGELOG.md)。
 
-### 最新版本 v1.4.0 (2026-09-05)
+### 最新版本 v1.4.1 (2026-09-24)
+
+**修复**
+- 日期选择弹窗切换年份后月份高亮不再残留；节假日网络层改用 Obsidian `requestUrl`（移动端不再受 CORS 限制）
+- 全库任务解析增加并发去重；新建文件夹后「任务文件夹」下拉立即可见；手动刷新与浏览获取共用请求通道
+- 23 点后新建任务默认时间不再回绕到已过去时段；弹窗小日历跟随「每周第一天」；「今天」格子对齐、各端字号一致
+
+**内部**
+- 移除节假日 builtin 升级死路径；删除两处死代码；补齐 CHANGELOG.md
+
+完整变更见 [CHANGELOG.md](./CHANGELOG.md)。
+
+### v1.4.0 (2026-09-05)
 
 **移动端**
 - 创建任务弹窗改用 Obsidian Modal 基类：系统返回键、ESC、点遮罩均可关闭；打开弹窗不再自动拉起输入法

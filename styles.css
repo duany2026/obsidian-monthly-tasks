@@ -3,7 +3,7 @@
  * 月历任务插件样式 (Monthly Tasks Plugin)
  * ============================================================
  *
- * 版本：1.4.0
+ * 版本：1.4.1
  * 作者：duany
  *
  * 样式架构：
@@ -245,6 +245,9 @@
 	flex-direction: column;
 	padding: 4px 5px;
 	background: var(--bg-primary);
+	/* 所有格子统一 1px 边框盒：today 此前 2px、工作日 0px、节假日 1px，
+	   网格中同行格子内容区错位；透明边框不占视觉、只统一盒模型 */
+	border: 1px solid transparent;
 	border-radius: var(--radius);
 	box-shadow: var(--shadow-sm);
 	cursor: pointer;
@@ -268,17 +271,19 @@
 	opacity: 0.4;
 }
 
-/* 今天 - 简洁高亮显示（描边 + 轻投影，不再用外圈光晕强调） */
+/* 今天 - 简洁高亮显示（描边 + 轻投影，不再用外圈光晕强调）。
+   1px 边框 + inset 内描边凑出 2px 观感，外盒与其他格子的 1px 边框对齐 */
 .day-cell.today {
-	border: 2px solid var(--primary-500);
-	box-shadow: 0 1px 4px rgba(59, 130, 246, 0.15);
+	border: 1px solid var(--primary-500);
+	box-shadow: inset 0 0 0 1px var(--primary-500), 0 1px 4px rgba(59, 130, 246, 0.15);
 	background: linear-gradient(135deg, var(--primary-50) 0%, #dbeafe 100%);
 }
 
+/* 不再覆盖字号：此前固定 15px 会在移动端（13px）放大日期、桌面端（17/19px）缩小日期，
+   两端观感不一致；今天与其他日期同字号，仅用颜色和加粗区分 */
 .day-cell.today .day-number {
 	color: var(--primary-700);
 	font-weight: 600;
-	font-size: 15px;
 }
 
 /* 当日高亮优先级最高，覆盖节假日样式 */
@@ -345,6 +350,19 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+/* 今天同时是周末/节假日/调休日时保持蓝色外框：.day-cell.today 与类型规则同优先级且在前，
+   外框色会被类型色覆盖；复合选择器提权，与暗色主题（today 规则在后天然胜出）对齐 */
+.day-cell.today.weekend,
+.day-cell.today.holiday,
+.day-cell.today.workday {
+	border-color: var(--primary-500);
+}
+
+/* hover 的 box-shadow 会整体替换 today 的内描边，悬停时补回 */
+.day-cell.today:hover {
+	box-shadow: inset 0 0 0 1px var(--primary-500), var(--shadow-md);
 }
 
 /* ========== 日期头部 ========== */
@@ -1688,6 +1706,11 @@
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+/* 深色同理：hover 不丢 today 的内描边 */
+.theme-dark .day-cell.today:hover {
+	box-shadow: inset 0 0 0 1px #3b82f6, 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
 .theme-dark .day-cell.weekend {
 	background: var(--weekend-bg);
 	border: 1px solid var(--weekend-border);
@@ -1719,16 +1742,15 @@
 	opacity: 0.25;
 }
 
-/* 深色模式 - 今天高亮 */
+/* 深色模式 - 今天高亮（同亮色：1px 边框 + inset 内描边，与其他格子外盒对齐） */
 .theme-dark .day-cell.today {
-	border: 2px solid #3b82f6;
-	box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2);
+	border: 1px solid #3b82f6;
+	box-shadow: inset 0 0 0 1px #3b82f6, 0 1px 4px rgba(59, 130, 246, 0.2);
 	background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
 }
 
 .theme-dark .day-cell.today .day-number {
 	color: #60a5fa;
-	font-size: 15px;
 	font-weight: 600;
 }
 
@@ -1991,11 +2013,7 @@
 		padding: 0 16px 20px;
 	}
 
-	/* 时间选择器适配 */
-	.modal-time-container {
-		margin: 0 16px 16px;
-		padding: 14px;
-	}
+	/* 时间选择器适配（容器边距已在上方统一收窄） */
 	.time-input-wrapper {
 		gap: 6px;
 	}
