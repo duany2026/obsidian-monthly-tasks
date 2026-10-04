@@ -2726,6 +2726,20 @@ function CF_MOTION_OFF() {
   }
 }
 
+/**
+ * v1.5.3：WAAPI 动画的 startTime 要等合成器出帧才结算；页面不可见/合成暂停时
+ * 动画会永远停在 pending 首帧（实测视图 detach 重开后 startTime 恒为 null、
+ * opacity 不动）。显式对齐到当前时间线，动画立即按时间推进，观感不受影响。
+ */
+function CF_KICK(anim) {
+  try {
+    if (anim && anim.startTime === null)
+      anim.startTime = document.timeline.currentTime;
+  } catch (e) {
+  }
+  return anim;
+}
+
 var CategoryFilterModal = class extends import_obsidian3.Modal {
   constructor(app, view, anchorEl) {
     super(app);
@@ -2880,10 +2894,10 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
     if (CF_MOTION_OFF())
       return;
     try {
-      modalEl.animate([
+      CF_KICK(modalEl.animate([
         { opacity: 0, transform: "translateY(-6px) scale(0.96)" },
         { opacity: 1, transform: "none" },
-      ], { duration: 160, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)" });
+      ], { duration: 160, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)" }));
     } catch (e) {
     }
   }
@@ -2891,12 +2905,12 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
   playLeave(modalEl, container) {
     const bg = container.querySelector(".modal-bg");
     try {
-      const a1 = modalEl.animate([
+      const a1 = CF_KICK(modalEl.animate([
         { opacity: 1, transform: "none" },
         { opacity: 0, transform: "translateY(-5px) scale(0.97)" },
-      ], { duration: 150, easing: "ease", fill: "forwards" });
+      ], { duration: 150, easing: "ease", fill: "forwards" }));
       if (bg)
-        bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: "ease", fill: "forwards" });
+        CF_KICK(bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: "ease", fill: "forwards" }));
       // 保持可见直到动画结束（fill:forwards 已停在终态），随后由 close() 的定时器卸载
       void a1;
     } catch (e) {
