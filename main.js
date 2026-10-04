@@ -305,6 +305,21 @@ function groupTasksByDate(tasks) {
   return map;
 }
 /**
+ * 由日期推导归档周期标识，年度/月度共用同一条文件名拼接路径。
+ * 注意：周期由被点击的日期推导（不是从"今天"），所以翻到别的月份点日期会写进那个月的文件。
+ * @param date - Date 对象
+ * @param period - "year" | "month"
+ * @returns 年度 "2026"；月度 "2026年10月"（月补零）
+ */
+function getPeriodId(date, period) {
+  const y = String(date.getFullYear());
+  if (period === "month") {
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    return `${y}\u5E74${m}\u6708`;
+  }
+  return y;
+}
+/**
  * 判断是否为跨天任务
  * 跨天任务有开始日期（🛫）且与截止日期不同
  * @param task - 任务对象
@@ -358,7 +373,7 @@ function isOverdue(dateStr) {
  * - parseAllTasks()：解析所有任务（带5秒缓存）
  * - createTask()：创建新任务，自动按月份分组到年度任务列表
  * - createTaskForDate()：在指定日期创建任务
- * - getOrCreateDefaultTaskFile()：获取或创建年度任务列表文件
+ * - getOrCreateDefaultTaskFile()：获取或创建归档任务列表文件（年度或月度）
  * 
  * 任务文件格式：
  * - 文件路径：任务/2026年任务列表.md
@@ -369,12 +384,14 @@ function isOverdue(dateStr) {
  */
 var TaskParser = class {
   // 5秒缓存
-  constructor(app) {
+  constructor(app, plugin) {
+    // plugin 用于读取 taskFilePeriod（归档粒度）；缺省时一律按年度行为
+    this.plugin = plugin || null;
     this.cache = null;
     this.lastParseTime = 0;
     this.CACHE_DURATION = 5e3;
     this.app = app;
-    // 任务文件路径缓存：{ year: filePath }
+    // 任务文件路径缓存：键为 `${period}|${periodId}`，年度/月度互不覆盖
     this.taskFileCache = /* @__PURE__ */ new Map();
     // 写操作串行化队列：避免 createTask/toggleTask/deleteTask 并发读写导致后写覆盖先写丢失任务
     this.writeQueue = Promise.resolve();
@@ -765,7 +782,7 @@ var TaskParser = class {
   async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath) {
     const dateStr = this.formatDate(date);
     const endDateStr = endDate ? this.formatDate(endDate) : dateStr;
-    // 一律写入年度任务列表，跳过日记查找：保证任务统一归集到 任务/YYYY年任务列表.md
+    // 一律写入归档任务列表（年度或月度，由设置决定），跳过日记查找：保证任务统一归集
     // （日记中已有的任务仍会被 parseAllTasks 全库扫描正常显示）
     const defaultFile = await this.getOrCreateDefaultTaskFile(date, customFolderPath);
     if (defaultFile) {
@@ -784,11 +801,12 @@ var TaskParser = class {
    */
   async getOrCreateDefaultTaskFile(date, customFolderPath) {
     const now = date || new Date();
-    const year = String(now.getFullYear());
-    const targetFileName = `${year}\u5E74\u4EFB\u52A1\u5217\u8868.md`;
+    const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
+    const periodId = getPeriodId(now, period);
+    const targetFileName = `${periodId}${period === "month" ? "" : "\u5E74"}\u4EFB\u52A1\u5217\u8868.md`;
 
-    // 1. 使用缓存查找已存在的年度任务文件（传入 customFolderPath 用于消歧）
-    const existingPath = this.findTaskFile(year, customFolderPath);
+    // 1. 使用缓存查找已存在的任务文件（传入 customFolderPath 用于消歧）
+    const existingPath = this.findTaskFile(periodId, customFolderPath);
     if (existingPath) {
       return existingPath;
     }
@@ -811,14 +829,14 @@ var TaskParser = class {
             break;
           }
         }
-        const initialContent = `# ${year}年任务列表
+        const initialContent = `# ${targetFileName.slice(0, -3)}
 
 > 由「月历任务」插件自动创建。
 
 `.replace(/\n/g, fileEol);
         await this.app.vault.create(filePath, initialContent);
-        // 缓存新创建的文件路径
-        this.taskFileCache.set(year, filePath);
+        // 缓存新创建的文件路径（键含粒度，年度/月度互不覆盖）
+        this.taskFileCache.set(`${period}|${periodId}`, filePath);
         return filePath;
       } catch (error) {
         console.error(`\u5728\u6587\u4EF6\u5939\u300C${folderPath}\u300D\u521B\u5EFA\u4EFB\u52A1\u6587\u4EF6\u5931\u8D25:`, error);
@@ -853,20 +871,21 @@ var TaskParser = class {
     this.taskFileCache.clear();
   }
   /**
-   * 查找年度任务文件（使用缓存）
+   * 查找任务文件（使用缓存；文件名由周期标识推导，年度/月度共用一条代码路径）
    * 优先返回位于 customFolderPath 下的文件，避免在多同名文件场景下选错。
-   * @param year - 年份
+   * @param periodId - 周期标识（"2026" 或 "2026年10月"）
    * @param customFolderPath - 自定义任务文件夹路径（可选）
    * @returns 文件路径或 null
    */
-  findTaskFile(year, customFolderPath) {
-    const yearStr = String(year);
-    const targetFileName = `${yearStr}年任务列表.md`;
+  findTaskFile(periodId, customFolderPath) {
+    const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
+    const cacheKey = `${period}|${periodId}`;
+    const targetFileName = `${periodId}${period === "month" ? "" : "\u5E74"}\u4EFB\u52A1\u5217\u8868.md`;
     const normalizedCustom = customFolderPath ? customFolderPath.replace(/\/+$/, "") : "";
 
     // 1. 检查缓存
-    if (this.taskFileCache.has(yearStr)) {
-      const cachedPath = this.taskFileCache.get(yearStr);
+    if (this.taskFileCache.has(cacheKey)) {
+      const cachedPath = this.taskFileCache.get(cacheKey);
       const file = this.app.vault.getAbstractFileByPath(cachedPath);
       if (file instanceof import_obsidian.TFile) {
         // 若指定了 customFolderPath，需校验缓存命中位于该文件夹下；
@@ -876,7 +895,7 @@ var TaskParser = class {
         }
       }
       // 缓存的文件不存在或不在指定文件夹下，清除缓存
-      this.taskFileCache.delete(yearStr);
+      this.taskFileCache.delete(cacheKey);
     }
 
     // 2. 在整个库中搜索
@@ -885,7 +904,7 @@ var TaskParser = class {
     if (normalizedCustom) {
       for (const file of files) {
         if (file.name === targetFileName && this.isPathInFolder(file.path, normalizedCustom)) {
-          this.taskFileCache.set(yearStr, file.path);
+          this.taskFileCache.set(cacheKey, file.path);
           return file.path;
         }
       }
@@ -893,7 +912,7 @@ var TaskParser = class {
     // 2b. 否则（或未在指定文件夹下找到）回退到第一条同名文件命中
     for (const file of files) {
       if (file.name === targetFileName) {
-        this.taskFileCache.set(yearStr, file.path);
+        this.taskFileCache.set(cacheKey, file.path);
         return file.path;
       }
     }
@@ -2926,7 +2945,9 @@ var DEFAULT_SETTINGS = {
   tasksPerDayLimit: 5,
   customTaskFolder: "",
   autoUpdateHolidays: false,
-  holidaysData: {}
+  holidaysData: {},
+  // 任务归档粒度："year"（默认，任务/2026年任务列表.md）| "month"（任务/2026年10月任务列表.md）
+  taskFilePeriod: "year"
 };
 
 /**
@@ -2999,7 +3020,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         }
       })();
     }
-    this.taskParser = new TaskParser(this.app);
+    this.taskParser = new TaskParser(this.app, this);
     this.registerView(
       VIEW_TYPE_MONTHLY,
       (leaf) => new MonthlyView(leaf, this.taskParser, this)
@@ -3133,7 +3154,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
    * 规则：
    * 1. 文件位于自定义任务文件夹或默认「任务」文件夹下
    * 2. 文件位于 Obsidian 内置「日记」插件配置的文件夹下
-   * 3. 文件名形如 YYYY-MM-DD.md 或包含 YYYY年任务列表.md
+   * 3. 文件名形如 YYYY-MM-DD.md 或包含 YYYY年任务列表.md / YYYY年MM月任务列表.md
    * 其余路径的 md 文件改动不会触发实时刷新（modify/create/changed 三个事件统一按此过滤），
    * 手动刷新或重开视图时仍会全库扫描收录其中的任务
    */
@@ -3159,6 +3180,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     const base = file.basename || "";
     if (/^\d{4}-\d{2}-\d{2}$/.test(base)) return true;
     if (/^\d{4}\u5E74\u4EFB\u52A1\u5217\u8868$/.test(base)) return true;
+    if (/^\d{4}\u5E74\d{2}\u6708\u4EFB\u52A1\u5217\u8868$/.test(base)) return true;
     return false;
   }
   /**
@@ -3188,6 +3210,10 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     // firstDayOfWeek 仅接受 0(日)/1(一)/6(六)，其余值会导致星期行与网格错位
     if (![0, 1, 6].includes(this.settings.firstDayOfWeek)) {
       this.settings.firstDayOfWeek = 0;
+    }
+    // taskFilePeriod 枚举校验：手编 data.json 写入 "week" 等非法值时回退按年
+    if (this.settings.taskFilePeriod !== "month") {
+      this.settings.taskFilePeriod = "year";
     }
     // customTaskFolder 含 \ 时 vault 永远查不到该路径（Obsidian 路径用 / 分隔），
     // 任务会写丢；归一为去掉首尾空白与尾部斜杠的合法相对路径，非法时回退默认
@@ -3327,7 +3353,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     for (const tip of [
       "点击日期格子添加任务；点击格子里的任务切换完成 / 未完成",
       "点击顶部月份标题可快速跳转年月，「回到本月」一键返回今天",
-      "任务保存在「任务/YYYY年任务列表.md」，可直接手动编辑，月历自动同步",
+      "任务保存在「任务」文件夹下的年度或月度任务列表（可在设置切换归档周期），可直接手动编辑，月历自动同步",
       "编辑弹窗可通过取消按钮、ESC、点击遮罩或移动端系统返回键关闭",
     ]) {
       tipList.createEl("li", { text: tip });
@@ -3369,6 +3395,15 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     new import_obsidian3.Setting(containerEl).setName("每日任务显示数量").setDesc("每个日期格子最多显示的任务数量").addDropdown((dropdown) => dropdown.addOption("3", "3").addOption("4", "4").addOption("5", "5").addOption("6", "6").addOption("7", "7").addOption("8", "8").addOption("9", "9").addOption("10", "10").setValue(String(this.plugin.settings.tasksPerDayLimit)).onChange(async (value) => {
       this.plugin.settings.tasksPerDayLimit = parseInt(value);
       await this.plugin.saveSettings();
+      this.plugin.refreshView();
+    }));
+    // 任务归档周期：决定新任务写入哪个文件；切换不影响已有文件
+    new import_obsidian3.Setting(containerEl).setName("任务归档周期").setDesc("决定新任务写入哪个文件。切换后不影响已有文件，历史任务仍会全部显示。").addDropdown((dropdown) => dropdown.addOption("year", "按年（2026年任务列表.md）").addOption("month", "按月（2026年10月任务列表.md）").setValue(this.plugin.settings.taskFilePeriod).onChange(async (value) => {
+      this.plugin.settings.taskFilePeriod = value === "month" ? "month" : "year";
+      await this.plugin.saveSettings();
+      // 粒度切换后必须清路径缓存，否则新任务会写回旧粒度的文件
+      this.plugin.taskParser.taskFileCache.clear();
+      this.plugin.taskParser.invalidateCache();
       this.plugin.refreshView();
     }));
     // 自定义任务文件夹设置
