@@ -529,13 +529,19 @@
 	background: var(--primary-50);
 }
 
+/* v1.5.2 方案A：.completed 只表意"已完成"（变暗 + 灰字 + 手机端左缘灰竖条），
+   恒加；删除线拆给 .completed-strike，仅「已完成隐藏删除线」关闭时叠加。
+   此前二者耦合：开关打开（默认）时格子里完成态毫无反馈 */
 .task-item.completed {
 	opacity: 0.4;
 }
 
 .task-item.completed .task-content {
-	text-decoration: line-through;
 	color: var(--gray-400);
+}
+
+.task-item.completed-strike .task-content {
+	text-decoration: line-through;
 }
 
 .task-item.overdue::before {
@@ -957,6 +963,26 @@
 	accent-color: #3b82f6;
 }
 
+/* v1.5.2 真机反馈：全天态时间区折叠——「+ 设置时间」按钮坐在「全天」勾选行右侧，
+   未展开时两个 <input type="time"> 整组 display:none（不进布局，手机上不再
+   "跳出时间选择器"） */
+.time-show-btn {
+	background: none;
+	border: 1px dashed #94a3b8;
+	border-radius: 8px;
+	color: #475569;
+	font-size: 12px;
+	padding: 3px 10px;
+	cursor: pointer;
+	margin-left: 10px;
+	white-space: nowrap;
+}
+
+.theme-dark .time-show-btn {
+	border-color: rgba(148, 163, 184, 0.5);
+	color: #cbd5e1;
+}
+
 .all-day-toggle span {
 	font-size: 13px;
 	font-weight: 500;
@@ -1023,8 +1049,9 @@
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 	border-radius: 12px;
 	border: 1px solid #e2e8f0;
-	max-height: 200px;
-	overflow-y: auto;
+	/* v1.5.2 真机反馈：原 max-height:200px + 内滚让 2 条以上的列表要在小盒子里
+	   滑动。取消内滚，列表整段展开，超长时由弹窗本体（.modal overflow hidden auto）
+	   统一滚动；>5 条的「查看全部」折叠逻辑保持不变 */
 }
 
 .existing-tasks-title-row {
@@ -1042,10 +1069,23 @@
 	color: #64748b;
 }
 
+/* v1.5.2 真机反馈②：标题行折叠角标（▾/▴）。窄屏默认收起列表，桌面默认展开——
+   两端都可点标题行切换，角标即开关的可见回显 */
+.existing-tasks-caret {
+	font-size: 11px;
+	color: #64748b;
+}
+
 .existing-tasks-list {
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
+}
+
+/* 标题行可点折叠：手型 + 无文本选中 */
+.existing-tasks-title-row {
+	cursor: pointer;
+	user-select: none;
 }
 
 .existing-task-item {
@@ -1135,8 +1175,11 @@
 
 .existing-task-item.completed .task-text {
 	opacity: 0.45;
-	text-decoration: line-through;
 	color: #94a3b8;
+}
+
+.existing-task-item.completed-strike .task-text {
+	text-decoration: line-through;
 }
 
 .existing-task-item.completed .task-check-icon {
@@ -2523,6 +2566,23 @@
 		border-radius: 0 3px 3px 0;
 		background: var(--mt-cat-color, #64748b);
 	}
+
+	/* v1.5.2 真机反馈：跨天 3px 蓝色 ::before 竖条在手机上遮挡文字。它的信息
+	   （跨天延续）已由 v1.5.0 起的时间行「N天」表意，桌面端保留，手机端整条隐藏。
+	   批次四只回收了 border-left 通道，伪元素通道是这次才发现的漏网 */
+	.day-cell .task-item.multi-day-task::before {
+		display: none;
+	}
+
+	/* v1.5.2 方案A：手机端完成态反馈——批次四回收的左边框槽位改画 3px 灰竖条，
+	   与右缘类别色带（::after）对偶；变暗由全局 .completed opacity 承担 */
+	.day-cell .task-item.completed {
+		border-left: 3px solid #9ca3af;
+	}
+
+	.theme-dark .day-cell .task-item.completed {
+		border-left-color: #6b7280;
+	}
 }
 
 /* ========== 设置页：类别管理（批次二⑦） ========== */
@@ -2556,8 +2616,11 @@
 
 .mt-category-color {
 	flex-shrink: 0;
-	max-width: 92px;
+	/* v1.5.2：原 max-width:92px 把 .dropdown 自带的 4px 左色边 + 31px 右侧箭头
+	   内边距算进了封顶值，系统字体放大后「色号 2」只剩 ~39px 文字区直接截字。
+	   去封顶，宽度按最长选项自适应；再补 2px 右侧余量，避免「色号 12」贴边截尾 */
 	border-left: 4px solid var(--mt-cat-color, #64748b);
+	padding-right: 33px;
 }
 
 .mt-category-btn {

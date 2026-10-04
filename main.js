@@ -1951,7 +1951,26 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   /**
    * 渲染月历网格
    */
+  /**
+   * v1.5.2 方案A：删除线开关热切换时只增删 .completed-strike 类名，
+   * 不重建网格/弹窗（完成态灰条+变暗由 .completed 恒承担，与开关无关）
+   */
+  _applyStrikeClasses() {
+    const strike = this.plugin.settings.showCompletedStrike;
+    const targets = [...document.querySelectorAll(".day-cell .task-item.completed"),
+      ...document.querySelectorAll(".existing-task-item.completed")];
+    for (const el of targets) {
+      if (strike) el.removeClass("completed-strike");
+      else el.addClass("completed-strike");
+    }
+  }
+
   async renderCalendarGrid() {
+    await this._renderCalendarGridCore();
+    // v1.5.2 方案A：网格重绘后把当前删除线开关态补挂到 .completed 元素上
+    this._applyStrikeClasses();
+  }
+  async _renderCalendarGridCore() {
     // 自增 requestId：快速切换月份时，旧请求完成后会因 requestId 不匹配而丢弃渲染结果
     this.renderRequestId = (this.renderRequestId || 0) + 1;
     const myRequestId = this.renderRequestId;
@@ -2100,8 +2119,12 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    */
   renderTaskItem(container, task, dayDate) {
     const taskEl = container.createDiv("task-item");
-    if (task.completed && !this.plugin.settings.showCompletedStrike) {
+    // v1.5.2 方案A：.completed 只表意"已完成"（手机端 = 左缘灰竖条 + 变暗），不再受
+    // 删除线开关门控；删除线通道拆给 .completed-strike（仅开关关闭时叠加）。
+    // 此前开关打开（默认）时已完成任务在日历里毫无反馈，是本批要修的根因
+    if (task.completed) {
       taskEl.addClass("completed");
+      if (!this.plugin.settings.showCompletedStrike) taskEl.addClass("completed-strike");
     }
     if (!this.plugin.settings.showCompletedStrike && task.dueDate && isOverdue(task.dueDate) && !task.completed) {
       taskEl.addClass("overdue");
@@ -2862,6 +2885,21 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const existingTasksEl = this.modalEl.createDiv("modal-existing-tasks");
       const titleRow = existingTasksEl.createDiv("existing-tasks-title-row");
       titleRow.createEl("div", { cls: "existing-tasks-title", text: `\u8BE5\u65E5\u5DF2\u6709 ${this.existingTasks.length} \u4E2A\u4EFB\u52A1` });
+      // v1.5.2 真机反馈②：手机端弹窗默认折叠「该日已有 N 个任务」列表——
+      // 类别标签让每条行变高，两三条就要在小盒子里上下滑，主输入框被顶出视线。
+      // 标题行整行可点（▾/▴ 角标只在窄屏显示），桌面端行为不变。判定用视口宽度
+      // （与 CSS @media(max-width:600px) 同口径），不用 Platform.isMobile——
+      // 窄窗分屏同样有"列表吃掉输入框"的问题，且可在桌面端实测
+      const caretEl = titleRow.createEl("span", { cls: "existing-tasks-caret", text: "\u25BE" });
+      let listOpen = window.innerWidth > 600;
+      const applyListOpen = () => {
+        tasksListEl.style.display = listOpen ? "" : "none";
+        caretEl.textContent = listOpen ? "\u25B4" : "\u25BE";
+      };
+      titleRow.addEventListener("click", () => {
+        listOpen = !listOpen;
+        applyListOpen();
+      });
       const tasksListEl = existingTasksEl.createDiv("existing-tasks-list");
       const LIMIT = 5;
       let showAll = false;
@@ -2870,7 +2908,10 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         const toShow = showAll ? this.existingTasks : this.existingTasks.slice(0, LIMIT);
         toShow.forEach((task) => {
           const taskEl = tasksListEl.createDiv("existing-task-item");
-          if (task.completed && !this.plugin.settings.showCompletedStrike) taskEl.addClass("completed");
+          if (task.completed) {
+            taskEl.addClass("completed");
+            taskEl.toggleClass("completed-strike", !this.plugin.settings.showCompletedStrike);
+          }
           if (task.priority > 0) taskEl.addClass(`priority-${task.priority}`);
           // 勾选框
           const checkboxEl = taskEl.createEl("input", { cls: "task-check-icon", attr: { type: "checkbox", "aria-label": "\u5207\u6362\u5B8C\u6210\u72B6\u6001" } });
@@ -2897,8 +2938,13 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
                   `$1${task.completed ? "x" : " "}$2`
                 );
               }
-              if (task.completed && !this.plugin.settings.showCompletedStrike) taskEl.addClass("completed");
-              else taskEl.removeClass("completed");
+              if (task.completed) {
+                taskEl.addClass("completed");
+                taskEl.toggleClass("completed-strike", !this.plugin.settings.showCompletedStrike);
+              } else {
+                taskEl.removeClass("completed");
+                taskEl.removeClass("completed-strike");
+              }
             } finally {
               checkboxEl.disabled = false;
             }
@@ -3005,6 +3051,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
           });
         }
       };
+      applyListOpen();
       renderTasks();
     }
 
@@ -3025,10 +3072,16 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     let endTimeEl = null;
     let isAllDay = this.editingTask ? !this.editingTask.time : this.plugin.settings.defaultAllDayTask;
     let allDayCheckbox = null;
+    // setTimeOpen 定义在时间区渲染块内，但编辑态同步块也要调它——提到函数级声明
+    let setTimeOpen = null;
     // 真机反馈修正：编辑全天任务不再弹出时间区（v1.5.0 的「编辑态恒渲染」过头了）。
     // 渲染条件 = 默认全天关闭，或被编辑任务本身带 ⏰（后者必须渲染，否则保存会静默
-    // 丢时间）。全天任务要加时间：先关「默认新建全天任务」设置
-    if (!this.plugin.settings.defaultAllDayTask || this.editingTask && this.editingTask.time) {
+    // 丢时间）。v1.5.2 起全天任务加时间改走时间区内的「+ 设置时间」，不再要求先关设置
+    // v1.5.2 真机反馈：全天态不再展示置灰时间框（在手机上那就是"跳出的时间选择器"）。
+    // 时间区默认折叠为一行「全天」勾选，点「+ 设置时间」才展开输入框；渲染条件不变：
+    // 默认全天开启且编辑无时间任务时整段不出现（v1.5.1 行为保留）
+    const renderTimeSection = !this.plugin.settings.defaultAllDayTask || this.editingTask && this.editingTask.time;
+    if (renderTimeSection) {
       // 计算默认时间：系统时间取整到下一小时，结束时间+4小时（结束跨午夜截断到 23:59，
       // 避免 "22:00~02:00" 被结束时间校验拒绝）；23 点后开始时间不再 %24 回绕——
       // 回绕会生成已过去的「当天 00:00~04:00」，截断为 23:00~23:59
@@ -3041,7 +3094,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const defaultEndHourStr = String(defaultEndHour).padStart(2, "0");
       const defaultEndMinuteStr = String(defaultEndMinute).padStart(2, "0");
       const timeContainer = this.modalEl.createDiv("modal-time-container");
-      timeContainer.createEl("span", { cls: "time-label", text: "\u65F6\u95F4" });
+      const timeLabelEl = timeContainer.createEl("span", { cls: "time-label", text: "\u65F6\u95F4" });
       const timeWrapper = timeContainer.createDiv("time-input-wrapper");
       // 原生时间输入框
       startTimeEl = timeWrapper.createEl("input", { type: "time", cls: "time-native-input" });
@@ -3054,13 +3107,32 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const allDayToggle = timeContainer.createDiv("all-day-toggle");
       allDayCheckbox = allDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": "\u5168\u5929" } });
       allDayToggle.createEl("span", { text: "\u5168\u5929" });
+      // 「+ 设置时间」：全天态下唯一的加时间入口，坐在勾选行右侧；
+      // 时间框组默认折叠（display:none = 不进布局，手机上不再"跳出时间选择器"）
+      const showTimeBtn = allDayToggle.createEl("button", { cls: "time-show-btn", type: "button", text: "+ \u8BBE\u7F6E\u65F6\u95F4" });
+      showTimeBtn.style.display = "none";
+      // 折叠开合：全天=「时间」标签与时间框整组隐藏，只剩勾选与加时间按钮
+      setTimeOpen = () => {
+        timeWrapper.style.display = isAllDay ? "none" : "flex";
+        timeLabelEl.style.display = isAllDay ? "none" : "block";
+        showTimeBtn.style.display = isAllDay ? "" : "none";
+      };
+      allDayCheckbox.checked = isAllDay;
       allDayCheckbox.addEventListener("change", (e) => {
         isAllDay = e.target.checked;
         startTimeEl.disabled = isAllDay;
         endTimeEl.disabled = isAllDay;
-        startTimeEl.style.opacity = isAllDay ? "0.4" : "1";
-        endTimeEl.style.opacity = isAllDay ? "0.4" : "1";
+        setTimeOpen();
       });
+      showTimeBtn.addEventListener("click", () => {
+        allDayCheckbox.checked = false;
+        isAllDay = false;
+        startTimeEl.disabled = false;
+        endTimeEl.disabled = false;
+        setTimeOpen();
+        startTimeEl.focus();
+      });
+      setTimeOpen();
     }
     if (this.editingTask && startTimeEl && endTimeEl) {
       // 批次三：编辑态时间区整体同步——有时间按 ~ 拆回填（extractTime 已归一化
@@ -3071,9 +3143,8 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       endTimeEl.value = tp0[1] || endTimeEl.value;
       startTimeEl.disabled = isAllDay;
       endTimeEl.disabled = isAllDay;
-      startTimeEl.style.opacity = isAllDay ? "0.4" : "1";
-      endTimeEl.style.opacity = isAllDay ? "0.4" : "1";
-      if (allDayCheckbox) allDayCheckbox.checked = isAllDay;
+      // v1.5.2：全天态改为折叠（时间框不进布局），透明度两行作废
+      if (allDayCheckbox) { allDayCheckbox.checked = isAllDay; if (setTimeOpen) setTimeOpen(); }
     }
     const endDateContainer = this.modalEl.createDiv("modal-end-date");
     endDateContainer.createEl("span", { cls: "end-date-label", text: "\u7ED3\u675F\u65E5\u671F" });
@@ -3456,7 +3527,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
 /**
  * 默认设置配置
  * @property {boolean} showCompletedTasks - 是否显示已完成任务
- * @property {boolean} showCompletedStrike - 是否隐藏已完成任务的删除线（true=隐藏，对应设置项「已完成隐藏删除线」；为 false 时才加 .completed 删除线样式）
+ * @property {boolean} showCompletedStrike - 是否隐藏已完成任务的删除线（true=隐藏，对应设置项「已完成隐藏删除线」；v1.5.2 起为 false 时叠加 .completed-strike 删除线类，完成态基础反馈 .completed 恒加）
  * @property {boolean} defaultAllDayTask - 新建任务默认是否为全天任务
  * @property {number} firstDayOfWeek - 每周第一天（0=周日，1=周一）
  * @property {boolean} showLunar - 是否显示农历
@@ -3908,7 +3979,22 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     }
   }
   /**
+   * v1.5.2 方案A：删除线开关热切换入口——对每个已加载视图做类名级更新，
+   * 不做 refreshView 全量重绘（改前切一次开关要重建整个网格，手机端肉眼可见闪一下）
+   */
+  _applyStrikeToViews() {
+    const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY);
+    for (const leaf of leaves) {
+      const view = leaf.view;
+      if (view && typeof view._applyStrikeClasses === "function") view._applyStrikeClasses();
+    }
+    // 弹窗里的 +N/已有任务列表不在视图 DOM 内：_applyStrikeClasses 用全局
+    // querySelector 扫描已一并覆盖，此处无需额外处理
+  }
+
+  /**
    * 刷新视图
+   * @param force 是否强制重新渲染整个视图
    */
   async refreshView() {
     const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY);
@@ -3962,10 +4048,10 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian3.Setting(containerEl).setName("已完成隐藏删除线").setDesc("打开后已完成任务将隐藏删除线（同时隐藏过期任务的红色竖线）").addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
+    new import_obsidian3.Setting(containerEl).setName("已完成隐藏删除线").setDesc("打开后已完成任务隐藏删除线（同时隐藏过期任务的红色竖线；完成态本身仍有反馈：手机端左缘灰竖条 + 变暗）").addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
       this.plugin.settings.showCompletedStrike = value;
       await this.plugin.saveSettings();
-      this.plugin.refreshView();
+      this.plugin._applyStrikeToViews();
     }));
     new import_obsidian3.Setting(containerEl).setName("显示农历").setDesc("在日期下方显示农历日期和节气").addToggle((toggle) => toggle.setValue(this.plugin.settings.showLunar).onChange(async (value) => {
       this.plugin.settings.showLunar = value;
