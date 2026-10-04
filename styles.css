@@ -2202,6 +2202,24 @@
 		font-size: 8px;
 		line-height: 1.1;
 	}
+	
+	/* 批次四⑨：字号收口（bug 修复）。基处第二条 .task-content 规则钉死 font-size: 10px，
+	   截胡了本块 .task-item 的 9px，手机端"9px"从未生效。这里用更高特异度把 9px 落到实处：
+	   同宽度字数 +11%（实测 3.9 → 4.3 字）。限 .day-cell 内，弹窗与桌面不动。
+	   纪律：只改 font-size，绝不顺手加 padding-left:0 —— 9px + padding-left:0 + ⑦ 的
+	   flex-wrap 三者同开时，带时间行的 .task-content 宽度实测坍缩为 0（保留那 1px，代价 0.1 字） */
+	.day-cell .task-item .task-content {
+		font-size: 9px;
+	}
+	
+	/* 批次四⑩：回收框架层左右留白（Obsidian 给 .view-content 的默认 padding: 12px，
+	   上一版纸面模型整层漏算）。实测 +3.43px/格（24px ÷ 7，4.3 → 4.7 字）。
+	   安全性：① 后容器自带 4px + 格子边框圆角，内容不会贴屏边。
+	   真机复核项：手机 Capacitor 端数值理论同源，装机时验证不一致则按实测改或放弃本条 */
+	.workspace-leaf-content[data-type="monthly-tasks-view"] .view-content {
+		padding-left: 0;
+		padding-right: 0;
+	}
 }
 
 /* ========== 触屏设备适配（无悬停能力） ========== */
