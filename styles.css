@@ -204,6 +204,39 @@
 	border-color: var(--primary-200);
 }
 
+/* 批次二④：「回到本月」并入 .nav-btn 家族后，二者规则叠加 ——
+   .nav-btn 定尺寸与居中，.today-btn 定主色外观；显式 border-box 防止 padding+border
+   在 content-box 下把 32×32 撑成 58×46（手机端表头实测口径） */
+.today-btn.nav-btn {
+	box-sizing: border-box;
+	padding: 0;
+	font-size: 0;
+}
+
+.today-btn.nav-btn svg {
+	width: 20px;
+	height: 20px;
+}
+
+/* 批次二⑤：漏斗筛选按钮 —— 与 .nav-btn 同尺寸，激活筛选时右上角挂一个色点角标，
+   不展开面板也能看出「当前不是全部」 */
+.nav-btn.filter-btn.filter-active {
+	position: relative;
+	color: var(--primary-600);
+}
+
+.nav-btn.filter-btn.filter-active::after {
+	content: "";
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--primary-500);
+	border: 1px solid var(--bg-secondary);
+}
+
 /* ========== 星期标题 ========== */
 .weekday-header {
 	display: grid;
@@ -682,14 +715,6 @@
 .modal.create-task-modal {
 	padding: 0 !important;
 	min-height: 0 !important;
-}
-
-/* DatePickerModal 同样收掉框架自带元素：X 关闭钮 + 空头部占位
-   （其内容构建在自身使用的 .modal-content 内，故不隐藏 .modal-content/.modal-title） */
-.modal.date-picker-modal > .modal-close-button,
-.modal.date-picker-modal .modal-header-button,
-.modal.date-picker-modal .modal-header {
-	display: none !important;
 }
 
 /* 弹窗容器 - 优化设计（宿主于 Obsidian Modal 容器内，居中/遮罩由框架负责） */
@@ -1301,6 +1326,105 @@
 	background: white;
 }
 
+/* 批次二⑥：月份跳转浮层的 12 月网格（4 列 × 3 行）。原整屏弹窗里的 month-grid
+   随之下线，这里用新的 .month-nav-grid 承接，保持与 .date-picker-popup 同族外观 */
+.month-nav-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 6px;
+}
+
+.month-nav-grid button {
+	box-sizing: border-box;
+	height: 34px;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	background: #f8fafc;
+	color: #1e293b;
+	font-size: 13px;
+	font-family: inherit;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.month-nav-grid button:hover {
+	border-color: #3b82f6;
+	background: #eff6ff;
+	color: #2563eb;
+}
+
+/* 绿=当前视图月，蓝=今天所在月（语义承接自原整屏弹窗） */
+.month-nav-grid button.mt-picker-active {
+	background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+	border-color: #10b981;
+	color: #047857;
+	font-weight: 600;
+}
+
+.month-nav-grid button.mt-picker-today {
+	background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+	border-color: #3b82f6;
+	color: #1d4ed8;
+	font-weight: 600;
+}
+
+/* 批次二⑤：类别筛选面板 —— 行 = 色点 + 名称 + 勾选位，点击整行切换，多选即时生效 */
+.category-filter-popup {
+	min-width: 180px;
+	padding: 8px;
+}
+
+.category-filter-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 8px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.15s;
+	font-size: 13px;
+	color: #1e293b;
+}
+
+.category-filter-item:hover {
+	background: #f1f5f9;
+}
+
+.category-filter-item.selected {
+	background: #eff6ff;
+}
+
+.category-filter-item .category-dot {
+	flex-shrink: 0;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--mt-cat-color, #64748b);
+}
+
+/* 「全部」没有颜色真身：用空心圈与实色点区分，避免误读为某个类别 */
+.category-filter-item .category-dot.category-dot-all {
+	background: transparent;
+	border: 1.5px solid #94a3b8;
+}
+
+.category-filter-item .category-name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* 勾选位固定占宽：有无勾选都对齐，不抖动 */
+.category-filter-item .category-check {
+	flex-shrink: 0;
+	width: 14px;
+	text-align: right;
+	color: #2563eb;
+	font-weight: 600;
+}
+
 /* 星期标题行 */
 .date-picker-week {
 	display: grid;
@@ -1372,6 +1496,14 @@
 .theme-dark .picker-nav-btn:hover { background: rgba(71, 85, 105, 0.4); color: #60a5fa; }
 .theme-dark .picker-select { background: rgba(30, 41, 59, 0.8); border-color: rgba(71, 85, 105, 0.5); color: #e2e8f0; }
 .theme-dark .picker-select:hover { border-color: #3b82f6; background: rgba(51, 65, 85, 0.9); }
+.theme-dark .month-nav-grid button { background: rgba(30, 41, 59, 0.8); border-color: rgba(71, 85, 105, 0.5); color: #e2e8f0; }
+.theme-dark .month-nav-grid button:hover { background: rgba(51, 65, 85, 0.9); border-color: #3b82f6; color: #60a5fa; }
+.theme-dark .month-nav-grid button.mt-picker-active { background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.28) 100%); border-color: #10b981; color: #6ee7b7; }
+.theme-dark .month-nav-grid button.mt-picker-today { background: linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(37, 99, 235, 0.28) 100%); border-color: #3b82f6; color: #93c5fd; }
+.theme-dark .category-filter-item { color: #e2e8f0; }
+.theme-dark .category-filter-item:hover { background: rgba(51, 65, 85, 0.7); }
+.theme-dark .category-filter-item.selected { background: rgba(59, 130, 246, 0.2); }
+.theme-dark .category-filter-item .category-check { color: #60a5fa; }
 .theme-dark .picker-week-day { color: #64748b; }
 .theme-dark .picker-cell { color: #e2e8f0; }
 .theme-dark .picker-cell:hover { background: #3b82f6; }
@@ -2078,6 +2210,22 @@
 		font-size: 12px;
 		padding: 6px 10px;
 	}
+
+	/* 批次二⑤⑥：窄屏下面板收边距，月份胶囊与类别行按拇指友好尺寸放大点击区 */
+	.month-nav-grid {
+		gap: 4px;
+	}
+	.month-nav-grid button {
+		height: 38px;
+		font-size: 14px;
+	}
+	.category-filter-popup {
+		padding: 6px;
+	}
+	.category-filter-item {
+		padding: 9px 8px;
+		font-size: 14px;
+	}
 	.picker-cell {
 		height: 36px;
 		font-size: 13px;
@@ -2145,13 +2293,22 @@
 	
 	.month-title {
 		font-size: 15px;
-		padding: 4px 8px;
-		margin: 0 4px;
+		padding: 4px 4px;
+		margin: 0 2px;
 	}
 	
-	.today-btn {
-		padding: 4px 8px;
-		font-size: 11px;
+	/* 批次二④：图标化后手机端沿用 .nav-btn 的 28×28，只补 border-box 与内边距归零
+	   （基处已声明，此处再写一遍是为了压过本块 .today-btn 的旧 padding/font-size 记忆） */
+	.today-btn.nav-btn {
+		box-sizing: border-box;
+		padding: 0;
+		font-size: 0;
+		border-width: 1px;
+	}
+
+	.today-btn.nav-btn svg {
+		width: 16px;
+		height: 16px;
 	}
 	
 	.weekday-cell {
@@ -2258,6 +2415,62 @@
 	}
 }
 
+/* ========== 设置页：类别管理（批次二⑦） ========== */
+.mt-category-list {
+	margin: 4px 0 12px;
+}
+
+.mt-category-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 0;
+}
+
+.mt-category-dot {
+	flex-shrink: 0;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: var(--mt-cat-color, #64748b);
+}
+
+.mt-category-name {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: var(--font-ui-medium);
+}
+
+.mt-category-color {
+	flex-shrink: 0;
+	max-width: 92px;
+	border-left: 4px solid var(--mt-cat-color, #64748b);
+}
+
+.mt-category-btn {
+	flex-shrink: 0;
+	padding: 2px 8px;
+	font-size: var(--font-ui-small);
+}
+
+.mt-category-del:hover {
+	color: var(--text-error);
+}
+
+.mt-category-input {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.mt-category-empty {
+	padding: 4px 0 8px;
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+}
+
 /* ========== 触屏设备适配（无悬停能力） ========== */
 /* 触屏 tap 后 :hover 会保持到下一次点击：上浮/放大/变深的样式看起来像「按住没弹起」
    （如「回到本月」按钮点按后一直停留在按下外观）。在无 hover 设备上还原这些效果，
@@ -2281,11 +2494,13 @@
 		transform: none;
 	}
 
+	.today-btn.nav-btn:hover,
 	.today-btn:hover {
 		background: var(--primary-50);
 		border-color: var(--primary-100);
 	}
 
+	.theme-dark .today-btn.nav-btn:hover,
 	.theme-dark .today-btn:hover {
 		background: rgba(59, 130, 246, 0.1);
 		border-color: rgba(59, 130, 246, 0.2);
