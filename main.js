@@ -425,6 +425,8 @@ var TaskParser = class {
     this.taskFileCache = /* @__PURE__ */ new Map();
     // 写操作串行化队列：避免 createTask/toggleTask/deleteTask 并发读写导致后写覆盖先写丢失任务
     this.writeQueue = Promise.resolve();
+    // 批次三：编辑「先建后删」的新行交接凭证（create 写、delete 一次性消费）
+    this.lastCreatedInfo = null;
     // 进行中的全库解析 Promise：供并发调用复用，避免缓存失效窗口内重复全库扫描
     this.parsingPromise = null;
   }
@@ -674,15 +676,80 @@ var TaskParser = class {
     }
   }
   /**
-   * 在指定文件中创建新任务
+   * 批次三：编辑「先建后删」的旧行删除入口。
+   * 新行插入后旧行 lineNumber 常发生偏移（同文件新行可能排在旧行之前），
+   * 直接 deleteTask(task) 会被行号身份校验判为失效。策略：读一次文件 →
+   * 先试 preferredLineNumber（命中即用）；否则全文件找与 rawLine（去尾空白）
+   * 相等且为任务行的行——多处相同取第一处（逐字节相同即等价任务，删哪条一致）。
+   * 找不到返回 false。排 writeQueue 串行，与勾选/删除/创建互斥。
    */
-  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category) {
-    // 串行化：避免与其他写操作并发导致后写覆盖先写丢失任务
-    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category);
+  // 批次三：options.excludeNew=true 时，本次链路刚写入的新行（lastCreatedInfo）
+  // 即使与 rawLine 逐字节相同也不得删除——那正是用户刚保存的结果
+  async deleteTaskByRawLine(filePath, rawLine, preferredLineNumber, options) {
+    const run = () => this._deleteTaskByRawLineImpl(filePath, rawLine, preferredLineNumber, options);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category) {
+  async _deleteTaskByRawLineImpl(filePath, rawLine, preferredLineNumber, options) {
+    try {
+      // 批次三：显式声明取用「本次编辑链路刚创建的新行」，读一次即清空——先建的
+      // 新行可能与旧 rawLine 逐字节相同（只改了其他字段时），不排除会误删刚落盘
+      // 的新行导致编辑静默失效（9a 探针实锤）。取不到时按无排除处理
+      const createdToken = options && options.excludeNew ? this.lastCreatedInfo : null;
+      this.lastCreatedInfo = null;
+      const file = this.app.vault.getAbstractFileByPath(filePath);
+      if (!(file instanceof import_obsidian.TFile)) {
+        console.error(`\u6587\u4EF6\u4E0D\u5B58\u5728: ${filePath}`);
+        return false;
+      }
+      const content = await this.app.vault.read(file);
+      const linesArr = content.split("\n");
+      const norm = (s) => s.replace(/\s+$/, "");
+      const want = norm(rawLine);
+      let idx = -1;
+      if (preferredLineNumber >= 0 && preferredLineNumber < linesArr.length &&
+          isTaskLine(linesArr[preferredLineNumber]) && norm(linesArr[preferredLineNumber]) === want &&
+          !(createdToken && createdToken.filePath === filePath && createdToken.index === preferredLineNumber && createdToken.text === want)) {
+        idx = preferredLineNumber;
+      } else {
+        for (let n = 0; n < linesArr.length; n++) {
+          if (isTaskLine(linesArr[n]) && norm(linesArr[n]) === want &&
+              !(createdToken && createdToken.filePath === filePath && createdToken.index === n && createdToken.text === want)) {
+            idx = n;
+            break;
+          }
+        }
+      }
+      if (idx === -1) {
+        console.error(`\u6309 rawLine \u672A\u627E\u5230\u4EFB\u52A1\u884C: ${filePath}`);
+        return false;
+      }
+      linesArr.splice(idx, 1);
+      // 与 _deleteTaskImpl 同款孤儿空行自愈
+      const prevLine = linesArr[idx - 1];
+      const nextLine = linesArr[idx];
+      if (prevLine !== undefined && nextLine !== undefined &&
+          prevLine.trim() === "" && nextLine.trim() === "") {
+        linesArr.splice(idx, 1);
+      }
+      await this.app.vault.modify(file, linesArr.join("\n"));
+      this.invalidateCache();
+      return true;
+    } catch (error) {
+      console.error("\u5220\u9664\u539F\u4EFB\u52A1\u884C\u5931\u8D25:", error);
+      return false;
+    }
+  }
+  /**
+   * 在指定文件中创建新任务
+   */
+  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed) {
+    // 串行化：避免与其他写操作并发导致后写覆盖先写丢失任务
+    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed);
+    this.writeQueue = this.writeQueue.then(run, run);
+    return this.writeQueue;
+  }
+  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed) {
     try {
       const file = this.app.vault.getAbstractFileByPath(filePath);
       if (!(file instanceof import_obsidian.TFile)) {
@@ -690,6 +757,8 @@ var TaskParser = class {
         return false;
       }
       let fileContent = await this.app.vault.read(file);
+      // 批次三：记录新行落点（0 基行号），供编辑「先建后删」排除刚写入的新行
+      let createdIndex = -1;
       // 归一化入参日期（防外部调用传不补零格式），保证排序比较与月份标题匹配正确
       const normDate = (s) => /^\d{4}-\d{1,2}-\d{1,2}$/.test(s) ? normalizeDateStr(s) : s;
       dueDate = normDate(dueDate);
@@ -704,7 +773,9 @@ var TaskParser = class {
       const dueMarker = dueDate ? `\u{1F4C5} ${dueDate}` : "";
       // 标记顺序约定：内容 → 优先级emoji → 🛫 → ⏰ → 📅 → #标签（与解析层行尾取标签互为逆操作）
       const categoryMarker = category ? ` #${category}` : "";
-      let taskLine = `- [ ] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${categoryMarker}`.trimEnd();
+      // 批次三：编辑=删除+重建，重建必须保留勾选态——已完成任务写 `- [x]`；
+      // 新建链路 completed 为 undefined（falsy），行为与旧版逐字节一致
+      let taskLine = `- [${completed ? "x" : " "}] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${categoryMarker}`.trimEnd();
       
       // 确定用于排序和插入的日期：跨天任务用开始日期，普通任务用截止日期
       const isMultiDay = startDate && startDate !== dueDate;
@@ -750,6 +821,7 @@ var TaskParser = class {
             ? `${leadBlank}${monthSection}${eol}${eol}${taskLine}${eol}${eol}${tailSep}`
             : `${leadBlank}---${eol}${eol}${monthSection}${eol}${eol}${taskLine}${eol}${eol}${tailSep}`;
           fileContent = fileContent.slice(0, insertPos) + newSection + fileContent.slice(insertPos);
+          createdIndex = (fileContent.slice(0, insertPos + newSection.indexOf(taskLine)).match(/\n/g) || []).length;
         } else {
           // 月份section已存在，按日期时间排序插入
           const afterSection = fileContent.slice(sectionIdx);
@@ -799,12 +871,16 @@ var TaskParser = class {
           }
           lines.splice(insertIdx, 0, ...parts);
           fileContent = fileContent.slice(0, sectionIdx) + lines.join("\n") + fileContent.slice(sectionEnd);
+          createdIndex = (fileContent.slice(0, sectionIdx).match(/\n/g) || []).length + insertIdx;
         }
       } else {
         const eol = fileContent.includes("\r\n") ? "\r\n" : "\n";
+        createdIndex = fileContent.split("\n").length;
         fileContent = fileContent + eol + taskLine + eol;
       }
       await this.app.vault.modify(file, fileContent);
+      // 一次性交接给紧随其后的编辑删除步骤（deleteTaskByRawLine 显式取用即清空）
+      this.lastCreatedInfo = createdIndex >= 0 ? { filePath, index: createdIndex, text: taskLine } : null;
       this.invalidateCache();
       return true;
     } catch (error) {
@@ -815,14 +891,14 @@ var TaskParser = class {
   /**
    * 在指定日期创建任务（自动选择或创建按年月归类的文件）
    */
-  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath, category) {
+  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath, category, completed) {
     // 串行化整个流程（含年度任务文件创建）：并发创建同一文件时 vault.create 会竞态抛"已存在"，
     // 并入 writeQueue 后第二个请求必能在 findTaskFile 命中首个创建结果
-    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category);
+    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category) {
+  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed) {
     const dateStr = this.formatDate(date);
     const endDateStr = endDate ? this.formatDate(endDate) : dateStr;
     // 一律写入归档任务列表（年度或月度，由设置决定），跳过日记查找：保证任务统一归集
@@ -832,7 +908,7 @@ var TaskParser = class {
       // 直接调用 _createTaskImpl 而非 createTask：本方法已在 writeQueue 链中执行，
       // 若再经 createTask 二次入队会形成 Q2 等待 Q1、Q1 等待 Q2 的死锁，
       // 导致任务永不写入文件、弹窗按钮永久禁用。
-      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr, category);
+      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr, category, completed);
     }
     return false;
   }
@@ -1048,6 +1124,15 @@ function isWeekend(date) {
  * @param date - 日期对象
  * @returns 格式化的日期字符串
  */
+/**
+ * 批次三：YYYY-MM-DD → 本地 Date。
+ * 不用 new Date(str)——那按 UTC 解析，东八区会整体偏早 8 小时，日期差一天
+ */
+function dateFromStr(str) {
+  const [y, m, d] = str.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 function formatDate(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -2212,17 +2297,14 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       }
     }
     const contentEl = taskEl.createDiv("task-content");
-    let displayText = task.content;
-    if (multiDay) {
-      displayText = `${task.content} (${duration}\u5929)`;
-    }
-    if (task.time) {
-      const startTime = task.time.split("~")[0];
+    // 批次三⑦：(N天) 后缀并入时间行。实测后缀宽 22.5~25px，会把批次四抠出的
+    // 文字盒吃回去；并入 .task-time 后文字行零成本（手机端时间行本就整行换行）。
+    // 跨天但无时间的任务也建时间行只显天数，信息不丢；桌面端观感不变（同一位置）
+    contentEl.textContent = task.content;
+    const timeHead = task.time ? task.time.split("~")[0] : "";
+    if (task.time || multiDay) {
       const timeEl = taskEl.createDiv("task-time");
-      timeEl.textContent = startTime;
-      contentEl.textContent = displayText;
-    } else {
-      contentEl.textContent = displayText;
+      timeEl.textContent = multiDay ? (timeHead ? `${timeHead} · ${duration}天` : `${duration}天`) : timeHead;
     }
     contentEl.setAttribute("title", task.content);
     // 类别标签（批次二⑧）：只用「尾部小号 #标签 文本 / 手机端色点」这一个通道，
@@ -2281,11 +2363,17 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   /**
    * 打开创建任务弹窗
    */
-  openCreateTaskModal(date, existingTasks = []) {
-    const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category) => {
+  openCreateTaskModal(date, existingTasks = [], editTask = null) {
+    const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category, editOld) => {
       const customFolderPath = this.plugin.settings.customTaskFolder || void 0;
-      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category);
+      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0);
       if (success) {
+        // 批次三：编辑=先建新行、再删旧行（3.4 定稿）。删除只认 rawLine：新行插入后
+        // 旧行行号常发生偏移；删不到不判失败——新行已在，重复行可见、可手动删除
+        if (editOld) {
+          const removed = await this.taskParser.deleteTaskByRawLine(editOld.filePath, editOld.rawLine, editOld.lineNumber, { excludeNew: true });
+          if (!removed) new import_obsidian2.Notice("编辑已保存，但原任务行未能自动删除，请检查是否重复", 5e3);
+        }
         // 任务出现在日历中即反馈，不再弹成功提示；refresh 失败仍有单独提示
         // refresh 失败不应让用户误以为任务创建失败（任务已写入文件），
         // 单独捕获并提示，避免抛错进入 .catch 导致用户重试产生重复任务
@@ -2299,7 +2387,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         // 抛错让 CreateTaskModal 的 .catch 分支接管：保留弹窗、回滚 submitted/disabled 状态，允许用户重试
         throw new Error("createTaskForDate returned false");
       }
-    }, this.plugin, existingTasks);
+    }, this.plugin, existingTasks, editTask);
     modal.open();
   }
   /**
@@ -2368,7 +2456,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
  * ============================================================
  */
 var CreateTaskModal = class extends import_obsidian3.Modal {
-  constructor(app, date, onSubmit, plugin, existingTasks = []) {
+  constructor(app, date, onSubmit, plugin, existingTasks = [], editTask = null) {
     super(app);
     this.app = app;
     this.date = date;
@@ -2377,6 +2465,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     this.onSubmit = onSubmit;
     this.plugin = plugin;
     this.existingTasks = existingTasks;
+    // 批次三：编辑目标任务（null=创建态）。同弹窗类内分支，不新增第二个弹窗类；
+    // 预填全部在 onOpen 构建期完成（打开方式=以任务锚点日期重建本弹窗）
+    this.editingTask = editTask;
     // 删除操作串行化链：避免并发删除时基于旧行号操作导致删错行
     this.deleteChain = Promise.resolve();
   }
@@ -2415,7 +2506,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     if (holidayInfo) {
       dateMainEl.createSpan({ text: ` \xB7 ${holidayInfo.name}` });
     }
-    if (this.existingTasks.length > 0) {
+    if (this.existingTasks.length > 0 && !this.editingTask) {
       const existingTasksEl = this.modalEl.createDiv("modal-existing-tasks");
       const titleRow = existingTasksEl.createDiv("existing-tasks-title-row");
       titleRow.createEl("div", { cls: "existing-tasks-title", text: `\u8BE5\u65E5\u5DF2\u6709 ${this.existingTasks.length} \u4E2A\u4EFB\u52A1` });
@@ -2471,6 +2562,24 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
           }
           // 操作按钮区域
           const actionsEl = taskEl.createDiv("task-item-actions");
+          // 批次三：编辑入口。基准日期用任务锚点（startDate||dueDate），不用
+          // 被点格子——跨天虚拟挂载时两者不同会把任务平移走样（3.2.4）。
+          // 重开同弹窗（构建期预填），列表对象原样带走，「取消编辑」可回创建态
+          const editBtn = actionsEl.createEl("button", { cls: "task-action-btn task-edit-btn", attr: { title: "编辑任务", "aria-label": "编辑任务" } });
+          editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`;
+          editBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const anchorStr = task.startDate || task.dueDate;
+            if (!anchorStr) {
+              new import_obsidian3.Notice("该任务没有日期标记，无法定位编辑", 3e3);
+              return;
+            }
+            const list = this.existingTasks;
+            const leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
+            const view = leaf ? leaf.view : null;
+            this.close();
+            if (view) view.openCreateTaskModal(dateFromStr(anchorStr), list, task);
+          });
           // 跳转按钮
           const gotoBtn = actionsEl.createEl("button", { cls: "task-action-btn task-goto-btn", attr: { title: "\u8DF3\u8F6C\u5230\u6587\u6863" } });
           gotoBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
@@ -2553,10 +2662,19 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         placeholder: "\u8F93\u5165\u4EFB\u52A1\u5185\u5BB9..."
       }
     });
+    // 批次三：编辑态预填内容（提交时复用同一套 emoji 剥离清洗，预填值已是
+    // 解析层剥好的 task.content，不存在二次剥离问题）
+    if (this.editingTask) {
+      inputEl.value = this.editingTask.content;
+    }
     let startTimeEl = null;
     let endTimeEl = null;
-    let isAllDay = this.plugin.settings.defaultAllDayTask;
-    if (!this.plugin.settings.defaultAllDayTask) {
+    let isAllDay = this.editingTask ? !this.editingTask.time : this.plugin.settings.defaultAllDayTask;
+    let allDayCheckbox = null;
+    // 批次三：编辑态恒渲染时间控件——设置开了默认全天时，若不渲染时间控件，编辑带
+    // ⏰ 的任务会静默丢时间（3.4 复核发现的真风险），全天任务也无法改回带时间。
+    // 全天/带时间的呈现由下方 C6 同步块（值/禁用/透明度/勾选）对齐 isAllDay
+    if (!this.plugin.settings.defaultAllDayTask || this.editingTask) {
       // 计算默认时间：系统时间取整到下一小时，结束时间+4小时（结束跨午夜截断到 23:59，
       // 避免 "22:00~02:00" 被结束时间校验拒绝）；23 点后开始时间不再 %24 回绕——
       // 回绕会生成已过去的「当天 00:00~04:00」，截断为 23:00~23:59
@@ -2580,7 +2698,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const defaultEndTime = `${defaultEndHourStr}:${defaultEndMinuteStr}`;
       endTimeEl.value = defaultEndTime;
       const allDayToggle = timeContainer.createDiv("all-day-toggle");
-      const allDayCheckbox = allDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": "\u5168\u5929" } });
+      allDayCheckbox = allDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": "\u5168\u5929" } });
       allDayToggle.createEl("span", { text: "\u5168\u5929" });
       allDayCheckbox.addEventListener("change", (e) => {
         isAllDay = e.target.checked;
@@ -2589,6 +2707,19 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         startTimeEl.style.opacity = isAllDay ? "0.4" : "1";
         endTimeEl.style.opacity = isAllDay ? "0.4" : "1";
       });
+    }
+    if (this.editingTask && startTimeEl && endTimeEl) {
+      // 批次三：编辑态时间区整体同步——有时间按 ~ 拆回填（extractTime 已归一化
+      // HH:MM）；无时间（isAllDay=true）也要把勾选/禁用/透明度对齐，否则「默认
+      // 非全天」设置下编辑全天任务会出现复选框未勾但提交按全天的观感不一致
+      const tp0 = this.editingTask.time ? String(this.editingTask.time).split("~") : [];
+      startTimeEl.value = tp0[0] || startTimeEl.value;
+      endTimeEl.value = tp0[1] || endTimeEl.value;
+      startTimeEl.disabled = isAllDay;
+      endTimeEl.disabled = isAllDay;
+      startTimeEl.style.opacity = isAllDay ? "0.4" : "1";
+      endTimeEl.style.opacity = isAllDay ? "0.4" : "1";
+      if (allDayCheckbox) allDayCheckbox.checked = isAllDay;
     }
     const endDateContainer = this.modalEl.createDiv("modal-end-date");
     endDateContainer.createEl("span", { cls: "end-date-label", text: "\u7ED3\u675F\u65E5\u671F" });
@@ -2605,6 +2736,18 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     let pickerMonth = this.date.getMonth();
     function formatDisplayDate(y, m, d) {
       return `${y}\u5E74${m + 1}\u6708${d}\u65E5`;
+    }
+    // 批次三：编辑跨天任务 → 勾上跨天、展开触发器、预填结束日期。
+    // 开始日期不单独进表单（本期只做结束日期一侧，3.3⑥）：this.date 已是
+    // 打开弹窗时传入的任务锚点，结束日期校验基准 self.date 天然正确
+    if (this.editingTask && this.editingTask.startDate && this.editingTask.dueDate && this.editingTask.startDate !== this.editingTask.dueDate) {
+      isMultiDay = true;
+      endDate = dateFromStr(this.editingTask.dueDate);
+      multiDayCheckbox.checked = true;
+      endDateTrigger.style.display = "flex";
+      const eArr = this.editingTask.dueDate.split("-").map(Number);
+      endDateTrigger.textContent = formatDisplayDate(eArr[0], eArr[1] - 1, eArr[2]);
+      endDateTrigger.setAttribute("data-value", this.editingTask.dueDate);
     }
     // 更新日期网格（年月切换时调用，不重建弹出层）
     function updateGrid(popup) {
@@ -2765,14 +2908,17 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       { value: 2, class: "priority-medium", label: "\u4E2D" },
       { value: 0, class: "priority-none", label: "\u666E\u901A" }
     ];
-    let selectedPriority = 0;
+    // 批次三：编辑态初值取任务优先级；两处选中判断（wrapper / btn）同源，
+    // 漏改任一处会出现 wrapper 高亮与按钮高亮不一致（3.3③）
+    const initialPriority = this.editingTask ? this.editingTask.priority : 0;
+    let selectedPriority = initialPriority;
     const priorityWrappers = [];
     priorities.forEach((p, index) => {
       const wrapper = priorityGroup.createDiv("priority-btn-wrapper");
-      if (p.value === 0)
+      if (p.value === initialPriority)
         wrapper.addClass("selected");
       const btn = wrapper.createEl("button", {
-        cls: `priority-btn ${p.class} ${p.value === 0 ? "selected" : ""}`,
+        cls: `priority-btn ${p.class} ${p.value === initialPriority ? "selected" : ""}`,
         attr: { "aria-label": p.label }
       });
       const label = wrapper.createDiv("priority-btn-text");
@@ -2796,9 +2942,14 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     const categoryContainer = this.modalEl.createDiv("modal-category");
     categoryContainer.createEl("span", { cls: "category-label", text: "类别" });
     const categoryGroup = categoryContainer.createDiv("category-group");
-    const categoryNames = (this.plugin.settings.categories || []).map((c) => c.name);
+    let categoryNames = (this.plugin.settings.categories || []).map((c) => c.name);
+    // 批次三：手写标签可能不在设置「已知类别」里（如手敲 #阅读）：编辑态把它
+    // 并进选项，否则重建保存会把原有类别静默丢掉（2.3⑦：设置只是选项源，不是白名单）
+    if (this.editingTask && this.editingTask.category && categoryNames.indexOf(this.editingTask.category) < 0) {
+      categoryNames = categoryNames.concat([this.editingTask.category]);
+    }
     const catOptions = [{ value: "", label: "无标签" }].concat(categoryNames.map((n) => ({ value: n, label: `#${n}` })));
-    let remembered = this.plugin.lastCategory || "";
+    let remembered = this.editingTask ? this.editingTask.category || "" : this.plugin.lastCategory || "";
     if (!catOptions.some((o) => o.value === remembered))
       remembered = "";
     let selectedCategory = remembered;
@@ -2826,9 +2977,25 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       text: "\u53D6\u6D88"
     });
     cancelBtn.addEventListener("click", () => this.close());
+    if (this.editingTask) {
+      // 批次三：编辑态在「取消」与「保存」之间插「取消编辑」——关弹窗后以同
+      // 一份列表回创建态（列表区恢复、表单清空）。「取消」= 放弃编辑直接关
+      // （先建后删未执行到删除步时原行从未被碰过，取消零副作用）
+      const cancelEditBtn = btnGroup.createEl("button", {
+        cls: "btn-cancel btn-cancel-edit",
+        text: "取消编辑"
+      });
+      cancelEditBtn.addEventListener("click", () => {
+        const list = this.existingTasks;
+        const leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
+        const view = leaf ? leaf.view : null;
+        this.close();
+        if (view) view.openCreateTaskModal(this.date, list);
+      });
+    }
     const confirmBtn = btnGroup.createEl("button", {
       cls: "btn-confirm",
-      text: "\u6DFB\u52A0\u4EFB\u52A1"
+      text: this.editingTask ? "保存" : "添加任务"
     });
     const submitTask = () => {
       // 防重复提交：双击或 Enter 连按时只生效一次
@@ -2877,7 +3044,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         // await onSubmit：确保 createTaskForDate 完成后再关闭弹窗，失败时回滚状态允许重试
         // 记住本次类别（内存态，下次打开弹窗预选）；提交链路把 category 交给视图回调
         this.plugin.lastCategory = selectedCategory;
-        Promise.resolve(this.onSubmit(content, isAllDay, time, selectedPriority, endDate, selectedCategory)).then(() => {
+        Promise.resolve(this.onSubmit(content, isAllDay, time, selectedPriority, endDate, selectedCategory, this.editingTask)).then(() => {
           this.close();
         }).catch((err) => {
           console.error("\u521B\u5EFA\u4EFB\u52A1\u5931\u8D25:", err);
@@ -3407,6 +3574,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       "点击日期格子添加任务；点击格子里的任务切换完成 / 未完成",
       "点击顶部月份标题可快速跳转年月，房屋图标一键返回今天",
       "任务行尾的 #标签 即类别：出现类别后，顶部漏斗按钮可按类别筛选（多选，默认全部）",
+      "点任务行的铅笔图标可编辑：改内容/优先级/时间/日期/类别，保存=先建新行再删旧行，跨天任务以开始日期为准",
       "任务保存在「任务」文件夹下的年度或月度任务列表（可在设置切换归档周期），可直接手动编辑，月历自动同步",
       "编辑弹窗可通过取消按钮、ESC、点击遮罩或移动端系统返回键关闭",
     ]) {

@@ -846,6 +846,19 @@
 	transform: translateY(0);
 }
 
+/* 批次三：编辑态「取消编辑」= 描边弱化款，与实心「取消」区分主次 */
+.btn-cancel-edit {
+	background: transparent;
+	border: 1px solid #cbd5e1;
+	color: #64748b;
+}
+
+.btn-cancel-edit:hover {
+	background: #f1f5f9;
+	border-color: #94a3b8;
+	color: #334155;
+}
+
 /* 时间选择器 */
 .modal-time-container {
 	margin: 0 24px 16px;
@@ -1104,6 +1117,12 @@
 	transition: background 0.15s, color 0.15s;
 	padding: 0;
 	color: #94a3b8;
+}
+
+/* 批次三：编辑按钮（铅笔）。中性蓝灰，不与跳转蓝/删除红抢语义 */
+.task-edit-btn:hover {
+	background: #f1f5f9;
+	color: #475569;
 }
 
 /* 跳转按钮 */
@@ -2211,6 +2230,11 @@
 	color: #64748b;
 }
 
+.theme-dark .task-edit-btn:hover {
+	background: rgba(148, 163, 184, 0.15);
+	color: #cbd5e1;
+}
+
 .theme-dark .task-goto-btn:hover {
 	background: rgba(59, 130, 246, 0.15);
 	color: #60a5fa;
@@ -2371,6 +2395,18 @@
 
 .theme-dark .btn-cancel:hover {
 	background: rgba(71, 85, 105, 0.6);
+	color: #e2e8f0;
+}
+
+.theme-dark .btn-cancel-edit {
+	background: transparent;
+	border: 1px solid rgba(100, 116, 139, 0.6);
+	color: #94a3b8;
+}
+
+.theme-dark .btn-cancel-edit:hover {
+	background: rgba(71, 85, 105, 0.4);
+	border-color: #94a3b8;
 	color: #e2e8f0;
 }
 
@@ -2593,6 +2629,20 @@
    （如「回到本月」按钮点按后一直停留在按下外观）。在无 hover 设备上还原这些效果，
    桌面端不受影响；同时把原本仅 hover 可见的元素改为常显。 */
 @media (hover: none) {
+	/* 批次三：取消编辑 hover 只改底色/边框；触屏 tap 后粘住，还原到未 hover 外观 */
+	.btn-cancel-edit:hover {
+		background: transparent;
+		border-color: #cbd5e1;
+		color: #64748b;
+	}
+
+	/* 批次三：深色款同上还原（.theme-dark 选择器特异度更高，必须单独写） */
+	.theme-dark .btn-cancel-edit:hover {
+		background: transparent;
+		border-color: rgba(100, 116, 139, 0.6);
+		color: #94a3b8;
+	}
+
 	/* 批次二③：胶囊 hover 只改边框；触屏 tap 后 :hover 会粘住，这里对未选中项还原。
 	   排除 .selected：否则本条（位置靠后、同特异度）会压掉选中态的蓝边框 */
 	.category-chip:not(.selected):hover {
