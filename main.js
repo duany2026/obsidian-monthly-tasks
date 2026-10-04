@@ -24,7 +24,7 @@
  *
  * 1. TaskModel (TaskParser.ts)
  *    - 任务数据模型和解析工具函数
- *    - 包含：generateTaskId, parsePriority, cleanTaskContent
+ *    - 包含：generateTaskId, parsePriority, cleanTaskContent（同时剥行尾 #tag 得类别）
  *    - 提取日期：extractDueDate, extractStartDate
  *    - 任务判断：isTaskLine, isTaskCompleted, isMultiDayTask
  *    - 工具函数：groupTasksByDate, getMultiDayDuration, isOverdue
@@ -157,13 +157,46 @@ function normalizeTimeStr(t) {
 let invalidDateNoticeShown = false;
 
 /**
- * 清理任务内容，移除所有元数据标记
+ * 清理任务内容，移除所有元数据标记，并剥出类别标签
  * 保留任务的核心文本内容；日期兼容补零与不补零两种写法
+ *
+ * 类别约定（批次二 2.2 / 2.4）：
+ * - 只认「行尾标签串」：连续写在行末的一串 #tag 才是类别候选；写在行首或正文中段
+ *   （如被日期标记隔断）的 #tag 按正文处理，不误伤手写习惯，也不会被重拼后改变归属。
+ * - 每任务至多一个类别：取行尾串里第一个合法标签作类别，其余标签留在正文原样显示。
+ * - 标签规则沿用 Obsidian：前导必须有空白、不含空格、非纯数字，中文可用。
+ * @returns { content, category } category 为不含 # 的标签名，无标签时为 ""
  */
 function cleanTaskContent(rawLine) {
+  // 以「去掉尾部空白」后的偏移为准定位标签，再回到原串截取，避免尾随空格错位
+  const norm = rawLine.replace(/\s+$/u, "");
+  const bodyOnly = norm.replace(/^\s*- \[[ x]\]\s*/i, "");
+  const prefixLen = norm.length - bodyOnly.length;
+  let category = "";
+  let cleanedLine = norm;
+  // 行尾标签串：形如 " #生活 #其它"（每个标签前都必须有空白，故行首 #xxx 不在此列）
+  const run = bodyOnly.match(/(?:\s#[^\s#]+)+$/u);
+  if (run) {
+    let offset = 0;
+    for (const raw of run[0].match(/\s(#[^\s#]+)/gu)) {
+      const name = raw.trim().slice(1);
+      // 纯数字不是合法标签（Obsidian 规则），在本串里继续往后找一个合法的
+      if (/^\d+$/.test(name)) {
+        offset += raw.length;
+        continue;
+      }
+      category = name;
+      // 只剥这一个标签：其余标签留在正文里（拼接时它们会落到日期标记之前，
+      // 下次解析不再属于行尾串，因此「解析→重拼」不会让类别在两个标签间来回翻转）
+      const at = run.index + offset;
+      cleanedLine = norm.slice(0, prefixLen + at) + norm.slice(prefixLen + at + raw.length);
+      break;
+    }
+  }
   // 与 CreateTaskModal 提交侧的剥离保持一致：🟢 优先级、➕ 创建日期 / ✅ 完成日期
   // （Tasks 插件格式）一并清理，避免外部格式粘贴后 emoji 混入任务显示文本
-  return rawLine.replace(/^\s*- \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*[^\s📅🛫🔴🟡✅🟢➕]+(?:\s*~\s*[^\s📅🛫🔴🟡✅🟢➕]+)?/gu, "").replace(/🔴|🟡|🟢/gu, "").trim();
+  const content = cleanedLine.replace(/^\s*- \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*[^\s📅🛫🔴🟡✅🟢➕]+(?:\s*~\s*[^\s📅🛫🔴🟡✅🟢➕]+)?/gu, "").replace(/🔴|🟡|🟢/gu, "").replace(/\s+/g, " ").trim();
+  return { content, category };
 }
 
 /**
@@ -502,7 +535,7 @@ var TaskParser = class {
     const dueDate = extractDueDate(line);
     const startDate = extractStartDate(line);
     const time = extractTime(line);
-    const content = cleanTaskContent(line);
+    const { content, category } = cleanTaskContent(line);
     // 含 📅/🛫 但日期无法解析（含形状合法但值非法，如 2026-02-30）：
     // 不静默丢弃，首次给出提示，其余仅记日志
     const badDue = !dueDate && line.includes("📅");
@@ -519,6 +552,8 @@ var TaskParser = class {
     return {
       id: generateTaskId(filePath, lineNumber),
       content,
+      // 类别：行尾 #tag 剥出的标签名（无标签为 ""）；仅参与显示与筛选
+      category,
       rawLine: line,
       filePath,
       lineNumber,
@@ -635,13 +670,13 @@ var TaskParser = class {
   /**
    * 在指定文件中创建新任务
    */
-  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate) {
+  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category) {
     // 串行化：避免与其他写操作并发导致后写覆盖先写丢失任务
-    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate);
+    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate) {
+  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category) {
     try {
       const file = this.app.vault.getAbstractFileByPath(filePath);
       if (!(file instanceof import_obsidian.TFile)) {
@@ -661,7 +696,9 @@ var TaskParser = class {
       let timeMarker = time && !isAllDay ? `\u23F0 ${time} ` : "";
       // dueDate 缺失时不写 📅 标记（防御：当前调用链恒传有效日期，但本方法是公共入队入口）
       const dueMarker = dueDate ? `\u{1F4C5} ${dueDate}` : "";
-      let taskLine = `- [ ] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}`.trimEnd();
+      // 标记顺序约定：内容 → 优先级emoji → 🛫 → ⏰ → 📅 → #标签（与解析层行尾取标签互为逆操作）
+      const categoryMarker = category ? ` #${category}` : "";
+      let taskLine = `- [ ] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${categoryMarker}`.trimEnd();
       
       // 确定用于排序和插入的日期：跨天任务用开始日期，普通任务用截止日期
       const isMultiDay = startDate && startDate !== dueDate;
@@ -772,14 +809,14 @@ var TaskParser = class {
   /**
    * 在指定日期创建任务（自动选择或创建按年月归类的文件）
    */
-  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath) {
+  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath, category) {
     // 串行化整个流程（含年度任务文件创建）：并发创建同一文件时 vault.create 会竞态抛"已存在"，
     // 并入 writeQueue 后第二个请求必能在 findTaskFile 命中首个创建结果
-    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath);
+    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath) {
+  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category) {
     const dateStr = this.formatDate(date);
     const endDateStr = endDate ? this.formatDate(endDate) : dateStr;
     // 一律写入归档任务列表（年度或月度，由设置决定），跳过日记查找：保证任务统一归集
@@ -789,7 +826,7 @@ var TaskParser = class {
       // 直接调用 _createTaskImpl 而非 createTask：本方法已在 writeQueue 链中执行，
       // 若再经 createTask 二次入队会形成 Q2 等待 Q1、Q1 等待 Q2 的死锁，
       // 导致任务永不写入文件、弹窗按钮永久禁用。
-      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr);
+      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr, category);
     }
     return false;
   }
@@ -1887,6 +1924,16 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       contentEl.textContent = displayText;
     }
     contentEl.setAttribute("title", task.content);
+    // 类别标签（批次二⑧）：只用「尾部小号 #标签 文本 / 手机端色点」这一个通道，
+    // 不加背景色、不加边框——那两个通道已被优先级背景与跨天/overdue 左边框占用。
+    // 独立 span 而非 ::before：.task-item::before 已被 overdue 与 multi-day-task 占用
+    if (task.category) {
+      const catEl = taskEl.createDiv("task-category");
+      catEl.textContent = `#${task.category}`;
+      catEl.setAttribute("title", `\u7C7B\u522B\uFF1A${task.category}`);
+      // 色点/文字颜色都取自这个变量：手机端只画圆点（见 styles.css 480 覆盖块）
+      catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
+    }
     taskEl.addEventListener("click", (e) => {
       e.stopPropagation();
       this.toggleTask(task);
@@ -2492,6 +2539,13 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
           });
           // 任务文字
           const textEl = taskEl.createEl("span", { cls: "task-text", text: task.content });
+          // 类别标签：与格子内同一套通道（文字/色点），样式选择器同时覆盖两种行
+          if (task.category) {
+            const catEl = taskEl.createDiv("task-category");
+            catEl.textContent = `#${task.category}`;
+            catEl.setAttribute("title", `\u7C7B\u522B\uFF1A${task.category}`);
+            catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
+          }
           // 操作按钮区域
           const actionsEl = taskEl.createDiv("task-item-actions");
           // 跳转按钮
@@ -2935,6 +2989,32 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
  * @property {boolean} autoUpdateHolidays - 启用时是否自动刷新节假日数据（数据源：holiday-cn → timor.tech；默认关闭，涉及第三方请求）
  * @property {Object} holidaysData - 节假日数据缓存（按年份存储）
  */
+// 类别色板（批次二）：固定 8 色，不开放自由选色——控制复杂度，同时保证暗色下可辨。
+var CATEGORY_PALETTE = [
+  "#3b82f6",
+  "#8b5cf6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#06b6d4",
+  "#ec4899",
+  "#64748b"
+];
+/**
+ * 取类别颜色：设置里配过名的一定用配置色（同一类别处处同色）；
+ * 没配过名的（用户手敲的新标签）按标签名哈希取固定色板，保证稳定且不撞色于邻近项
+ */
+function resolveCategoryColor(name, categories) {
+  for (const c of categories || []) {
+    if (c && c.name === name)
+      return c.color;
+  }
+  let h = 0;
+  for (let i = 0; i < name.length; i++) {
+    h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  }
+  return CATEGORY_PALETTE[h % CATEGORY_PALETTE.length];
+}
 var DEFAULT_SETTINGS = {
   showCompletedTasks: true,
   showCompletedStrike: true,
@@ -2947,7 +3027,13 @@ var DEFAULT_SETTINGS = {
   autoUpdateHolidays: false,
   holidaysData: {},
   // 任务归档粒度："year"（默认，任务/2026年任务列表.md）| "month"（任务/2026年10月任务列表.md）
-  taskFilePeriod: "year"
+  taskFilePeriod: "year",
+  // 已知类别列表（名称 + 颜色，顺序即弹窗/漏斗的显示顺序）。
+  // 类别真身是内容里的 #tag：这里只是显示顺序与配色，删除此处条目不碰任何笔记
+  categories: [
+    { name: "\u751F\u6D3B", color: "#3b82f6" },
+    { name: "\u5B66\u4E60", color: "#8b5cf6" }
+  ]
 };
 
 /**
@@ -3214,6 +3300,25 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     // taskFilePeriod 枚举校验：手编 data.json 写入 "week" 等非法值时回退按年
     if (this.settings.taskFilePeriod !== "month") {
       this.settings.taskFilePeriod = "year";
+    }
+    // categories 与现有字段同级校验：非数组回退默认；元素缺 name/color、名字非法（空/含空格/纯数字/带 #）或重名则跳过该条。
+    // 注意：这里只校验「显示配置」，笔记里的 #tag 不受影响——删配置不删标签
+    if (!Array.isArray(this.settings.categories)) {
+      this.settings.categories = DEFAULT_SETTINGS.categories.map((c) => ({ name: c.name, color: c.color }));
+    } else {
+      const seenNames = /* @__PURE__ */ new Set();
+      const validCats = [];
+      for (const c of this.settings.categories) {
+        if (!c || typeof c !== "object")
+          continue;
+        const name = typeof c.name === "string" ? c.name.trim() : "";
+        if (!name || /\s/.test(name) || /^\d+$/.test(name) || name.includes("#") || seenNames.has(name))
+          continue;
+        seenNames.add(name);
+        const color = CATEGORY_PALETTE.includes(c.color) ? c.color : CATEGORY_PALETTE[(seenNames.size - 1) % CATEGORY_PALETTE.length];
+        validCats.push({ name, color });
+      }
+      this.settings.categories = validCats;
     }
     // customTaskFolder 含 \ 时 vault 永远查不到该路径（Obsidian 路径用 / 分隔），
     // 任务会写丢；归一为去掉首尾空白与尾部斜杠的合法相对路径，非法时回退默认

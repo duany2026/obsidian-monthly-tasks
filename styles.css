@@ -481,6 +481,29 @@
 	line-height: 1.3;
 }
 
+/* ========== 类别标签（批次二⑧） ========== */
+/* 视觉通道纪律：类别只占「尾部小号 #标签 文本」这一个通道，不加背景、不加边框——
+   背景已被优先级占用，左边框已被跨天/overdue 占用。
+   必须用独立 span 而非 ::before：.task-item::before 已被 overdue 与 multi-day-task 占用。
+   选择器同时覆盖日历格子行与创建弹窗的已有任务行（一套渲染器两条路径），
+   否则 +N 列表与格子里显示不一致 */
+.task-item .task-category,
+.existing-task-item .task-category {
+	flex-shrink: 0;
+	font-size: 9px;
+	line-height: 1.3;
+	/* --gray-400 定义在 .monthly-tasks-container 上，弹窗内取不到，故留同值兜底 */
+	color: var(--gray-400, #9CA3AF);
+	margin-left: 4px;
+	white-space: nowrap;
+	cursor: default;
+}
+
+.theme-dark .task-item .task-category,
+.theme-dark .existing-task-item .task-category {
+	color: #6b7280;
+}
+
 .task-item:hover {
 	background: var(--primary-50);
 }
@@ -2219,6 +2242,19 @@
 	.workspace-leaf-content[data-type="monthly-tasks-view"] .view-content {
 		padding-left: 0;
 		padding-right: 0;
+	}
+	/* 批次二⑧：手机端类别降级为色点。实测口径：`#生活` 文字实占约 22px，会把格子内
+	   文字盒从 4.7 字吃回约 1.5 字（等于抵消批次四）；6px 圆点 + 3px 间距约 8px 宽，
+	   保住约 4.0 字。font-size:0 同时收掉文字与行高，颜色取 JS 写入的 --mt-cat-color */
+	.task-item .task-category,
+	.existing-task-item .task-category {
+		font-size: 0;
+		line-height: 0;
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		margin-left: 3px;
+		background: var(--mt-cat-color, #64748b);
 	}
 }
 
