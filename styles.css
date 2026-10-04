@@ -204,19 +204,7 @@
 	border-color: var(--primary-200);
 }
 
-/* 批次二④：「回到本月」并入 .nav-btn 家族后，二者规则叠加 ——
-   .nav-btn 定尺寸与居中，.today-btn 定主色外观；显式 border-box 防止 padding+border
-   在 content-box 下把 32×32 撑成 58×46（手机端表头实测口径） */
-.today-btn.nav-btn {
-	box-sizing: border-box;
-	padding: 0;
-	font-size: 0;
-}
-
-.today-btn.nav-btn svg {
-	width: 20px;
-	height: 20px;
-}
+/* 真机反馈回退：图标化方案下线，「回到本月」恢复 v1.4.2 文本按钮 */
 
 /* 批次二⑤：漏斗筛选按钮 —— 与 .nav-btn 同尺寸，激活筛选时右上角挂一个色点角标，
    不展开面板也能看出「当前不是全部」 */
@@ -683,6 +671,14 @@
 /* 遮罩层：由 Obsidian Modal 基类的 .modal-bg 提供，这里仅补充与原设计一致的模糊效果 */
 .modal-container .modal-bg {
 	backdrop-filter: blur(6px);
+}
+
+/* 真机反馈回退：DatePickerModal 恢复整屏弹窗后，同样收掉框架自带元素：
+   X 关闭钮 + 空头部占位（内容构建在 .modal-content 内，故不隐藏 .modal-content/.modal-title） */
+.modal.date-picker-modal > .modal-close-button,
+.modal.date-picker-modal .modal-header-button,
+.modal.date-picker-modal .modal-header {
+	display: none !important;
 }
 
 /* 收掉框架自带元素：右上角关闭按钮、空的标题/内容占位（移动端会撑出弹窗顶部空白）。
@@ -1345,46 +1341,20 @@
 	background: white;
 }
 
-/* 批次二⑥：月份跳转浮层的 12 月网格（4 列 × 3 行）。原整屏弹窗里的 month-grid
-   随之下线，这里用新的 .month-nav-grid 承接，保持与 .date-picker-popup 同族外观 */
-.month-nav-grid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: 6px;
-}
-
-.month-nav-grid button {
-	box-sizing: border-box;
-	height: 34px;
+/* 真机反馈：类别筛选面板由 body 浮层改挂 Obsidian Modal（系统返回键/Esc/遮罩可关）。
+   .modal 负责容器外观，行结构沿用 .category-filter-popup 一族；锚定位置由 JS 写死 */
+.modal.category-filter-modal {
+	padding: 0;
+	width: auto;
+	max-width: 92vw;
+	border-radius: 16px;
+	background: var(--background-primary);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
 	border: 1px solid #e2e8f0;
-	border-radius: 8px;
-	background: #f8fafc;
-	color: #1e293b;
-	font-size: 13px;
-	font-family: inherit;
-	cursor: pointer;
-	transition: all 0.15s;
 }
 
-.month-nav-grid button:hover {
-	border-color: #3b82f6;
-	background: #eff6ff;
-	color: #2563eb;
-}
-
-/* 绿=当前视图月，蓝=今天所在月（语义承接自原整屏弹窗） */
-.month-nav-grid button.mt-picker-active {
-	background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-	border-color: #10b981;
-	color: #047857;
-	font-weight: 600;
-}
-
-.month-nav-grid button.mt-picker-today {
-	background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-	border-color: #3b82f6;
-	color: #1d4ed8;
-	font-weight: 600;
+.theme-dark .modal.category-filter-modal {
+	border-color: rgba(71, 85, 105, 0.5);
 }
 
 /* 批次二⑤：类别筛选面板 —— 行 = 色点 + 名称 + 勾选位，点击整行切换，多选即时生效 */
@@ -1522,10 +1492,6 @@
 .theme-dark .picker-nav-btn:hover { background: rgba(71, 85, 105, 0.4); color: #60a5fa; }
 .theme-dark .picker-select { background: rgba(30, 41, 59, 0.8); border-color: rgba(71, 85, 105, 0.5); color: #e2e8f0; }
 .theme-dark .picker-select:hover { border-color: #3b82f6; background: rgba(51, 65, 85, 0.9); }
-.theme-dark .month-nav-grid button { background: rgba(30, 41, 59, 0.8); border-color: rgba(71, 85, 105, 0.5); color: #e2e8f0; }
-.theme-dark .month-nav-grid button:hover { background: rgba(51, 65, 85, 0.9); border-color: #3b82f6; color: #60a5fa; }
-.theme-dark .month-nav-grid button.mt-picker-active { background: linear-gradient(135deg, rgba(16, 185, 129, 0.18) 0%, rgba(5, 150, 105, 0.28) 100%); border-color: #10b981; color: #6ee7b7; }
-.theme-dark .month-nav-grid button.mt-picker-today { background: linear-gradient(135deg, rgba(59, 130, 246, 0.18) 0%, rgba(37, 99, 235, 0.28) 100%); border-color: #3b82f6; color: #93c5fd; }
 .theme-dark .category-filter-item { color: #e2e8f0; }
 .theme-dark .category-filter-item:hover { background: rgba(51, 65, 85, 0.7); }
 .theme-dark .category-filter-item.selected { background: rgba(59, 130, 246, 0.2); }
@@ -2352,14 +2318,7 @@
 		padding: 6px 10px;
 	}
 
-	/* 批次二⑤⑥：窄屏下面板收边距，月份胶囊与类别行按拇指友好尺寸放大点击区 */
-	.month-nav-grid {
-		gap: 4px;
-	}
-	.month-nav-grid button {
-		height: 38px;
-		font-size: 14px;
-	}
+	/* 批次二⑤：窄屏下类别行按拇指友好尺寸放大点击区 */
 	.category-filter-popup {
 		padding: 6px;
 	}
@@ -2450,18 +2409,11 @@
 		margin: 0 2px;
 	}
 	
-	/* 批次二④：图标化后手机端沿用 .nav-btn 的 28×28，只补 border-box 与内边距归零
-	   （基处已声明，此处再写一遍是为了压过本块 .today-btn 的旧 padding/font-size 记忆） */
-	.today-btn.nav-btn {
-		box-sizing: border-box;
-		padding: 0;
-		font-size: 0;
-		border-width: 1px;
-	}
-
-	.today-btn.nav-btn svg {
-		width: 16px;
-		height: 16px;
+	/* 真机反馈回退：「回到本月」恢复文本按钮（图标化并未省出标题区，flex:1 把省下的
+	   宽度全给了日期胶囊）；沿用 v1.4.2 手机端紧凑字号 */
+	.today-btn {
+		padding: 4px 8px;
+		font-size: 11px;
 	}
 	
 	.weekday-cell {
@@ -2553,17 +2505,22 @@
 		padding-left: 0;
 		padding-right: 0;
 	}
-	/* 批次二⑧：手机端类别降级为色点。实测口径：`#生活` 文字实占约 22px，会把格子内
-	   文字盒从 4.7 字吃回约 1.5 字（等于抵消批次四）；6px 圆点 + 3px 间距约 8px 宽，
-	   保住约 4.0 字。font-size:0 同时收掉文字与行高，颜色取 JS 写入的 --mt-cat-color */
-	.task-item .task-category,
-	.existing-task-item .task-category {
-		font-size: 0;
-		line-height: 0;
-		width: 6px;
-		height: 6px;
-		border-radius: 50%;
-		margin-left: 3px;
+	/* 真机反馈：类别不再用「文字/色点」通道（色点占宽又不好看）。手机端格子内直接
+	   隐藏 #标签 元素，改由任务条右缘一条 3px 色带（.task-item::after）表意——
+	   ::after 画在条内、零宽度成本，保住批次四省下的每格约 4.7 字。色带取 JS 写在
+	   .task-item 上的 --mt-cat-color；跨天条右缘本无 ::before（在左侧），不冲突 */
+	.day-cell .task-item .task-category {
+		display: none;
+	}
+
+	.day-cell .task-item.has-category::after {
+		content: '';
+		position: absolute;
+		right: 0;
+		top: 1px;
+		bottom: 1px;
+		width: 3px;
+		border-radius: 0 3px 3px 0;
 		background: var(--mt-cat-color, #64748b);
 	}
 }
@@ -2671,13 +2628,11 @@
 		transform: none;
 	}
 
-	.today-btn.nav-btn:hover,
 	.today-btn:hover {
 		background: var(--primary-50);
 		border-color: var(--primary-100);
 	}
 
-	.theme-dark .today-btn.nav-btn:hover,
 	.theme-dark .today-btn:hover {
 		background: rgba(59, 130, 246, 0.1);
 		border-color: rgba(59, 130, 246, 0.2);

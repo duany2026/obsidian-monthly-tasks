@@ -1726,10 +1726,6 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   async onOpen() {
     // 类别筛选为视图内存态（不持久化）：空集=全部；重开视图回「全部」
     this.activeCategories = /* @__PURE__ */ new Set();
-    // popup 状态（批次二⑤⑥）：同一时刻至多一个浮层
-    this.activePopupEl = null;
-    this.activePopupTrigger = null;
-    this.popupCloseHandler = null;
     // 使用自有字段 rootEl，而非覆写 ItemView 基类的 containerEl（视图根元素，含视图头部）：
     // 框架后续经 view.containerEl 操作视图时必须拿到正确元素
     this.rootEl = this.contentEl.createDiv("monthly-tasks-container");
@@ -1747,50 +1743,21 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       for (const t of this.pendingTimers) clearTimeout(t);
       this.pendingTimers.clear();
     }
-    // 浮层挂在 document.body 上，不随 rootEl 回收：视图关闭时一并拆除，
-    // 避免残留失联面板与 document 级监听器（与弹窗 activeInstances 清理同目的）
+    // 托管弹窗挂在框架层不随 rootEl 回收：视图关闭时一并收起，避免失联
     this.closeActivePopup();
     this.rootEl.empty();
   }
-  /**
-   * 统一 popup 管理（批次二⑤⑥）：年月导航与类别筛选共用 .date-picker-popup 机制。
-   * 同一时刻至多一个 popup：漏斗与日期面板互斥由「先关后开」天然保证。
-   */
+  /** 关闭本视图挂出的所有托管弹窗（日期跳转 / 类别筛选）；两个面板改挂 Modal 后
+   * 仍保留此入口：onClose、header 重建与回归测试统一从这里收起 */
   closeActivePopup() {
-    if (this.activePopupEl) {
-      this.activePopupEl.remove();
-      this.activePopupEl = null;
-    }
-    this.activePopupTrigger = null;
-    if (this.popupCloseHandler) {
-      document.removeEventListener("click", this.popupCloseHandler);
-      this.popupCloseHandler = null;
-    }
-  }
-  /** 同一触发器再点 = 关闭（返回 true 时调用方直接 return）；点别的触发器 = 先关旧的 */
-  togglePopupFor(triggerEl) {
-    if (this.activePopupEl && this.activePopupTrigger === triggerEl) {
-      this.closeActivePopup();
-      return true;
-    }
-    this.closeActivePopup();
-    return false;
-  }
-  /** 登记 popup 与「点外部关闭」监听（延迟一拍，避免本次 click 立即把它关掉） */
-  openManagedPopup(popup, triggerEl) {
-    const self = this;
-    this.activePopupEl = popup;
-    this.activePopupTrigger = triggerEl || null;
-    this.popupCloseHandler = (e) => {
-      if (!popup.isConnected) {
-        self.closeActivePopup();
-        return;
+    for (const cls of [DatePickerModal, CategoryFilterModal]) {
+      if (cls.activeInstances) {
+        for (const inst of Array.from(cls.activeInstances)) {
+          try { inst.close(); } catch (e) {
+          }
+        }
       }
-      if (!popup.contains(e.target) && !(triggerEl && triggerEl.contains(e.target))) {
-        self.closeActivePopup();
-      }
-    };
-    setTimeout(() => document.addEventListener("click", this.popupCloseHandler), 0);
+    }
   }
   /**
    * 扫描当前解析结果里的类别（批次二⑤）：类别 = 任务行尾 #tag 剥出的 category。
@@ -1810,78 +1777,24 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const known = (this.plugin.settings.categories || []).map((c) => c.name).filter((n) => found.includes(n));
     return known.concat(found.filter((n) => !known.includes(n)));
   }
-  /** 类别多选面板：空集=全部；点行即时刷新网格，面板保持打开便于连续多选 */
+  /** 类别多选面板：真机反馈回退——body 浮层不接系统返回键/Esc，改挂 Obsidian Modal
+   * （弹窗管理器统一接管关闭途径），行内保持多选不关、点「全部」即关 */
   renderCategoryPopup(anchorEl) {
-    if (this.togglePopupFor(anchorEl))
+    // 再点漏斗 = 收起（沿用浮层时代的交互）；与日期弹窗互斥
+    if (CategoryFilterModal.activeInstances && CategoryFilterModal.activeInstances.size > 0) {
+      for (const inst of Array.from(CategoryFilterModal.activeInstances)) {
+        try { inst.close(); } catch (e) {
+        }
+      }
       return;
-    const cats = this.scanCategories();
-    const active = this.activeCategories;
-    const popup = document.body.createDiv("date-picker-popup category-filter-popup");
-    popup.style.display = "block";
-    const rect = anchorEl.getBoundingClientRect();
-    const estW = 200;
-    const hasUntagged = (() => { const c0 = this.taskParser.cache; return !!(c0 && c0.tasks && c0.tasks.some((t) => !t.category)); })();
-    const estH = 24 + (cats.length + 1 + (hasUntagged ? 1 : 0)) * 30;
-    popup.style.top = `${rect.bottom + 6 + estH > window.innerHeight ? Math.max(8, rect.top - estH - 6) : rect.bottom + 6}px`;
-    const mkRow = (label, checked, color, onPick, noneDot) => {
-      const row = popup.createDiv("category-filter-item");
-      if (checked)
-        row.addClass("selected");
-      const dot = row.createDiv("category-dot");
-      if (color)
-        dot.style.setProperty("--mt-cat-color", color);
-      else if (noneDot)
-        dot.addClass("category-dot-none");
-      else
-        dot.addClass("category-dot-all");
-      row.createDiv("category-name").textContent = label;
-      const checkEl = row.createDiv("category-check");
-      if (checked)
-        checkEl.textContent = "\u2713";
-      row.addEventListener("click", (e) => {
-        e.stopPropagation();
-        onPick();
-      });
-    };
-    mkRow("\u5168\u90E8", active.size === 0, null, () => {
-      this.setCategoryFilter(/* @__PURE__ */ new Set());
-      this.renderCalendarGrid();
-      // 重建面板刷新勾选态：先显式关闭当前面板，否则 togglePopupFor 见同一触发器会判为「收起」
-      this.closeActivePopup();
-      this.renderCategoryPopup(anchorEl);
-    });
-    // 无标签行（规范 2.1：默认类别 = 无标签 = 工作）：key 用空串，
-    // 渲染过滤处 active.has(x.category) 天然命中未带标签的任务，无需特判
-    if (hasUntagged) {
-      mkRow("\u65E0\u6807\u7B7E", active.has(""), null, () => {
-        const next = new Set(active);
-        if (next.has("")) {
-          next.delete("");
-        } else {
-          next.add("");
-        }
-        this.setCategoryFilter(next);
-        this.renderCalendarGrid();
-        this.closeActivePopup();
-        this.renderCategoryPopup(anchorEl);
-      }, true);
     }
-    for (const name of cats) {
-      const color = resolveCategoryColor(name, this.plugin.settings.categories);
-      mkRow(`#${name}`, active.has(name), color, () => {
-        const next = new Set(active);
-        if (next.has(name)) {
-          next.delete(name);
-        } else {
-          next.add(name);
+    if (DatePickerModal.activeInstances) {
+      for (const inst of Array.from(DatePickerModal.activeInstances)) {
+        try { inst.close(); } catch (e) {
         }
-        this.setCategoryFilter(next);
-        this.renderCalendarGrid();
-        this.closeActivePopup();
-        this.renderCategoryPopup(anchorEl);
-      });
+      }
     }
-    this.openManagedPopup(popup, anchorEl);
+    new CategoryFilterModal(this.app, this, anchorEl).open();
   }
   /** 应用筛选：只改状态与角标；重渲由调用方触发（避免双重重绘） */
   setCategoryFilter(set) {
@@ -1956,11 +1869,10 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
     nextBtn.setAttribute("aria-label", "\u4E0B\u6708");
     nextBtn.addEventListener("click", () => this.navigateMonth(1));
-    const todayBtn = rightGroup.createDiv("today-btn nav-btn");
-    // 图标化（批次二④）：手机端 header 要给漏斗腾位，「回到本月」四字换成 house SVG，并入
-    // .nav-btn 家族（手机 28×28）；文案退到 aria-label/title，可发现性与无障碍不倒退
-    todayBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>';
-    todayBtn.setAttribute("aria-label", "\u56DE\u5230\u672C\u6708");
+    const todayBtn = rightGroup.createDiv("today-btn");
+    // 真机反馈回退：图标化并未省下标题区（.month-title flex:1 吃掉余量），四字文案
+    // 可读性更好，恢复 v1.4.2 文本按钮
+    todayBtn.textContent = "\u56DE\u5230\u672C\u6708";
     todayBtn.setAttribute("title", "\u56DE\u5230\u672C\u6708");
     todayBtn.addEventListener("click", () => this.goToToday());
     // 漏斗筛选按钮（批次二⑤）：当前解析结果里出现 ≥1 个类别才渲染——纯无标签工作流
@@ -1987,104 +1899,20 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 打开日期选择器
    */
   openDatePicker() {
-    // 批次二⑥：整屏 Modal 改为锚定标题的 .date-picker-popup 浮层（与结束日期选择器、
-    // 漏斗面板同一套机制），手机端不再整屏遮挡；点月份即跳转，无确认步骤
-    const titleEl = this.headerEl.querySelector(".month-title");
-    if (!titleEl)
-      return;
-    if (this.togglePopupFor(titleEl))
-      return;
-    let pickerYear = this.currentYear;
-    let pickerMonth = this.currentMonth;
-    const popup = document.body.createDiv("date-picker-popup month-nav-popup");
-    popup.style.display = "block";
-    const rect = titleEl.getBoundingClientRect();
-    const estW = 300;
-    const estH = 240;
-    popup.style.left = `${Math.min(Math.max(8, rect.left + rect.width / 2 - estW / 2), Math.max(8, window.innerWidth - estW - 8))}px`;
-    popup.style.top = `${rect.bottom + 6 + estH > window.innerHeight ? Math.max(8, rect.top - estH - 6) : rect.bottom + 6}px`;
-    // 年月导航：◀▶ 翻月 + 年/月下拉（沿用 .date-picker-nav 家族的既有样式）
-    const navRow = popup.createDiv("date-picker-nav");
-    const prevBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "\u25C0" });
-    const yearSelect = navRow.createEl("select", { cls: "picker-select picker-select-year" });
-    const monthSelect = navRow.createEl("select", { cls: "picker-select picker-select-month" });
-    const nextBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "\u25B6" });
-    const buildYearOptions = () => {
-      yearSelect.replaceChildren();
-      for (let y = pickerYear - 1; y <= pickerYear + 1; y++) {
-        const opt = yearSelect.createEl("option", { value: String(y), text: `${y}\u5E74` });
-        if (y === pickerYear)
-          opt.selected = true;
+    // 真机反馈回退：整屏 Modal 恢复 v1.4.2 形态——Modal 由 Obsidian 弹窗管理器接管，
+    // 系统返回键/Esc/遮罩点击天然关闭；锚定浮层不自带这套生命周期，手机上关不掉
+    if (CategoryFilterModal.activeInstances) {
+      for (const inst of Array.from(CategoryFilterModal.activeInstances)) {
+        try { inst.close(); } catch (e) {
+        }
       }
-    };
-    buildYearOptions();
-    for (let m = 0; m < 12; m++) {
-      const opt = monthSelect.createEl("option", { value: String(m), text: `${m + 1}\u6708` });
-      if (m === pickerMonth)
-        opt.selected = true;
     }
-    const clampYear = (y) => Math.max(1900, Math.min(2100, y));
-    const syncMonthSelect = () => {
-      Array.from(monthSelect.options).forEach((o) => {
-        o.selected = o.value === String(pickerMonth);
-      });
-    };
-    const monthGrid = popup.createDiv("month-nav-grid");
-    const monthBtns = [];
-    for (let m = 0; m < 12; m++) {
-      const monthBtn = monthGrid.createEl("button", { text: `${m + 1}\u6708` });
-      monthBtns.push(monthBtn);
-      monthBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        goMonth(pickerYear, m);
-      });
-    }
-    // 月份胶囊着色：绿=当前视图月，蓝=今天所在月（原整屏日期弹窗的语义保留）
-    const refreshMonthStyles = () => {
-      const now = new Date();
-      monthBtns.forEach((btn, idx) => {
-        btn.removeClass("mt-picker-active");
-        btn.removeClass("mt-picker-today");
-        if (idx === this.currentMonth && pickerYear === this.currentYear)
-          btn.addClass("mt-picker-active");
-        if (pickerYear === now.getFullYear() && idx === now.getMonth())
-          btn.addClass("mt-picker-today");
-      });
-    };
-    const goMonth = (y, m) => {
-      pickerYear = clampYear(y);
-      pickerMonth = m;
-      buildYearOptions();
-      syncMonthSelect();
-      this.currentYear = pickerYear;
-      this.currentMonth = pickerMonth;
-      refreshMonthStyles();
-      // 即时导航：标题同步 + 整月网格重绘（renderCalendarGrid 自带 requestId 竞态纪律）
-      const t2 = this.headerEl.querySelector(".month-title");
-      if (t2)
-        t2.textContent = getMonthTitle(this.currentYear, this.currentMonth);
-      this.renderCalendarGrid();
-    };
-    prevBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const p = pickerMonth === 0 ? { y: pickerYear - 1, m: 11 } : { y: pickerYear, m: pickerMonth - 1 };
-      goMonth(p.y, p.m);
+    const modal = new DatePickerModal(this.app, this.currentYear, this.currentMonth, async (year, month) => {
+      this.currentYear = year;
+      this.currentMonth = month;
+      await this.renderCalendarGrid();
     });
-    nextBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const n = pickerMonth === 11 ? { y: pickerYear + 1, m: 0 } : { y: pickerYear, m: pickerMonth + 1 };
-      goMonth(n.y, n.m);
-    });
-    yearSelect.addEventListener("change", (e) => {
-      e.stopPropagation();
-      goMonth(parseInt(yearSelect.value), pickerMonth);
-    });
-    monthSelect.addEventListener("change", (e) => {
-      e.stopPropagation();
-      goMonth(pickerYear, parseInt(monthSelect.value));
-    });
-    refreshMonthStyles();
-    this.openManagedPopup(popup, titleEl);
+    modal.open();
   }
   /**
    * 刷新视图
@@ -2315,7 +2143,10 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       catEl.textContent = `#${task.category}`;
       catEl.setAttribute("title", `\u7C7B\u522B\uFF1A${task.category}`);
       // 色点/文字颜色都取自这个变量：手机端只画圆点（见 styles.css 480 覆盖块）
-      catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
+      const catColor = resolveCategoryColor(task.category, this.plugin.settings.categories);
+      catEl.style.setProperty("--mt-cat-color", catColor);
+      taskEl.style.setProperty("--mt-cat-color", catColor);
+      taskEl.addClass("has-category");
     }
     taskEl.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -2455,6 +2286,527 @@ var MonthlyView = class extends import_obsidian2.ItemView {
  * - 任务格式：- [ ] 任务名 📅 2026-04-21
  * ============================================================
  */
+/**
+ * ============================================================
+ * DatePickerModal - 日期选择器
+ * ============================================================
+ * 月份导航弹窗，允许用户选择跳转的目标月份
+ *
+ * 实现：全部逻辑集中在 onOpen() 内（年份步进、12 个月份按钮、
+ * 取消/确定），样式以行内 style 设置为主，选择结果经 onSubmit 回调。
+ *
+ * 样式类（styles.css 中仅 modal-buttons 有规则，其余为行内样式）：
+ * - date-picker-modal：弹窗容器
+ * - modal-title：标题
+ * - picker-section / year-input-wrapper / month-grid：年份与月份区块
+ * - modal-buttons：底部按钮组
+ * ============================================================
+ */
+var DatePickerModal = class extends import_obsidian3.Modal {
+  constructor(app, currentYear, currentMonth, onSubmit) {
+    super(app);
+    this.year = currentYear;
+    this.month = currentMonth;
+    this.onSubmit = onSubmit;
+    const now = new Date();
+    this.currentYear = now.getFullYear();
+    this.currentMonth = now.getMonth();
+  }
+  
+  // 检测是否为暗色模式
+  isDarkMode() {
+    return document.body.classList.contains('theme-dark');
+  }
+  
+  onOpen() {
+    // 登记活动实例：onunload 时关闭仍打开的弹窗，避免卸载后残留可交互但已失联的 DOM
+    if (!DatePickerModal.activeInstances) DatePickerModal.activeInstances = /* @__PURE__ */ new Set();
+    DatePickerModal.activeInstances.add(this);
+    const { contentEl, modalEl } = this;
+    const isDark = this.isDarkMode();
+    
+    modalEl.addClass("date-picker-modal");
+    // 与 CreateTaskModal 一致：收掉框架自带的 X 关闭按钮与空头部占位（新版弹窗结构
+    // .modal > .modal-header-button + .modal-header，会撑出顶部空白并显示冗余 X；
+    // 关闭途径仍有取消/确定/ESC/遮罩/系统返回键）。
+    // 注意：本弹窗内容构建在 contentEl（.modal-content）内，故不移除 .modal-content/.modal-title
+    const sweepChrome = () => {
+      if (!this.containerEl) return;
+      this.containerEl.querySelectorAll(".modal-header-button, .modal-close-button").forEach((el) => el.remove());
+      const header = this.modalEl.querySelector(":scope > .modal-header");
+      if (header) header.remove();
+    };
+    sweepChrome();
+    requestAnimationFrame(sweepChrome);
+    setTimeout(sweepChrome, 100);
+    modalEl.style.background = "var(--background-primary)";
+    modalEl.style.padding = "32px";
+    modalEl.style.borderRadius = "24px";
+    modalEl.style.width = "420px";
+    modalEl.style.maxWidth = "92vw";
+    modalEl.style.border = "none";
+    modalEl.style.boxShadow = isDark 
+      ? "0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)"
+      : "0 25px 80px rgba(0, 0, 0, 0.35)";
+    modalEl.style.margin = "auto";
+    contentEl.empty();
+    
+    // 颜色配置
+    const colors = isDark ? {
+      text: '#e2e8f0',
+      textMuted: '#94a3b8',
+      bg: '#1e293b',
+      bgLight: '#334155',
+      border: '#475569',
+      inputBg: '#1e293b',
+      inputBorder: '#475569',
+      btnBg: '#334155',
+      btnHover: '#475569',
+      btnCancel: '#334155',
+      btnCancelHover: '#475569',
+      wrapperBg: '#334155',
+      wrapperBorder: '#475569'
+    } : {
+      text: '#374151',
+      textMuted: '#6B7280',
+      bg: '#F9FAFB',
+      bgLight: '#F3F4F6',
+      border: '#E5E7EB',
+      inputBg: 'white',
+      inputBorder: '#D1D5DB',
+      btnBg: '#F9FAFB',
+      btnHover: '#F3F4F6',
+      btnCancel: '#F1F5F9',
+      btnCancelHover: '#E2E8F0',
+      wrapperBg: '#F9FAFB',
+      wrapperBorder: '#E5E7EB'
+    };
+    
+    // 标题
+    const titleEl = contentEl.createDiv("modal-title");
+    titleEl.textContent = "\u9009\u62E9\u65E5\u671F";
+    titleEl.style.fontSize = "20px";
+    titleEl.style.fontWeight = "700";
+    titleEl.style.textAlign = "center";
+    titleEl.style.marginBottom = "28px";
+    titleEl.style.paddingBottom = "20px";
+    titleEl.style.borderBottom = "2px solid var(--background-modifier-border)";
+    titleEl.style.color = "var(--text-normal)";
+    
+    // 年份区域
+    const yearSection = contentEl.createDiv("picker-section");
+    yearSection.style.marginBottom = "28px";
+    
+    const yearLabel = yearSection.createEl("div", { text: "\u5E74\u4EFD" });
+    yearLabel.style.fontSize = "13px";
+    yearLabel.style.fontWeight = "600";
+    yearLabel.style.color = colors.textMuted;
+    yearLabel.style.textAlign = "center";
+    yearLabel.style.marginBottom = "16px";
+    
+    const yearInputWrapper = yearSection.createDiv("year-input-wrapper");
+    yearInputWrapper.style.display = "flex";
+    yearInputWrapper.style.alignItems = "center";
+    yearInputWrapper.style.justifyContent = "center";
+    yearInputWrapper.style.gap = "16px";
+    yearInputWrapper.style.padding = "8px";
+    
+    const yearDecBtn = yearInputWrapper.createEl("button", { text: "\u2212" });
+    yearDecBtn.style.width = "40px";
+    yearDecBtn.style.height = "40px";
+    yearDecBtn.style.fontSize = "18px";
+    yearDecBtn.style.fontWeight = "600";
+    yearDecBtn.style.color = colors.text;
+    yearDecBtn.style.background = colors.inputBg;
+    yearDecBtn.style.border = `2px solid ${colors.inputBorder}`;
+    yearDecBtn.style.borderRadius = "10px";
+    yearDecBtn.style.cursor = "pointer";
+    yearDecBtn.style.display = "flex";
+    yearDecBtn.style.alignItems = "center";
+    yearDecBtn.style.justifyContent = "center";
+    yearDecBtn.style.transition = "all 0.2s ease";
+    yearDecBtn.style.outline = "none";
+    yearDecBtn.style.boxShadow = "none";
+    
+    const yearInput = yearInputWrapper.createEl("input", {
+      attr: {
+        type: "number",
+        value: String(this.year),
+        min: "1900",
+        max: "2100"
+      }
+    });
+    yearInput.style.width = "120px";
+    yearInput.style.height = "40px";
+    yearInput.style.padding = "0 14px";
+    yearInput.style.fontSize = "20px";
+    yearInput.style.fontWeight = "700";
+    yearInput.style.textAlign = "center";
+    yearInput.style.color = colors.text;
+    yearInput.style.background = colors.inputBg;
+    yearInput.style.border = `2px solid ${colors.inputBorder}`;
+    yearInput.style.borderRadius = "10px";
+    yearInput.style.outline = "none";
+    yearInput.style.transition = "all 0.2s ease";
+    yearInput.style.boxSizing = "border-box";
+    
+    const yearIncBtn = yearInputWrapper.createEl("button", { text: "+" });
+    yearIncBtn.style.width = "40px";
+    yearIncBtn.style.height = "40px";
+    yearIncBtn.style.fontSize = "18px";
+    yearIncBtn.style.fontWeight = "600";
+    yearIncBtn.style.color = colors.text;
+    yearIncBtn.style.background = colors.inputBg;
+    yearIncBtn.style.border = `2px solid ${colors.inputBorder}`;
+    yearIncBtn.style.borderRadius = "10px";
+    yearIncBtn.style.cursor = "pointer";
+    yearIncBtn.style.display = "flex";
+    yearIncBtn.style.alignItems = "center";
+    yearIncBtn.style.justifyContent = "center";
+    yearIncBtn.style.transition = "all 0.2s ease";
+    yearIncBtn.style.outline = "none";
+    yearIncBtn.style.boxShadow = "none";
+    
+    const currentYearHint = yearSection.createEl("div", {
+      text: `\u5F53\u524D\u5E74\u4EFD: ${this.currentYear}`
+    });
+    currentYearHint.style.textAlign = "center";
+    currentYearHint.style.fontSize = "12px";
+    currentYearHint.style.color = colors.textMuted;
+    currentYearHint.style.marginTop = "12px";
+    currentYearHint.style.fontWeight = "500";
+    
+    // 按钮悬停效果
+    const btnHoverStyle = (btn) => {
+      btn.addEventListener("mouseenter", () => {
+        btn.style.background = isDark ? "rgba(59, 130, 246, 0.2)" : "#EFF6FF";
+        btn.style.borderColor = isDark ? "rgba(59, 130, 246, 0.5)" : "#93C5FD";
+        btn.style.color = "#60a5fa";
+      });
+      btn.addEventListener("mouseleave", () => {
+        btn.style.background = colors.inputBg;
+        btn.style.borderColor = colors.inputBorder;
+        btn.style.color = colors.text;
+      });
+    };
+    btnHoverStyle(yearDecBtn);
+    btnHoverStyle(yearIncBtn);
+    
+    yearDecBtn.addEventListener("click", () => {
+      this.year = Math.max(1900, this.year - 1);
+      yearInput.value = String(this.year);
+      refreshMonthStyles();
+    });
+    yearIncBtn.addEventListener("click", () => {
+      this.year = Math.min(2100, this.year + 1);
+      yearInput.value = String(this.year);
+      refreshMonthStyles();
+    });
+    yearInput.addEventListener("change", () => {
+      let val = parseInt(yearInput.value);
+      if (isNaN(val)) val = this.currentYear;
+      val = Math.max(1900, Math.min(2100, val));
+      this.year = val;
+      yearInput.value = String(val);
+      refreshMonthStyles();
+    });
+    
+    // 月份区域
+    const monthSection = contentEl.createDiv("picker-section");
+    monthSection.style.marginBottom = "28px";
+    
+    const monthLabel = monthSection.createEl("div", { text: "\u6708\u4EFD" });
+    monthLabel.style.fontSize = "13px";
+    monthLabel.style.fontWeight = "600";
+    monthLabel.style.color = colors.textMuted;
+    monthLabel.style.textAlign = "center";
+    monthLabel.style.marginBottom = "16px";
+    
+    const monthGrid = monthSection.createDiv("month-grid");
+    monthGrid.style.display = "grid";
+    monthGrid.style.gridTemplateColumns = "repeat(4, 1fr)";
+    monthGrid.style.gap = "12px";
+    
+    const monthNames = ["1\u6708", "2\u6708", "3\u6708", "4\u6708", "5\u6708", "6\u6708", "7\u6708", "8\u6708", "9\u6708", "10\u6708", "11\u6708", "12\u6708"];
+    
+    // 月份按钮着色集中在这里：绿色=当前选中，蓝色=今天所在月（仅当年）。
+    // 年份 +/- 、输入变化、点击选中后都调用它整体重绘，
+    // 否则旧高亮会残留在已切换走的年份视图上
+    const refreshMonthStyles = () => {
+      monthGrid.querySelectorAll("button").forEach((btn, idx) => {
+        btn.style.color = colors.text;
+        btn.style.background = colors.wrapperBg;
+        btn.style.borderColor = "transparent";
+        btn.style.boxShadow = "none";
+        btn.style.transform = "none";
+        if (idx === this.month) {
+          // 选中月份 - 绿色（与今天所在月重合时优先显示选中）
+          btn.style.color = "white";
+          btn.style.background = "linear-gradient(135deg, #10b981, #059669)";
+          btn.style.borderColor = "#34d399";
+          btn.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35)";
+          btn.style.transform = "scale(1.05)";
+        } else if (this.year === this.currentYear && idx === this.currentMonth) {
+          // 今天所在月（须同年）- 蓝色
+          btn.style.color = "white";
+          btn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+          btn.style.borderColor = "#60a5fa";
+          btn.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35)";
+          btn.style.transform = "scale(1.05)";
+        }
+      });
+    };
+
+    for (let m = 0; m < 12; m++) {
+      const monthBtn = monthGrid.createEl("button", { text: monthNames[m] });
+      monthBtn.style.padding = "16px 8px";
+      monthBtn.style.fontSize = "14px";
+      monthBtn.style.fontWeight = "600";
+      monthBtn.style.borderRadius = "12px";
+      monthBtn.style.cursor = "pointer";
+      monthBtn.style.border = "2px solid transparent";
+      monthBtn.style.transition = "all 0.2s ease";
+      monthBtn.style.display = "flex";
+      monthBtn.style.alignItems = "center";
+      monthBtn.style.justifyContent = "center";
+      monthBtn.style.outline = "none";
+      monthBtn.style.boxShadow = "none";
+      
+      monthBtn.addEventListener("mouseenter", () => {
+        if (!(this.year === this.currentYear && m === this.currentMonth) && m !== this.month) {
+          monthBtn.style.background = colors.btnHover;
+          monthBtn.style.transform = "translateY(-2px)";
+          monthBtn.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
+        }
+      });
+      
+      monthBtn.addEventListener("mouseleave", () => {
+        if (!(this.year === this.currentYear && m === this.currentMonth) && m !== this.month) {
+          monthBtn.style.background = colors.wrapperBg;
+          monthBtn.style.transform = "none";
+          monthBtn.style.boxShadow = "none";
+        }
+      });
+      
+      monthBtn.addEventListener("click", () => {
+        this.month = m;
+        refreshMonthStyles();
+      });
+    }
+    refreshMonthStyles();
+    
+    // 按钮组
+    const btnGroup = contentEl.createDiv("modal-buttons");
+    btnGroup.style.display = "flex";
+    btnGroup.style.gap = "16px";
+    btnGroup.style.justifyContent = "center";
+    btnGroup.style.marginTop = "8px";
+    
+    const cancelBtn = btnGroup.createEl("button", { text: "\u53D6\u6D88" });
+    cancelBtn.style.padding = "14px 32px";
+    cancelBtn.style.fontSize = "15px";
+    cancelBtn.style.fontWeight = "600";
+    cancelBtn.style.borderRadius = "12px";
+    cancelBtn.style.cursor = "pointer";
+    cancelBtn.style.border = "none";
+    cancelBtn.style.minWidth = "100px";
+    cancelBtn.style.background = colors.btnCancel;
+    cancelBtn.style.color = isDark ? "#94a3b8" : "#64748B";
+    cancelBtn.style.transition = "all 0.2s ease";
+    
+    cancelBtn.addEventListener("mouseenter", () => {
+      cancelBtn.style.background = colors.btnCancelHover;
+      cancelBtn.style.color = isDark ? "#e2e8f0" : "#475569";
+    });
+    cancelBtn.addEventListener("mouseleave", () => {
+      cancelBtn.style.background = colors.btnCancel;
+      cancelBtn.style.color = isDark ? "#94a3b8" : "#64748B";
+    });
+    cancelBtn.addEventListener("click", () => this.close());
+    
+    const confirmBtn = btnGroup.createEl("button", { text: "\u786E\u5B9A" });
+    confirmBtn.style.padding = "14px 32px";
+    confirmBtn.style.fontSize = "15px";
+    confirmBtn.style.fontWeight = "600";
+    confirmBtn.style.borderRadius = "12px";
+    confirmBtn.style.cursor = "pointer";
+    confirmBtn.style.border = "none";
+    confirmBtn.style.minWidth = "100px";
+    confirmBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+    confirmBtn.style.color = "white";
+    confirmBtn.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
+    confirmBtn.style.transition = "all 0.2s ease";
+    
+    confirmBtn.addEventListener("mouseenter", () => {
+      confirmBtn.style.background = "linear-gradient(135deg, #2563eb, #1d4ed8)";
+      confirmBtn.style.transform = "translateY(-1px)";
+      confirmBtn.style.boxShadow = "0 6px 20px rgba(59, 130, 246, 0.45)";
+    });
+    confirmBtn.addEventListener("mouseleave", () => {
+      confirmBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
+      confirmBtn.style.transform = "none";
+      confirmBtn.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
+    });
+    confirmBtn.addEventListener("click", () => {
+      // 防止双击导致 onSubmit 触发两次（close 异步前仍可接收点击）
+      if (confirmBtn.disabled) return;
+      confirmBtn.disabled = true;
+      this.onSubmit(this.year, this.month);
+      this.close();
+    });
+  }
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+    if (DatePickerModal.activeInstances && DatePickerModal.activeInstances.has(this)) {
+      DatePickerModal.activeInstances.delete(this);
+    }
+  }
+};
+
+/**
+ * ============================================================
+ * CreateTaskModal - 创建任务弹窗
+ * ============================================================
+ * 用于在月历视图中创建新任务
+ * 
+ * 表单字段：
+ * - 任务内容（必填）：文本输入框
+ * - 日期：日期选择器，默认选中当前点击的日期
+ * - 时间（可选）：时间选择器
+ * - 优先级：
+ *   - 无：普通任务
+ *   - 中：🟡黄色标记
+ *   - 高：🔴红色标记
+ * 
+ * 任务格式：
+ * - 创建到年度任务列表（任务/2026年任务列表.md）
+ * - 自动按月份分组（## 2026年04月）
+ * - 任务格式：- [ ] 任务名 📅 2026-04-21
+ * ============================================================
+ */
+
+/**
+ * ============================================================
+ * CategoryFilterModal - 类别筛选面板（真机反馈：浮层改挂 Modal）
+ * ============================================================
+ * 锚定漏斗按钮下方居中显示；多选即时生效、面板保持打开；
+ * 「全部」为终结性重置，点完即关。关闭途径：系统返回键 / Esc / 点遮罩。
+ * ============================================================
+ */
+var CategoryFilterModal = class extends import_obsidian3.Modal {
+  constructor(app, view, anchorEl) {
+    super(app);
+    this.view = view;
+    this.anchorEl = anchorEl;
+  }
+  onOpen() {
+    if (!CategoryFilterModal.activeInstances) CategoryFilterModal.activeInstances = /* @__PURE__ */ new Set();
+    CategoryFilterModal.activeInstances.add(this);
+    const { modalEl } = this;
+    modalEl.addClass("category-filter-modal");
+    const sweepChrome = () => {
+      if (!this.containerEl) return;
+      this.containerEl.querySelectorAll(".modal-header-button, .modal-close-button").forEach((el) => el.remove());
+      const header = this.modalEl.querySelector(":scope > .modal-header");
+      if (header) header.remove();
+    };
+    sweepChrome();
+    requestAnimationFrame(sweepChrome);
+    setTimeout(sweepChrome, 100);
+    this.positionAt(modalEl);
+    this.renderRows();
+  }
+  /** 锚定到漏斗按钮正下方；越界翻到上方 / 收进屏内 */
+  positionAt(modalEl) {
+    modalEl.style.position = "fixed";
+    modalEl.style.margin = "0";
+    modalEl.style.top = "auto";
+    modalEl.style.left = "auto";
+    modalEl.style.width = "auto";
+    modalEl.style.maxWidth = "92vw";
+    const rect = this.anchorEl && this.anchorEl.getBoundingClientRect();
+    const render = () => {
+      if (!modalEl.isConnected || !rect)
+        return;
+      const w = modalEl.offsetWidth || 200;
+      const h = modalEl.offsetHeight || 200;
+      let left = rect.left + rect.width / 2 - w / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+      let top = rect.bottom + 6;
+      if (top + h > window.innerHeight - 8)
+        top = Math.max(8, rect.top - h - 6);
+      modalEl.style.left = `${left}px`;
+      modalEl.style.top = `${top}px`;
+    };
+    render();
+    requestAnimationFrame(render);
+  }
+  renderRows() {
+    const V = this.view;
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("category-filter-popup");
+    const cats = V.scanCategories();
+    const active = V.activeCategories;
+    const c0 = V.taskParser.cache;
+    const hasUntagged = !!(c0 && c0.tasks && c0.tasks.some((t) => !t.category));
+    const mkRow = (label, checked, color, onPick, noneDot) => {
+      const row = contentEl.createDiv("category-filter-item");
+      if (checked)
+        row.addClass("selected");
+      const dot = row.createDiv("category-dot");
+      if (color)
+        dot.style.setProperty("--mt-cat-color", color);
+      else if (noneDot)
+        dot.addClass("category-dot-none");
+      else
+        dot.addClass("category-dot-all");
+      row.createDiv("category-name").textContent = label;
+      const checkEl = row.createDiv("category-check");
+      if (checked)
+        checkEl.textContent = "\u2713";
+      row.addEventListener("click", (e) => {
+        e.stopPropagation();
+        onPick();
+      });
+    };
+    mkRow("\u5168\u90E8", active.size === 0, null, () => {
+      V.setCategoryFilter(/* @__PURE__ */ new Set());
+      V.renderCalendarGrid();
+      // 「全部」= 终结性重置，点完即关
+      this.close();
+    });
+    if (hasUntagged) {
+      mkRow("\u65E0\u6807\u7B7E", active.has(""), null, () => {
+        const next = new Set(active);
+        if (next.has("")) next.delete("");
+        else next.add("");
+        V.setCategoryFilter(next);
+        V.renderCalendarGrid();
+        this.renderRows();
+      }, true);
+    }
+    for (const name of cats) {
+      const color = resolveCategoryColor(name, V.plugin.settings.categories);
+      mkRow(`#${name}`, active.has(name), color, () => {
+        const next = new Set(active);
+        if (next.has(name)) next.delete(name);
+        else next.add(name);
+        V.setCategoryFilter(next);
+        V.renderCalendarGrid();
+        this.renderRows();
+      });
+    }
+  }
+  onClose() {
+    this.contentEl.empty();
+    if (CategoryFilterModal.activeInstances && CategoryFilterModal.activeInstances.has(this)) {
+      CategoryFilterModal.activeInstances.delete(this);
+    }
+  }
+};
+
 var CreateTaskModal = class extends import_obsidian3.Modal {
   constructor(app, date, onSubmit, plugin, existingTasks = [], editTask = null) {
     super(app);
@@ -2558,7 +2910,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
             const catEl = taskEl.createDiv("task-category");
             catEl.textContent = `#${task.category}`;
             catEl.setAttribute("title", `\u7C7B\u522B\uFF1A${task.category}`);
-            catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
+            const catColor = resolveCategoryColor(task.category, this.plugin.settings.categories);
+            catEl.style.setProperty("--mt-cat-color", catColor);
+            taskEl.style.setProperty("--mt-cat-color", catColor);
           }
           // 操作按钮区域
           const actionsEl = taskEl.createDiv("task-item-actions");
@@ -2671,10 +3025,10 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     let endTimeEl = null;
     let isAllDay = this.editingTask ? !this.editingTask.time : this.plugin.settings.defaultAllDayTask;
     let allDayCheckbox = null;
-    // 批次三：编辑态恒渲染时间控件——设置开了默认全天时，若不渲染时间控件，编辑带
-    // ⏰ 的任务会静默丢时间（3.4 复核发现的真风险），全天任务也无法改回带时间。
-    // 全天/带时间的呈现由下方 C6 同步块（值/禁用/透明度/勾选）对齐 isAllDay
-    if (!this.plugin.settings.defaultAllDayTask || this.editingTask) {
+    // 真机反馈修正：编辑全天任务不再弹出时间区（v1.5.0 的「编辑态恒渲染」过头了）。
+    // 渲染条件 = 默认全天关闭，或被编辑任务本身带 ⏰（后者必须渲染，否则保存会静默
+    // 丢时间）。全天任务要加时间：先关「默认新建全天任务」设置
+    if (!this.plugin.settings.defaultAllDayTask || this.editingTask && this.editingTask.time) {
       // 计算默认时间：系统时间取整到下一小时，结束时间+4小时（结束跨午夜截断到 23:59，
       // 避免 "22:00~02:00" 被结束时间校验拒绝）；23 点后开始时间不再 %24 回绕——
       // 回绕会生成已过去的「当天 00:00~04:00」，截断为 23:00~23:59
@@ -2876,7 +3230,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       return popup;
     }
     function renderDatePicker() {
-      const existing = document.body.querySelector(":scope > .date-picker-popup:not(.month-nav-popup):not(.category-filter-popup)");
+      const existing = document.body.querySelector(":scope > .date-picker-popup");
       if (existing) {
         if (self.datePickerCloseHandler) document.removeEventListener("click", self.datePickerCloseHandler);
         existing.remove();
@@ -2891,7 +3245,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       endDateTrigger.style.display = isMultiDay ? "flex" : "none";
       if (!isMultiDay) {
         endDate = void 0;
-        const popup = document.body.querySelector(":scope > .date-picker-popup:not(.month-nav-popup):not(.category-filter-popup)");
+        const popup = document.body.querySelector(":scope > .date-picker-popup");
         if (popup) popup.remove();
         // 同步清理 this.datePickerCloseHandler，避免遗留全局监听器
         if (this.datePickerCloseHandler) {
@@ -3081,7 +3435,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       this.datePickerCloseHandler = null;
     }
     // 浮层挂在 document.body 上，关闭弹窗时显式移除，避免残留可交互的孤儿浮层
-    const strayPopup = document.body.querySelector(":scope > .date-picker-popup:not(.month-nav-popup):not(.category-filter-popup)");
+    const strayPopup = document.body.querySelector(":scope > .date-picker-popup");
     if (strayPopup) strayPopup.remove();
     // modalEl 由 Modal 基类负责移除
     // 从静态活动实例表中摘除
@@ -3338,8 +3692,29 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         }
       }
     }
-    // 日期跳转面板已改为视图内 .date-picker-popup 浮层（批次二⑥）：
-    // 残留面板由 MonthlyView.onClose 的 closeActivePopup 兜底拆除，无需再扫弹窗实例
+    // 真机反馈回退：类别筛选面板同样挂 Modal，卸载时关闭仍打开的实例
+    if (CategoryFilterModal.activeInstances && CategoryFilterModal.activeInstances.size > 0) {
+      const cfInstances = Array.from(CategoryFilterModal.activeInstances);
+      CategoryFilterModal.activeInstances.clear();
+      for (const inst of cfInstances) {
+        try {
+          inst.close();
+        } catch (e) {
+        }
+      }
+    }
+    // 真机反馈回退：日期跳转恢复整屏 DatePickerModal，卸载时同样关闭仍打开的实例，
+    // 避免残留可交互但已失联的弹窗
+    if (DatePickerModal.activeInstances && DatePickerModal.activeInstances.size > 0) {
+      const dpInstances = Array.from(DatePickerModal.activeInstances);
+      DatePickerModal.activeInstances.clear();
+      for (const inst of dpInstances) {
+        try {
+          inst.close();
+        } catch (e) {
+        }
+      }
+    }
     // 兜底清理：弹窗现宿主于 Obsidian Modal 容器内，卸载时残留实例已由上方 close() 回收，
     // 这里再扫一遍全文档防止异常路径漏网
     document.querySelectorAll(".create-task-modal").forEach((el) => {
@@ -3572,7 +3947,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     const tipList = tips.createEl("ul");
     for (const tip of [
       "点击日期格子添加任务；点击格子里的任务切换完成 / 未完成",
-      "点击顶部月份标题可快速跳转年月，房屋图标一键返回今天",
+      "点击顶部月份标题可快速跳转年月，「回到本月」一键返回今天",
       "任务行尾的 #标签 即类别：出现类别后，顶部漏斗按钮可按类别筛选（多选，默认全部）",
       "点任务行的铅笔图标可编辑：改内容/优先级/时间/日期/类别，保存=先建新行再删旧行，跨天任务以开始日期为准",
       "任务保存在「任务」文件夹下的年度或月度任务列表（可在设置切换归档周期），可直接手动编辑，月历自动同步",

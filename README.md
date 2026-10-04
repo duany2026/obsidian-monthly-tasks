@@ -2,7 +2,7 @@
 
 ## 📥 下载安装（小白版）
 
-1. 打开本仓库的 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases)，下载最新版本的 `monthly-tasks-1.5.0.zip`
+1. 打开本仓库的 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases)，下载最新版本的 `monthly-tasks-1.5.1.zip`
 2. 解压，得到文件夹 `monthly-tasks`
 3. 打开你的 Obsidian 笔记库文件夹，进入隐藏目录 `.obsidian/plugins/`（如果没见过这个目录：在 Obsidian 里点左下角仓库图标 →「在系统资源管理器中显示仓库」，进去就能看到 `.obsidian`）
 4. 把解压出的 `monthly-tasks` 文件夹整个放进去，变成 `.obsidian/plugins/monthly-tasks/`（里面应有 `main.js`、`manifest.json`、`styles.css`）
@@ -48,7 +48,7 @@
 
 ### 方式二：手动安装
 
-1. 下载最新版本的 `monthly-tasks-1.5.0.zip`
+1. 下载最新版本的 `monthly-tasks-1.5.1.zip`
 2. 解压到 Obsidian 插件目录 `.obsidian/plugins/monthly-tasks/`
 3. 重启 Obsidian 并启用插件
 
@@ -216,7 +216,16 @@
 
 查看完整的版本更新历史，请参阅 [CHANGELOG.md](./CHANGELOG.md)。
 
-### 最新版本 v1.5.0 (2026-10-04)
+### 最新版本 v1.5.1 (2026-10-04)
+
+**真机反馈修复（手机端）**
+- 日期选择器恢复为整屏弹窗（v1.4.2 形态）：支持系统返回键、点遮罩关闭，选月后点「确定」才跳转
+- 类别筛选面板改为锚定浮层弹窗：同样遵循系统返回/遮罩关闭，点「全部」立即收起
+- 手机端类别不再显示色点/文字，改为任务条右缘 3px 色带，宽度全部让给任务内容；桌面端保留 `#标签` 文本
+- 「回到本月」恢复为文字按钮（图标版并未省出宽度）
+- 修复：默认全天任务开启时，编辑全天任务不再误弹时间选择区；仅当任务本身带时间或该开关关闭时才显示
+
+### v1.5.0 (2026-10-04)
 
 **新增：任务类别**
 - 任务行尾的 `#标签` 就是类别（如 `#工作`），弹窗新增「类别」点选行，本次选择会被记住作为下次默认值
