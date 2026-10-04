@@ -2167,6 +2167,17 @@
 		font-size: 9px;
 	}
 	
+	/* 批次四⑤：手机端取消优先级/跨天左边框（普通 +2px/格、跨天 +3px/格，实测精确）。
+	   语义不丢：优先级靠背景渐变+文字色，跨天靠加粗+主色文字+起止角标。
+	   必须带 .day-cell 前缀——防止误伤创建弹窗里的已有任务列表（.existing-task-item）。 */
+	.day-cell .task-item[class*="priority-bg-"] {
+		border-left-width: 0;
+	}
+	
+	.day-cell .task-item.multi-day-task {
+		border-left-width: 0;
+	}
+	
 	/* 批次四⑥：隐藏格子内滚动条（沙箱实测 +0px——styled scrollbar 本就不占位，
 	   保留此规则是防个别 Android WebView 出现经典滚动条吃掉 3px，预算表不计收益） */
 	.day-tasks {
