@@ -1735,16 +1735,18 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     popup.style.display = "block";
     const rect = anchorEl.getBoundingClientRect();
     const estW = 200;
-    const estH = 24 + (cats.length + 1) * 30;
-    popup.style.left = `${Math.min(Math.max(8, rect.right - estW), Math.max(8, window.innerWidth - estW - 8))}px`;
+    const hasUntagged = (() => { const c0 = this.taskParser.cache; return !!(c0 && c0.tasks && c0.tasks.some((t) => !t.category)); })();
+    const estH = 24 + (cats.length + 1 + (hasUntagged ? 1 : 0)) * 30;
     popup.style.top = `${rect.bottom + 6 + estH > window.innerHeight ? Math.max(8, rect.top - estH - 6) : rect.bottom + 6}px`;
-    const mkRow = (label, checked, color, onPick) => {
+    const mkRow = (label, checked, color, onPick, noneDot) => {
       const row = popup.createDiv("category-filter-item");
       if (checked)
         row.addClass("selected");
       const dot = row.createDiv("category-dot");
       if (color)
         dot.style.setProperty("--mt-cat-color", color);
+      else if (noneDot)
+        dot.addClass("category-dot-none");
       else
         dot.addClass("category-dot-all");
       row.createDiv("category-name").textContent = label;
@@ -1763,6 +1765,22 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.closeActivePopup();
       this.renderCategoryPopup(anchorEl);
     });
+    // 无标签行（规范 2.1：默认类别 = 无标签 = 工作）：key 用空串，
+    // 渲染过滤处 active.has(x.category) 天然命中未带标签的任务，无需特判
+    if (hasUntagged) {
+      mkRow("\u65E0\u6807\u7B7E", active.has(""), null, () => {
+        const next = new Set(active);
+        if (next.has("")) {
+          next.delete("");
+        } else {
+          next.add("");
+        }
+        this.setCategoryFilter(next);
+        this.renderCalendarGrid();
+        this.closeActivePopup();
+        this.renderCategoryPopup(anchorEl);
+      }, true);
+    }
     for (const name of cats) {
       const color = resolveCategoryColor(name, this.plugin.settings.categories);
       mkRow(`#${name}`, active.has(name), color, () => {
@@ -2264,9 +2282,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 打开创建任务弹窗
    */
   openCreateTaskModal(date, existingTasks = []) {
-    const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate) => {
+    const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category) => {
       const customFolderPath = this.plugin.settings.customTaskFolder || void 0;
-      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath);
+      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category);
       if (success) {
         // 任务出现在日历中即反馈，不再弹成功提示；refresh 失败仍有单独提示
         // refresh 失败不应让用户误以为任务创建失败（任务已写入文件），
@@ -2771,6 +2789,37 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         btn.addClass("selected");
       });
     });
+    // 类别行（批次二③）：优先级下方一排小号胶囊。默认「无标签」= 不加 #tag =
+    // 规范里的「工作」默认类（老文件零迁移，存储层无类别就是空串）；其余选项来自
+    // settings.categories，顺序即设置页顺序。记住上次所选（仅内存，一期不持久化），
+    // 连续建同类任务不用每次点。插件重启回「无标签」
+    const categoryContainer = this.modalEl.createDiv("modal-category");
+    categoryContainer.createEl("span", { cls: "category-label", text: "类别" });
+    const categoryGroup = categoryContainer.createDiv("category-group");
+    const categoryNames = (this.plugin.settings.categories || []).map((c) => c.name);
+    const catOptions = [{ value: "", label: "无标签" }].concat(categoryNames.map((n) => ({ value: n, label: `#${n}` })));
+    let remembered = this.plugin.lastCategory || "";
+    if (!catOptions.some((o) => o.value === remembered))
+      remembered = "";
+    let selectedCategory = remembered;
+    const categoryChips = [];
+    catOptions.forEach((o) => {
+      const chip = categoryGroup.createEl("button", { cls: "category-chip", text: o.label, attr: { type: "button", "aria-label": `类别 ${o.label}` } });
+      const chipDot = chip.createSpan({ cls: "category-chip-dot" });
+      if (o.value) {
+        chipDot.style.setProperty("--mt-cat-color", resolveCategoryColor(o.value, this.plugin.settings.categories));
+      } else {
+        chipDot.addClass("category-chip-dot-none");
+      }
+      if (o.value === selectedCategory)
+        chip.addClass("selected");
+      categoryChips.push(chip);
+      chip.addEventListener("click", () => {
+        selectedCategory = o.value;
+        categoryChips.forEach((c) => c.removeClass("selected"));
+        chip.addClass("selected");
+      });
+    });
     const btnGroup = this.modalEl.createDiv("modal-buttons");
     const cancelBtn = btnGroup.createEl("button", {
       cls: "btn-cancel",
@@ -2826,7 +2875,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         submitTask.submitted = true;
         confirmBtn.disabled = true;
         // await onSubmit：确保 createTaskForDate 完成后再关闭弹窗，失败时回滚状态允许重试
-        Promise.resolve(this.onSubmit(content, isAllDay, time, selectedPriority, endDate)).then(() => {
+        // 记住本次类别（内存态，下次打开弹窗预选）；提交链路把 category 交给视图回调
+        this.plugin.lastCategory = selectedCategory;
+        Promise.resolve(this.onSubmit(content, isAllDay, time, selectedPriority, endDate, selectedCategory)).then(() => {
           this.close();
         }).catch((err) => {
           console.error("\u521B\u5EFA\u4EFB\u52A1\u5931\u8D25:", err);
@@ -3011,6 +3062,8 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         }
       })();
     }
+    // 批次二③：上次所选类别（内存态，不持久化；视图/弹窗共享同一个插件实例）
+    this.lastCategory = "";
     this.taskParser = new TaskParser(this.app, this);
     this.registerView(
       VIEW_TYPE_MONTHLY,

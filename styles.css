@@ -1408,6 +1408,13 @@
 	border: 1.5px solid #94a3b8;
 }
 
+/* 「无标签」= 未带 #tag 的任务。用虚线圈与「全部」的实线圈区分：
+   前者是筛选目标（一类内容），后者是「不筛」（全集） */
+.category-filter-item .category-dot.category-dot-none {
+	background: transparent;
+	border: 1.5px dashed #94a3b8;
+}
+
 .category-filter-item .category-name {
 	flex: 1;
 	min-width: 0;
@@ -1626,6 +1633,75 @@
 .priority-btn.priority-medium.selected {
 	border-color: #92400e;
 	box-shadow: 0 4px 16px rgba(217, 119, 6, 0.4);
+}
+
+/* 批次二③：创建弹窗类别行——优先级下方一排小号胶囊，首个「无标签」= 不加 #tag。
+   外观沿用 .modal-priority 的浅灰渐变卡片语汇，保持弹窗内区块一致；胶囊用圆角
+   999px 与优先级方块区分开，色点复用 --mt-cat-color（与日历/漏斗/设置同色） */
+.modal-category {
+	margin: 0 24px 20px;
+	padding: 14px 20px;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	border-radius: 14px;
+	border: 1px solid #e2e8f0;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.modal-category .category-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #475569;
+	flex-shrink: 0;
+}
+
+.category-group {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	flex: 1 1 auto;
+}
+
+.category-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 5px 12px;
+	border-radius: 999px;
+	border: 1.5px solid #e2e8f0;
+	background: #ffffff;
+	color: #475569;
+	font-size: 12px;
+	line-height: 1.4;
+	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.category-chip:hover {
+	border-color: #94a3b8;
+}
+
+.category-chip.selected {
+	border-color: #2563eb;
+	background: #eff6ff;
+	color: #1d4ed8;
+	font-weight: 600;
+}
+
+.category-chip .category-chip-dot {
+	flex-shrink: 0;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--mt-cat-color, #64748b);
+}
+
+/* 「无标签」没有颜色真身：空心圈，和漏斗面板的空心点同一语汇 */
+.category-chip .category-chip-dot.category-chip-dot-none {
+	background: transparent;
+	border: 1.5px solid #94a3b8;
 }
 
 /* ========== 响应式设计 ========== */
@@ -2041,6 +2117,36 @@
 	color: #4ade80;
 }
 
+/* 批次二③：深色模式类别行 */
+.theme-dark .modal-category {
+	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%);
+	border-color: rgba(71, 85, 105, 0.4);
+}
+
+.theme-dark .modal-category .category-label {
+	color: #cbd5e1;
+}
+
+.theme-dark .category-chip {
+	background: rgba(15, 23, 42, 0.6);
+	border-color: rgba(71, 85, 105, 0.6);
+	color: #cbd5e1;
+}
+
+.theme-dark .category-chip:hover {
+	border-color: #94a3b8;
+}
+
+.theme-dark .category-chip.selected {
+	background: rgba(59, 130, 246, 0.18);
+	border-color: #3b82f6;
+	color: #93c5fd;
+}
+
+.theme-dark .category-chip .category-chip-dot.category-chip-dot-none {
+	border-color: #64748b;
+}
+
 /* 深色模式 - 日期头部（不设背景带，与亮色的干净头部保持一致） */
 .theme-dark .modal-date-info .date-main {
 	color: #e2e8f0;
@@ -2163,6 +2269,17 @@
 	}
 	.modal-priority {
 		margin: 0 16px 20px;
+	}
+	.modal-category {
+		margin: 0 16px 16px;
+		padding: 12px 14px;
+		gap: 10px;
+	}
+	/* 触屏点击区：5px 12px 的胶囊约 27px 高，拇指按不准，抬到 33px 以上 */
+	.category-chip {
+		padding: 8px 14px;
+		font-size: 13px;
+		line-height: 1.3;
 	}
 	.modal-buttons {
 		padding: 0 16px 20px;
@@ -2476,6 +2593,16 @@
    （如「回到本月」按钮点按后一直停留在按下外观）。在无 hover 设备上还原这些效果，
    桌面端不受影响；同时把原本仅 hover 可见的元素改为常显。 */
 @media (hover: none) {
+	/* 批次二③：胶囊 hover 只改边框；触屏 tap 后 :hover 会粘住，这里对未选中项还原。
+	   排除 .selected：否则本条（位置靠后、同特异度）会压掉选中态的蓝边框 */
+	.category-chip:not(.selected):hover {
+		border-color: #e2e8f0;
+	}
+
+	.theme-dark .category-chip:not(.selected):hover {
+		border-color: rgba(71, 85, 105, 0.6);
+	}
+
 	.day-cell:hover {
 		transform: none;
 		box-shadow: var(--shadow-sm);
