@@ -2717,6 +2717,15 @@ var DatePickerModal = class extends import_obsidian3.Modal {
  * 「全部」为终结性重置，点完即关。关闭途径：系统返回键 / Esc / 点遮罩。
  * ============================================================
  */
+/** v1.5.3：用户要求减少动效时，筛选面板跳过进/出场动画（其余交互不变） */
+function CF_MOTION_OFF() {
+  try {
+    return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  } catch (e) {
+    return false;
+  }
+}
+
 var CategoryFilterModal = class extends import_obsidian3.Modal {
   constructor(app, view, anchorEl) {
     super(app);
@@ -2737,19 +2746,36 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
     sweepChrome();
     requestAnimationFrame(sweepChrome);
     setTimeout(sweepChrome, 100);
-    this.positionAt(modalEl);
+    // v1.5.3 流畅性：先量尺寸再定位。旧序是「定位→画行→rAF 再修正」，
+    // 面板会先跳到一个偏小的位置再撑开，观感上是一次突兀的位移。
+    // 现在按行数预估尺寸，同帧完成定位，行渲染不再改变盒尺寸位置。
     this.renderRows();
+    this.positionAt(modalEl, true);
+
+    // v1.5.3：进/出场动画改用 Web Animations API（el.animate），而不是「加类 + CSS 过渡」。
+    // 实测后者在本弹窗上不可靠：同一 JS 任务里改类再读计算样式，浏览器把两个状态
+    // 当作首帧样式直接结算，过渡不触发（getAnimations() 为空、opacity 从 1 直接跳到 0）。
+    // WAAPI 是显式时间线，动画一定跑，且能被 getAnimations() 验证，也便于减少动效时跳过。
+    this.playEnter(modalEl);
   }
   /** 锚定到漏斗按钮正下方；越界翻到上方 / 收进屏内 */
-  positionAt(modalEl) {
+  positionAt(modalEl, prefill = false) {
     modalEl.style.position = "fixed";
     modalEl.style.margin = "0";
     modalEl.style.top = "auto";
     modalEl.style.left = "auto";
     modalEl.style.width = "auto";
     modalEl.style.maxWidth = "92vw";
+
+    // 预估尺寸（首帧定位前）：宽度=内容 min-width 180 + 内边距，高度=标题+行高×行数
+    if (prefill) {
+      const rows = (this.view.scanCategories().length || 0) + 2;
+      modalEl.style.minWidth = "196px";
+      modalEl.style.minHeight = `${Math.min(8 + 30 + rows * 34, window.innerHeight - 16)}px`;
+    }
     const rect = this.anchorEl && this.anchorEl.getBoundingClientRect();
     const render = () => {
+      let flipped = false;
       if (!modalEl.isConnected || !rect)
         return;
       const w = modalEl.offsetWidth || 200;
@@ -2757,19 +2783,40 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
       let left = rect.left + rect.width / 2 - w / 2;
       left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
       let top = rect.bottom + 6;
-      if (top + h > window.innerHeight - 8)
+      // v1.5.3：贴底放不下就翻到按钮上方，缩放原点跟着换到底边中线，
+      // 动画才始终"从按钮长出来"。注意必须带大括号——早前少写花括号时
+      // flipped 恒为 true，原点永远是底边（自查发现）。
+      if (top + h > window.innerHeight - 8) {
         top = Math.max(8, rect.top - h - 6);
+        flipped = true;
+      }
       modalEl.style.left = `${left}px`;
       modalEl.style.top = `${top}px`;
+
+      modalEl.classList.toggle("cf-flip-up", flipped);
+      // 定位完成后解除预估高度，避免面板比内容高一块
+      modalEl.style.minHeight = "";
     };
     render();
     requestAnimationFrame(render);
   }
   renderRows() {
+    if (this.isClosed) return;  // v1.5.3：淡出期间不再重渲染（动画期网格可能仍在刷新）
     const V = this.view;
     const { contentEl } = this;
     contentEl.empty();
     contentEl.addClass("category-filter-popup");
+
+    // v1.5.3 筛选面板美化：标题行 + 细分隔线；多选不自动关的语义不变。
+    // 标题不参与逐行重建（renderRows 每次 empty() 后重画，成本可忽略）
+    const titleRow = contentEl.createDiv("category-filter-title");
+    titleRow.createSpan({ text: "\u6309\u7C7B\u522B\u7B5B\u9009" });
+    const selN = (V.activeCategories ? V.activeCategories.size : 0);
+    titleRow.createSpan({
+      cls: "category-filter-count",
+      text: selN > 0 ? `\u5df2\u9009 ${selN}` : (V.scanCategories().length > 0 ? "\u5168\u90e8" : ""),
+    });
+    contentEl.createDiv("category-filter-sep");
     const cats = V.scanCategories();
     const active = V.activeCategories;
     const c0 = V.taskParser.cache;
@@ -2779,8 +2826,11 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
       if (checked)
         row.addClass("selected");
       const dot = row.createDiv("category-dot");
-      if (color)
+      if (color) {
         dot.style.setProperty("--mt-cat-color", color);
+        // v1.5.3：选中行左侧细条读行上的变量，故行也要写
+        row.style.setProperty("--mt-cat-color", color);
+      }
       else if (noneDot)
         dot.addClass("category-dot-none");
       else
@@ -2820,6 +2870,63 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
         V.renderCalendarGrid();
         this.renderRows();
       });
+    }
+  }
+  /**
+   * v1.5.3：进场动画——从漏斗按钮一侧淡入 + 轻微位移缩放，160ms。
+   * 缩放原点由 .cf-flip-up（面板翻到按钮上方时）决定，见 styles.css。
+   */
+  playEnter(modalEl) {
+    if (CF_MOTION_OFF())
+      return;
+    try {
+      modalEl.animate([
+        { opacity: 0, transform: "translateY(-6px) scale(0.96)" },
+        { opacity: 1, transform: "none" },
+      ], { duration: 160, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)" });
+    } catch (e) {
+    }
+  }
+  /** 出场动画：与进场对称的淡出微缩，遮罩同步淡到透明 */
+  playLeave(modalEl, container) {
+    const bg = container.querySelector(".modal-bg");
+    try {
+      const a1 = modalEl.animate([
+        { opacity: 1, transform: "none" },
+        { opacity: 0, transform: "translateY(-5px) scale(0.97)" },
+      ], { duration: 150, easing: "ease", fill: "forwards" });
+      if (bg)
+        bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: "ease", fill: "forwards" });
+      // 保持可见直到动画结束（fill:forwards 已停在终态），随后由 close() 的定时器卸载
+      void a1;
+    } catch (e) {
+    }
+  }
+  /**
+   * v1.5.3 流畅性：接管收起动画。
+   * 框架的 close() 在 onClose() 之后同步 remove 掉 .modal-container，淡出没有播放
+   * 窗口（实测 Esc 后 30ms DOM 已空）。故覆写 close()：先用 WAAPI 播完 150ms 淡出，
+   * 再调父类真正卸载。isClosed 挡住动画期间的逐行重渲染；activeInstances 立即
+   * 摘除，动画期间再点漏斗能正常开新面板（互斥逻辑视其为已关）。
+   */
+  close() {
+    if (this.closing)
+      return;
+    this.closing = true;
+    this.isClosed = true;
+    if (CategoryFilterModal.activeInstances)
+      CategoryFilterModal.activeInstances.delete(this);
+    const container = this.containerEl;
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (container && container.isConnected && !reduce) {
+      // 面板淡出微缩 + 遮罩淡出并行；两者都播完（或最迟 LEAVE_MS 超时兜底）才真正卸载
+      this.playLeave(this.modalEl, container);
+      setTimeout(() => {
+        try { super.close(); } catch (e) {
+        }
+      }, 160);
+    } else {
+      super.close();
     }
   }
   onClose() {
