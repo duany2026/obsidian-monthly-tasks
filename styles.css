@@ -2096,8 +2096,9 @@
 
 /* ========== 移动端优化 ========== */
 @media (max-width: 480px) {
+	/* 批次四①：容器内边距 8→4（左右共 8px 由 7 列分摊，实测 +1.14px/格） */
 	.monthly-tasks-container {
-		padding: 8px;
+		padding: 4px;
 	}
 	
 	.monthly-header {
@@ -2135,12 +2136,19 @@
 		font-size: 11px;
 	}
 	
-	.calendar-grid {
-		gap: 2px;
+	/* 批次四②：网格间隙 2→1（+0.86px/格）。星期标题行必须同步降 gap，
+	   否则网格与标题列错位（实测只降网格时周六列偏 −2.57px，同步后 0.00px） */
+	.weekday-header {
+		gap: 1px;
 	}
 	
+	.calendar-grid {
+		gap: 1px;
+	}
+	
+	/* 批次四③：格子内边距横向 4→2（实测精确 +4px/格；纵向 3px 不动，不碰 min-height） */
 	.day-cell {
-		padding: 3px 4px;
+		padding: 3px 2px;
 		min-height: 80px;
 		border-radius: 8px;
 	}
@@ -2153,9 +2161,35 @@
 		font-size: 9px;
 	}
 	
+	/* 批次四④：任务条内边距横向 2→1（实测精确 +2px/格） */
 	.task-item {
-		padding: 1px 2px;
+		padding: 1px 1px;
 		font-size: 9px;
+	}
+	
+	/* 批次四⑥：隐藏格子内滚动条（沙箱实测 +0px——styled scrollbar 本就不占位，
+	   保留此规则是防个别 Android WebView 出现经典滚动条吃掉 3px，预算表不计收益） */
+	.day-tasks {
+		scrollbar-width: none;
+	}
+	
+	.day-tasks::-webkit-scrollbar {
+		width: 0;
+		height: 0;
+	}
+	
+	/* 批次四⑦：带时间任务的时间标签独占一行（实测内容盒 0.83px → 38.86px 整行满宽，
+	   行高 41 → 23.8px，内容不再竖排）。只作用于日历格子，弹窗列表不受影响 */
+	.day-cell .task-item {
+		flex-wrap: wrap;
+	}
+	
+	.day-cell .task-item .task-time {
+		order: -1;
+		flex-basis: 100%;
+		margin-left: 0;
+		font-size: 8px;
+		line-height: 1.1;
 	}
 }
 
