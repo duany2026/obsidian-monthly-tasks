@@ -586,7 +586,7 @@ var TaskParser = class {
         console.error(`\u884C\u53F7\u8D85\u51FA\u8303\u56F4: ${task.lineNumber}`);
         return false;
       }
-      // 删除该行，同时移除可能产生的多余空行
+      // 删除该行；若删除后上下相邻行均为空行，收掉一个，自愈存量孤儿空行
       // 行号失效校验：若该行已不是任务行（文件被改），拒绝操作避免误删正文
       const lineToDelete = lines[task.lineNumber];
       if (!isTaskLine(lineToDelete)) {
@@ -600,6 +600,13 @@ var TaskParser = class {
         return false;
       }
       lines.splice(task.lineNumber, 1);
+      // 自愈：上下皆空行时收掉其后那个（只碰空行，连续多空行随多次删除逐步收敛）
+      const prevLine = lines[task.lineNumber - 1];
+      const nextLine = lines[task.lineNumber];
+      if (prevLine !== undefined && nextLine !== undefined &&
+          prevLine.trim() === "" && nextLine.trim() === "") {
+        lines.splice(task.lineNumber, 1);
+      }
       await this.app.vault.modify(file, lines.join("\n"));
       this.invalidateCache();
       return true;
@@ -723,20 +730,12 @@ var TaskParser = class {
           // 避免 CRLF 文件里混入裸 \n（git diff 整段变更、其它按行处理的插件不可预期）
           const useCRLF = fileContent.includes("\r\n");
           const taskLineWithEol = useCRLF ? taskLine + "\r" : taskLine;
-          const blankLine = useCRLF ? "\r" : "";
-          // 插入片段：前后按需补空行，保持「任务之间空一行、--- 前空一行」的文件约定；
-          // 相邻已是空行时不再补，连续插入不会累积空行
+          // 任务之间不再补空行（「空一行」旧约定已取消；存量空行由删除侧自愈清理）
           const parts = [taskLineWithEol];
           if (insertIdx >= lines.length) {
             // 段末插入：越过尾部既有空行（原为 --- 前的分隔行），
             // 使既有空行落在新任务之后而非被顶到前面
             while (insertIdx > 0 && lines[insertIdx - 1].trim() === "") insertIdx--;
-          }
-          if (insertIdx > 0 && lines[insertIdx - 1].trim() !== "") {
-            parts.unshift(blankLine);
-          }
-          if (insertIdx < lines.length && lines[insertIdx].trim() !== "") {
-            parts.push(blankLine);
           }
           lines.splice(insertIdx, 0, ...parts);
           fileContent = fileContent.slice(0, sectionIdx) + lines.join("\n") + fileContent.slice(sectionEnd);
@@ -1834,7 +1833,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     if (task.completed && !this.plugin.settings.showCompletedStrike) {
       taskEl.addClass("completed");
     }
-    if (task.dueDate && isOverdue(task.dueDate) && !task.completed) {
+    if (!this.plugin.settings.showCompletedStrike && task.dueDate && isOverdue(task.dueDate) && !task.completed) {
       taskEl.addClass("overdue");
     }
     taskEl.addClass(`priority-bg-${task.priority}`);
@@ -3340,7 +3339,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian3.Setting(containerEl).setName("已完成隐藏删除线").setDesc("打开后已完成任务将隐藏删除线").addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
+    new import_obsidian3.Setting(containerEl).setName("已完成隐藏删除线").setDesc("打开后已完成任务将隐藏删除线（同时隐藏过期任务的红色竖线）").addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
       this.plugin.settings.showCompletedStrike = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
