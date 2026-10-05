@@ -1070,11 +1070,46 @@
 	color: #64748b;
 }
 
-/* v1.5.2 真机反馈②：标题行折叠角标（▾/▴）。窄屏默认收起列表，桌面默认展开——
-   两端都可点标题行切换，角标即开关的可见回显 */
-.existing-tasks-caret {
-	font-size: 11px;
+/* v1.5.4 真机反馈：折叠开关由 11px 的 ▾ 角标升级为胶囊按钮（chevron 图标 + 文案）。
+   口径与 .category-chip 一致（同字号/同圆角/同边框），只是配色更淡一档——
+   它是「列表开合」的次级控件，不该抢任务条的视觉重心。
+   图标朝下=可展开，is-open 时整枚旋转 180°，比换字符更顺滑 */
+.existing-tasks-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	flex-shrink: 0;
+	padding: 3px 9px 3px 7px;
+	border-radius: 999px;
+	border: 1px solid #dbe3ec;
+	background: #ffffff;
 	color: #64748b;
+	font-size: 11px;
+	line-height: 1.4;
+	font-weight: 500;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.existing-tasks-toggle svg {
+	width: 13px;
+	height: 13px;
+	stroke-width: 2.4;
+	transition: transform 0.16s ease;
+}
+
+.existing-tasks-toggle.is-open svg {
+	transform: rotate(180deg);
+}
+
+.existing-tasks-title-row:hover .existing-tasks-toggle {
+	border-color: #94a3b8;
+	color: #334155;
+	background: #f8fafc;
+}
+
+.existing-tasks-title-row:focus-visible {
+	outline: 2px solid var(--primary-500, #3b82f6);
+	outline-offset: 2px;
 }
 
 .existing-tasks-list {
@@ -2275,6 +2310,19 @@
 	color: #94a3b8;
 }
 
+/* v1.5.4：深色下胶囊用「面板底 + 半透明填充」，不用 #fff，避免在暗背景上炸成一块白斑 */
+.theme-dark .existing-tasks-toggle {
+	border-color: rgba(148, 163, 184, 0.32);
+	background: rgba(148, 163, 184, 0.12);
+	color: #94a3b8;
+}
+
+.theme-dark .existing-tasks-title-row:hover .existing-tasks-toggle {
+	border-color: rgba(148, 163, 184, 0.55);
+	background: rgba(148, 163, 184, 0.2);
+	color: #cbd5e1;
+}
+
 .theme-dark .existing-task-item {
 	background: rgba(30, 41, 59, 0.6);
 	color: #e2e8f0;
@@ -2377,6 +2425,11 @@
 		padding: 8px 14px;
 		font-size: 13px;
 		line-height: 1.3;
+	}
+	/* 同上：折叠胶囊在窄屏是唯一的列表开关，抬到拇指可稳定命中 */
+	.existing-tasks-toggle {
+		padding: 6px 12px 6px 9px;
+		font-size: 12px;
 	}
 	.modal-buttons {
 		padding: 0 16px 20px;

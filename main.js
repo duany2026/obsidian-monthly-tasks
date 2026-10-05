@@ -3008,18 +3008,33 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       titleRow.createEl("div", { cls: "existing-tasks-title", text: `\u8BE5\u65E5\u5DF2\u6709 ${this.existingTasks.length} \u4E2A\u4EFB\u52A1` });
       // v1.5.2 真机反馈②：手机端弹窗默认折叠「该日已有 N 个任务」列表——
       // 类别标签让每条行变高，两三条就要在小盒子里上下滑，主输入框被顶出视线。
-      // 标题行整行可点（▾/▴ 角标只在窄屏显示），桌面端行为不变。判定用视口宽度
-      // （与 CSS @media(max-width:600px) 同口径），不用 Platform.isMobile——
+      // 判定用视口宽度（与 CSS @media(max-width:600px) 同口径），不用 Platform.isMobile——
       // 窄窗分屏同样有"列表吃掉输入框"的问题，且可在桌面端实测
-      const caretEl = titleRow.createEl("span", { cls: "existing-tasks-caret", text: "\u25BE" });
+      // v1.5.4 真机反馈：折叠开关原来只有一颗 11px 的 ▾ 字符，窄屏上几乎看不见，
+      // 也没有"可点"的暗示。改成胶囊按钮（chevron 图标 + 展开/收起 文案），整行仍可点，
+      // 并补 role/tabindex/键盘：胶囊用 span 而非 button，避免点击冒泡到整行造成二次切换
+      titleRow.setAttribute("role", "button");
+      titleRow.setAttribute("tabindex", "0");
+      const toggleEl = titleRow.createSpan({ cls: "existing-tasks-toggle" });
+      import_obsidian3.setIcon(toggleEl, "chevron-down");
+      const toggleTextEl = toggleEl.createSpan({ text: "\u5C55\u5F00" });
       let listOpen = window.innerWidth > 600;
       const applyListOpen = () => {
         tasksListEl.style.display = listOpen ? "" : "none";
-        caretEl.textContent = listOpen ? "\u25B4" : "\u25BE";
+        toggleEl.toggleClass("is-open", listOpen);
+        toggleTextEl.setText(listOpen ? "\u6536\u8D77" : "\u5C55\u5F00");
+        titleRow.setAttribute("aria-expanded", listOpen ? "true" : "false");
       };
-      titleRow.addEventListener("click", () => {
+      const toggleList = () => {
         listOpen = !listOpen;
         applyListOpen();
+      };
+      titleRow.addEventListener("click", toggleList);
+      titleRow.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleList();
+        }
       });
       const tasksListEl = existingTasksEl.createDiv("existing-tasks-list");
       const LIMIT = 5;
