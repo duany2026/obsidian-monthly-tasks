@@ -355,19 +355,26 @@
 	font-weight: 600;
 }
 
-/* 调休标识 - 左下角 */
+/* 调休标识 - 左下角。文案走 CSS 变量：伪元素 content 是编译期常量、i18n 够不着，
+   由 main.js 的 applyBadgeLocale() 按界面语言写入，'班' 只是兜底值 */
 .day-cell.workday::after {
-	content: '班';
+	content: var(--mt-badge-work, '班');
 	position: absolute;
 	bottom: 4px;
 	left: 4px;
-	width: 16px;
+	/* 单字（班）时是 16px 圆点；英文 Work 这类长文案会被硬宽度裁掉，
+	   改 min-width + padding 让它自动扩成胶囊 */
+	min-width: 16px;
 	height: 16px;
+	padding: 0 3px;
+	box-sizing: border-box;
 	font-size: 9px;
+	line-height: 1;
 	font-weight: 700;
+	white-space: nowrap;
 	color: white;
 	background: var(--workday-badge);
-	border-radius: 50%;
+	border-radius: 999px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
