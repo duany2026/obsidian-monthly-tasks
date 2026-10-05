@@ -587,6 +587,10 @@
 	display: none;
 }
 
+/* v1.5.4 真机核验补充：色带只作用于日历格子，弹窗宽列表与筛选面板不受影响
+   （.existing-task-item 不在 .day-cell 内，天然不被上面这组规则命中；
+   优先级归零同样限定 .day-cell，弹窗/其他列表里的任务条边框保持原样）。 */
+
 .task-item:hover {
 	background: var(--primary-50);
 }
