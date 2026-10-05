@@ -502,11 +502,18 @@
 	flex-shrink: 0;
 }
 
+/* 任务内容：v1.5.4 全审合并——原先此处与暗色区之前各有一条 .task-content，
+   同特异度下后者靠源码顺序截胡（font-size/padding-left/font-family 全靠它生效），
+   合并为一条后字号收口规则（见移动端 ⑨）的覆盖面也更清楚 */
 .task-content {
 	flex: 1;
 	min-width: 0;
-	word-break: break-word;
+	color: var(--gray-700);
+	padding-left: 1px;
+	font-size: 10px;
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
 	line-height: 1.3;
+	word-break: break-word;
 }
 
 /* ========== 类别标签（批次二⑧） ========== */
@@ -615,17 +622,6 @@
 
 .theme-dark .task-item.priority-bg-3 .task-content {
 	color: #fca5a5;
-}
-
-/* 任务内容 - 支持多行显示 */
-.task-content {
-	flex: 1;
-	color: var(--gray-700);
-	padding-left: 1px;
-	font-size: 10px;
-	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
-	line-height: 1.3;
-	word-break: break-word;
 }
 
 /* 更多任务 */
@@ -2451,6 +2447,12 @@
 		font-size: 16px;
 		min-width: 120px;
 	}
+	/* 深色下的同类适配并回本块：原先单开一个 @media (max-width: 600px) 隔了 100 多行，
+	   同宽断点拆两处，改移动端尺寸要翻两个地方 */
+	.theme-dark .time-native-input {
+		font-size: 16px;
+		min-width: 120px;
+	}
 	.all-day-toggle {
 		padding: 12px 20px;
 		margin: 14px auto 0;
@@ -2534,14 +2536,6 @@
 	background: rgba(71, 85, 105, 0.4);
 	border-color: #94a3b8;
 	color: #e2e8f0;
-}
-
-/* 深色模式+移动端 - 时间选择器 */
-@media (max-width: 600px) {
-	.theme-dark .time-native-input {
-		font-size: 16px;
-		min-width: 120px;
-	}
 }
 
 /* ========== 移动端优化 ========== */
@@ -2655,7 +2649,7 @@
 		line-height: 1.1;
 	}
 	
-	/* 批次四⑨：字号收口（bug 修复）。基处第二条 .task-content 规则钉死 font-size: 10px，
+	/* 批次四⑨：字号收口（bug 修复）。基处 .task-content 规则钉死 font-size: 10px，
 	   截胡了本块 .task-item 的 9px，手机端"9px"从未生效。这里用更高特异度把 9px 落到实处：
 	   同宽度字数 +11%（实测 3.9 → 4.3 字）。限 .day-cell 内，弹窗与桌面不动。
 	   纪律：只改 font-size，绝不顺手加 padding-left:0 —— 9px + padding-left:0 + ⑦ 的

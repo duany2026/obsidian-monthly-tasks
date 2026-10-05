@@ -1328,7 +1328,10 @@ var TaskParser = class {
     this.taskFileCache = /* @__PURE__ */ new Map();
     // 写操作串行化队列：避免 createTask/toggleTask/deleteTask 并发读写导致后写覆盖先写丢失任务
     this.writeQueue = Promise.resolve();
-    // 批次三：编辑「先建后删」的新行交接凭证（create 写、delete 一次性消费）
+    // 批次三：编辑「先建后删」的新行交接凭证（create 写、delete 消费）。
+    // v1.5.4：调用方在 create 之后同步取走、再显式传给 deleteTaskByRawLine（options.created）。
+    // 之所以不再让 delete 自己去读：两条编辑链路并发时（B建→A建→B删→A删）这个单槽会被
+    // 后写者覆盖，排在队列里的 B删读到的却是 A 的坐标，可能把 A 刚保存的行当成旧行删掉
     this.lastCreatedInfo = null;
     // 进行中的全库解析 Promise：供并发调用复用，避免缓存失效窗口内重复全库扫描
     this.parsingPromise = null;
@@ -1583,11 +1586,11 @@ var TaskParser = class {
    * 新行插入后旧行 lineNumber 常发生偏移（同文件新行可能排在旧行之前），
    * 直接 deleteTask(task) 会被行号身份校验判为失效。策略：读一次文件 →
    * 先试 preferredLineNumber（命中即用）；否则全文件找与 rawLine（去尾空白）
-   * 相等且为任务行的行——多处相同取第一处（逐字节相同即等价任务，删哪条一致）。
+   * 相等且为任务行的行——多处相同取离 preferredLineNumber 最近的一条。
    * 找不到返回 false。排 writeQueue 串行，与勾选/删除/创建互斥。
    */
-  // 批次三：options.excludeNew=true 时，本次链路刚写入的新行（lastCreatedInfo）
-  // 即使与 rawLine 逐字节相同也不得删除——那正是用户刚保存的结果
+  // 批次三：options.created 传入本次链路刚写入的新行坐标；它与 rawLine 逐字节相同时
+  // 也不得删除——那正是用户刚保存的结果
   async deleteTaskByRawLine(filePath, rawLine, preferredLineNumber, options) {
     const run = () => this._deleteTaskByRawLineImpl(filePath, rawLine, preferredLineNumber, options);
     this.writeQueue = this.writeQueue.then(run, run);
@@ -1597,11 +1600,12 @@ var TaskParser = class {
     try {
       const norm = (s) => s.replace(/\s+$/, "");
       const want = norm(rawLine);
-      // 批次三：显式声明取用「本次编辑链路刚创建的新行」，读一次即清空——先建的
-      // 新行可能与旧 rawLine 逐字节相同（只改了其他字段时），不排除会误删刚落盘
-      // 的新行导致编辑静默失效（9a 探针实锤）。取不到时按无排除处理
-      const createdToken = options && options.excludeNew ? this.lastCreatedInfo : null;
-      this.lastCreatedInfo = null;
+      // 批次三：先建的新行可能与旧 rawLine 逐字节相同（只改了其他字段时），不排除会
+      // 误删刚落盘的新行导致编辑静默失效（9a 探针实锤）。令牌是「本次链路那一条新行」
+      // 的坐标，所以按 filePath + text + index 三重匹配，只排除这一条，别的同名行照删
+      const createdToken = options && options.created ? options.created : null;
+      const tokenApplies = !!(createdToken && createdToken.filePath === filePath && createdToken.text === want);
+      const isNewRow = (n) => tokenApplies && createdToken.index === n;
       const file = this.app.vault.getAbstractFileByPath(filePath);
       if (!(file instanceof import_obsidian.TFile)) {
         console.error(tr("error.fileNotFound2", { path: filePath }));
@@ -1612,14 +1616,19 @@ var TaskParser = class {
       let idx = -1;
       if (preferredLineNumber >= 0 && preferredLineNumber < linesArr.length &&
           isTaskLine(linesArr[preferredLineNumber]) && norm(linesArr[preferredLineNumber]) === want &&
-          !(createdToken && createdToken.filePath === filePath && createdToken.index === preferredLineNumber && createdToken.text === want)) {
+          !isNewRow(preferredLineNumber)) {
         idx = preferredLineNumber;
       } else {
+        // 全文件兜底：同名任务多行时，取离 preferredLineNumber 最近的一条，
+        // 而不是固定取首条——固定取首条会让用户删/改 B、实际删掉更靠前的 A（内容相同，
+        // 用户难以察觉）。preferred 无效（-1）时退化为原来的「取首条」
+        let bestDist = Infinity;
         for (let n = 0; n < linesArr.length; n++) {
-          if (isTaskLine(linesArr[n]) && norm(linesArr[n]) === want &&
-              !(createdToken && createdToken.filePath === filePath && createdToken.index === n && createdToken.text === want)) {
+          if (!isTaskLine(linesArr[n]) || norm(linesArr[n]) !== want || isNewRow(n)) continue;
+          const dist = preferredLineNumber >= 0 ? Math.abs(n - preferredLineNumber) : 0;
+          if (idx === -1 || dist < bestDist) {
             idx = n;
-            break;
+            bestDist = dist;
           }
         }
       }
@@ -1779,12 +1788,15 @@ var TaskParser = class {
           createdIndex = (fileContent.slice(0, sectionIdx).match(/\n/g) || []).length + insertIdx;
         }
       } else {
+        // 无日期兜底（当前调用链不可达，公共入队入口保留）：文件已以换行结尾时不能再补
+        // eol，否则新行前多出一个空行；createdIndex 用换行数精确算，不用 split().length
         const eol = fileContent.includes("\r\n") ? "\r\n" : "\n";
-        createdIndex = fileContent.split("\n").length;
-        fileContent = fileContent + eol + taskLine + eol;
+        const needEol = fileContent.length > 0 && !/\r?\n$/.test(fileContent);
+        createdIndex = (fileContent.match(/\n/g) || []).length + (needEol ? 1 : 0);
+        fileContent = fileContent + (needEol ? eol : "") + taskLine + eol;
       }
       await this.app.vault.modify(file, fileContent);
-      // 一次性交接给紧随其后的编辑删除步骤（deleteTaskByRawLine 显式取用即清空）
+      // 一次性交接给紧随其后的编辑删除步骤（调用方取走后经 options.created 显式传回）
       this.lastCreatedInfo = createdIndex >= 0 ? { filePath, index: createdIndex, text: taskLine } : null;
       this.invalidateCache();
       return true;
@@ -3322,7 +3334,10 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         // 批次三：编辑=先建新行、再删旧行（3.4 定稿）。删除只认 rawLine：新行插入后
         // 旧行行号常发生偏移；删不到不判失败——新行已在，重复行可见、可手动删除
         if (editOld) {
-          const removed = await this.taskParser.deleteTaskByRawLine(editOld.filePath, editOld.rawLine, editOld.lineNumber, { excludeNew: true });
+          // 令牌必须在 await 之后、下一次入队之前同步取走：晚一步就会被并发链路的 create 覆盖
+          const createdToken = this.taskParser.lastCreatedInfo;
+          this.taskParser.lastCreatedInfo = null;
+          const removed = await this.taskParser.deleteTaskByRawLine(editOld.filePath, editOld.rawLine, editOld.lineNumber, { created: createdToken });
           if (!removed) new import_obsidian2.Notice(tr("notice.editSavedBut"), 5e3);
         }
         // 任务出现在日历中即反馈，不再弹成功提示；refresh 失败仍有单独提示
@@ -5179,7 +5194,9 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
           continue;
         }
         const holidays = this.settings.holidaysData[year];
-        if (!Array.isArray(holidays) || !holidays.every((h) => h && typeof h.date === "string")) {
+        // 校验口径与 loadBuiltinHolidays（holidays.json）对齐：只查 date 会放过缺 name / type 的条目，
+        // 后果是格子里渲染出 "undefined"（holiday-name），或 type 不匹配导致该日既不标假日也不标调休
+        if (!Array.isArray(holidays) || !holidays.every((h) => h && typeof h.date === "string" && typeof h.name === "string" && typeof h.isOff === "boolean" && (h.type === "legal" || h.type === "workday"))) {
           delete this.settings.holidaysData[year];
           console.warn(tr("error.holidaysDataFormat", { year: year }));
         }
