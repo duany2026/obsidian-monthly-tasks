@@ -517,11 +517,10 @@
 }
 
 /* ========== 类别标签（批次二⑧） ========== */
-/* 视觉通道纪律：类别只占「尾部小号 #标签 文本」这一个通道，不加背景、不加边框——
-   背景已被优先级占用，左边框已被跨天/overdue 占用。
-   必须用独立 span 而非 ::before：.task-item::before 已被 overdue 与 multi-day-task 占用。
-   选择器同时覆盖日历格子行与创建弹窗的已有任务行（一套渲染器两条路径），
-   否则 +N 列表与格子里显示不一致 */
+/* 视觉通道纪律（v1.5.4 定稿）：「宽处」用尾部小号 #标签 文字，「窄处」（日历格子）只用
+   左缘色带，两者不同时出现。文字标签如今只剩创建弹窗的已有任务行（.existing-task-item）
+   一条路径——那里整行宽，够放；格子里渲染器已不再产出 .task-category，下面的
+   .task-item .task-category 选择器保留作防御，真出现文字也由色带段的规则统一隐藏。 */
 .task-item .task-category,
 .existing-task-item .task-category {
 	flex-shrink: 0;
@@ -537,6 +536,55 @@
 .theme-dark .task-item .task-category,
 .theme-dark .existing-task-item .task-category {
 	color: #6b7280;
+}
+
+/* ========== 日历格子里的类别：左缘色带（v1.5.4 真机反馈） ========== */
+/* 原先只有手机端（@media max-width:480px）走色带、桌面端走 #标签 文字，同一个位置两端
+   说的是两件事——桌面端左缘那条是优先级（绿/黄/红），手机端左缘那条是类别（类别自己的色），
+   同一天同一条任务两端颜色不同。现在两端统一：格子只认色带，#标签 文字留给整行宽的
+   弹窗列表（.existing-task-item）与筛选面板对照用。
+   左缘槽位让给色带后，优先级与跨天的 border-left 一并取消——优先级仍有背景渐变 + 文字色，
+   跨天仍有时间行的「N天」，信息不丢，只是不再和色带抢同一条线。
+   选择器一律带 .day-cell 前缀：只作用于日历格子，不碰弹窗列表。 */
+.day-cell .task-item .task-category {
+	display: none;
+}
+
+.day-cell .task-item.has-category {
+	padding-left: 4px;
+}
+
+.day-cell .task-item.has-category::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 1px;
+	bottom: 1px;
+	width: 3px;
+	border-radius: 3px 0 0 3px;
+	background: var(--mt-cat-color, #64748b);
+}
+
+/* 过期红条（.task-item.overdue::before）同在 left:0，两者同时出现时红条留在 0、
+   色带右移避让并补内边距，否则过期信号被色带盖掉 */
+.day-cell .task-item.overdue.has-category::after {
+	left: 2px;
+}
+
+.day-cell .task-item.overdue.has-category {
+	padding-left: 7px;
+}
+
+/* 左缘让位给类别色带：优先级与跨天不再画 border-left */
+.day-cell .task-item[class*="priority-bg-"],
+.day-cell .task-item.multi-day-task {
+	border-left-width: 0;
+}
+
+/* 跨天的 3px 蓝色 ::before 竖条同样占 left:0（与色带完全重叠），且窄格里遮挡文字，
+   一并取消；跨天延续由时间行「N天」表意（v1.5.0 起跨天无时间任务也会建时间行） */
+.day-cell .task-item.multi-day-task::before {
+	display: none;
 }
 
 .task-item:hover {
@@ -2613,16 +2661,8 @@
 		font-size: 9px;
 	}
 	
-	/* 批次四⑤：手机端取消优先级/跨天左边框（普通 +2px/格、跨天 +3px/格，实测精确）。
-	   语义不丢：优先级靠背景渐变+文字色，跨天靠加粗+主色文字+起止角标。
-	   必须带 .day-cell 前缀——防止误伤创建弹窗里的已有任务列表（.existing-task-item）。 */
-	.day-cell .task-item[class*="priority-bg-"] {
-		border-left-width: 0;
-	}
-	
-	.day-cell .task-item.multi-day-task {
-		border-left-width: 0;
-	}
+	/* 批次四⑤：手机端取消优先级/跨天左边框 —— v1.5.4 起该规则已上收为全局（两端一致），
+	   见「日历格子里的类别：左缘色带」段 */
 	
 	/* 批次四⑥：隐藏格子内滚动条（沙箱实测 +0px——styled scrollbar 本就不占位，
 	   保留此规则是防个别 Android WebView 出现经典滚动条吃掉 3px，预算表不计收益） */
@@ -2666,53 +2706,10 @@
 		padding-left: 0;
 		padding-right: 0;
 	}
-	/* 真机反馈：类别不再用「文字/色点」通道（色点占宽又不好看）。手机端格子内直接
-	   隐藏 #标签 元素，改由任务条一条 3px 色带（.task-item::after）表意。色带取 JS 写在
-	   .task-item 上的 --mt-cat-color。
-	   v1.5.3（真机反馈）：色带从右缘挪到左缘——跨天蓝竖条隐藏后左槽位空了出来，
-	   与优先级左边框、完成态形成同侧节奏，观感更好。仍走 ::after 而非 ::before：
-	   ::before 被 overdue 占用，挪过去会打架。带子画在条内不占布局，但为避让文字
-	   起点补 4px 左内边距（成本 ~0.3 字，代价可接受）。 */
-	.day-cell .task-item .task-category {
-		display: none;
-	}
-
-	.day-cell .task-item.has-category {
-		padding-left: 4px;
-	}
-
-	.day-cell .task-item.has-category::after {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 1px;
-		bottom: 1px;
-		width: 3px;
-		border-radius: 3px 0 0 3px;
-		background: var(--mt-cat-color, #64748b);
-	}
-
-	/* v1.5.2 真机反馈：跨天 3px 蓝色 ::before 竖条在手机上遮挡文字。它的信息
-	   （跨天延续）已由 v1.5.0 起的时间行「N天」表意，桌面端保留，手机端整条隐藏。
-	   批次四只回收了 border-left 通道，伪元素通道是这次才发现的漏网 */
-	.day-cell .task-item.multi-day-task::before {
-		display: none;
-	}
-
-	/* v1.5.3：手机端不再单独画完成态灰竖条（反馈统一为变暗 + 可选删除线，
-	   左缘槽位让给类别色带；有类别的完成任务保留自己的类别色，一眼可见
-	   「哪个类别做完了」） */
-
-	/* v1.5.3 冲突修正：色带挪到左缘后，与过期红条（overdue::before，同为 left:0
-	   的 2px）叠在同一条线上，红条会被色带盖掉——过期信号丢失。两者同时出现时
-	   红条留在 0、色带右移 2px 并加宽左内边距避让（仅"显示删除线"档才会同时出现） */
-	.day-cell .task-item.overdue.has-category::after {
-		left: 2px;
-	}
-
-	.day-cell .task-item.overdue.has-category {
-		padding-left: 7px;
-	}
+	/* 手机端类别色带 / 隐藏 #标签 / 跨天竖条 / 过期红条避让 —— v1.5.4 起这些规则已上收为
+	   全局（两端一致，见「日历格子里的类别：左缘色带」段），此处不再重复。
+	   历史备注保留：v1.5.1 手机端先改右缘色带、v1.5.3 挪到左缘；v1.5.3 起手机端不再单独
+	   画完成态灰竖条，左缘槽位让给类别色带。 */
 }
 
 /* ========== 设置页：类别管理（批次二⑦） ========== */

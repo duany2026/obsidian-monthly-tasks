@@ -3267,16 +3267,13 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       timeEl.textContent = multiDay ? (timeHead ? tr("view.cell.timeDuration", { time: timeHead, days: duration }) : tr("view.cell.duration", { days: duration })) : timeHead;
     }
     contentEl.setAttribute("title", task.content);
-    // 类别标签（批次二⑧）：只用「尾部小号 #标签 文本 / 手机端色点」这一个通道，
-    // 不加背景色、不加边框——那两个通道已被优先级背景与跨天/overdue 左边框占用。
-    // 独立 span 而非 ::before：.task-item::before 已被 overdue 与 multi-day-task 占用
+    // 类别（v1.5.4 起两端统一）：格子里只画一条左缘色带，不再放 #标签 文字——
+    // 窄格里一行只塞得下四五个汉字，文字标签会把任务名挤掉；而文字标签本来是给
+    // 筛选功能对照用的，那个用途由弹窗列表与筛选面板承担。
+    // 这里只留 --mt-cat-color 与 has-category 两个钩子，色带本体在 styles.css 的
+    // 「日历格子里的类别：左缘色带」段用 ::after 画（不占布局）。
     if (task.category) {
-      const catEl = taskEl.createDiv("task-category");
-      catEl.textContent = `#${task.category}`;
-      catEl.setAttribute("title", tr("view.cell.category", { category: task.category }));
-      // 色点/文字颜色都取自这个变量：手机端只画圆点（见 styles.css 480 覆盖块）
       const catColor = resolveCategoryColor(task.category, this.plugin.settings.categories);
-      catEl.style.setProperty("--mt-cat-color", catColor);
       taskEl.style.setProperty("--mt-cat-color", catColor);
       taskEl.addClass("has-category");
     }
@@ -4199,7 +4196,8 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
           });
           // 任务文字
           const textEl = taskEl.createEl("span", { cls: "task-text", text: task.content });
-          // 类别标签：与格子内同一套通道（文字/色点），样式选择器同时覆盖两种行
+          // 类别标签：这条宽列表是 #标签 文字的唯一去处（v1.5.4 起格子里只剩色带），
+          // 用户在这里对照着看当日都有哪些类别，筛选面板用的也是同一批名字
           if (task.category) {
             const catEl = taskEl.createDiv("task-category");
             catEl.textContent = `#${task.category}`;
