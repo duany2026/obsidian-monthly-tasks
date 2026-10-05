@@ -346,6 +346,8 @@ var I18N = {
     "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
     "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "view.agenda.addOne": "\u6dfb\u52a0",
+    "view.agenda.emptyDay": "\u8fd9\u5929\u6ca1\u5b89\u6392",
     "view.agenda.hasTaskDot": "\u8fd9\u5929\u6709\u5b89\u6392",
     "view.agenda.overdueDot": "\u8fd9\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u7c7b\u522b\uff1a{category}",
@@ -621,6 +623,8 @@ var I18N = {
     "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
     "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "view.agenda.addOne": "\u6dfb\u52a0",
+    "view.agenda.emptyDay": "\u9019\u5929\u6c92\u5b89\u6392",
     "view.agenda.hasTaskDot": "\u9019\u5929\u6709\u5b89\u6392",
     "view.agenda.overdueDot": "\u9019\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u985e\u5225\uff1a{category}",
@@ -896,6 +900,8 @@ var I18N = {
     "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
     "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
     "settings.tips.title": "Usage Tips",
+    "view.agenda.addOne": "Add",
+    "view.agenda.emptyDay": "Nothing planned",
     "view.agenda.hasTaskDot": "Plans on this day",
     "view.agenda.overdueDot": "Overdue on this day",
     "view.cell.category": "Category: {category}",
@@ -1166,6 +1172,24 @@ function isTaskLine(line) {
 }
 
 /**
+ * 收某任务行下方紧跟的引用块（v1.6.0 批次二：任务备注）。
+ * 归属规则只有一条：从 startIdx 起「连续」的以 > 开头的行才算该任务的备注，
+ * 中间夹了任何非引用行（空行、任务行、普通段落）即止——section 首行、文件头、
+ * 隔了别的行的引用块一律不归属、不显示，老笔记里的说明性引用不会莫名变成备注。
+ * > 后的空格可无（手打 >文本 很常见）。多行以 \n 合并，写回时逐行补 > 前缀（批次三）。
+ */
+function collectNoteAfter(lines, startIdx) {
+  const parts = [];
+  for (let i = startIdx; i < lines.length; i++) {
+    const line = lines[i];
+    if (!/^\s*>/.test(line)) break;
+    parts.push(line.replace(/^\s*>\s?/, '').replace(/\r$/, '').trimEnd());
+  }
+  while (parts.length && parts[parts.length - 1] === '') parts.pop();
+  return parts.length ? parts.join('\n') : '';
+}
+
+/**
  * 判断任务是否已完成
  * @param line - 文本行
  * @returns 是否已完成
@@ -1423,6 +1447,10 @@ var TaskParser = class {
           continue;
         const task = this.parseTaskLine(line, file.path, lineNumber);
         if (task) {
+          // 备注（v1.6.0 批次二）：listItems 只认列表项、看不到引用块，
+          // 从任务行的下一行起按原文补收；与逐行扫描分支同一套规则，
+          // 保证缓存命中/未命中两条分支结果一致
+          task.note = collectNoteAfter(lines, lineNumber + 1);
           tasks.push(task);
         }
       }
@@ -1440,7 +1468,10 @@ var TaskParser = class {
         if (inFence) continue;
         if (!isTaskLine(line)) continue;
         const task = this.parseTaskLine(line, file.path, i);
-        if (task) tasks.push(task);
+        if (task) {
+          task.note = collectNoteAfter(lines, i + 1);
+          tasks.push(task);
+        }
       }
     }
     return tasks;
@@ -1485,6 +1516,9 @@ var TaskParser = class {
       dueDate,
       time,
       priority: parsePriority(line),
+      // 备注（v1.6.0 批次二）：任务行下方紧跟的 > 引用块，由 parseFile
+      // 两个分支经 collectNoteAfter 回填；无备注为空字符串
+      note: "",
       createdAt: Date.now()
     };
   }
@@ -2778,6 +2812,9 @@ var AGENDA_TOGGLE_ICONS = {
   list: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>'
 };
 
+// 明细区「＋ 添加」按钮的加号图标（lucide plus 路径子集，stroke 规格同上）
+var AGENDA_ADD_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+
 /**
  * ============================================================
  * MonthlyView - 月历视图
@@ -2941,6 +2978,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.closeActivePopup();
     this.rootEl.empty();
     this.gridEl = null;
+    this.detailEl = null;
     this.renderHeader();
     this.renderWeekdayHeader();
     this.gridEl = this.rootEl.createDiv("calendar-grid");
@@ -2972,6 +3010,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.closeActivePopup();
       this.rootEl.empty();
       this.gridEl = null;
+      this.detailEl = null;
       this.renderHeader();
       this.renderWeekdayHeader();
       this.gridEl = this.rootEl.createDiv("calendar-grid");
@@ -3102,7 +3141,10 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   _applyStrikeClasses() {
     const strike = this.plugin.settings.showCompletedStrike;
     const targets = [...document.querySelectorAll(".day-cell .task-item.completed"),
-      ...document.querySelectorAll(".existing-task-item.completed")];
+      ...document.querySelectorAll(".existing-task-item.completed"),
+      // 明细区的勾选行也走同一条删除线开关（v1.6.0 批次二）：
+      // 日程视图里已完成 = 变暗 + 按开关决定是否划线，与条视图口径一致
+      ...document.querySelectorAll(".agenda-item.completed")];
     for (const el of targets) {
       if (strike) el.removeClass("completed-strike");
       else el.addClass("completed-strike");
@@ -3165,6 +3207,19 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         tasks = tasks.filter((x) => this.activeCategories.has(x.category));
       }
       this.renderDayCell(day, tasks);
+    }
+
+    // 明细区（v1.6.0 批次二）：网格画完再画它，DOM 顺序天然是
+    // header → weekday-header → grid → agenda-detail。
+    // 任务集合与格子同源（同一份筛选后的 tasks），绝不会出现「格子有点、明细为空」
+    if (this.isAgenda()) {
+      let dayTasks = taskMap.taskMap.get(this.selectedDate) || [];
+      if (this.activeCategories && this.activeCategories.size > 0) {
+        dayTasks = dayTasks.filter((x) => this.activeCategories.has(x.category));
+      }
+      this.renderAgendaDetail(dayTasks);
+    } else {
+      this.removeAgendaDetail();
     }
 
     // 解析完成后再收敛漏斗：类别首次出现/清零的这一帧重建 header，
@@ -3483,6 +3538,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.plugin.settings.viewMode = this.isAgenda() ? "list" : "agenda";
     await this.plugin.saveSettings();
     // 进日程视图时若从未选中过日子，先把选中日收敛到当前月内（否则明细区空白）
+    if (this.isAgenda() && !this.selectedDate) this.convergeSelectedDate();
     this.applyViewModeClass();
     this.applyViewToggleIcon();
     await this.renderCalendarGrid();
@@ -3501,6 +3557,131 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     if (!key || this.selectedDate === key) return false;
     this.selectedDate = key;
     return true;
+  }
+  /**
+   * 明细区（v1.6.0 批次二）：日程视图的下半屏，读 selectedDate 那一天。
+   * ------------------------------------------------------------
+   * 结构：吸顶日期行（＋ 添加）→ 任务条目（勾选圈 + 原文 + 类别 pill，
+   * 备注作为宿主的附属卡片跟在条目下方）。三件套之外一律不画：不渲染时间行、
+   * 不渲染 priority-bg-*、不渲染跨天竖条（计划 §2.3 的颜色预算）。
+   * 已完成任务照常列出（打勾 + 变暗），不跟随 showCompletedTasks 隐藏——
+   * 格子里的圆点用的是完整 tasks，明细若藏掉已完成就会出现「格子有点、点开却说
+   * 这天没安排」的自相矛盾，这条比省两行字重要。
+   * 文本一律 textContent/createEl 构建，不拼 innerHTML（备注是用户数据）。
+   */
+  renderAgendaDetail(tasks) {
+    if (!this.detailEl || !this.detailEl.isConnected) {
+      this.detailEl = this.rootEl.createDiv("agenda-detail");
+    }
+    const detail = this.detailEl;
+    detail.empty();
+    const [y, m, d] = (this.selectedDate || "").split("-").map(Number);
+    const dayDate = new Date(y, m - 1, d);
+    // ---- 吸顶日期行 ----
+    const headEl = detail.createDiv("agenda-day-head");
+    const titleRow = headEl.createDiv("agenda-day-title");
+    const weekday = [
+      tr("modal.create.weekday.sun"), tr("modal.create.weekday.mon"), tr("modal.create.weekday.tue"),
+      tr("modal.create.weekday.wed"), tr("modal.create.weekday.thu"), tr("modal.create.weekday.fri"),
+      tr("modal.create.weekday.sat")
+    ][dayDate.getDay()];
+    titleRow.textContent = tr("modal.create.dateLine", { m, day: d, weekday });
+    const holidayInfo = this.plugin.settings.showHoliday ? this.plugin.holidayManager.getHolidayInfo(dayDate) : null;
+    if (holidayInfo) {
+      titleRow.createSpan({ text: ` \xB7 ${translateHolidayName(holidayInfo.name)}` });
+    }
+    const addBtn = headEl.createDiv("agenda-add-btn");
+    addBtn.setAttribute("role", "button");
+    addBtn.setAttribute("tabindex", "0");
+    addBtn.setAttribute("aria-label", tr("view.agenda.addOne"));
+    addBtn.innerHTML = AGENDA_ADD_ICON;
+    addBtn.createSpan({ text: tr("view.agenda.addOne") });
+    const startCreate = () => this.openCreateTaskModal(dayDate, tasks);
+    addBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      startCreate();
+    });
+    addBtn.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        startCreate();
+      }
+    });
+    // ---- 空状态：不给空白框 ----
+    if (!tasks || tasks.length === 0) {
+      const emptyEl = detail.createDiv("agenda-empty");
+      emptyEl.createDiv({ cls: "agenda-empty-text", text: tr("view.agenda.emptyDay") });
+      const emptyAdd = emptyEl.createDiv("agenda-add-btn");
+      emptyAdd.setAttribute("role", "button");
+      emptyAdd.setAttribute("tabindex", "0");
+      emptyAdd.innerHTML = AGENDA_ADD_ICON;
+      emptyAdd.createSpan({ text: tr("modal.create.add") });
+      emptyAdd.addEventListener("click", startCreate);
+      emptyAdd.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          startCreate();
+        }
+      });
+      return;
+    }
+    // ---- 条目列表 ----
+    const listEl = detail.createDiv("agenda-list");
+    for (const task of tasks) {
+      this.renderAgendaEntry(listEl, task);
+    }
+  }
+  /**
+   * 一条任务 + 它的备注（备注是宿主的附属，不独立成条目——这样桌面端双列时
+   * 两者永远同列，不会被网格拆到两个栏里）。
+   */
+  renderAgendaEntry(container, task) {
+    const entryEl = container.createDiv("agenda-entry");
+    const itemEl = entryEl.createDiv("agenda-item");
+    if (task.completed) itemEl.addClass("completed");
+    const checkEl = itemEl.createEl("input", {
+      cls: "agenda-check",
+      attr: { type: "checkbox", "aria-label": tr("modal.create.toggleComplete") }
+    });
+    checkEl.checked = task.completed;
+    checkEl.addEventListener("change", async () => {
+      // 写入期间禁用，防连点竞态；失败回滚勾选态（与弹窗列表同一套口径）
+      if (checkEl.disabled) return;
+      checkEl.disabled = true;
+      try {
+        await this.toggleTask(task);
+      } finally {
+        if (checkEl.isConnected) checkEl.disabled = false;
+      }
+    });
+    // 点整行也算勾选（手机端目标小，勾选圈只有 16px）
+    itemEl.addEventListener("click", (e) => {
+      if (e.target === checkEl) return;
+      checkEl.click();
+    });
+    const textEl = itemEl.createEl("span", { cls: "agenda-text", text: task.content });
+    textEl.setAttribute("title", task.content);
+    // 类别 pill：明细区是整行宽，不需要格子里那条 3px 色带，直接写 #类别名。
+    // 这里必须新写一套（.agenda-cat），不能沿用 .day-cell .task-category——
+    // 后者在色带段里被 display:none 掉了
+    if (task.category) {
+      const catEl = itemEl.createSpan({ cls: "agenda-cat", text: `#${task.category}` });
+      catEl.setAttribute("title", tr("view.cell.category", { category: task.category }));
+      catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
+    }
+    // 备注卡片：左侧细竖线是「这不是任务」的唯一提示，不写「备注」二字
+    if (task.note) {
+      const noteEl = entryEl.createDiv("agenda-note");
+      noteEl.textContent = task.note;
+      noteEl.setAttribute("title", task.note);
+    }
+  }
+  /** 切回条视图时明细区必须整块摘掉，留着会把网格挤成半屏 */
+  removeAgendaDetail() {
+    if (this.detailEl) {
+      this.detailEl.remove();
+      this.detailEl = null;
+    }
   }
   /**
    * 把选中日收敛进当前月：含今天则选今天，否则选该月 1 号。
