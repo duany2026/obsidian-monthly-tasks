@@ -3271,3 +3271,166 @@
 		background: color-mix(in srgb, var(--mt-cat-color, #64748b) 22%, transparent);
 	}
 }
+
+/* ---- v1.6.0 批次三：备注可写 ---- */
+/* 只读卡片 = 可点：hover 给一层极浅底 + 光标提示，不加重边框（明细区本来就密） */
+.monthly-tasks-container.view-agenda .agenda-note[role="button"] {
+	cursor: pointer;
+}
+
+.monthly-tasks-container.view-agenda .agenda-note[role="button"]:hover {
+	background: var(--background-modifier-hover);
+}
+
+.monthly-tasks-container.view-agenda .agenda-note[role="button"]:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 1px;
+}
+
+/* 空态幽灵按钮：没备注的任务也留一个入口，但弱到不跟已有备注抢视线 */
+.monthly-tasks-container.view-agenda .agenda-note.agenda-note-empty {
+	background: none;
+	border-left-color: transparent;
+	color: var(--text-faint);
+	font-size: 12px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+.monthly-tasks-container.view-agenda .agenda-note.agenda-note-empty:hover {
+	color: var(--text-muted);
+	background: var(--background-modifier-hover);
+}
+
+.monthly-tasks-container.view-agenda .agenda-note-plus {
+	margin-right: 4px;
+	font-weight: 600;
+}
+
+/* 编辑态：蓝描边 + 白底抬到最上层，一眼知道「正在写、不是看」 */
+.monthly-tasks-container.view-agenda .agenda-note.is-editing {
+	cursor: auto;
+	background: var(--background-primary);
+	border-left-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 25%, transparent);
+	padding: 6px 8px;
+}
+
+.monthly-tasks-container.view-agenda .agenda-note.is-editing:hover {
+	background: var(--background-primary);
+}
+
+@supports not (background: color-mix(in srgb, red 12%, white)) {
+	.monthly-tasks-container.view-agenda .agenda-note.is-editing {
+		box-shadow: 0 0 0 2px var(--interactive-accent);
+	}
+}
+
+.monthly-tasks-container.view-agenda .agenda-note-input {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	resize: none;
+	overflow: hidden;
+	min-height: 34px;
+	border: 0;
+	outline: none;
+	background: transparent;
+	color: var(--text-normal);
+	font-size: 12px;
+	line-height: 1.5;
+	font-family: inherit;
+	padding: 0;
+	margin: 0;
+}
+
+/* 手机端：编辑时字号提到 16px——iOS WebKit 对 <16px 的输入框聚焦会强制放大整页，
+   不压回去就是每次写备注屏幕跳一下 */
+@media (max-width: 600px) {
+	.monthly-tasks-container.view-agenda .agenda-note-input {
+		font-size: 16px;
+	}
+}
+
+.theme-dark .monthly-tasks-container.view-agenda .agenda-note.is-editing {
+	background: var(--modal-background);
+}
+
+/* ---- v1.6.0 批次四：筛选联动观感 ---- */
+/* 未命中筛选但筛选前有内容 → 整格淡出。真·空格不加这个类，
+   否则整月一起变灰反而看不出谁被筛掉（判定在 main.js renderDayCell） */
+.monthly-tasks-container.view-agenda .day-cell.filter-miss {
+	opacity: 0.3;
+}
+
+/* 筛选中的类别 pill 挂在吸顶日期行右侧、＋ 添加左边：不新增横条、不占额外高度 */
+.monthly-tasks-container.view-agenda .agenda-filter-chips {
+	display: flex;
+	flex: 0 1 auto;
+	flex-wrap: nowrap;
+	gap: 4px;
+	margin-left: auto;
+	min-width: 0;
+	overflow: hidden;
+	align-items: center;
+}
+
+.monthly-tasks-container.view-agenda .agenda-filter-chip {
+	flex: 0 0 auto;
+	max-width: 96px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 11px;
+	line-height: 1;
+	padding: 4px 8px;
+	border-radius: 999px;
+	border: 1px solid var(--mt-cat-color, var(--gray-500));
+	color: var(--mt-cat-color, var(--text-muted));
+	cursor: pointer;
+	background: var(--background-primary);
+}
+
+.monthly-tasks-container.view-agenda .agenda-filter-chip.agenda-filter-chip-none {
+	--mt-cat-color: var(--gray-500);
+}
+
+.monthly-tasks-container.view-agenda .agenda-filter-chip:hover {
+	opacity: 0.75;
+}
+
+.monthly-tasks-container.view-agenda .agenda-filter-chip:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 1px;
+}
+
+@supports (background: color-mix(in srgb, red 12%, white)) {
+	.monthly-tasks-container.view-agenda .agenda-filter-chip {
+		background: color-mix(in srgb, var(--mt-cat-color, #64748b) 12%, transparent);
+	}
+}
+
+/* 手机端：pill 与标题挤同一行，标题先收缩、pill 保持可点尺寸 */
+@media (max-width: 600px) {
+	.monthly-tasks-container.view-agenda .agenda-filter-chip {
+		font-size: 12px;
+		padding: 6px 10px;
+		max-width: 84px;
+	}
+	.monthly-tasks-container.view-agenda .agenda-day-title {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.theme-dark .monthly-tasks-container.view-agenda .agenda-filter-chip {
+	background: var(--background-secondary);
+}
+
+@supports (background: color-mix(in srgb, red 12%, white)) {
+	.theme-dark .monthly-tasks-container.view-agenda .agenda-filter-chip {
+		background: color-mix(in srgb, var(--mt-cat-color, #64748b) 22%, transparent);
+	}
+}

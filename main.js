@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.5.4
+ * 版本：1.6.0
  * 作者：duany
  * 许可证：MIT
  *
@@ -116,6 +116,7 @@ var I18N = {
   "zh-CN": {
     "cmd.open": "\u6253\u5f00\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
     "cmd.refresh": "\u5237\u65b0\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
+    "cmd.toggle": "\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE",
     "error.badDateConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u8bc6\u522b\u7684\u65e5\u671f\u4efb\u52a1\u884c ({path}:{line}): {line}",
     "error.builtinHoliday": "\u6708\u5386\u4efb\u52a1\uff1a\u5185\u7f6e\u8282\u5047\u65e5\u6570\u636e\u8bfb\u53d6\u5931\u8d25\uff08holidays.json \u7f3a\u5931\u6216\u635f\u574f\uff09\uff0c\u5bf9\u5e94\u5e74\u4efd\u5c06\u4f9d\u8d56\u7f51\u7edc\u6570\u636e\u6e90",
     "error.createFail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25:",
@@ -141,6 +142,7 @@ var I18N = {
     "error.lineInvalidDel2": "\u884c\u53f7\u5df2\u5931\u6548\uff0c\u8be5\u884c\u4e0d\u662f\u76ee\u6807\u4efb\u52a1\uff0c\u62d2\u7edd\u5220\u9664\uff1a{line}",
     "error.lineRange": "\u884c\u53f7\u8d85\u51fa\u8303\u56f4: {line}",
     "error.loadTasks": "\u52a0\u8f7d\u4efb\u52a1\u5931\u8d25:",
+    "error.noteSaveFail": "\u5907\u6CE8\u4FDD\u5B58\u5931\u8D25:",
     "error.oversizedConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u8de8\u5929\u4efb\u52a1\u533a\u95f4 {start} ~ {due} \u8d85\u8fc7 {limit} \u5929\uff0c\u4ec5\u6302\u8f7d\u9996\u5c3e\u4e24\u65e5 ({path}:{line}): {content}",
     "error.parseFile": "\u89e3\u6790\u6587\u4ef6\u5931\u8d25: {path}",
     "error.postCreateRefresh": "\u521b\u5efa\u540e\u5237\u65b0\u89c6\u56fe\u5931\u8d25:",
@@ -339,16 +341,24 @@ var I18N = {
     "settings.showLunar.name": "\u663e\u793a\u519c\u5386",
     "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf",
-    "settings.tips.1": "\u70b9\u51fb\u65e5\u671f\u683c\u5b50\u6dfb\u52a0\u4efb\u52a1\uff1b\u70b9\u51fb\u683c\u5b50\u91cc\u7684\u4efb\u52a1\u5207\u6362\u5b8c\u6210 / \u672a\u5b8c\u6210",
+    "settings.tips.1": "\u6761\u89C6\u56FE\u70B9\u65E5\u671F\u683C\u5B50\u6DFB\u52A0\u4EFB\u52A1\u3001\u70B9\u683C\u5B50\u91CC\u7684\u4EFB\u52A1\u5207\u6362\u5B8C\u6210 / \u672A\u5B8C\u6210\uFF1B\u65E5\u7A0B\u89C6\u56FE\u70B9\u683C\u5B50\u662F\u9009\u4E2D\u8BE5\u5929\uFF0C\u6DFB\u52A0\u8D70\u4E0B\u65B9\u660E\u7EC6\u533A\u7684\u300C\uFF0B \u6DFB\u52A0\u300D",
     "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52a1\u884c\u5c3e\u7684 #\u6807\u7b7e \u5373\u7c7b\u522b\uff1a\u51fa\u73b0\u7c7b\u522b\u540e\uff0c\u9876\u90e8\u6f0f\u6597\u6309\u94ae\u53ef\u6309\u7c7b\u522b\u7b5b\u9009\uff08\u591a\u9009\uff0c\u9ed8\u8ba4\u5168\u90e8\uff09",
     "settings.tips.4": "\u70b9\u4efb\u52a1\u884c\u7684\u94c5\u7b14\u56fe\u6807\u53ef\u7f16\u8f91\uff1a\u6539\u5185\u5bb9/\u4f18\u5148\u7ea7/\u65f6\u95f4/\u65e5\u671f/\u7c7b\u522b\uff0c\u4fdd\u5b58=\u5148\u5efa\u65b0\u884c\u518d\u5220\u65e7\u884c\uff0c\u8de8\u5929\u4efb\u52a1\u4ee5\u5f00\u59cb\u65e5\u671f\u4e3a\u51c6",
     "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
     "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
+    "settings.tips.7": "\u65E5\u7A0B\u89C6\u56FE\uFF1A\u53F3\u4E0A\u89D2\u5207\u6362\u6309\u94AE\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE\u300D\uFF09\u8FDB\u5165\u3002\u683C\u5B50\u91CC\u53EA\u6807\u4E00\u679A\u70B9\u8868\u793A\u8FD9\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u53D8\u7EA2\u70B9\uFF1B\u4E0B\u534A\u533A\u5217\u51FA\u9009\u4E2D\u65E5\u7684\u4EFB\u52A1\u4E0E\u5907\u6CE8",
+    "settings.tips.8": "\u5907\u6CE8\u5199\u5728\u4EFB\u52A1\u884C\u7684\u4E0B\u4E00\u884C\u3001\u4EE5 > \u5F00\u5934\uFF08Markdown \u5F15\u7528\u5757\uFF09\uFF0C\u8FDE\u7EED\u591A\u884C\u5408\u5E76\u6210\u4E00\u6761\uFF1B\u70B9\u660E\u7EC6\u533A\u7684\u5907\u6CE8\u5361\u7247\u5373\u53EF\u5C31\u5730\u4FEE\u6539\uFF0C\u56DE\u8F66\u4FDD\u5B58\u3001Esc \u53D6\u6D88",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
+    "view.agenda.clearFilterAria": "\u6E05\u9664\u5F53\u524D\u7C7B\u522B\u7B5B\u9009",
     "view.agenda.emptyDay": "\u8fd9\u5929\u6ca1\u5b89\u6392",
+    "view.agenda.emptyFiltered": "\u5F53\u524D\u7B5B\u9009\u4E0B\u8FD9\u5929\u6CA1\u6709\u4EFB\u52A1",
     "view.agenda.hasTaskDot": "\u8fd9\u5929\u6709\u5b89\u6392",
+    "view.agenda.noteAdd": "\u5199\u5907\u6CE8",
+    "view.agenda.noteAddAria": "\u7ED9\u8FD9\u6761\u4EFB\u52A1\u5199\u5907\u6CE8",
+    "view.agenda.noteEdit": "\u7F16\u8F91\u5907\u6CE8",
+    "view.agenda.noteHelp": "\u56DE\u8F66\u4FDD\u5B58 \u00B7 Shift+\u56DE\u8F66\u6362\u884C \u00B7 Esc \u53D6\u6D88",
     "view.agenda.overdueDot": "\u8fd9\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u7c7b\u522b\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
@@ -393,6 +403,7 @@ var I18N = {
   "zh-TW": {
     "cmd.open": "\u958b\u555f\u6708\u66c6\u4efb\u52d9\u8996\u5716",
     "cmd.refresh": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u4efb\u52d9\u8996\u5716",
+    "cmd.toggle": "\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996",
     "error.badDateConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u8b58\u5225\u7684\u65e5\u671f\u4efb\u52d9\u884c ({path}:{line}): {line}",
     "error.builtinHoliday": "\u6708\u66c6\u4efb\u52d9\uff1a\u5167\u5efa\u7bc0\u5047\u65e5\u6578\u64da\u8b80\u53d6\u5931\u6557\uff08holidays.json \u7f3a\u5931\u6216\u640d\u58de\uff09\uff0c\u5c0d\u61c9\u5e74\u4efd\u5c07\u4f9d\u8cf4\u7db2\u8def\u6578\u64da\u6e90",
     "error.createFail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff1a",
@@ -418,6 +429,7 @@ var I18N = {
     "error.lineInvalidDel2": "\u884c\u865f\u5df2\u5931\u6548\uff0c\u8a72\u884c\u4e0d\u662f\u76ee\u6a19\u4efb\u52d9\uff0c\u62d2\u7d55\u522a\u9664\uff1a{line}",
     "error.lineRange": "\u884c\u865f\u8d85\u51fa\u7bc4\u570d\uff1a{line}",
     "error.loadTasks": "\u8f09\u5165\u4efb\u52d9\u5931\u6557\uff1a",
+    "error.noteSaveFail": "\u5099\u8A3B\u5132\u5B58\u5931\u6557\uFF1A",
     "error.oversizedConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u8de8\u5929\u4efb\u52d9\u5340\u9593 {start} ~ {due} \u8d85\u904e {limit} \u5929\uff0c\u50c5\u639b\u8f09\u9996\u5c3e\u5169\u65e5 ({path}:{line}): {content}",
     "error.parseFile": "\u89e3\u6790\u6a94\u6848\u5931\u6557\uff1a{path}",
     "error.postCreateRefresh": "\u5efa\u7acb\u5f8c\u91cd\u65b0\u6574\u7406\u8996\u5716\u5931\u6557\uff1a",
@@ -616,16 +628,24 @@ var I18N = {
     "settings.showLunar.name": "\u986f\u793a\u8fb2\u66c6",
     "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf",
-    "settings.tips.1": "\u9ede\u64ca\u65e5\u671f\u683c\u4f4d\u65b0\u589e\u4efb\u52d9\uff1b\u9ede\u64ca\u683c\u4f4d\u88e1\u7684\u4efb\u52d9\u5207\u63db\u5b8c\u6210 / \u672a\u5b8c\u6210",
+    "settings.tips.1": "\u689D\u6AA2\u8996\u9EDE\u65E5\u671F\u683C\u4F4D\u65B0\u589E\u4EFB\u52D9\u3001\u9EDE\u683C\u4F4D\u88E1\u7684\u4EFB\u52D9\u5207\u63DB\u5B8C\u6210 / \u672A\u5B8C\u6210\uFF1B\u65E5\u7A0B\u6AA2\u8996\u9EDE\u683C\u4F4D\u662F\u9078\u53D6\u8A72\u5929\uFF0C\u65B0\u589E\u8D70\u4E0B\u65B9\u660E\u7D30\u5340\u7684\u300C\uFF0B \u65B0\u589E\u300D",
     "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52d9\u884c\u5c3e\u7684 #\u6a19\u7c64 \u5373\u985e\u5225\uff1a\u51fa\u73fe\u985e\u5225\u5f8c\uff0c\u9802\u90e8\u6f0f\u6597\u6309\u9215\u53ef\u6309\u985e\u5225\u7be9\u9078\uff08\u591a\u9078\uff0c\u9810\u8a2d\u5168\u90e8\uff09",
     "settings.tips.4": "\u9ede\u4efb\u52d9\u884c\u7684\u925b\u7b46\u5716\u793a\u53ef\u7de8\u8f2f\uff1a\u6539\u5167\u5bb9/\u512a\u5148\u7d1a/\u6642\u9593/\u65e5\u671f/\u985e\u5225\uff0c\u5132\u5b58=\u5148\u5efa\u65b0\u884c\u518d\u522a\u820a\u884c\uff0c\u8de8\u5929\u4efb\u52d9\u4ee5\u958b\u59cb\u65e5\u671f\u70ba\u6e96",
     "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
     "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
+    "settings.tips.7": "\u65E5\u7A0B\u6AA2\u8996\uFF1A\u53F3\u4E0A\u89D2\u5207\u63DB\u6309\u9215\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996\u300D\uFF09\u9032\u5165\u3002\u683C\u4F4D\u88E1\u53EA\u6A19\u4E00\u679A\u9EDE\u8868\u793A\u9019\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u8B8A\u7D05\u9EDE\uFF1B\u4E0B\u65B9\u5340\u5217\u51FA\u9078\u53D6\u65E5\u7684\u4EFB\u52D9\u8207\u5099\u8A3B",
+    "settings.tips.8": "\u5099\u8A3B\u5BEB\u5728\u4EFB\u52D9\u884C\u7684\u4E0B\u4E00\u884C\u3001\u4EE5 > \u958B\u982D\uFF08Markdown \u5F15\u7528\u584A\uFF09\uFF0C\u9023\u7E8C\u591A\u884C\u5408\u4F75\u6210\u4E00\u689D\uFF1B\u9EDE\u660E\u7D30\u5340\u7684\u5099\u8A3B\u5361\u7247\u5373\u53EF\u5C31\u5730\u4FEE\u6539\uFF0Center \u5132\u5B58\u3001Esc \u53D6\u6D88",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
+    "view.agenda.clearFilterAria": "\u6E05\u9664\u76EE\u524D\u985E\u5225\u7BE9\u9078",
     "view.agenda.emptyDay": "\u9019\u5929\u6c92\u5b89\u6392",
+    "view.agenda.emptyFiltered": "\u76EE\u524D\u7BE9\u9078\u4E0B\u9019\u5929\u6C92\u6709\u4EFB\u52D9",
     "view.agenda.hasTaskDot": "\u9019\u5929\u6709\u5b89\u6392",
+    "view.agenda.noteAdd": "\u5BEB\u5099\u8A3B",
+    "view.agenda.noteAddAria": "\u70BA\u9019\u689D\u4EFB\u52D9\u5BEB\u5099\u8A3B",
+    "view.agenda.noteEdit": "\u7DE8\u8F2F\u5099\u8A3B",
+    "view.agenda.noteHelp": "Enter \u5B58\u6A94 \u00B7 Shift+Enter \u63DB\u884C \u00B7 Esc \u53D6\u6D88",
     "view.agenda.overdueDot": "\u9019\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u985e\u5225\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
@@ -670,6 +690,7 @@ var I18N = {
   "en": {
     "cmd.open": "Open Monthly Tasks View",
     "cmd.refresh": "Refresh Monthly Tasks View",
+    "cmd.toggle": "Toggle Calendar / Agenda View",
     "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {line}",
     "error.builtinHoliday": "Monthly Tasks: Built-in holiday data read failed (holidays.json missing or corrupted), corresponding year will rely on network data source",
     "error.createFail": "Create task failed:",
@@ -695,6 +716,7 @@ var I18N = {
     "error.lineInvalidDel2": "Line number invalid, line is not target task, delete refused: {line}",
     "error.lineRange": "Line number out of range: {line}",
     "error.loadTasks": "Load tasks failed:",
+    "error.noteSaveFail": "Save note failed:",
     "error.oversizedConsole": "Monthly Tasks: Multi-day task range {start} ~ {due} exceeds {limit} days, only mounting start and end dates ({path}:{line}): {content}",
     "error.parseFile": "Parse file failed: {path}",
     "error.postCreateRefresh": "Post-create refresh view failed:",
@@ -893,16 +915,24 @@ var I18N = {
     "settings.showLunar.name": "Show Lunar Calendar",
     "settings.tasksLimit.desc": "Maximum tasks shown per date cell",
     "settings.tasksLimit.name": "Tasks Per Day Limit",
-    "settings.tips.1": "Click date cell to add task; click task in cell to toggle complete/incomplete",
+    "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; add via the \uFF0B Add button in the detail pane below",
     "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
     "settings.tips.3": "#tag at end of task line is category: after categories appear, funnel button at top can filter by category (multi-select, default all)",
     "settings.tips.4": "Click pencil icon on task line to edit: change content/priority/time/date/category, save=create new line then delete old line, multi-day tasks based on start date",
     "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
     "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
+    "settings.tips.7": "Agenda view: use the toggle button at the top right, or the command palette entry \"Toggle Calendar / Agenda View\". A dot marks a day with plans, red when overdue; the pane below lists the selected day's tasks and notes",
+    "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. Click a note card in the detail pane to edit it inline: Enter saves, Esc cancels",
     "settings.tips.title": "Usage Tips",
     "view.agenda.addOne": "Add",
+    "view.agenda.clearFilterAria": "Clear current category filter",
     "view.agenda.emptyDay": "Nothing planned",
+    "view.agenda.emptyFiltered": "No tasks on this day under the current filter",
     "view.agenda.hasTaskDot": "Plans on this day",
+    "view.agenda.noteAdd": "Add note",
+    "view.agenda.noteAddAria": "Add a note to this task",
+    "view.agenda.noteEdit": "Edit note",
+    "view.agenda.noteHelp": "Enter to save \u00B7 Shift+Enter for newline \u00B7 Esc to cancel",
     "view.agenda.overdueDot": "Overdue on this day",
     "view.cell.category": "Category: {category}",
     "view.cell.duration": "{days}d",
@@ -1187,6 +1217,60 @@ function collectNoteAfter(lines, startIdx) {
   }
   while (parts.length && parts[parts.length - 1] === '') parts.pop();
   return parts.length ? parts.join('\n') : '';
+}
+
+/**
+ * 备注文本（多行以 \n 合并）→ 写回用的原文行数组（批次三）。
+ * 归一化掉 \r\n / \r，裁掉尾部空行；返回空数组 = 清除备注。
+ */
+function noteTextToLines(text) {
+  const parts = String(text == null ? "" : text).replace(/\r\n?/g, "\n").split("\n");
+  while (parts.length && parts[parts.length - 1].trim() === "") parts.pop();
+  return parts;
+}
+/**
+ * 定位任务行（批次三：备注写回的唯一寻址入口）。
+ * 缓存的 lineNumber 在文件被别处加过行之后就会集体错位，所以判定顺序与
+ * _deleteTaskByRawLineImpl 同口径：先试缓存行号（必须是任务行且与 rawLine 去尾空白
+ * 相等），不中则全文件找同文任务行、取离缓存行号最近的一条；都找不到返回 -1。
+ */
+function findTaskLineIdx(lines, task) {
+  const norm = (s) => s.replace(/\s+$/, "");
+  const want = norm(task.rawLine == null ? "" : task.rawLine);
+  const n = task.lineNumber;
+  if (n >= 0 && n < lines.length && isTaskLine(lines[n]) && norm(lines[n]) === want) return n;
+  let idx = -1;
+  let best = Infinity;
+  for (let i = 0; i < lines.length; i++) {
+    if (!isTaskLine(lines[i]) || norm(lines[i]) !== want) continue;
+    const dist = n >= 0 ? Math.abs(i - n) : 0;
+    if (idx === -1 || dist < best) {
+      idx = i;
+      best = dist;
+    }
+  }
+  return idx;
+}
+/**
+ * 把某任务行下方**自己那段**备注块整体替换为新内容（原地增删行，不重建文件）。
+ * 删旧块从 start 起按 > 连续性取，写新块逐行补 "> " 前缀；CRLF 文件里新行行尾
+ * 补 \r（split("\n") 后每行自带 \r，补上才不混入裸 \n）。
+ * @returns 实际替换掉的旧行数（0 = 该任务原本没有备注）
+ */
+function writeNoteAfter(lines, taskIdx, noteText, crlf) {
+  let end = taskIdx + 1;
+  while (end < lines.length && /^\s*>/.test(lines[end])) end++;
+  const removed = end - (taskIdx + 1);
+  if (removed > 0) lines.splice(taskIdx + 1, removed);
+  const body = noteTextToLines(noteText);
+  if (body.length) {
+    const block = body.map((l) => {
+      const text = l === "" ? ">" : "> " + l;
+      return crlf ? text + "\r" : text;
+    });
+    lines.splice(taskIdx + 1, 0, ...block);
+  }
+  return removed;
 }
 
 /**
@@ -1608,13 +1692,33 @@ var TaskParser = class {
         console.error(tr("error.lineInvalidDel2", { line: task.lineNumber }));
         return false;
       }
+      const hadCRLF = /\r$/.test(lineToDelete);
+      const blankLine = hadCRLF ? "\r" : "";
       lines.splice(task.lineNumber, 1);
-      // 自愈：上下皆空行时收掉其后那个（只碰空行，连续多空行随多次删除逐步收敛）
-      const prevLine = lines[task.lineNumber - 1];
-      const nextLine = lines[task.lineNumber];
+      // v1.6.0 批次三：删任务不连带删备注——内容丢了最心疼。紧跟它的 > 块
+      // 去掉前缀降级成普通段落留在原地。行间补空行：连续两个非空行会被 Markdown
+      // 按「惰性续行」并成一段，多行备注会糊成一行；且降级后的文字若紧贴上一条
+      // 任务行，会被并进那条任务的正文。
+      let demoted = 0;
+      while (task.lineNumber + demoted < lines.length && /^[ \t]*>/.test(lines[task.lineNumber + demoted])) {
+        const raw = lines[task.lineNumber + demoted];
+        const eol = /\r$/.test(raw) ? "\r" : "";
+        const stripped = raw.replace(/\r$/, "").replace(/^[ \t]*>[ \t]?/, "").replace(/[ \t]+$/, "");
+        if (stripped !== "") lines[task.lineNumber + demoted] = stripped + eol;
+        else lines[task.lineNumber + demoted] = blankLine;
+        demoted++;
+      }
+      if (demoted > 0 && lines[task.lineNumber].trim() !== "") {
+        lines.splice(task.lineNumber, 0, blankLine);
+      }
+      // 自愈：上下皆空行时收掉其后那个（只碰空行，连续多空行随多次删除逐步收敛）。
+      // 基准下移到降级块末尾：任务行已被摘掉，紧跟降级块的那一行才是「下一行」
+      const selfHealIdx = task.lineNumber + demoted;
+      const prevLine = lines[selfHealIdx - 1];
+      const nextLine = lines[selfHealIdx];
       if (prevLine !== undefined && nextLine !== undefined &&
           prevLine.trim() === "" && nextLine.trim() === "") {
-        lines.splice(task.lineNumber, 1);
+        lines.splice(selfHealIdx, 1);
       }
       await this.app.vault.modify(file, lines.join("\n"));
       this.invalidateCache();
@@ -1679,6 +1783,15 @@ var TaskParser = class {
         console.error(tr("error.rawLineNotFound", { path: filePath }));
         return false;
       }
+      // v1.6.0 批次三：编辑=先建新行再删旧行，备注要跟着新行走。默认（直接删除任务）
+      // 走 _deleteTaskImpl 的降级保留策略；只有编辑链路显式 dropNote 才连着备注块一起删，
+      // 由调用方把同一份内容写到新行下方，避免出现「降级副本 + 新行副本」两份。
+      if (options && options.dropNote) {
+        let dn = idx + 1;
+        while (dn < linesArr.length && /^[ \t]*>/.test(linesArr[dn])) {
+          linesArr.splice(dn, 1);
+        }
+      }
       linesArr.splice(idx, 1);
       // 与 _deleteTaskImpl 同款孤儿空行自愈
       const prevLine = linesArr[idx - 1];
@@ -1696,15 +1809,51 @@ var TaskParser = class {
     }
   }
   /**
-   * 在指定文件中创建新任务
+   * v1.6.0 批次三：写回某任务的备注（> 引用块）。排进 writeQueue 与勾选/删除/创建互斥，
+   * 成功后 invalidateCache —— 备注增删会让后续行号集体错位，不立刻重解析就会出现
+   * 「点别的任务改错行」，这条是批次二遗留风险（计划 §五.2）的收口。
+   * @param task - 只需 filePath / rawLine / lineNumber 三个定位字段
+   * @param noteText - 新备注原文（多行以 \n 分隔）；空串 = 清除备注
    */
-  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed) {
-    // 串行化：避免与其他写操作并发导致后写覆盖先写丢失任务
-    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed);
+  async updateTaskNote(task, noteText) {
+    const run = () => this._updateTaskNoteImpl(task, noteText);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed) {
+  async _updateTaskNoteImpl(task, noteText) {
+    try {
+      const file = this.app.vault.getAbstractFileByPath(task.filePath);
+      if (!(file instanceof import_obsidian.TFile)) {
+        console.error(tr("error.fileNotFound", { path: task.filePath }));
+        return false;
+      }
+      const content = await this.app.vault.read(file);
+      const lines = content.split("\n");
+      const idx = findTaskLineIdx(lines, task);
+      if (idx === -1) {
+        // 定位不到就什么都不写：宁可保存失败让用户重试，也不能把备注挂到别的任务上
+        console.error(tr("error.rawLineNotFound", { path: task.filePath }));
+        return false;
+      }
+      writeNoteAfter(lines, idx, noteText, content.includes("\r\n"));
+      await this.app.vault.modify(file, lines.join("\n"));
+      this.invalidateCache();
+      return true;
+    } catch (error) {
+      console.error(tr("error.noteSaveFail"), error);
+      return false;
+    }
+  }
+  /**
+   * 在指定文件中创建新任务
+   */
+  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note) {
+    // 串行化：避免与其他写操作并发导致后写覆盖先写丢失任务
+    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note);
+    this.writeQueue = this.writeQueue.then(run, run);
+    return this.writeQueue;
+  }
+  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note) {
     try {
       const file = this.app.vault.getAbstractFileByPath(filePath);
       if (!(file instanceof import_obsidian.TFile)) {
@@ -1731,6 +1880,9 @@ var TaskParser = class {
       // 批次三：编辑=删除+重建，重建必须保留勾选态——已完成任务写 `- [x]`；
       // 新建链路 completed 为 undefined（falsy），行为与旧版逐字节一致
       let taskLine = `- [${completed ? "x" : " "}] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${categoryMarker}`.trimEnd();
+      // v1.6.0 批次三：编辑=删除+重建时备注必须跟着新行走（否则改一次日期备注就没了）。
+      // 这里只把备注渲染成待写回的原文行数组，具体插入位置由各分支按 CRLF 补 \r。
+      const noteBody = noteTextToLines(note);
       
       // 确定用于排序和插入的日期：跨天任务用开始日期，普通任务用截止日期
       const isMultiDay = startDate && startDate !== dueDate;
@@ -1774,9 +1926,12 @@ var TaskParser = class {
           const sepBefore = /(?:^|\n)---[ \t]*$/.test(before.replace(/(?:[ \t]*\r?\n)+$/, ""));
           const leadBlank = /(?:^|\n)[ \t]*\r?\n$/.test(before) ? "" : eol;
           const tailSep = insertPos < fileContent.length ? `---${eol}${eol}` : "";
+          // 备注行逐行补 > 前缀；CRLF 文件里 taskLine 本身不带 \r（靠 eol 分隔），
+          // 所以这里统一用 eol 连接，不重复补 \r
+          const noteStr = noteBody.length ? noteBody.map((l) => (l === "" ? ">" : "> " + l)).join(eol) + eol : "";
           const newSection = sepBefore
-            ? `${leadBlank}${monthSection}${eol}${eol}${taskLine}${eol}${eol}${tailSep}`
-            : `${leadBlank}---${eol}${eol}${monthSection}${eol}${eol}${taskLine}${eol}${eol}${tailSep}`;
+            ? `${leadBlank}${monthSection}${eol}${eol}${taskLine}${eol}${noteStr}${eol}${tailSep}`
+            : `${leadBlank}---${eol}${eol}${monthSection}${eol}${eol}${taskLine}${eol}${noteStr}${eol}${tailSep}`;
           fileContent = fileContent.slice(0, insertPos) + newSection + fileContent.slice(insertPos);
           createdIndex = (fileContent.slice(0, insertPos + newSection.indexOf(taskLine)).match(/\n/g) || []).length;
         } else {
@@ -1826,6 +1981,21 @@ var TaskParser = class {
             // 使既有空行落在新任务之后而非被顶到前面
             while (insertIdx > 0 && lines[insertIdx - 1].trim() === "") insertIdx--;
           }
+          // v1.6.0 批次三（计划 §四.3 提的坑）：排序循环只对 "- [" 行取坐标，
+          // 所以 insertIdx 天然落在任务行上或备注块之后，正常不会劈开「任务 + 备注」。
+          // 这里仍加一道方向确定的保险：万一 insertIdx 指到 > 行（段末回退等边界），
+          // 就整段向后越过它——新行绝不能夹在备注行与它的宿主任务之间，那会让归属
+          // 当场失效。只向后不向前：向前退到块首才会真把备注和宿主隔开。
+          const isNoteLine = (s) => /^[ \t]*>/.test(s);
+          if (insertIdx > 0 && insertIdx < lines.length && isNoteLine(lines[insertIdx])) {
+            while (insertIdx < lines.length && isNoteLine(lines[insertIdx])) insertIdx++;
+          }
+          if (noteBody.length) {
+            parts.push(...noteBody.map((l) => {
+              const text = l === "" ? ">" : "> " + l;
+              return useCRLF ? text + "\r" : text;
+            }));
+          }
           lines.splice(insertIdx, 0, ...parts);
           fileContent = fileContent.slice(0, sectionIdx) + lines.join("\n") + fileContent.slice(sectionEnd);
           createdIndex = (fileContent.slice(0, sectionIdx).match(/\n/g) || []).length + insertIdx;
@@ -1851,14 +2021,14 @@ var TaskParser = class {
   /**
    * 在指定日期创建任务（自动选择或创建按年月归类的文件）
    */
-  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath, category, completed) {
+  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath, category, completed, note) {
     // 串行化整个流程（含年度任务文件创建）：并发创建同一文件时 vault.create 会竞态抛"已存在"，
     // 并入 writeQueue 后第二个请求必能在 findTaskFile 命中首个创建结果
-    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed);
+    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed, note);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed) {
+  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed, note) {
     const dateStr = this.formatDate(date);
     const endDateStr = endDate ? this.formatDate(endDate) : dateStr;
     // 一律写入归档任务列表（年度或月度，由设置决定），跳过日记查找：保证任务统一归集
@@ -1868,7 +2038,7 @@ var TaskParser = class {
       // 直接调用 _createTaskImpl 而非 createTask：本方法已在 writeQueue 链中执行，
       // 若再经 createTask 二次入队会形成 Q2 等待 Q1、Q1 等待 Q2 的死锁，
       // 导致任务永不写入文件、弹窗按钮永久禁用。
-      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr, category, completed);
+      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr, category, completed, note);
     }
     return false;
   }
@@ -2897,6 +3067,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
     // 托管弹窗挂在框架层不随 rootEl 回收：视图关闭时一并收起，避免失联
     this.closeActivePopup();
+    // 编辑态必须一起清掉：留着 true 会让这个实例之后的每次渲染都被守卫跳过
+    this.editingNote = false;
+    this.renderAfterNoteEdit = false;
     this.rootEl.empty();
   }
   /** 关闭本视图挂出的所有托管弹窗（日期跳转 / 类别筛选）；两个面板改挂 Modal 后
@@ -3160,6 +3333,13 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 自增 requestId：快速切换月份时，旧请求完成后会因 requestId 不匹配而丢弃渲染结果
     this.renderRequestId = (this.renderRequestId || 0) + 1;
     const myRequestId = this.renderRequestId;
+    // v1.6.0 批次三：正在就地编辑备注时不重绘——vault 修改事件 → 500ms 防抖 →
+    // invalidateCache + refreshView 会整片重画，不拦就等于「写着写着字没了」。
+    // 先递增 requestId 再返回：进行中的旧渲染也会被作废，编辑结束后补的那次才是最终态
+    if (this.editingNote) {
+      this.renderAfterNoteEdit = true;
+      return;
+    }
     const titleEl = this.headerEl.querySelector(".month-title");
     if (titleEl) {
       titleEl.textContent = getMonthTitle(this.currentYear, this.currentMonth);
@@ -3201,12 +3381,15 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     for (const day of calendar.days) {
       const dateStr = formatDate(day.date);
       let tasks = taskMap.taskMap.get(dateStr) || [];
+      // v1.6.0 批次四：日程视图要区分「这天空」和「这天有内容但被筛掉了」，
+      // 后者整格淡掉。只传一个布尔以外的信息没必要，长度 > 0 就够用。
+      const hadBeforeFilter = tasks.length;
       // 类别筛选在「取到当日全量之后、渲染之前」一处生效：+N 计数、格子 overflow 判定、
       // 「该日已有 N 个任务」列表全部基于筛选后集合（未筛选项不进弹窗列表）
       if (this.activeCategories && this.activeCategories.size > 0) {
         tasks = tasks.filter((x) => this.activeCategories.has(x.category));
       }
-      this.renderDayCell(day, tasks);
+      this.renderDayCell(day, tasks, hadBeforeFilter);
     }
 
     // 明细区（v1.6.0 批次二）：网格画完再画它，DOM 顺序天然是
@@ -3229,7 +3412,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   /**
    * 渲染日期格子
    */
-  renderDayCell(day, tasks) {
+  renderDayCell(day, tasks, hadBeforeFilter) {
     const cellEl = this.gridEl.createDiv("day-cell");
     const agenda = this.isAgenda();
     const dateKey = formatDate(day.date);
@@ -3273,6 +3456,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 数据源用完整 tasks（不是 displayTasksList）：否则关掉「显示已完成任务」会让
     // 含已完成任务的那些天的点整个消失。
     if (agenda) {
+      const filtering = this.activeCategories && this.activeCategories.size > 0;
       if (tasks.length > 0) {
         const markEl = cellEl.createDiv("day-mark");
         // 红点判定必须带「本格日期 == 任务截止日」这一半：跨天任务在它占用的每一天
@@ -3285,6 +3469,12 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         } else {
           markEl.setAttribute("aria-label", tr("view.agenda.hasTaskDot"));
         }
+      }
+      // 未命中筛选但筛选前有内容 → 整格淡出（计划 §2.1 最后一行）。
+      // 判定放在点之后：淡出只解释「为什么这格没有点」，不改变点的有无本身。
+      // 真·空格不加这个类，否则整月会一起变灰，反而看不出谁被筛掉了。
+      if (filtering && tasks.length === 0 && hadBeforeFilter > 0) {
+        cellEl.addClass("filter-miss");
       }
       if (dateKey === this.selectedDate) {
         cellEl.addClass("sel");
@@ -3449,7 +3639,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   openCreateTaskModal(date, existingTasks = [], editTask = null) {
     const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category, editOld) => {
       const customFolderPath = this.plugin.settings.customTaskFolder || void 0;
-      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0);
+      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0, editOld ? editOld.note : void 0);
       if (success) {
         // 批次三：编辑=先建新行、再删旧行（3.4 定稿）。删除只认 rawLine：新行插入后
         // 旧行行号常发生偏移；删不到不判失败——新行已在，重复行可见、可手动删除
@@ -3457,7 +3647,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
           // 令牌必须在 await 之后、下一次入队之前同步取走：晚一步就会被并发链路的 create 覆盖
           const createdToken = this.taskParser.lastCreatedInfo;
           this.taskParser.lastCreatedInfo = null;
-          const removed = await this.taskParser.deleteTaskByRawLine(editOld.filePath, editOld.rawLine, editOld.lineNumber, { created: createdToken });
+          // dropNote：新行已带上同一份备注，旧行那段必须一起摘掉，否则文件里会
+          // 出现「降级副本 + 新行副本」两份；无备注时该选项无副作用
+          const removed = await this.taskParser.deleteTaskByRawLine(editOld.filePath, editOld.rawLine, editOld.lineNumber, { created: createdToken, dropNote: true });
           if (!removed) new import_obsidian2.Notice(tr("notice.editSavedBut"), 5e3);
         }
         // 任务出现在日历中即反馈，不再弹成功提示；refresh 失败仍有单独提示
@@ -3590,6 +3782,36 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     if (holidayInfo) {
       titleRow.createSpan({ text: ` \xB7 ${translateHolidayName(holidayInfo.name)}` });
     }
+    // 筛选中的类别以小 pill 挂在吸顶行右侧（＋ 添加左边）：不新增横条、不占额外高度，
+    // 点它等于清除筛选（计划 §四.3 的防呆三处之一）。不用顶部横条是因为横条要从明细区扣 28px
+    if (this.activeCategories && this.activeCategories.size > 0) {
+      const chips = headEl.createDiv("agenda-filter-chips");
+      for (const name of Array.from(this.activeCategories)) {
+        const label = name === "" ? tr("modal.filter.untagged") : "#" + name;
+        const chip = chips.createSpan({ cls: "agenda-filter-chip", text: label });
+        chip.setAttribute("role", "button");
+        chip.setAttribute("tabindex", "0");
+        chip.setAttribute("aria-label", tr("view.agenda.clearFilterAria"));
+        chip.setAttribute("title", tr("view.agenda.clearFilterAria"));
+        if (name !== "") {
+          chip.style.setProperty("--mt-cat-color", resolveCategoryColor(name, this.plugin.settings.categories));
+        } else {
+          chip.addClass("agenda-filter-chip-none");
+        }
+        const clear = (e) => {
+          e.stopPropagation();
+          this.setCategoryFilter(new Set());
+          this.renderCalendarGrid();
+        };
+        chip.addEventListener("click", clear);
+        chip.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            clear(e);
+          }
+        });
+      }
+    }
     const addBtn = headEl.createDiv("agenda-add-btn");
     addBtn.setAttribute("role", "button");
     addBtn.setAttribute("tabindex", "0");
@@ -3610,7 +3832,13 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // ---- 空状态：不给空白框 ----
     if (!tasks || tasks.length === 0) {
       const emptyEl = detail.createDiv("agenda-empty");
-      emptyEl.createDiv({ cls: "agenda-empty-text", text: tr("view.agenda.emptyDay") });
+      // 空态分两种：这天本来没安排 / 有内容但被当前筛掉了。文案不区分会让人以为
+      // 筛选没生效（计划 §四.3）
+      const filtering = this.activeCategories && this.activeCategories.size > 0;
+      emptyEl.createDiv({
+        cls: "agenda-empty-text",
+        text: tr(filtering ? "view.agenda.emptyFiltered" : "view.agenda.emptyDay")
+      });
       const emptyAdd = emptyEl.createDiv("agenda-add-btn");
       emptyAdd.setAttribute("role", "button");
       emptyAdd.setAttribute("tabindex", "0");
@@ -3669,12 +3897,185 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       catEl.setAttribute("title", tr("view.cell.category", { category: task.category }));
       catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
     }
-    // 备注卡片：左侧细竖线是「这不是任务」的唯一提示，不写「备注」二字
+    // 备注（v1.6.0 批次三：可读 + 可写）。有备注 = 卡片，点它就地编辑；没备注 =
+    // 一枚很轻的「＋ 写备注」幽灵按钮（用户明确要求下半区要能写备注，只读不够用）。
+    // 左侧细竖线仍是「这不是任务」的唯一提示，不写「备注」二字。
+    const noteEl = entryEl.createDiv("agenda-note");
+    this.paintNoteReadonly(noteEl, task);
+    noteEl.addEventListener("click", () => {
+      if (this.editingNote) return;
+      this.startNoteEdit(noteEl, task);
+    });
+    noteEl.setAttribute("role", "button");
+    noteEl.setAttribute("tabindex", "0");
+    noteEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        if (!this.editingNote) this.startNoteEdit(noteEl, task);
+      }
+    });
+  }
+  /** 备注的只读呈现：有内容 = 卡片（title 挂全文），无内容 = 幽灵按钮 */
+  paintNoteReadonly(noteEl, task) {
+    noteEl.empty();
+    noteEl.removeClass("agenda-note-empty");
+    noteEl.removeClass("is-editing");
+    noteEl.removeAttribute("contenteditable");
     if (task.note) {
-      const noteEl = entryEl.createDiv("agenda-note");
       noteEl.textContent = task.note;
       noteEl.setAttribute("title", task.note);
+      noteEl.setAttribute("aria-label", tr("view.agenda.noteEdit"));
+    } else {
+      noteEl.addClass("agenda-note-empty");
+      noteEl.createSpan({ cls: "agenda-note-plus", text: "\uFF0B" });
+      noteEl.createSpan({ text: tr("view.agenda.noteAdd") });
+      noteEl.setAttribute("aria-label", tr("view.agenda.noteAddAria"));
     }
+  }
+  /**
+   * 就地编辑备注：不弹窗（手机上弹窗套一层很难受），原卡片换成 textarea。
+   * 用 textarea 而不是 contenteditable：IME 组字、粘贴纯文本、Shift+Enter 换行、
+   * 读取值这四件事浏览器实现各不相同，contenteditable 要写一堆兼容分支才不丢字；
+   * textarea 是唯一「读出来就是用户打的」的那个。
+   */
+  startNoteEdit(noteEl, task) {
+    const original = task.note || "";
+    this.editingNote = true;
+    this.renderAfterNoteEdit = false;
+    noteEl.addClass("is-editing");
+    noteEl.removeClass("agenda-note-empty");
+    noteEl.empty();
+    const ta = noteEl.createEl("textarea", {
+      cls: "agenda-note-input",
+      attr: {
+        "aria-label": original ? tr("view.agenda.noteEdit") : tr("view.agenda.noteAddAria"),
+        "title": tr("view.agenda.noteHelp"),
+        spellcheck: "false"
+      }
+    });
+    ta.value = original;
+    const autosize = () => {
+      ta.style.height = "auto";
+      ta.style.height = Math.max(ta.scrollHeight + 2, 34) + "px";
+    };
+    autosize();
+    ta.addEventListener("input", autosize);
+    let done = false;
+    // 开编辑瞬间的「伪 blur」宽限。CDP 插桩时间线（Input.dispatchMouseEvent 真实点击与
+    // JS 合成 click 两条路径都一样）：mousedown 时浏览器先把焦点给到 .agenda-note 本身
+    // （它有 tabindex），click 里换成 textarea 并 ta.focus()，随后 Obsidian 的焦点簿记
+    // 还会再补一次 blur（rel=null，焦点掉回 body）。不拦的话刚建好的 textarea 立刻走
+    // 「点别处=保存」，备注框一闪就收回（真机 bug，合成事件一度测不出）。第二版在 blur
+    // 里同步补 ta.focus() 并封顶次数——实机证明那是 blur→focus→blur 的同步乒乓：额度
+    // 3ms 内烧光，宽限形同虚设。这版改尾部防抖：风暴期间只挂一个 24ms 的延迟 refocus
+    // （跳出 blur 派发再抢回焦点，乒乓自然断开）。同时用捕获阶段的 document mousedown
+    // 记「点到卡片外」：窗口内用户真点了别处，blur 照常走保存，不会把焦点锁死在输入框
+    // 里；收软键盘那种纯 blur 仍走 refocus（手机端收起键盘≠放弃编辑）。内容一旦改过
+    // （value≠原文）或窗口（500ms）一过，立即恢复「blur 即保存」，不吞用户输入。
+    const openedAt = Date.now();
+    let refocusTimer = 0;
+    let refocusTries = 0;
+    let outsideDown = false;
+    const onDocDown = (e) => { if (!noteEl.contains(e.target)) outsideDown = true; };
+    const refocusSoon = () => {
+      if (refocusTimer) clearTimeout(refocusTimer);
+      refocusTimer = setTimeout(() => {
+        refocusTimer = 0;
+        if (done || !ta.isConnected || refocusTries >= 3) return;
+        // 封顶放在延迟回调里（而不是 blur 里同步自增）：实机见过一种「焦点被框架
+        // 反复抢回 body」的抢焦循环（document.hasFocus() 全程 true，约 28ms 一轮，
+        // 只在窗口失过焦之后出现），防抖 refocus 会给它无限续命，宽限窗口（500ms）
+        // 一过反而把未保存的草稿 blur 存出去。每轮 refocus 至少隔 24ms，3 次足够
+        // 赢下正常的单次伪 blur；病态循环则 ~72ms 内落到「blur 即保存」——内容还是
+        // 原文时保存不写盘，等价于安全收回编辑态。
+        refocusTries++;
+        ta.focus();
+        ta.setSelectionRange(ta.value.length, ta.value.length);
+      }, 24);
+    };
+    const onBlur = () => {
+      if (done) return;
+      if (Date.now() - openedAt < 500 && ta.value === original && !outsideDown && ta.isConnected) {
+        refocusSoon();
+        return;
+      }
+      if (refocusTimer) {
+        clearTimeout(refocusTimer);
+        refocusTimer = 0;
+      }
+      // 点别处 = 保存：手机端收起软键盘走的是 blur，判取消会把用户输入丢掉
+      if (stop()) finish(true);
+    };
+    const stop = () => {
+      if (done) return false;
+      done = true;
+      if (refocusTimer) {
+        clearTimeout(refocusTimer);
+        refocusTimer = 0;
+      }
+      ta.removeEventListener("blur", onBlur);
+      document.removeEventListener("mousedown", onDocDown, true);
+      return true;
+    };
+    // retry：写回失败时把 blur 监听挂回去，用户再点一下别处或按回车即可重试
+    const finish = (save) => this.endNoteEdit(noteEl, task, save ? ta.value : original, save, () => {
+      done = false;
+      outsideDown = false;
+      document.addEventListener("mousedown", onDocDown, true);
+      ta.addEventListener("blur", onBlur);
+      ta.focus();
+    });
+    ta.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        // Esc 只放弃编辑：既要阻止冒泡（否则同一次按键会在 noteEl 的 keydown 里
+        // 再进一次编辑），也要阻止默认（否则框架可能把它当成关闭视图）
+        e.preventDefault();
+        e.stopPropagation();
+        if (stop()) finish(false);
+        return;
+      }
+      if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (stop()) finish(true);
+      }
+    });
+    ta.addEventListener("blur", onBlur);
+    document.addEventListener("mousedown", onDocDown, true);
+    ta.focus();
+    // 光标落到文末（全选会把原文当占位符直接覆盖，改一句话要重打一遍很难受）
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+  }
+  /**
+   * 结束编辑。save 且内容有变化才落盘（只读一遍不动文件，避免无意义的 modify 事件
+   * 触发全库重解析）；写回失败**保留编辑态与已输入内容**并重新挂回 blur 监听，让用户
+   * 能再按一次回车重试，而不是把刚打的字全丢了。
+   */
+  async endNoteEdit(noteEl, task, text, save, retry) {
+    this.editingNote = false;
+    const next = noteTextToLines(text).join("\n");
+    if (save && next !== (task.note || "")) {
+      const ok = await this.taskParser.updateTaskNote(task, next);
+      if (!ok) {
+        new import_obsidian2.Notice(tr("notice.opFail"));
+        this.editingNote = true;
+        if (retry) retry();
+        return;
+      }
+      task.note = next;
+    }
+    if (this.renderAfterNoteEdit) {
+      this.renderAfterNoteEdit = false;
+      // 编辑期间被压掉的其它刷新（勾选、防抖刷新）在这里补一次，走全量解析取最新落盘内容
+      this.paintNoteReadonly(noteEl, task);
+      try {
+        await this.refresh();
+      } catch (e) {
+        console.error(tr("error.delayRefresh"), e);
+      }
+      return;
+    }
+    this.paintNoteReadonly(noteEl, task);
   }
   /** 切回条视图时明细区必须整块摘掉，留着会把网格挤成半屏 */
   removeAgendaDetail() {
@@ -5227,6 +5628,13 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       name: tr("cmd.refresh"),
       callback: () => this.refreshView()
     });
+    // v1.6.0 批次四：命令面板也能切视图。切语言时要与另两条一起 remove/re-add，
+    // 否则命令标题会停在旧语言
+    this.addCommand({
+      id: "toggle-agenda-view",
+      name: tr("cmd.toggle"),
+      callback: () => this.toggleViewModeFromCommand()
+    });
     this.settingTab = new MonthlyTasksSettingTab(this.app, this);
     this.addSettingTab(this.settingTab);
     // 合并 vault 事件监听器，使用防抖优化性能
@@ -5402,6 +5810,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     if (typeof this.removeCommand === "function") {
       this.removeCommand("monthly-tasks:open-monthly-view");
       this.removeCommand("monthly-tasks:refresh-monthly-view");
+      this.removeCommand("monthly-tasks:toggle-agenda-view");
     }
     this.addCommand({
       id: "open-monthly-view",
@@ -5412,6 +5821,13 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       id: "refresh-monthly-view",
       name: tr("cmd.refresh"),
       callback: () => this.refreshView()
+    });
+    // v1.6.0 批次四：命令面板也能切视图。切语言时要与另两条一起 remove/re-add，
+    // 否则命令标题会停在旧语言
+    this.addCommand({
+      id: "toggle-agenda-view",
+      name: tr("cmd.toggle"),
+      callback: () => this.toggleViewModeFromCommand()
     });
     this.refreshView();
     // 设置页若正开着，重绘成当前语言
@@ -5598,6 +6014,20 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
    * 刷新视图
    * @param force 是否强制重新渲染整个视图
    */
+  /**
+   * v1.6.0 批次四：命令面板切视图。视图没开时先开（activateView 建 leaf 是异步的，
+   * 不 await 会切不到），已开则对当前活动视图调 toggleViewMode。
+   */
+  async toggleViewModeFromCommand() {
+    let leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
+    if (!leaf) {
+      await this.activateView();
+      leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
+    }
+    if (!leaf || !leaf.view || typeof leaf.view.toggleViewMode !== "function") return;
+    this.app.workspace.setActiveLeaf(leaf, { focus: true });
+    await leaf.view.toggleViewMode();
+  }
   async refreshView() {
     const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY);
     for (const leaf of leaves) {
@@ -5640,6 +6070,8 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       tr("settings.tips.4"),
       tr("settings.tips.5"),
       tr("settings.tips.6"),
+      tr("settings.tips.7"),
+      tr("settings.tips.8"),
     ]) {
       tipList.createEl("li", { text: tip });
     }
