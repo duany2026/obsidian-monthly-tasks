@@ -148,13 +148,13 @@
 	transform: scale(0.95);
 }
 
-.nav-btn.close-btn {
-	color: var(--gray-400);
-}
-
-.nav-btn.close-btn:hover {
-	background: rgba(239, 68, 68, 0.15);
-	color: #ef4444;
+/* 视图切换按钮（v1.6.0 批次一）：原 .nav-btn.close-btn 的两条规则随 × 按钮一并删除
+   （Obsidian 标签页自带关闭，插件再放一个 × 既冗余又容易误触）。切换按钮沿用 .nav-btn
+   的全部基础样式（尺寸/圆角/hover/active），这里只补一条「当前处于日程视图」的弱强调，
+   让用户不看格子也能知道自己在哪个视图——不改变按钮位置，避免顶栏抖动。 */
+.nav-btn.view-toggle-btn.is-agenda {
+	color: var(--primary-600);
+	background: var(--primary-100);
 }
 
 .month-title {
@@ -2204,13 +2204,9 @@
 	color: #60a5fa;
 }
 
-.theme-dark .nav-btn.close-btn {
-	color: #6b7280;
-}
-
-.theme-dark .nav-btn.close-btn:hover {
-	background: rgba(239, 68, 68, 0.15);
-	color: #f87171;
+.theme-dark .nav-btn.view-toggle-btn.is-agenda {
+	color: #60a5fa;
+	background: rgba(59, 130, 246, 0.16);
 }
 
 .theme-dark .month-title {
@@ -2870,4 +2866,119 @@
 	color: var(--text-muted);
 	font-size: 13px;
 	line-height: 1.8;
+}
+
+/* ============================================================
+   v1.6.0 批次一：日程视图（agenda view）
+   ------------------------------------------------------------
+   作用域纪律：本段所有选择器一律以 .monthly-tasks-container.view-agenda 开头，
+   条视图（默认）不命中任何一条，因此这一整段对现有观感是零影响。
+   视图形态由 root 上的 .view-agenda 类门控（main.js applyViewModeClass），
+   切换不重建视图、只改类名 + 重画网格。
+   ============================================================ */
+
+/* ---------- 布局：网格收成固定高度，剩余空间给明细区 ---------- */
+/* 条视图靠 .calendar-grid 的 flex:1 把剩余高度全吃掉撑满屏幕；日程视图必须反过来，
+   网格只占实际行高，明细区才能拿到可滚动的下半屏 */
+.monthly-tasks-container.view-agenda .calendar-grid {
+	flex: 0 0 auto;
+	/* 行高由格子内容决定（min-height 52px），不再 1fr 平摊容器高度 */
+	grid-auto-rows: auto;
+}
+
+/* ---------- 格子：压到 52px ---------- */
+/* min-height 在条视图里是五条规则（基础 95 / 平板 115 / 桌面 160 / 侧栏回落 95 /
+   手机端 80），日程视图要全部盖掉。前三条靠「.monthly-tasks-container.view-agenda
+   三个类 > .day-cell 一个类」的权重自然压制；侧栏那两条是 4 个类，权重更高，
+   必须在下面单独补一条带 .workspace-split 的规则，不能只靠这条。 */
+.monthly-tasks-container.view-agenda .day-cell {
+	min-height: 52px;
+	padding: 3px 4px;
+	gap: 0;
+}
+
+/* ---------- 格子底色：三类统一去掉 ---------- */
+/* 新视图格子里唯一的硬信息是那枚蓝点，而淡蓝底上的蓝点对比度最差；只要留着任何
+   一类底色，点就会在那批格子上变淡。所以节假日淡红、周末淡蓝、今天淡蓝渐变一起
+   去掉，网格变成完全平的格子，日期信息全部交给日号字色（节假日红 / 周末蓝 /
+   今天深蓝加粗，这三条字色规则在上面的基础段里，不动）。
+   红色通道整幅让给逾期红点。今天仍保留整格描边（去掉渐变底后描边更清晰）。 */
+.monthly-tasks-container.view-agenda .day-cell.holiday,
+.monthly-tasks-container.view-agenda .day-cell.weekend,
+.monthly-tasks-container.view-agenda .day-cell.workday {
+	background: var(--bg-primary);
+}
+
+.monthly-tasks-container.view-agenda .day-cell.today {
+	background: var(--bg-primary);
+	border: 1px solid var(--primary-500);
+	/* 去掉渐变底，只留描边 + 极轻投影；inset 内描边凑 2px 观感与其他格子盒模型对齐 */
+	box-shadow: inset 0 0 0 1px var(--primary-500);
+}
+
+/* ---------- 底部圆点 ---------- */
+/* 一枚点表示「这天记了待办」，不并排多点、不带任何数字（全月大部分格子只有 1、2，
+   一排「1111」既没信息量又难看）。margin-top: auto 沉底：格子是 flex column，
+   点作为末子元素自然贴底，行高变化不影响它的位置语义。 */
+.monthly-tasks-container.view-agenda .day-mark {
+	margin-top: auto;
+	align-self: center;
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: var(--primary-500);
+	flex-shrink: 0;
+}
+
+/* 逾期：同一枚点变红，与条视图逾期红条同源（--danger）。一天只显示一枚点，
+   有逾期即红，不做「蓝点 + 红点」两点并排 */
+.monthly-tasks-container.view-agenda .day-mark.overdue-mark {
+	background: var(--danger);
+}
+
+/* ---------- 选中日：只动日号 ---------- */
+/* 「今天」与「选中日」必须分开：今天是整格描边（格子级），选中日只给日号包一枚
+   实心蓝药丸（元素级）。两者若都用描边，用户分不清哪个是「今天」哪个是「正在看的那天」。 */
+.monthly-tasks-container.view-agenda .day-cell.sel .day-number {
+	background: var(--primary-500);
+	color: #fff;
+	border-radius: 999px;
+	padding: 0 5px;
+	font-weight: 700;
+}
+
+/* 选中格自身不加边框，只给一层极淡底色帮助定位（描边留给「今天」） */
+.monthly-tasks-container.view-agenda .day-cell.sel {
+	background: var(--primary-50);
+}
+
+.monthly-tasks-container.view-agenda .day-cell.sel.today {
+	background: var(--primary-50);
+	border: 1px solid var(--primary-500);
+}
+
+/* ---------- 侧栏窄面板：权重高于上面那条，必须单独覆盖 ---------- */
+/* 基础段里的侧栏规则是 4 个类（.workspace-split.mod-*-split .monthly-tasks-container
+   .day-cell），比 .monthly-tasks-container.view-agenda .day-cell（3 个类）权重高，
+   不补这条的话「日程视图开在右侧栏」会退回 95px 行高，明细区被挤没。 */
+.workspace-split.mod-right-split .monthly-tasks-container.view-agenda .day-cell,
+.workspace-split.mod-left-split .monthly-tasks-container.view-agenda .day-cell {
+	min-height: 52px;
+	padding: 3px 4px;
+}
+
+/* ---------- 深色模式：底色跟随主题变量，点色不变 ---------- */
+.theme-dark .monthly-tasks-container.view-agenda .day-cell.holiday,
+.theme-dark .monthly-tasks-container.view-agenda .day-cell.weekend,
+.theme-dark .monthly-tasks-container.view-agenda .day-cell.workday,
+.theme-dark .monthly-tasks-container.view-agenda .day-cell.today {
+	background: var(--bg-primary);
+}
+
+.theme-dark .monthly-tasks-container.view-agenda .day-cell.sel {
+	background: rgba(59, 130, 246, 0.16);
+}
+
+.theme-dark .monthly-tasks-container.view-agenda .day-cell.sel .day-number {
+	color: #fff;
 }

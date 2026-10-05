@@ -346,15 +346,18 @@ var I18N = {
     "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
     "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "view.agenda.hasTaskDot": "\u8fd9\u5929\u6709\u5b89\u6392",
+    "view.agenda.overdueDot": "\u8fd9\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u7c7b\u522b\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
     "view.cell.loadError": "\u4efb\u52a1\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u67e5\u770b\u63a7\u5236\u53f0",
     "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
-    "view.header.close": "\u5173\u95ed",
     "view.header.nextMonth": "\u4e0b\u6708",
     "view.header.prevMonth": "\u4e0a\u6708",
     "view.header.title": "\u6708\u5386\u4efb\u52a1",
     "view.header.titleTip": "\u70b9\u51fb\u5feb\u901f\u5207\u6362\u65e5\u671f",
+    "view.header.toAgenda": "\u5207\u6362\u5230\u65e5\u7a0b\u89c6\u56fe",
+    "view.header.toList": "\u5207\u6362\u5230\u6761\u89c6\u56fe",
     "view.header.today": "\u56de\u5230\u672c\u6708",
     "view.month.1": "1\u6708",
     "view.month.10": "10\u6708",
@@ -618,15 +621,18 @@ var I18N = {
     "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
     "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "view.agenda.hasTaskDot": "\u9019\u5929\u6709\u5b89\u6392",
+    "view.agenda.overdueDot": "\u9019\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u985e\u5225\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
     "view.cell.loadError": "\u4efb\u52d9\u8f09\u5165\u5931\u6557\uff0c\u8acb\u67e5\u770b\u4e3b\u63a7\u53f0",
     "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
-    "view.header.close": "\u95dc\u9589",
     "view.header.nextMonth": "\u4e0b\u6708",
     "view.header.prevMonth": "\u4e0a\u6708",
     "view.header.title": "\u6708\u66c6\u4efb\u52d9",
     "view.header.titleTip": "\u9ede\u64ca\u5feb\u901f\u5207\u63db\u65e5\u671f",
+    "view.header.toAgenda": "\u63db\u5230\u65e5\u7a0b\u8996\u5716",
+    "view.header.toList": "\u63db\u5230\u689d\u8996\u5716",
     "view.header.today": "\u56de\u5230\u672c\u6708",
     "view.month.1": "1\u6708",
     "view.month.10": "10\u6708",
@@ -890,15 +896,18 @@ var I18N = {
     "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
     "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
     "settings.tips.title": "Usage Tips",
+    "view.agenda.hasTaskDot": "Plans on this day",
+    "view.agenda.overdueDot": "Overdue on this day",
     "view.cell.category": "Category: {category}",
     "view.cell.duration": "{days}d",
     "view.cell.loadError": "Failed to load tasks, check console",
     "view.cell.timeDuration": "{time} \xb7 {days}d",
-    "view.header.close": "Close",
     "view.header.nextMonth": "Next Month",
     "view.header.prevMonth": "Prev Month",
     "view.header.title": "Monthly Tasks",
     "view.header.titleTip": "Click to jump to date",
+    "view.header.toAgenda": "Switch to agenda view",
+    "view.header.toList": "Switch to list view",
     "view.header.today": "Today",
     "view.month.1": "Jan",
     "view.month.10": "Oct",
@@ -2761,6 +2770,14 @@ var HolidayManager = class {
 
 var VIEW_TYPE_MONTHLY = "monthly-tasks-view";
 
+// 视图切换按钮的两态图标（lucide calendar / list 的路径子集，与顶部其他图标同
+// 一套 stroke 规格，不引第三方图标库）。agenda = 当前在条视图、点了去日程；
+// list = 当前在日程视图、点了回条视图。
+var AGENDA_TOGGLE_ICONS = {
+  agenda: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+  list: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>'
+};
+
 /**
  * ============================================================
  * MonthlyView - 月历视图
@@ -2823,6 +2840,10 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 使用自有字段 rootEl，而非覆写 ItemView 基类的 containerEl（视图根元素，含视图头部）：
     // 框架后续经 view.containerEl 操作视图时必须拿到正确元素
     this.rootEl = this.contentEl.createDiv("monthly-tasks-container");
+    // 视图形态与选中日：root class 决定样式作用域，selectedDate 决定明细区看哪天。
+    // 两者都必须在首次 render 之前就位，否则第一帧会按条视图渲染再翻牌（闪一下）
+    this.applyViewModeClass();
+    this.convergeSelectedDate();
     await this.render();
   }
   /**
@@ -2923,6 +2944,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.renderHeader();
     this.renderWeekdayHeader();
     this.gridEl = this.rootEl.createDiv("calendar-grid");
+    this.applyViewModeClass();
     this.renderCalendarGrid();
   }
   /**
@@ -2931,10 +2953,16 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   async render() {
     const langChanged = this.lastLang !== I18N_LANG;
     const firstDayChanged = this.lastFirstDayOfWeek !== this.plugin.settings.firstDayOfWeek;
+    // 视图形态每次渲染都对齐一次（幂等）：root class 与切换按钮图标只在重建分支里
+    // 恢复的话，「不重建 header 但 settings.viewMode 变了」的路径（设置页改值、
+    // 外部 loadData 后 loadSettings）会留下上一个视图的类名——实机测出来过。
+    this.applyViewModeClass();
+    this.applyViewToggleIcon();
     if (this.rootEl.childElementCount === 0) {
       this.renderHeader();
       this.renderWeekdayHeader();
       this.gridEl = this.rootEl.createDiv("calendar-grid");
+      this.applyViewModeClass();
       this.lastFirstDayOfWeek = this.plugin.settings.firstDayOfWeek;
       this.lastLang = I18N_LANG;
     } else if (langChanged) {
@@ -2947,6 +2975,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.renderHeader();
       this.renderWeekdayHeader();
       this.gridEl = this.rootEl.createDiv("calendar-grid");
+      // rootEl.empty() 之后 .view-agenda 随子节点一起没了，必须补回：否则
+      // 「类别数 0↔≥1 翻转 + 语言切换」这类重建路径会把日程视图打回条视图样式
+      this.applyViewModeClass();
       this.lastFirstDayOfWeek = this.plugin.settings.firstDayOfWeek;
       this.lastLang = I18N_LANG;
     } else if (firstDayChanged) {
@@ -2999,10 +3030,13 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.filterBtnEl = funnelBtn;
       this.applyFilterButtonState(funnelBtn);
     }
-    const closeBtn = rightGroup.createDiv("nav-btn close-btn");
-    closeBtn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-    closeBtn.setAttribute("aria-label", tr("view.header.close"));
-    closeBtn.addEventListener("click", () => this.closeView());
+    // 视图切换按钮（v1.6.0 批次一）：原右上角的 × 已取消——Obsidian 标签页自带关闭，
+    // 插件再放一个 × 既冗余又容易误触（closeView 随之删除，它只有这一处调用）。
+    // 图标指向「去处」而非「当前」：条视图下画日历图标（点了去日程），日程视图下画列表图标。
+    const viewBtn = rightGroup.createDiv("nav-btn view-toggle-btn");
+    this.viewToggleBtnEl = viewBtn;
+    this.applyViewToggleIcon(viewBtn);
+    viewBtn.addEventListener("click", () => this.toggleViewMode());
   }
   /**
    * 打开日期选择器
@@ -3019,6 +3053,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const modal = new DatePickerModal(this.app, this.currentYear, this.currentMonth, async (year, month) => {
       this.currentYear = year;
       this.currentMonth = month;
+      this.convergeSelectedDate();
       await this.renderCalendarGrid();
     });
     modal.open();
@@ -3141,6 +3176,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    */
   renderDayCell(day, tasks) {
     const cellEl = this.gridEl.createDiv("day-cell");
+    const agenda = this.isAgenda();
+    const dateKey = formatDate(day.date);
     if (!day.isCurrentMonth) {
       cellEl.addClass("other-month");
     }
@@ -3174,6 +3211,37 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     if (this.plugin.settings.showHoliday && holidayInfo && holidayInfo.type === "legal" /* LEGAL */) {
       const holidayNameEl = headerEl.createDiv("holiday-name");
       holidayNameEl.textContent = translateHolidayName(holidayInfo.name);
+    }
+    // ---- 日程视图（v1.6.0 批次一）：格子里不铺任务行，只在底部放一枚圆点 ----
+    // 不创建 .day-tasks 容器：它带 flex:1，留着会把点顶到不确定的位置；.day-cell
+    // 本身是 flex-direction: column，点作为末子元素 + margin-top:auto 沉底。
+    // 数据源用完整 tasks（不是 displayTasksList）：否则关掉「显示已完成任务」会让
+    // 含已完成任务的那些天的点整个消失。
+    if (agenda) {
+      if (tasks.length > 0) {
+        const markEl = cellEl.createDiv("day-mark");
+        // 红点判定必须带「本格日期 == 任务截止日」这一半：跨天任务在它占用的每一天
+        // 都出现在 tasks 里（groupTasksByDate 按闭区间逐日挂载），只判 isOverdue(dueDate)
+        // 会让一个逾期跨天任务在它占的每一天都变红，连排一片。
+        const overdueHere = tasks.some((t) => !t.completed && t.dueDate && t.dueDate === dateKey && isOverdue(t.dueDate));
+        if (overdueHere) {
+          markEl.addClass("overdue-mark");
+          markEl.setAttribute("aria-label", tr("view.agenda.overdueDot"));
+        } else {
+          markEl.setAttribute("aria-label", tr("view.agenda.hasTaskDot"));
+        }
+      }
+      if (dateKey === this.selectedDate) {
+        cellEl.addClass("sel");
+      }
+      // 点格子 = 选中该天（不再直接开创建弹窗；创建走明细区吸顶行的「＋ 添加」）。
+      // 条视图保持原行为：点空白格子仍直接开创建弹窗。
+      cellEl.addEventListener("click", () => {
+        if (this.selectDay(dateKey)) {
+          this.renderCalendarGrid();
+        }
+      });
+      return;
     }
     const tasksEl = cellEl.createDiv("day-tasks");
     let displayTasksList = tasks;
@@ -3375,6 +3443,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.currentYear = 2100;
       this.currentMonth = 11;
     }
+    // 日程视图：选中日跟着月份走，否则会出现「网格已翻月、明细还在上一月某天」
+    this.convergeSelectedDate();
     await this.renderCalendarGrid();
   }
   /**
@@ -3384,16 +3454,66 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const { year, month } = getCurrentYearMonth();
     this.currentYear = year;
     this.currentMonth = month;
+    this.convergeSelectedDate();
     await this.renderCalendarGrid();
   }
   /**
-   * 关闭视图
+   * 视图模式（v1.6.0 批次一）
+   * ----------------------------------------------------------
+   * 两个视图共用同一套 DOM 骨架（header → weekday-header → grid → 明细区），
+   * 切换只改 rootEl 上的 .view-agenda 类 + 重画网格，不重建视图；所有日程视图
+   * 样式都带 .view-agenda 前缀，条视图一行样式都不碰。
+   * 状态源是 settings.viewMode（单一真相），视图上不另存副本，避免两处不同步。
    */
-  async closeView() {
-    const leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
-    if (leaf) {
-      await leaf.detach();
+  isAgenda() {
+    return this.plugin.settings.viewMode === "agenda";
+  }
+  /** 切换按钮的图标与可达性文案：说明「去处」，不说「当前是什么」 */
+  applyViewToggleIcon(btn) {
+    const el = btn || this.viewToggleBtnEl;
+    if (!el) return;
+    const toAgenda = !this.isAgenda();
+    el.innerHTML = toAgenda ? AGENDA_TOGGLE_ICONS.agenda : AGENDA_TOGGLE_ICONS.list;
+    const label = toAgenda ? tr("view.header.toAgenda") : tr("view.header.toList");
+    el.setAttribute("aria-label", label);
+    el.setAttribute("title", label);
+    el.toggleClass("is-agenda", !toAgenda);
+  }
+  async toggleViewMode() {
+    this.plugin.settings.viewMode = this.isAgenda() ? "list" : "agenda";
+    await this.plugin.saveSettings();
+    // 进日程视图时若从未选中过日子，先把选中日收敛到当前月内（否则明细区空白）
+    this.applyViewModeClass();
+    this.applyViewToggleIcon();
+    await this.renderCalendarGrid();
+  }
+  /** root class 的唯一写入口：header 重建、语言切换重绘后都要靠它恢复视图形态 */
+  applyViewModeClass() {
+    if (this.rootEl) this.rootEl.toggleClass("view-agenda", this.isAgenda());
+  }
+  /**
+   * 选中日（日程视图专用）。入参是 YYYY-MM-DD 字符串而不是 Date：格子渲染时
+   * 已经算好了 dateKey（与 taskMap 的键同格式），再转一次 Date 只会多一次往返；
+   * 而且把 Date 传进来会被 formatDate 当成字符串直接抛错（实机点格子时踩到）。
+   * 返回是否真的变了，调用方据此决定要不要重画。
+   */
+  selectDay(key) {
+    if (!key || this.selectedDate === key) return false;
+    this.selectedDate = key;
+    return true;
+  }
+  /**
+   * 把选中日收敛进当前月：含今天则选今天，否则选该月 1 号。
+   * 换月（navigateMonth / 日期选择器 / goToToday）必须走这里，否则会出现
+   * 「网格已是 11 月、明细还在 10 月 4 日」的错位。
+   */
+  convergeSelectedDate() {
+    const today = new Date();
+    if (today.getFullYear() === this.currentYear && today.getMonth() === this.currentMonth) {
+      this.selectedDate = formatDate(today);
+      return;
     }
+    this.selectedDate = formatDate(new Date(this.currentYear, this.currentMonth, 1));
   }
 };
 
@@ -4810,6 +4930,10 @@ function resolveCategoryColor(name, categories) {
   return CATEGORY_PALETTE[h % CATEGORY_PALETTE.length];
 }
 var DEFAULT_SETTINGS = {
+  // 视图模式："list"（条视图，格子里铺任务行）| "agenda"（日程视图：格子只出一枚
+  // 圆点，全部文字在下方明细区）。v1.6.0 新增；老 data.json 缺该键时由
+  // Object.assign({}, DEFAULT_SETTINGS, loadedData) 取此默认值，不需额外兜底。
+  viewMode: "list",
   // 界面语言："auto"（跟随 Obsidian 设置）| "zh-CN" | "zh-TW" | "en"
   language: "auto",
   showCompletedTasks: true,
@@ -5147,6 +5271,11 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     // firstDayOfWeek 仅接受 0(日)/1(一)/6(六)，其余值会导致星期行与网格错位
     if (![0, 1, 6].includes(this.settings.firstDayOfWeek)) {
       this.settings.firstDayOfWeek = 0;
+    }
+    // viewMode 枚举校验（对齐 firstDayOfWeek / taskFilePeriod 的写法）：手编 data.json
+    // 写进非法值时回退条视图，避免 root class 与渲染分支对不上
+    if (!["list", "agenda"].includes(this.settings.viewMode)) {
+      this.settings.viewMode = "list";
     }
     // taskFilePeriod 枚举校验：手编 data.json 写入 "week" 等非法值时回退按年
     if (this.settings.taskFilePeriod !== "month") {
