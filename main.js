@@ -785,13 +785,15 @@ var TaskParser = class {
         const [y, m] = sortDate.split("-");
         const monthSection = `## ${y}\u5E74${m}\u6708`;
         // 查找月份section位置：兼容用户手动创建的无前导零月份标题（如 "## 2026年4月"），
-        // 避免与插件生成的 "## 2026年04月" 重复创建同月 section
-        const sectionMatch = fileContent.match(new RegExp(`^## ${y}\u5E740*${parseInt(m)}\u6708`, "m"));
+        // 避免与插件生成的 "## 2026年04月" 重复创建同月 section。
+        // 两处模式都必须锚定行尾（[ \t]*\r?$ 兼容 CRLF）：否则用户手写的日期级标题
+        // "## 2026年1月1日 元旦计划会" 会被当成 1 月节，新任务被塞进那段纪要下面
+        const sectionMatch = fileContent.match(new RegExp(`^## ${y}\u5E740*${parseInt(m)}\u6708[ \\t]*\\r?$`, "m"));
         const sectionIdx = sectionMatch ? sectionMatch.index : -1;
         if (sectionIdx === -1) {
           // 月份section不存在，需要创建
-          // 找到所有月份section的位置（锚定行首，避免误匹配 ### 或行中）
-          const monthRegex = /^## (\d{4})\u5E74(\d{1,2})\u6708/gm;
+          // 找到所有月份section的位置（锚定行首+行尾，避免误匹配 ### 、行中或日期级标题）
+          const monthRegex = /^## (\d{4})\u5E74(\d{1,2})\u6708[ \t]*\r?$/gm;
           const months = [];
           let match;
           while ((match = monthRegex.exec(fileContent)) !== null) {
