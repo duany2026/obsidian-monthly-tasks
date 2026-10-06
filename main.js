@@ -116,7 +116,7 @@ var I18N = {
   "zh-CN": {
     "cmd.open": "\u6253\u5f00\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
     "cmd.refresh": "\u5237\u65b0\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
-    "cmd.toggle": "\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE",
+    "cmd.toggle": "\u5faa\u73af\u5207\u6362\u6708\u5386\u89c6\u56fe\uff08\u5927\u6708 / \u5c0f\u6708 / \u5c0f\u5468\uff09",
     "error.badDateConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u8bc6\u522b\u7684\u65e5\u671f\u4efb\u52a1\u884c ({path}:{line}): {line}",
     "error.builtinHoliday": "\u6708\u5386\u4efb\u52a1\uff1a\u5185\u7f6e\u8282\u5047\u65e5\u6570\u636e\u8bfb\u53d6\u5931\u8d25\uff08holidays.json \u7f3a\u5931\u6216\u635f\u574f\uff09\uff0c\u5bf9\u5e94\u5e74\u4efd\u5c06\u4f9d\u8d56\u7f51\u7edc\u6570\u636e\u6e90",
     "error.createFail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25:",
@@ -327,6 +327,14 @@ var I18N = {
     "settings.folder.desc": "\u9009\u62e9\u4efb\u52a1\u6587\u4ef6\u7684\u5b58\u50a8\u4f4d\u7f6e\u3002\u5982\u679c\u5df2\u6709\u5e74\u5ea6\u4efb\u52a1\u6587\u4ef6\uff0c\u63d2\u4ef6\u4f1a\u4f18\u5148\u4f7f\u7528\u5b83\u3002",
     "settings.hideStrike.desc": "\u6253\u5f00\u540e\u5df2\u5b8c\u6210\u4efb\u52a1\u9690\u85cf\u5220\u9664\u7ebf\uff08\u540c\u65f6\u9690\u85cf\u8fc7\u671f\u4efb\u52a1\u7684\u7ea2\u8272\u7ad6\u7ebf\uff1b\u5b8c\u6210\u6001\u672c\u8eab\u4ecd\u6709\u53cd\u9988\uff1a\u624b\u673a\u7aef\u5de6\u7f18\u7070\u7ad6\u6761 + \u53d8\u6697\uff09",
     "settings.hideStrike.name": "\u5df2\u5b8c\u6210\u9690\u85cf\u5220\u9664\u7ebf",
+    "settings.language.auto": "\u81ea\u52a8\uff08\u8ddf\u968f Obsidian\uff09",
+    "settings.language.desc": "\u63d2\u4ef6\u754c\u9762\u6587\u6848\u7684\u8bed\u8a00\u3002\u4e0d\u5f71\u54cd\u4efb\u52a1\u6587\u4ef6\uff1a\u6587\u4ef6\u540d\u3001\u6708\u4efd\u6807\u9898\u3001\u9ed8\u8ba4\u6587\u4ef6\u5939\u540d\u59cb\u7ec8\u4fdd\u6301\u4e2d\u6587\uff0c\u4ee5\u514d\u7834\u574f\u5df2\u6709\u7b14\u8bb0\u3002",
+    "settings.language.en": "English",
+    "settings.language.name": "\u754c\u9762\u8bed\u8a00",
+    // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
+    // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
+    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
+    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
     "settings.loading": "\u52a0\u8f7d\u4e2d...",
     "settings.refreshBtn": "\u5237\u65b0",
     "settings.refreshHoliday.desc": "\u4ece holiday-cn / timor.tech \u6570\u636e\u6e90\u83b7\u53d6\u6700\u65b0\u8282\u5047\u65e5\u6570\u636e",
@@ -346,32 +354,45 @@ var I18N = {
     "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf\uff1b\u5f53\u5929\u9762\u677f\u7684\u4efb\u52a1\u5217\u8868\u8d85\u8fc7\u8fd9\u4e2a\u6570\u5c31\u9ed8\u8ba4\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u6309\u5b83\u51fa\u73b0",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf",
     "settings.tips.1": "条视图点日期格子添加任务、点格子里的任务切换完成 / 未完成；日程视图点格子选中该天，点任务行直接编辑这一条，点明细右上角的「管理 / ＋ 添加」打开当天面板新建",
-"settings.tips.10": "\u8de8\u5929\u4efb\u52a1\u7684\u7ed3\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u91cc\uff1a\u6ca1\u52fe\u9009\u300c\u8de8\u5929\u4efb\u52a1\u300d\u65f6\u5b83\u662f\u7070\u7684\uff0c\u70b9\u4e00\u4e0b\u4f1a\u6296\u4e00\u4e0b\u52fe\u9009\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9009",    "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
+    "settings.tips.10": "\u8de8\u5929\u4efb\u52a1\u7684\u7ed3\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u91cc\uff1a\u6ca1\u52fe\u9009\u300c\u8de8\u5929\u4efb\u52a1\u300d\u65f6\u5b83\u662f\u7070\u7684\uff0c\u70b9\u4e00\u4e0b\u4f1a\u6296\u4e00\u4e0b\u52fe\u9009\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9009",
+    "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52a1\u884c\u5c3e\u7684 #\u6807\u7b7e \u5373\u7c7b\u522b\uff1a\u51fa\u73b0\u7c7b\u522b\u540e\uff0c\u9876\u90e8\u6f0f\u6597\u6309\u94ae\u53ef\u6309\u7c7b\u522b\u7b5b\u9009\uff08\u591a\u9009\uff0c\u9ed8\u8ba4\u5168\u90e8\uff09",
     "settings.tips.4": "点日程里的任务行 = 直接编辑这一条；面板里点别的行的铅笔可切换目标（再点一次退回新建）。改内容/优先级/时间/日期/类别/备注，保存=先建新行再删旧行，跨天任务以开始日期为准",
     "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
     "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
     "settings.tips.7": "\u65E5\u7A0B\u89C6\u56FE\uFF1A\u53F3\u4E0A\u89D2\u5207\u6362\u6309\u94AE\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE\u300D\uFF09\u8FDB\u5165\u3002\u683C\u5B50\u91CC\u53EA\u6807\u4E00\u679A\u70B9\u8868\u793A\u8FD9\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u53D8\u7EA2\u70B9\uFF1B\u4E0B\u534A\u533A\u5217\u51FA\u9009\u4E2D\u65E5\u7684\u4EFB\u52A1\u4E0E\u5907\u6CE8",
     "settings.tips.8": "备注写在任务行的下一行、以 > 开头（Markdown 引用块），连续多行合并成一条；明细区只读展示备注卡片，要改就在当天面板的备注框里编辑（无备注时是一整条虚线框，点一下即可输入）",
-"settings.tips.9": "\u5f53\u5929\u9762\u677f\u4f1a\u81ea\u5df1\u6536\u8d77\u4e24\u5904\uff1a\u4efb\u52a1\u6570\u8d85\u8fc7\u8bbe\u7f6e\u91cc\u7684\u300c\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf\u300d\u65f6\uff0c\u5217\u8868\u9ed8\u8ba4\u6536\u8d77\uff08\u70b9\u6807\u9898\u5c55\u5f00\uff09\uff1b\u7c7b\u522b\u8d85\u8fc7\u4e24\u884c\u65f6\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u94ae",    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "settings.tips.9": "\u5f53\u5929\u9762\u677f\u4f1a\u81ea\u5df1\u6536\u8d77\u4e24\u5904\uff1a\u4efb\u52a1\u6570\u8d85\u8fc7\u8bbe\u7f6e\u91cc\u7684\u300c\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf\u300d\u65f6\uff0c\u5217\u8868\u9ed8\u8ba4\u6536\u8d77\uff08\u70b9\u6807\u9898\u5c55\u5f00\uff09\uff1b\u7c7b\u522b\u8d85\u8fc7\u4e24\u884c\u65f6\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u94ae",
+    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "settings.view.desc": "\u6253\u5f00\u6708\u5386\u65f6\u9ed8\u8ba4\u4f7f\u7528\u54ea\u4e00\u6863\u89c6\u56fe\u3002\u9876\u680f\u5207\u6362\u89c6\u56fe\u540e\u8fd9\u91cc\u4f1a\u8ddf\u7740\u53d8\u6210\u4f60\u6700\u540e\u7528\u7684\u90a3\u4e00\u6863\uff0c\u4e0b\u6b21\u6253\u5f00\u5c31\u505c\u5728\u90a3\u513f\u3002",
+    "settings.view.name": "\u9ed8\u8ba4\u89c6\u56fe",
     "view.agenda.addOne": "\u6dfb\u52a0",
-    "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.clearFilterAria": "\u6E05\u9664\u5F53\u524D\u7C7B\u522B\u7B5B\u9009",
     "view.agenda.emptyDay": "\u8fd9\u5929\u6ca1\u5b89\u6392",
     "view.agenda.emptyFiltered": "\u5F53\u524D\u7B5B\u9009\u4E0B\u8FD9\u5929\u6CA1\u6709\u4EFB\u52A1",
     "view.agenda.hasTaskDot": "\u8fd9\u5929\u6709\u5b89\u6392",
+    "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.overdueDot": "\u8fd9\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u7c7b\u522b\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
     "view.cell.loadError": "\u4efb\u52a1\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u67e5\u770b\u63a7\u5236\u53f0",
     "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
     "view.header.nextMonth": "\u4e0b\u6708",
+    "view.header.nextWeek": "\u4e0b\u4e00\u5468",
+    "view.header.pickView": "\u5207\u6362\u89c6\u56fe",
     "view.header.prevMonth": "\u4e0a\u6708",
+    "view.header.prevWeek": "\u4e0a\u4e00\u5468",
+    "view.header.thisWeek": "\u56de\u5230\u672c\u5468",
     "view.header.title": "\u6708\u5386\u4efb\u52a1",
     "view.header.titleTip": "\u70b9\u51fb\u5feb\u901f\u5207\u6362\u65e5\u671f",
-    "view.header.toAgenda": "\u5207\u6362\u5230\u65e5\u7a0b\u89c6\u56fe",
-    "view.header.toList": "\u5207\u6362\u5230\u6761\u89c6\u56fe",
     "view.header.today": "\u56de\u5230\u672c\u6708",
+    "view.menu.title": "\u89c6\u56fe",
+    "view.mode.agenda": "\u5c0f\u6708\u89c6\u56fe",
+    "view.mode.desc.agenda": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
+    "view.mode.desc.list": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
+    "view.mode.desc.week": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
+    "view.mode.list": "\u5927\u6708\u89c6\u56fe",
+    "view.mode.week": "\u5c0f\u5468\u89c6\u56fe",
     "view.month.1": "1\u6708",
     "view.month.10": "10\u6708",
     "view.month.11": "11\u6708",
@@ -385,26 +406,19 @@ var I18N = {
     "view.month.8": "8\u6708",
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
+    "view.week.title": "{a} \u2013 {b}",
     "view.weekday.fri": "\u4e94",
     "view.weekday.mon": "\u4e00",
     "view.weekday.sat": "\u516d",
     "view.weekday.sun": "\u65e5",
     "view.weekday.thu": "\u56db",
     "view.weekday.tue": "\u4e8c",
-    "view.weekday.wed": "\u4e09",
-    "settings.language.name": "\u754c\u9762\u8bed\u8a00",
-    "settings.language.desc": "\u63d2\u4ef6\u754c\u9762\u6587\u6848\u7684\u8bed\u8a00\u3002\u4e0d\u5f71\u54cd\u4efb\u52a1\u6587\u4ef6\uff1a\u6587\u4ef6\u540d\u3001\u6708\u4efd\u6807\u9898\u3001\u9ed8\u8ba4\u6587\u4ef6\u5939\u540d\u59cb\u7ec8\u4fdd\u6301\u4e2d\u6587\uff0c\u4ee5\u514d\u7834\u574f\u5df2\u6709\u7b14\u8bb0\u3002",
-    "settings.language.auto": "\u81ea\u52a8\uff08\u8ddf\u968f Obsidian\uff09",
-    // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
-    // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
-    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
-    "settings.language.en": "English"
+    "view.weekday.wed": "\u4e09"
   },
   "zh-TW": {
     "cmd.open": "\u958b\u555f\u6708\u66c6\u4efb\u52d9\u8996\u5716",
     "cmd.refresh": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u4efb\u52d9\u8996\u5716",
-    "cmd.toggle": "\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996",
+    "cmd.toggle": "\u8ff4\u5708\u5207\u63db\u6708\u66c6\u6aa2\u8996\uff08\u5927\u6708 / \u5c0f\u6708 / \u5c0f\u9031\uff09",
     "error.badDateConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u8b58\u5225\u7684\u65e5\u671f\u4efb\u52d9\u884c ({path}:{line}): {line}",
     "error.builtinHoliday": "\u6708\u66c6\u4efb\u52d9\uff1a\u5167\u5efa\u7bc0\u5047\u65e5\u6578\u64da\u8b80\u53d6\u5931\u6557\uff08holidays.json \u7f3a\u5931\u6216\u640d\u58de\uff09\uff0c\u5c0d\u61c9\u5e74\u4efd\u5c07\u4f9d\u8cf4\u7db2\u8def\u6578\u64da\u6e90",
     "error.createFail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff1a",
@@ -615,6 +629,14 @@ var I18N = {
     "settings.folder.desc": "\u9078\u64c7\u4efb\u52d9\u6a94\u6848\u7684\u5132\u5b58\u4f4d\u7f6e\u3002\u5982\u679c\u5df2\u6709\u5e74\u5ea6\u4efb\u52d9\u6a94\u6848\uff0c\u5916\u639b\u6703\u512a\u5148\u4f7f\u7528\u5b83\u3002",
     "settings.hideStrike.desc": "\u958b\u555f\u5f8c\u5df2\u5b8c\u6210\u4efb\u52d9\u96b1\u85cf\u522a\u9664\u7dda\uff08\u540c\u6642\u96b1\u85cf\u904e\u671f\u4efb\u52d9\u7684\u7d05\u8272\u8c4e\u7dda\uff1b\u5b8c\u6210\u614b\u672c\u8eab\u4ecd\u6709\u56de\u994b\uff1a\u624b\u6a5f\u7aef\u5de6\u7de3\u7070\u8c4e\u689d + \u8b8a\u6697\uff09",
     "settings.hideStrike.name": "\u5df2\u5b8c\u6210\u96b1\u85cf\u522a\u9664\u7dda",
+    "settings.language.auto": "\u81ea\u52d5\uff08\u8ddf\u96a8 Obsidian\uff09",
+    "settings.language.desc": "\u5916\u639b\u4ecb\u9762\u6587\u5b57\u8a9e\u8a00\u3002\u4e0d\u5f71\u97ff\u4efb\u52d9\u6a94\u6848\uff1a\u6a94\u540d\u3001\u6708\u4efd\u6a19\u984c\u3001\u9810\u8a2d\u8cc7\u6599\u593e\u540d\u7a31\u59cb\u7d42\u4fdd\u6301\u4e2d\u6587\uff0c\u4ee5\u514d\u7834\u58de\u65e2\u6709\u7b46\u8a18\u3002",
+    "settings.language.en": "English",
+    "settings.language.name": "\u4ecb\u9762\u8a9e\u8a00",
+    // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
+    // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
+    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
+    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
     "settings.loading": "\u8f09\u5165\u4e2d\u2026",
     "settings.refreshBtn": "\u91cd\u65b0\u6574\u7406",
     "settings.refreshHoliday.desc": "\u5f9e holiday-cn / timor.tech \u6578\u64da\u6e90\u53d6\u5f97\u6700\u65b0\u7bc0\u5047\u65e5\u6578\u64da",
@@ -634,32 +656,45 @@ var I18N = {
     "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf\uff1b\u7576\u5929\u9762\u677f\u7684\u4efb\u52d9\u6e05\u55ae\u8d85\u904e\u9019\u500b\u6578\u5c31\u9810\u8a2d\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u4f9d\u5b83\u51fa\u73fe",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf",
     "settings.tips.1": "條檢視點日期格位新增任務、點格位裡的任務切換完成 / 未完成；日程檢視點格位選取該天，點任務列直接編輯這一條，點明細右上角的「管理 / ＋ 新增」開啟當天面板新增",
-"settings.tips.10": "\u8de8\u5929\u4efb\u52d9\u7684\u7d50\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u88e1\uff1a\u6c92\u52fe\u9078\u300c\u8de8\u5929\u4efb\u52d9\u300d\u6642\u5b83\u662f\u7070\u7684\uff0c\u9ede\u4e00\u4e0b\u6703\u6296\u4e00\u4e0b\u52fe\u9078\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9078",    "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
+    "settings.tips.10": "\u8de8\u5929\u4efb\u52d9\u7684\u7d50\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u88e1\uff1a\u6c92\u52fe\u9078\u300c\u8de8\u5929\u4efb\u52d9\u300d\u6642\u5b83\u662f\u7070\u7684\uff0c\u9ede\u4e00\u4e0b\u6703\u6296\u4e00\u4e0b\u52fe\u9078\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9078",
+    "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52d9\u884c\u5c3e\u7684 #\u6a19\u7c64 \u5373\u985e\u5225\uff1a\u51fa\u73fe\u985e\u5225\u5f8c\uff0c\u9802\u90e8\u6f0f\u6597\u6309\u9215\u53ef\u6309\u985e\u5225\u7be9\u9078\uff08\u591a\u9078\uff0c\u9810\u8a2d\u5168\u90e8\uff09",
     "settings.tips.4": "點日程裡的任務列 = 直接編輯這一條；面板裡點其他列的鉛筆可切換目標（再點一次退回新增）。改內容/優先級/時間/日期/類別/備註，儲存=先建新行再刪舊行，跨天任務以開始日期為準",
     "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
     "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
     "settings.tips.7": "\u65E5\u7A0B\u6AA2\u8996\uFF1A\u53F3\u4E0A\u89D2\u5207\u63DB\u6309\u9215\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996\u300D\uFF09\u9032\u5165\u3002\u683C\u4F4D\u88E1\u53EA\u6A19\u4E00\u679A\u9EDE\u8868\u793A\u9019\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u8B8A\u7D05\u9EDE\uFF1B\u4E0B\u65B9\u5340\u5217\u51FA\u9078\u53D6\u65E5\u7684\u4EFB\u52D9\u8207\u5099\u8A3B",
     "settings.tips.8": "備註寫在任務行的下一行、以 > 開頭（Markdown 引用塊），連續多行合併成一條；明細區唯讀顯示備註卡片，要改就在當天面板的備註框裡編輯（無備註時是一整條虛線框，點一下即可輸入）",
-"settings.tips.9": "\u7576\u5929\u9762\u677f\u6703\u81ea\u5df1\u6536\u8d77\u5169\u8655\uff1a\u4efb\u52d9\u6578\u8d85\u904e\u8a2d\u5b9a\u88e1\u7684\u300c\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf\u300d\u6642\uff0c\u6e05\u55ae\u9810\u8a2d\u6536\u8d77\uff08\u9ede\u6a19\u984c\u5c55\u958b\uff09\uff1b\u985e\u5225\u8d85\u904e\u5169\u884c\u6642\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u9215",    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "settings.tips.9": "\u7576\u5929\u9762\u677f\u6703\u81ea\u5df1\u6536\u8d77\u5169\u8655\uff1a\u4efb\u52d9\u6578\u8d85\u904e\u8a2d\u5b9a\u88e1\u7684\u300c\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf\u300d\u6642\uff0c\u6e05\u55ae\u9810\u8a2d\u6536\u8d77\uff08\u9ede\u6a19\u984c\u5c55\u958b\uff09\uff1b\u985e\u5225\u8d85\u904e\u5169\u884c\u6642\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u9215",
+    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+    "settings.view.desc": "\u958b\u555f\u6708\u66c6\u6642\u9810\u8a2d\u4f7f\u7528\u54ea\u4e00\u6a94\u6aa2\u8996\u3002\u9802\u6b04\u5207\u63db\u6aa2\u8996\u5f8c\u9019\u88e1\u6703\u8ddf\u8457\u8b8a\u6210\u4f60\u6700\u5f8c\u4f7f\u7528\u7684\u90a3\u4e00\u6a94\uff0c\u4e0b\u6b21\u958b\u555f\u5c31\u505c\u5728\u90a3\u88e1\u3002",
+    "settings.view.name": "\u9810\u8a2d\u6aa2\u8996",
     "view.agenda.addOne": "\u6dfb\u52a0",
-    "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.clearFilterAria": "\u6E05\u9664\u76EE\u524D\u985E\u5225\u7BE9\u9078",
     "view.agenda.emptyDay": "\u9019\u5929\u6c92\u5b89\u6392",
     "view.agenda.emptyFiltered": "\u76EE\u524D\u7BE9\u9078\u4E0B\u9019\u5929\u6C92\u6709\u4EFB\u52D9",
     "view.agenda.hasTaskDot": "\u9019\u5929\u6709\u5b89\u6392",
+    "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.overdueDot": "\u9019\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u985e\u5225\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
     "view.cell.loadError": "\u4efb\u52d9\u8f09\u5165\u5931\u6557\uff0c\u8acb\u67e5\u770b\u4e3b\u63a7\u53f0",
     "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
     "view.header.nextMonth": "\u4e0b\u6708",
+    "view.header.nextWeek": "\u4e0b\u4e00\u9031",
+    "view.header.pickView": "\u5207\u63db\u6aa2\u8996",
     "view.header.prevMonth": "\u4e0a\u6708",
+    "view.header.prevWeek": "\u4e0a\u4e00\u9031",
+    "view.header.thisWeek": "\u56de\u5230\u672c\u9031",
     "view.header.title": "\u6708\u66c6\u4efb\u52d9",
     "view.header.titleTip": "\u9ede\u64ca\u5feb\u901f\u5207\u63db\u65e5\u671f",
-    "view.header.toAgenda": "\u63db\u5230\u65e5\u7a0b\u8996\u5716",
-    "view.header.toList": "\u63db\u5230\u689d\u8996\u5716",
     "view.header.today": "\u56de\u5230\u672c\u6708",
+    "view.menu.title": "\u6aa2\u8996",
+    "view.mode.agenda": "\u5c0f\u6708\u6aa2\u8996",
+    "view.mode.desc.agenda": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
+    "view.mode.desc.list": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
+    "view.mode.desc.week": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
+    "view.mode.list": "\u5927\u6708\u6aa2\u8996",
+    "view.mode.week": "\u5c0f\u9031\u6aa2\u8996",
     "view.month.1": "1\u6708",
     "view.month.10": "10\u6708",
     "view.month.11": "11\u6708",
@@ -673,26 +708,19 @@ var I18N = {
     "view.month.8": "8\u6708",
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
+    "view.week.title": "{a} \u2013 {b}",
     "view.weekday.fri": "\u4e94",
     "view.weekday.mon": "\u4e00",
     "view.weekday.sat": "\u516d",
     "view.weekday.sun": "\u65e5",
     "view.weekday.thu": "\u56db",
     "view.weekday.tue": "\u4e8c",
-    "view.weekday.wed": "\u4e09",
-    "settings.language.name": "\u4ecb\u9762\u8a9e\u8a00",
-    "settings.language.desc": "\u5916\u639b\u4ecb\u9762\u6587\u5b57\u8a9e\u8a00\u3002\u4e0d\u5f71\u97ff\u4efb\u52d9\u6a94\u6848\uff1a\u6a94\u540d\u3001\u6708\u4efd\u6a19\u984c\u3001\u9810\u8a2d\u8cc7\u6599\u593e\u540d\u7a31\u59cb\u7d42\u4fdd\u6301\u4e2d\u6587\uff0c\u4ee5\u514d\u7834\u58de\u65e2\u6709\u7b46\u8a18\u3002",
-    "settings.language.auto": "\u81ea\u52d5\uff08\u8ddf\u96a8 Obsidian\uff09",
-    // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
-    // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
-    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
-    "settings.language.en": "English"
+    "view.weekday.wed": "\u4e09"
   },
   "en": {
     "cmd.open": "Open Monthly Tasks View",
     "cmd.refresh": "Refresh Monthly Tasks View",
-    "cmd.toggle": "Toggle Calendar / Agenda View",
+    "cmd.toggle": "Cycle monthly view (Month / Agenda / Week)",
     "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {line}",
     "error.builtinHoliday": "Monthly Tasks: Built-in holiday data read failed (holidays.json missing or corrupted), corresponding year will rely on network data source",
     "error.createFail": "Create task failed:",
@@ -903,6 +931,14 @@ var I18N = {
     "settings.folder.desc": "Select storage location for task files. If yearly task file already exists, plugin will prioritize using it.",
     "settings.hideStrike.desc": "When enabled, hide strikethrough for completed tasks (also hides red vertical line for overdue tasks; completed state still has feedback: gray vertical bar on left edge + dimmed on mobile)",
     "settings.hideStrike.name": "Hide Strikethrough for Completed",
+    "settings.language.auto": "Auto (follow Obsidian)",
+    "settings.language.desc": "Language for the plugin's own text. Task files are unaffected: file names, month headings and the default folder stay Chinese so existing notes keep working.",
+    "settings.language.en": "English",
+    "settings.language.name": "Interface Language",
+    // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
+    // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
+    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
+    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
     "settings.loading": "Loading\u2026",
     "settings.refreshBtn": "Refresh",
     "settings.refreshHoliday.desc": "Get latest holiday data from holiday-cn / timor.tech data source",
@@ -922,32 +958,45 @@ var I18N = {
     "settings.tasksLimit.desc": "Maximum tasks shown per date cell; the day panel also collapses its task list beyond this number and shows \"View all\" at the same threshold",
     "settings.tasksLimit.name": "Tasks Per Day Limit",
     "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; click a task row to edit that task directly, or the Manage / \uFF0B Add button at the top-right of the detail pane to open the day panel and create one",
-"settings.tips.10": "The multi-day end-date field is always there: while \"Multi-day task\" is unchecked it stays greyed out, and tapping it nudges the checkbox to remind you to tick it first",    "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
+    "settings.tips.10": "The multi-day end-date field is always there: while \"Multi-day task\" is unchecked it stays greyed out, and tapping it nudges the checkbox to remind you to tick it first",
+    "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
     "settings.tips.3": "#tag at end of task line is category: after categories appear, funnel button at top can filter by category (multi-select, default all)",
     "settings.tips.4": "Clicking a task row in the agenda edits that task directly; inside the day panel a row's pencil switches the target (click again to go back to create). Edit content/priority/time/date/category/note; save = create a new line then delete the old one, multi-day tasks key off the start date",
     "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
     "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
     "settings.tips.7": "Agenda view: use the toggle button at the top right, or the command palette entry \"Toggle Calendar / Agenda View\". A dot marks a day with plans, red when overdue; the pane below lists the selected day's tasks and notes",
     "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. The detail pane shows note cards read-only; edit them in the note box of the day panel (when empty it is a full-width dashed field, tap to type)",
-"settings.tips.9": "The day panel folds itself in two places: when the task count exceeds the \"Tasks per day\" setting the list starts collapsed (click the title to expand), and categories beyond two rows collapse into one with a \"More N\" button at the end",    "settings.tips.title": "Usage Tips",
+    "settings.tips.9": "The day panel folds itself in two places: when the task count exceeds the \"Tasks per day\" setting the list starts collapsed (click the title to expand), and categories beyond two rows collapse into one with a \"More N\" button at the end",
+    "settings.tips.title": "Usage Tips",
+    "settings.view.desc": "Which view the calendar opens with. Switching views from the header updates this to the one you last used.",
+    "settings.view.name": "Default view",
     "view.agenda.addOne": "Add",
-    "view.agenda.manageDay": "Manage",
     "view.agenda.clearFilterAria": "Clear current category filter",
     "view.agenda.emptyDay": "Nothing planned",
     "view.agenda.emptyFiltered": "No tasks on this day under the current filter",
     "view.agenda.hasTaskDot": "Plans on this day",
+    "view.agenda.manageDay": "Manage",
     "view.agenda.overdueDot": "Overdue on this day",
     "view.cell.category": "Category: {category}",
     "view.cell.duration": "{days}d",
     "view.cell.loadError": "Failed to load tasks, check console",
     "view.cell.timeDuration": "{time} \xb7 {days}d",
     "view.header.nextMonth": "Next Month",
+    "view.header.nextWeek": "Next week",
+    "view.header.pickView": "Switch view",
     "view.header.prevMonth": "Prev Month",
+    "view.header.prevWeek": "Prev week",
+    "view.header.thisWeek": "This week",
     "view.header.title": "Monthly Tasks",
     "view.header.titleTip": "Click to jump to date",
-    "view.header.toAgenda": "Switch to agenda view",
-    "view.header.toList": "Switch to list view",
     "view.header.today": "Today",
+    "view.menu.title": "View",
+    "view.mode.agenda": "Month \u00b7 Agenda",
+    "view.mode.desc.agenda": "Whole month, tasks in the list below",
+    "view.mode.desc.list": "Whole month, tasks written in the cells",
+    "view.mode.desc.week": "One week only, tasks in the list below",
+    "view.mode.list": "Month \u00b7 Cells",
+    "view.mode.week": "Week \u00b7 Agenda",
     "view.month.1": "Jan",
     "view.month.10": "Oct",
     "view.month.11": "Nov",
@@ -961,21 +1010,14 @@ var I18N = {
     "view.month.8": "Aug",
     "view.month.9": "Sep",
     "view.month.title": "{monthName} {year}",
+    "view.week.title": "{a} \u2013 {b}",
     "view.weekday.fri": "Fri",
     "view.weekday.mon": "Mon",
     "view.weekday.sat": "Sat",
     "view.weekday.sun": "Sun",
     "view.weekday.thu": "Thu",
     "view.weekday.tue": "Tue",
-    "view.weekday.wed": "Wed",
-    "settings.language.name": "Interface Language",
-    "settings.language.desc": "Language for the plugin's own text. Task files are unaffected: file names, month headings and the default folder stay Chinese so existing notes keep working.",
-    "settings.language.auto": "Auto (follow Obsidian)",
-    // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
-    // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
-    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
-    "settings.language.en": "English"
+    "view.weekday.wed": "Wed"
   }
 };
 
@@ -2407,6 +2449,29 @@ function getCurrentYearMonth() {
 function getMonthTitle(year, month) {
   return tr("view.month.title", { year: year, monthName: monthNames()[month] });
 }
+/**
+ * v1.7.0：把任意日期收进「它所在的那一周」的起点。周视图的锚点只存周起点
+ * （YYYY-MM-DD），不存整条周数组：锚点可变、派生数据每次现算，避免两份状态打架。
+ * firstDayOfWeek 沿用设置（日/一/六），与星期表头同源，切换起始日时周视图自然跟着翻。
+ */
+function weekStartFrom(date, firstDayOfWeek) {
+  const fdow = [0, 1, 6].includes(firstDayOfWeek) ? firstDayOfWeek : 0;
+  const diff = (date.getDay() - fdow + 7) % 7;
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate() - diff);
+  return formatDate(d);
+}
+/** 周起点 + 6 天 = 周末日；入参是锚点字符串，返回本地 Date（dateFromStr 同口径，避开 UTC 偏移） */
+function weekEndFrom(startKey) {
+  const d = dateFromStr(startKey);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + 6);
+}
+/** 标题「10/5 – 10/11」：紧凑月/日，两端都带月，跨年周也读得通 */
+function getWeekTitle(startKey) {
+  const s = dateFromStr(startKey);
+  const e = weekEndFrom(startKey);
+  const p = (x) => String(x.getMonth() + 1) + "/" + String(x.getDate());
+  return tr("view.week.title", { a: p(s), b: p(e) });
+}
 
 /** 农历月名，下标 0=正月 … 11=腊月 */
 function lunarMonthNames() {
@@ -2980,10 +3045,21 @@ var VIEW_TYPE_MONTHLY = "monthly-tasks-view";
 // 视图切换按钮的两态图标（lucide calendar / list 的路径子集，与顶部其他图标同
 // 一套 stroke 规格，不引第三方图标库）。agenda = 当前在条视图、点了去日程；
 // list = 当前在日程视图、点了回条视图。
+/* v1.7.0：视图模式常量（settings.viewMode 的合法取值，顺序即菜单/循环顺序）。
+   list=大月（整月 + 任务写进格子）agenda=小月（整月 + 格子只出圆点，文字在明细区）
+   week=小周（只留所在那一行的周格子，明细区不变）。v1.7.1 再追加 bigWeek=大周。 */
+var VIEW_MODES = ["list", "agenda", "week"];
+var WEEK_TOGGLE_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="15" x2="8" y2="15.01"></line><line x1="12" y1="15" x2="12" y2="15.01"></line><line x1="16" y1="15" x2="16" y2="15.01"></line></svg>';
 var AGENDA_TOGGLE_ICONS = {
   agenda: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-  list: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>'
+  list: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>',
+  week: WEEK_TOGGLE_ICON
 };
+
+/** 视图模式的显示名（菜单行、设置项、命令标题共用一处定义，避免三处文案漂移） */
+function viewModeLabel(mode) {
+  return tr("view.mode." + mode);
+}
 
 // 明细区「＋ 添加」按钮的加号图标（lucide plus 路径子集，stroke 规格同上）
 var AGENDA_ADD_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
@@ -3057,6 +3133,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 两者都必须在首次 render 之前就位，否则第一帧会按条视图渲染再翻牌（闪一下）
     this.applyViewModeClass();
     this.convergeSelectedDate();
+    // 小周是冷启动默认值也可能命中的视图，锚点必须在首帧前就位
+    if (this.isWeek()) this.ensureWeekAnchor();
     await this.render();
   }
   /**
@@ -3078,7 +3156,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   /** 关闭本视图挂出的所有托管弹窗（日期跳转 / 类别筛选）；两个面板改挂 Modal 后
    * 仍保留此入口：onClose、header 重建与回归测试统一从这里收起 */
   closeActivePopup() {
-    for (const cls of [DatePickerModal, CategoryFilterModal]) {
+    for (const cls of [DatePickerModal, CategoryFilterModal, ViewMenuModal]) {
       if (cls.activeInstances) {
         for (const inst of Array.from(cls.activeInstances)) {
           try { inst.close(); } catch (e) {
@@ -3104,6 +3182,25 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
     const known = (this.plugin.settings.categories || []).map((c) => c.name).filter((n) => found.includes(n));
     return known.concat(found.filter((n) => !known.includes(n)));
+  }
+  /** 视图选择菜单：与类别面板同一套 Modal 托管纪律（系统返回键/Esc/遮罩都能关） */
+  renderViewMenuPopup(anchorEl) {
+    if (ViewMenuModal.activeInstances && ViewMenuModal.activeInstances.size > 0) {
+      for (const inst of Array.from(ViewMenuModal.activeInstances)) {
+        try { inst.close(); } catch (e) {
+        }
+      }
+      return;
+    }
+    for (const cls of [CategoryFilterModal, DatePickerModal]) {
+      if (cls.activeInstances) {
+        for (const inst of Array.from(cls.activeInstances)) {
+          try { inst.close(); } catch (e) {
+          }
+        }
+      }
+    }
+    new ViewMenuModal(this.app, this, anchorEl).open();
   }
   /** 类别多选面板：真机反馈回退——body 浮层不接系统返回键/Esc，改挂 Obsidian Modal
    * （弹窗管理器统一接管关闭途径），行内保持多选不关、点「全部」即关 */
@@ -3152,12 +3249,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       return;
     }
     this.closeActivePopup();
-    this.rootEl.empty();
-    this.gridEl = null;
-    this.detailEl = null;
-    this.renderHeader();
-    this.renderWeekdayHeader();
-    this.gridEl = this.rootEl.createDiv("calendar-grid");
+    this.rebuildHeader();
     this.applyViewModeClass();
     this.renderCalendarGrid();
   }
@@ -3200,6 +3292,13 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       const oldHeader = this.rootEl.querySelector(".weekday-header");
       if (oldHeader) oldHeader.remove();
       this.renderWeekdayHeader();
+      // 周视图还要重算锚点：整月的行切分随起始日整体平移，旧锚点（如周六起的 10-04）
+      // 在周一为始的网格里没有对应行，visibleDays 会退到合成兜底、列与表头错位
+      if (this.isWeek()) {
+        this.ensureWeekAnchor();
+        const t2 = this.headerEl.querySelector(".month-title");
+        if (t2) t2.textContent = this.headerTitleText();
+      }
       this.lastFirstDayOfWeek = this.plugin.settings.firstDayOfWeek;
     }
     await this.renderCalendarGrid();
@@ -3212,23 +3311,24 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const leftGroup = this.headerEl.createDiv("header-btn-group");
     const prevBtn = leftGroup.createDiv("nav-btn prev-btn");
     prevBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
-    prevBtn.setAttribute("aria-label", tr("view.header.prevMonth"));
-    prevBtn.addEventListener("click", () => this.navigateMonth(-1));
+    prevBtn.setAttribute("aria-label", this.isWeek() ? tr("view.header.prevWeek") : tr("view.header.prevMonth"));
+    prevBtn.addEventListener("click", () => this.navigatePeriod(-1));
     const titleEl = this.headerEl.createDiv("month-title");
-    titleEl.textContent = getMonthTitle(this.currentYear, this.currentMonth);
+    titleEl.textContent = this.headerTitleText();
     titleEl.addClass("clickable");
     titleEl.setAttribute("title", tr("view.header.titleTip"));
     titleEl.addEventListener("click", () => this.openDatePicker());
     const rightGroup = this.headerEl.createDiv("header-btn-group");
     const nextBtn = rightGroup.createDiv("nav-btn next-btn");
     nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-    nextBtn.setAttribute("aria-label", tr("view.header.nextMonth"));
-    nextBtn.addEventListener("click", () => this.navigateMonth(1));
+    nextBtn.setAttribute("aria-label", this.isWeek() ? tr("view.header.nextWeek") : tr("view.header.nextMonth"));
+    nextBtn.addEventListener("click", () => this.navigatePeriod(1));
     const todayBtn = rightGroup.createDiv("today-btn");
     // 真机反馈回退：图标化并未省下标题区（.month-title flex:1 吃掉余量），四字文案
     // 可读性更好，恢复 v1.4.2 文本按钮
-    todayBtn.textContent = tr("view.header.today");
-    todayBtn.setAttribute("title", tr("view.header.today"));
+    // v1.7.0：周视图下同一颗按钮语义变成「回到本周」（四字，宽度不跳），文案分开
+    todayBtn.textContent = this.isWeek() ? tr("view.header.thisWeek") : tr("view.header.today");
+    todayBtn.setAttribute("title", this.isWeek() ? tr("view.header.thisWeek") : tr("view.header.today"));
     todayBtn.addEventListener("click", () => this.goToToday());
     // 漏斗筛选按钮（批次二⑤）：当前解析结果里出现 ≥1 个类别才渲染——纯无标签工作流
     // 永远看不到它；渲染与去留由 updateFilterButton 在每次网格渲染前统一收敛
@@ -3251,7 +3351,24 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const viewBtn = rightGroup.createDiv("nav-btn view-toggle-btn");
     this.viewToggleBtnEl = viewBtn;
     this.applyViewToggleIcon(viewBtn);
-    viewBtn.addEventListener("click", () => this.toggleViewMode());
+    // v1.7.0：三个（v1.7.1 起四个）视图不再是「两点一线」的循环，按钮改为唤出视图菜单：
+    // 一眼能看见全部去处、当前在哪一档，误触一次就能退回；循环切换仍保留给命令面板。
+    viewBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.renderViewMenuPopup(viewBtn);
+    });
+  }
+  /** 顶栏标题文案：月视图=「2026年 10月」，周视图=「10/5 – 10/11」 */
+  headerTitleText() {
+    return this.isWeek() ? getWeekTitle(this.weekAnchor()) : getMonthTitle(this.currentYear, this.currentMonth);
+  }
+  /** 左右箭头统一入口：月视图按月走，周视图按周走（±7 天） */
+  async navigatePeriod(direction) {
+    if (this.isWeek()) {
+      await this.navigateWeek(direction);
+    } else {
+      await this.navigateMonth(direction);
+    }
   }
   /**
    * 打开日期选择器
@@ -3269,6 +3386,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.currentYear = year;
       this.currentMonth = month;
       this.convergeSelectedDate();
+      if (this.isWeek()) this.ensureWeekAnchor();
       await this.renderCalendarGrid();
     });
     modal.open();
@@ -3327,6 +3445,55 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
   }
 
+  /**
+   * 当前该画哪些格子。月视图 = generateMonthCalendar 的整月（5 或 6 行）；
+   * 周视图 = 同一个 42 天数组里切出锚点所在的那一行（7 格）。
+   * 刻意复用整月数组而不是另写一个「生成一周」的函数：农历、节假日、补位、
+   * isToday、列对齐（firstDayOfWeek）全部与月视图同源，小周与大月看到的
+   * 同一天必然一模一样，不会出现「月视图有节日名、周视图没有」这类分叉。
+   */
+  visibleDays(calendar) {
+    if (!this.isWeek()) return calendar.days;
+    const start = this.weekAnchor();
+    const at = calendar.days.findIndex((d) => formatDate(d.date) === start);
+    if (at < 0) {
+      // 锚点不在本月网格内（跨月周：如锚点 10/26 而当前显示 11 月）——
+      // 按锚点自身造 7 天，字段与 generateMonthCalendar 完全同构
+      const days = [];
+      const base = dateFromStr(start);
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+        days.push({
+          date,
+          day: date.getDate(),
+          month: date.getMonth(),
+          year: date.getFullYear(),
+          isCurrentMonth: date.getMonth() === this.currentMonth,
+          isToday: isToday(date),
+          isWeekend: isWeekend(date),
+          dayOfWeek: date.getDay()
+        });
+      }
+      return days;
+    }
+    return calendar.days.slice(at, at + 7);
+  }
+  /**
+   * header 序列的唯一重建入口（v1.7.0 从 updateFilterButton 里抽出）。
+   * 视图切换也要走它：顶栏的箭头 aria-label、「回到本月/本周」文案、视图按钮图标
+   * 都只在 renderHeader 里生成一次，只改 root class 会留下上一个视图的头部措辞。
+   */
+  rebuildHeader() {
+    this.rootEl.empty();
+    this.gridEl = null;
+    this.detailEl = null;
+    this.renderHeader();
+    this.renderWeekdayHeader();
+    this.gridEl = this.rootEl.createDiv("calendar-grid");
+    this.applyViewModeClass();
+    this.lastFirstDayOfWeek = this.plugin.settings.firstDayOfWeek;
+    this.lastLang = I18N_LANG;
+  }
   async renderCalendarGrid() {
     await this._renderCalendarGridCore();
     // v1.5.2 方案A：网格重绘后把当前删除线开关态补挂到 .completed 元素上
@@ -3338,14 +3505,14 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const myRequestId = this.renderRequestId;
     const titleEl = this.headerEl.querySelector(".month-title");
     if (titleEl) {
-      titleEl.textContent = getMonthTitle(this.currentYear, this.currentMonth);
+      titleEl.textContent = this.headerTitleText();
     }
     this.gridEl.empty();
     const calendar = generateMonthCalendar(this.currentYear, this.currentMonth, this.plugin.settings.firstDayOfWeek);
     // 42 天网格可能跨年（如查看 12 月时下月溢出日期属次年），对所有涉及的年份都按需 ensure，
     // 避免溢出日期无节假日标注
     const yearsToEnsure = /* @__PURE__ */ new Set([this.currentYear]);
-    for (const day of calendar.days) {
+    for (const day of this.visibleDays(calendar)) {
       yearsToEnsure.add(day.date.getFullYear());
     }
     // 按需获取不阻塞渲染：网格先按现有缓存画出来（浏览到的年份若无缓存数据，
@@ -3374,7 +3541,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       return;
     }
     if (myRequestId !== this.renderRequestId) return;
-    for (const day of calendar.days) {
+    for (const day of this.visibleDays(calendar)) {
       const dateStr = formatDate(day.date);
       let tasks = taskMap.taskMap.get(dateStr) || [];
       // v1.6.0 批次四：日程视图要区分「这天空」和「这天有内容但被筛掉了」，
@@ -3391,7 +3558,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 明细区（v1.6.0 批次二）：网格画完再画它，DOM 顺序天然是
     // header → weekday-header → grid → agenda-detail。
     // 任务集合与格子同源（同一份筛选后的 tasks），绝不会出现「格子有点、明细为空」
-    if (this.isAgenda()) {
+    if (this.isCompactCell()) {
       let dayTasks = taskMap.taskMap.get(this.selectedDate) || [];
       if (this.activeCategories && this.activeCategories.size > 0) {
         dayTasks = dayTasks.filter((x) => this.activeCategories.has(x.category));
@@ -3410,7 +3577,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    */
   renderDayCell(day, tasks, hadBeforeFilter) {
     const cellEl = this.gridEl.createDiv("day-cell");
-    const agenda = this.isAgenda();
+    const agenda = this.isCompactCell();
     const dateKey = formatDate(day.date);
     if (!day.isCurrentMonth) {
       cellEl.addClass("other-month");
@@ -3717,6 +3884,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
     // 日程视图：选中日跟着月份走，否则会出现「网格已翻月、明细还在上一月某天」
     this.convergeSelectedDate();
+    // 周视图：月都换了，锚点没有留在旧周的道理（convergeSelectedDate 已把选中日
+    // 拉进新月，这里据它重算锚点，标题与网格自然对齐）
+    if (this.isWeek()) this.ensureWeekAnchor();
     await this.renderCalendarGrid();
   }
   /**
@@ -3727,6 +3897,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.currentYear = year;
     this.currentMonth = month;
     this.convergeSelectedDate();
+    // 「回到本周」：周视图下锚点强制回到含今天那一周（ensureWeekAnchor 走 selectedDate=今天）
+    if (this.isWeek()) this.weekStart = weekStartFrom(new Date(), this.plugin.settings.firstDayOfWeek);
     await this.renderCalendarGrid();
   }
   /**
@@ -3740,29 +3912,86 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   isAgenda() {
     return this.plugin.settings.viewMode === "agenda";
   }
-  /** 切换按钮的图标与可达性文案：说明「去处」，不说「当前是什么」 */
+  /** 小周视图（v1.7.0）：上半屏只留所在那一行的周格子，下半屏明细区与小月完全一致 */
+  isWeek() {
+    return this.plugin.settings.viewMode === "week";
+  }
+  /**
+   * 「格子只出圆点」的判定：小月与小周共用同一套格子渲染与明细区，
+   * 差异只在网格给几行。所以原来所有 isAgenda() 的渲染分支一律换成这个，
+   * 新增的 .view-week 类只用来管行高与顶栏文案，不再多开一条渲染分支。
+   */
+  isCompactCell() {
+    const m = this.plugin.settings.viewMode;
+    return m === "agenda" || m === "week";
+  }
+  /** 按钮图标改为「当前视图」的自证（菜单形态下按钮是入口，不再是「去处」） */
   applyViewToggleIcon(btn) {
     const el = btn || this.viewToggleBtnEl;
     if (!el) return;
-    const toAgenda = !this.isAgenda();
-    el.innerHTML = toAgenda ? AGENDA_TOGGLE_ICONS.agenda : AGENDA_TOGGLE_ICONS.list;
-    const label = toAgenda ? tr("view.header.toAgenda") : tr("view.header.toList");
+    const mode = VIEW_MODES.includes(this.plugin.settings.viewMode) ? this.plugin.settings.viewMode : "list";
+    el.innerHTML = AGENDA_TOGGLE_ICONS[mode] || AGENDA_TOGGLE_ICONS.list;
+    const label = tr("view.header.pickView") + " · " + viewModeLabel(mode);
     el.setAttribute("aria-label", label);
     el.setAttribute("title", label);
-    el.toggleClass("is-agenda", !toAgenda);
+    // .is-agenda 保留原义（当前不是条视图），条视图下按钮回到无强调态
+    el.toggleClass("is-agenda", mode !== "list");
   }
+  /** 命令面板用：按 VIEW_MODES 顺序循环（菜单是主入口，循环留给键盘用户一键到底） */
   async toggleViewMode() {
-    this.plugin.settings.viewMode = this.isAgenda() ? "list" : "agenda";
+    const cur = VIEW_MODES.includes(this.plugin.settings.viewMode) ? this.plugin.settings.viewMode : "list";
+    const next = VIEW_MODES[(VIEW_MODES.indexOf(cur) + 1) % VIEW_MODES.length];
+    await this.setViewMode(next);
+  }
+  /** 视图模式的唯一写入口：菜单与命令都走这里，避免两处各自 saveSettings */
+  async setViewMode(mode) {
+    if (!VIEW_MODES.includes(mode)) mode = "list";
+    if (this.plugin.settings.viewMode === mode) return;
+    this.plugin.settings.viewMode = mode;
     await this.plugin.saveSettings();
-    // 进日程视图时若从未选中过日子，先把选中日收敛到当前月内（否则明细区空白）
-    if (this.isAgenda() && !this.selectedDate) this.convergeSelectedDate();
+    // 进紧凑格子类视图时若从未选中过日子，先把选中日收敛到当前月内（否则明细区空白）
+    if (this.isCompactCell() && !this.selectedDate) this.convergeSelectedDate();
+    // 进周视图：锚点若无或不属当前月，收到当前月（切出周视图不动锚点，回来还在同一周）
+    if (this.isWeek()) this.ensureWeekAnchor();
+    this.closeActivePopup();
+    this.rebuildHeader();
     this.applyViewModeClass();
     this.applyViewToggleIcon();
     await this.renderCalendarGrid();
   }
   /** root class 的唯一写入口：header 重建、语言切换重绘后都要靠它恢复视图形态 */
   applyViewModeClass() {
-    if (this.rootEl) this.rootEl.toggleClass("view-agenda", this.isAgenda());
+    if (!this.rootEl) return;
+    this.rootEl.toggleClass("view-agenda", this.isCompactCell());
+    this.rootEl.toggleClass("view-week", this.isWeek());
+  }
+  /** 周锚点（YYYY-MM-DD，视图内存态）：小周视图显示哪一周由它决定 */
+  weekAnchor() {
+    return this.weekStart || this.convergeSelectedDateAndReturn();
+  }
+  /** 锚点缺失或不合法时按 selectedDate / 今天补一个（不在 render 路径里改状态，故单独成式） */
+  convergeSelectedDateAndReturn() {
+    const base = this.selectedDate ? dateFromStr(this.selectedDate) : new Date();
+    this.weekStart = weekStartFrom(base, this.plugin.settings.firstDayOfWeek);
+    return this.weekStart;
+  }
+  /** 进周视图时把锚点收进「当前显示的那个月」：避免切视图瞬间屏幕跳到别周 */
+  ensureWeekAnchor() {
+    if (!this.selectedDate) this.convergeSelectedDate();
+    this.weekStart = weekStartFrom(dateFromStr(this.selectedDate), this.plugin.settings.firstDayOfWeek);
+  }
+  /**
+   * 按周导航：锚点 ±7 天，再把 currentYear/Month 跟到锚点所在月——
+   * 否则跨月周（10/26–11/1）走下一周时网格列语义、日期选择器仍停在旧月。
+   */
+  async navigateWeek(direction) {
+    const cur = dateFromStr(this.weekAnchor());
+    const next = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + direction * 7);
+    this.selectedDate = formatDate(next);
+    this.weekStart = weekStartFrom(next, this.plugin.settings.firstDayOfWeek);
+    this.currentYear = next.getFullYear();
+    this.currentMonth = next.getMonth();
+    await this.renderCalendarGrid();
   }
   /**
    * 选中日（日程视图专用）。入参是 YYYY-MM-DD 字符串而不是 Date：格子渲染时
@@ -3773,6 +4002,14 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   selectDay(key) {
     if (!key || this.selectedDate === key) return false;
     this.selectedDate = key;
+    // 周视图下点格子可能点到「锚点之外」的日期（跨月周里相邻周的日子不会出现在
+    // 本视图，但日期选择器/明细区跳转会）：锚点跟着走，屏幕不留在原地
+    if (this.isWeek()) {
+      const anchor = this.weekAnchor();
+      if (weekStartFrom(dateFromStr(key), this.plugin.settings.firstDayOfWeek) !== anchor) {
+        this.weekStart = weekStartFrom(dateFromStr(key), this.plugin.settings.firstDayOfWeek);
+      }
+    }
     return true;
   }
   /**
@@ -4626,6 +4863,161 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
     this.contentEl.empty();
     if (CategoryFilterModal.activeInstances && CategoryFilterModal.activeInstances.has(this)) {
       CategoryFilterModal.activeInstances.delete(this);
+    }
+  }
+};
+
+/**
+ * ============================================================
+ * ViewMenuModal - 视图选择菜单（v1.7.0）
+ * ============================================================
+ * 刻意不重新发明面板：与 CategoryFilterModal 同一套锚定 Modal 骨架
+ * （sweepChrome 摘掉 Obsidian 自带标题栏/关闭钮、positionAt 先量尺寸再定位、
+ * playEnter/playLeave 走 WAAPI 并尊重 prefers-reduced-motion、activeInstances
+ * 做互斥与「再点一次=收起」）。好处：手机上系统返回键/Esc/遮罩点击天然可关，
+ * 这条是 v1.5.x 用真机踩出来的教训，不该在新面板上重犯。
+ * 单选语义：点一行即切视图并收起面板，当前视图行打勾 + 左侧细条强调。
+ */
+var ViewMenuModal = class extends import_obsidian3.Modal {
+  constructor(app, view, anchorEl) {
+    super(app);
+    this.view = view;
+    this.anchorEl = anchorEl;
+  }
+  onOpen() {
+    if (!ViewMenuModal.activeInstances) ViewMenuModal.activeInstances = /* @__PURE__ */ new Set();
+    ViewMenuModal.activeInstances.add(this);
+    const { modalEl } = this;
+    modalEl.addClass("category-filter-modal");
+    modalEl.addClass("view-menu-modal");
+    const sweepChrome = () => {
+      if (!this.containerEl) return;
+      this.containerEl.querySelectorAll(".modal-header-button, .modal-close-button").forEach((el) => el.remove());
+      const header = this.modalEl.querySelector(":scope > .modal-header");
+      if (header) header.remove();
+    };
+    sweepChrome();
+    requestAnimationFrame(sweepChrome);
+    setTimeout(sweepChrome, 100);
+    this.renderRows();
+    this.positionAt(modalEl, true);
+    this.playEnter(modalEl);
+  }
+  positionAt(modalEl, prefill = false) {
+    modalEl.style.position = "fixed";
+    modalEl.style.margin = "0";
+    modalEl.style.top = "auto";
+    modalEl.style.left = "auto";
+    modalEl.style.width = "auto";
+    modalEl.style.maxWidth = "92vw";
+    if (prefill) {
+      // 预估尺寸只为压掉首帧跳动：行数 = 视图数 + 标题
+      const rows = VIEW_MODES.length + 1;
+      modalEl.style.minWidth = "232px";
+      modalEl.style.minHeight = `${Math.min(8 + 30 + rows * 46, window.innerHeight - 16)}px`;
+    }
+    const rect = this.anchorEl && this.anchorEl.getBoundingClientRect();
+    const render = () => {
+      let flipped = false;
+      if (!modalEl.isConnected || !rect)
+        return;
+      const w = modalEl.offsetWidth || 232;
+      const h = modalEl.offsetHeight || 200;
+      // 视图按钮在顶栏右侧：面板按按钮中线展开，越界则整体左移贴边（右侧留 8px）
+      let left = rect.left + rect.width / 2 - w / 2;
+      left = Math.max(8, Math.min(left, window.innerWidth - w - 8));
+      let top = rect.bottom + 6;
+      if (top + h > window.innerHeight - 8) {
+        top = Math.max(8, rect.top - h - 6);
+        flipped = true;
+      }
+      modalEl.style.left = `${left}px`;
+      modalEl.style.top = `${top}px`;
+      modalEl.classList.toggle("cf-flip-up", flipped);
+      modalEl.style.minHeight = "";
+    };
+    render();
+    requestAnimationFrame(render);
+  }
+  renderRows() {
+    if (this.isClosed) return;
+    const V = this.view;
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.addClass("category-filter-popup", "view-menu-popup");
+    const titleRow = contentEl.createDiv("category-filter-title");
+    titleRow.createSpan({ text: tr("view.menu.title") });
+    contentEl.createDiv("category-filter-sep");
+    const cur = V.plugin.settings.viewMode;
+    for (const mode of VIEW_MODES) {
+      const row = contentEl.createDiv("category-filter-item vm-row");
+      const on = mode === cur;
+      if (on)
+        row.addClass("selected");
+      row.style.setProperty("--mt-cat-color", "var(--primary-500)");
+      const iconEl = row.createDiv("vm-icon");
+      iconEl.innerHTML = AGENDA_TOGGLE_ICONS[mode] || AGENDA_TOGGLE_ICONS.list;
+      const textBox = row.createDiv("vm-text");
+      textBox.createDiv("vm-name").textContent = viewModeLabel(mode);
+      textBox.createDiv("vm-desc").textContent = tr("view.mode.desc." + mode);
+      const checkEl = row.createDiv("category-check");
+      if (on)
+        checkEl.textContent = "\u2713";
+      row.setAttribute("role", "button");
+      row.setAttribute("aria-pressed", on ? "true" : "false");
+      row.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.close();
+        V.setViewMode(mode);
+      });
+    }
+  }
+  playEnter(modalEl) {
+    if (CF_MOTION_OFF())
+      return;
+    try {
+      CF_KICK(modalEl.animate([
+        { opacity: 0, transform: "translateY(-6px) scale(0.96)" },
+        { opacity: 1, transform: "none" },
+      ], { duration: 160, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)" }));
+    } catch (e) {
+    }
+  }
+  playLeave(modalEl, container) {
+    const bg = container.querySelector(".modal-bg");
+    try {
+      const a1 = CF_KICK(modalEl.animate([
+        { opacity: 1, transform: "none" },
+        { opacity: 0, transform: "translateY(-5px) scale(0.97)" },
+      ], { duration: 150, easing: "ease", fill: "forwards" }));
+      if (bg)
+        CF_KICK(bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: "ease", fill: "forwards" }));
+      void a1;
+    } catch (e) {
+    }
+  }
+  close() {
+    if (this.closing)
+      return;
+    this.closing = true;
+    this.isClosed = true;
+    if (ViewMenuModal.activeInstances)
+      ViewMenuModal.activeInstances.delete(this);
+    const container = this.containerEl;
+    if (container && container.isConnected && !CF_MOTION_OFF()) {
+      this.playLeave(this.modalEl, container);
+      setTimeout(() => {
+        try { super.close(); } catch (e) {
+        }
+      }, 160);
+    } else {
+      super.close();
+    }
+  }
+  onClose() {
+    this.contentEl.empty();
+    if (ViewMenuModal.activeInstances && ViewMenuModal.activeInstances.has(this)) {
+      ViewMenuModal.activeInstances.delete(this);
     }
   }
 };
@@ -5507,8 +5899,9 @@ function resolveCategoryColor(name, categories) {
   return CATEGORY_PALETTE[h % CATEGORY_PALETTE.length];
 }
 var DEFAULT_SETTINGS = {
-  // 视图模式："list"（条视图，格子里铺任务行）| "agenda"（日程视图：格子只出一枚
-  // 圆点，全部文字在下方明细区）。v1.6.0 新增；老 data.json 缺该键时由
+  // 视图模式："list"（大月：格子里铺任务行）| "agenda"（小月：格子只出一枚圆点，
+  // 文字在下方明细区）| "week"（小周：上半屏只留所在那一行的周格子）。
+  // v1.6.0 新增、v1.7.0 扩到三值；老 data.json 缺该键时由
   // Object.assign({}, DEFAULT_SETTINGS, loadedData) 取此默认值，不需额外兜底。
   viewMode: "list",
   // 界面语言："auto"（跟随 Obsidian 设置）| "zh-CN" | "zh-TW" | "en"
@@ -5865,9 +6258,10 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       this.settings.firstDayOfWeek = 0;
     }
     // viewMode 枚举校验（对齐 firstDayOfWeek / taskFilePeriod 的写法）：手编 data.json
-    // 写进非法值时回退条视图，避免 root class 与渲染分支对不上
-    if (!["list", "agenda"].includes(this.settings.viewMode)) {
-      this.settings.viewMode = "list";
+    // 写进非法值时回退大月视图，避免 root class 与渲染分支对不上。
+    // v1.7.0：合法值来自 VIEW_MODES 常量，v1.7.1 加大周时这里不用改。
+    if (!VIEW_MODES.includes(this.settings.viewMode)) {
+      this.settings.viewMode = DEFAULT_SETTINGS.viewMode;
     }
     // taskFilePeriod 枚举校验：手编 data.json 写入 "week" 等非法值时回退按年
     if (this.settings.taskFilePeriod !== "month") {
@@ -6085,6 +6479,29 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       .onChange(async (value) => {
         await this.plugin.setLanguage(value);
       }));
+    // 默认视图（v1.7.0）：只管「下次打开月历是哪一档」；顶栏菜单切的是当前状态，
+    // 不回写这里，避免用户点一下按钮就悄悄改掉了自己的默认设置
+    new import_obsidian3.Setting(containerEl).setName(tr("settings.view.name")).setDesc(tr("settings.view.desc")).addDropdown((dropdown) => {
+      for (const m of VIEW_MODES) {
+        dropdown.addOption(m, viewModeLabel(m));
+      }
+      dropdown.setValue(this.plugin.settings.viewMode).onChange(async (value) => {
+        // 走视图自己的 setViewMode，而不是「写 settings + refreshView」：顶栏的箭头
+        // aria-label 与「回到本月/本周」只在 renderHeader 里生成，refreshView 不重建
+        // header，会出现「网格已是周视图、顶栏还写着本月」的半拉子状态
+        const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY);
+        if (!leaves.length) {
+          this.plugin.settings.viewMode = VIEW_MODES.includes(value) ? value : DEFAULT_SETTINGS.viewMode;
+          await this.plugin.saveSettings();
+          return;
+        }
+        for (const leaf of leaves) {
+          if (leaf.view instanceof MonthlyView) {
+            await leaf.view.setViewMode(value);
+          }
+        }
+      });
+    });
     new import_obsidian3.Setting(containerEl).setName(tr("settings.showCompleted.name")).setDesc(tr("settings.showCompleted.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedTasks).onChange(async (value) => {
       this.plugin.settings.showCompletedTasks = value;
       await this.plugin.saveSettings();

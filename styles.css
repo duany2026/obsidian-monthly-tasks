@@ -3604,3 +3604,121 @@
 		background: color-mix(in srgb, var(--mt-cat-color, #64748b) 22%, transparent);
 	}
 }
+
+/* ============================================================
+   v1.7.0 小周视图 + 视图选择菜单
+   ------------------------------------------------------------
+   作用域纪律沿用 v1.6.0：小周视图的 root 同时带 .view-agenda 与 .view-week
+   （前者=「格子只出圆点 + 下方明细区」这一族，后者=这一族里的「只画一行」），
+   因此本段只写差异项，圆点、选中日、明细区样式全部继承小月，不再抄一遍。
+   ============================================================ */
+
+/* ---------- 只有一行，就把这一行做够 ---------- */
+/* 小月里格子压到 52px 是为了给 5~6 行让位；小周只剩一行，52px 就成了浪费：
+   日号与农历挤在半空里，整块上半屏看着像一条被压扁的表头。这里加高到 92px
+   （手机端 84px），农历/节日名不需要缩放就读得清，明细区仍在下方照常滚。 */
+.monthly-tasks-container.view-week .day-cell {
+	min-height: 92px;
+	padding: 6px 8px;
+}
+
+/* 跨月周（如 10/26–11/1）里的溢出日期：整月视图要淡掉，是因为它「不属于这一屏
+   的主题月」；小周只有一行，这一行本身就是主题，淡掉反而像 3 个坏掉的格子。
+   月份归属此时已由顶栏的周区间（10/26 – 11/1）说明，格子不再需要自证。 */
+.monthly-tasks-container.view-week .day-cell.other-month {
+	opacity: 1;
+}
+
+/* 侧栏窄面板权重更高（4 个类），单独补齐，口径与小月那段一致 */
+.workspace-split.mod-right-split .monthly-tasks-container.view-week .day-cell,
+.workspace-split.mod-left-split .monthly-tasks-container.view-week .day-cell {
+	min-height: 92px;
+	padding: 6px 8px;
+}
+
+@media (max-width: 600px) {
+	.monthly-tasks-container.view-week .day-cell,
+	.workspace-split.mod-right-split .monthly-tasks-container.view-week .day-cell,
+	.workspace-split.mod-left-split .monthly-tasks-container.view-week .day-cell {
+		min-height: 84px;
+		padding: 4px 3px;
+	}
+}
+
+/* ============================================================
+   视图选择菜单（顶栏视图按钮唤出）
+   ------------------------------------------------------------
+   外壳沿用 .category-filter-modal（同一套圆角/描边/阴影/进出场），本段只加行内
+   结构：图标 + 两行文字（名称 / 一句「这里能看到什么」）+ 当前视图的勾选位。
+   图标不用色点：类别面板的点色是数据（类别真身），这里的图标是功能说明，
+   两者共用 .category-dot 会让「蓝点=工作」这种直觉串味。
+   ============================================================ */
+.modal.category-filter-modal.view-menu-modal {
+	min-width: 248px;
+}
+
+.category-filter-item.vm-row {
+	align-items: center;
+	gap: 10px;
+	padding: 8px 10px;
+	min-height: 46px;
+}
+
+.vm-row .vm-icon {
+	flex-shrink: 0;
+	width: 20px;
+	height: 20px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--primary-500);
+}
+
+.vm-row .vm-icon svg {
+	width: 18px;
+	height: 18px;
+	display: block;
+}
+
+.vm-row .vm-text {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+}
+
+.vm-row .vm-name {
+	flex: none;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.vm-row .vm-desc {
+	font-size: 11px;
+	line-height: 1.3;
+	color: var(--text-muted);
+	/* 说明文字两行封顶，长语言（en）不至于把面板撑到比屏幕还高 */
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.theme-dark .vm-row .vm-desc {
+	color: var(--text-faint);
+}
+
+@media (max-width: 480px) {
+	.modal.category-filter-modal.view-menu-modal {
+		min-width: 210px;
+	}
+	.vm-row .vm-desc {
+		font-size: 11px;
+	}
+}
