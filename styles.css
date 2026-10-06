@@ -823,7 +823,7 @@
 
 /* 输入框 - 全面优化样式 */
 .task-input-wrapper {
-	margin: 16px 24px 16px;
+	margin: 12px 24px 12px;
 	position: relative;
 	padding: 4px;
 	border-radius: 16px;
@@ -860,7 +860,7 @@
 	display: flex;
 	gap: 12px;
 	justify-content: center;
-	padding: 0 24px 24px;
+	padding: 0 24px 14px;
 }
 
 .btn-cancel,
@@ -902,19 +902,6 @@
 .btn-confirm:active,
 .btn-cancel:active {
 	transform: translateY(0);
-}
-
-/* 批次三：编辑态「取消编辑」= 描边弱化款，与实心「取消」区分主次 */
-.btn-cancel-edit {
-	background: transparent;
-	border: 1px solid #cbd5e1;
-	color: #64748b;
-}
-
-.btn-cancel-edit:hover {
-	background: #f1f5f9;
-	border-color: #94a3b8;
-	color: #334155;
 }
 
 /* 时间选择器 */
@@ -1183,9 +1170,12 @@
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	font-size: 12px;
+	/* v1.6.0 手机端反馈版：列表默认展开后成了弹窗里最高的一块，纵向压缩
+	   主要靠这里——行高从约 34px 降到 26px，5 行省约 40px。字号 11.5px
+	   仍高于日历格子里的 10px，读起来不比格子吃力 */
+	font-size: 11.5px;
 	color: #334155;
-	padding: 7px 10px;
+	padding: 4px 10px;
 	background: var(--background-primary);
 	border-radius: 8px;
 	border-left: 3px solid #cbd5e1;
@@ -1200,6 +1190,24 @@
 
 .existing-task-item:hover .task-item-actions {
 	opacity: 1;
+}
+
+/* 就地切换编辑目标后，"表单里预填的是哪一条"必须在列表里看得见：
+   左侧色带换成主色 + 浅蓝底，与 hover 的灰底区分开，选中态优先于 hover */
+.existing-task-item.editing {
+	background: #eff6ff;
+	border-left-color: #2563eb;
+	box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18);
+}
+
+.existing-task-item.editing .task-item-actions {
+	opacity: 1;
+}
+
+.theme-dark .existing-task-item.editing {
+	background: rgba(37, 99, 235, 0.16);
+	border-left-color: #3b82f6;
+	box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
 }
 
 /* 勾选框 */
@@ -1314,28 +1322,21 @@
 /* 结束日期选择 */
 .modal-end-date {
 	margin: 0 24px 16px;
-	padding: 16px 20px;
+	padding: 12px 20px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 	border-radius: 14px;
 	border: 1px solid #e2e8f0;
 }
 
-.end-date-label {
-	font-size: 13px;
-	font-weight: 600;
-	color: #475569;
-	margin-bottom: 12px;
-	display: block;
-	text-align: center;
-	letter-spacing: 0.5px;
-}
-
+/* v1.6.0 手机端反馈版：整块压成一行。原来「结束日期」标题 + 竖排的跨天勾选 +
+   日期触发器合计约 100px，只为一个可选字段；标题与勾选文案还互相拆台。
+   现在标题删掉，勾选框与触发器横排（触发器默认隐藏，勾上才在右侧长出） */
 .end-date-wrapper {
 	display: flex;
-	flex-direction: column;
-	gap: 12px;
 	align-items: center;
+	gap: 10px;
 	position: relative;
+	flex-wrap: wrap;
 }
 
 .multi-day-toggle {
@@ -1343,11 +1344,12 @@
 	align-items: center;
 	gap: 8px;
 	cursor: pointer;
-	padding: 8px 16px;
+	padding: 6px 14px;
 	background: var(--background-primary);
 	border-radius: 8px;
 	border: 1px solid #e2e8f0;
 	transition: all 0.2s ease;
+	flex-shrink: 0;
 }
 
 .multi-day-toggle:hover {
@@ -1374,9 +1376,6 @@
 	border-color: rgba(71, 85, 105, 0.4);
 }
 
-.theme-dark .end-date-label {
-	color: #94a3b8;
-}
 
 .theme-dark .multi-day-toggle {
 	background: rgba(30, 41, 59, 0.6);
@@ -1396,12 +1395,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 10px 18px;
+	padding: 6px 12px;
 	background: var(--background-primary);
-	border: 2px solid #e2e8f0;
-	border-radius: 10px;
+	border: 1.5px solid #e2e8f0;
+	border-radius: 8px;
 	cursor: pointer;
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 500;
 	color: #334155;
 	transition: all 0.2s ease;
@@ -1706,119 +1705,91 @@
 .theme-dark .task-time { color: #94a3b8; }
 
 .modal-priority {
-	margin: 0 24px 20px;
-	padding: 18px 20px;
+	margin: 0 24px 16px;
+	padding: 12px 20px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 	border-radius: 14px;
 	border: 1px solid #e2e8f0;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
 }
 
+/* v1.6.0 手机端反馈版：优先级从「标题在上 + 44px 大圆点在下」改为
+   与类别行同构的一行（左标签 + 胶囊横排）。原布局单块约 120px，
+   现在约 52px；两者视觉语言一致后，弹窗不再是一摞风格各异的卡片 */
 .priority-label {
 	font-size: 13px;
 	font-weight: 600;
 	color: #475569;
-	margin-bottom: 14px;
 	display: block;
-	text-align: center;
-	letter-spacing: 0.5px;
+	flex-shrink: 0;
 }
 
 .priority-group {
 	display: flex;
-	gap: 20px;
-	justify-content: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	flex: 1 1 auto;
 }
 
+/* 胶囊本体：外观与 .category-chip 同族，选中态同样是蓝边 + 浅蓝底 */
 .priority-btn-wrapper {
-	display: flex;
-	flex-direction: column;
+	display: inline-flex;
 	align-items: center;
 	gap: 6px;
+	padding: 5px 12px;
+	border-radius: 999px;
+	border: 1.5px solid #e2e8f0;
+	background: #ffffff;
+	color: #475569;
 	cursor: pointer;
+	transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
+.priority-btn-wrapper:hover {
+	border-color: #94a3b8;
+}
+
+.priority-btn-wrapper.selected {
+	border-color: #2563eb;
+	background: #eff6ff;
+	color: #1d4ed8;
+}
+
+/* 色点：原 44px 圆钮缩成 10px 点，颜色语义不变 */
 .priority-btn {
-	width: 44px;
-	height: 44px;
+	width: 10px;
+	height: 10px;
 	border-radius: 50%;
-	border: 3px solid transparent;
+	border: none;
 	cursor: pointer;
-	transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-	position: relative;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.priority-btn:hover {
-	transform: scale(1.12);
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.priority-btn.selected {
-	transform: scale(1.08);
-}
-
-.priority-btn.selected::after {
-	content: '✓';
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	font-size: 18px;
-	font-weight: bold;
-	color: white;
-	text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	padding: 0;
+	flex-shrink: 0;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 .priority-btn-text {
-	font-size: 11px;
+	font-size: 12px;
 	font-weight: 500;
-	color: #64748b;
-	transition: color 0.2s ease;
-}
-
-.priority-btn-wrapper:hover .priority-btn-text {
-	color: #475569;
+	line-height: 1.4;
 }
 
 .priority-btn-wrapper.selected .priority-btn-text {
-	color: #334155;
 	font-weight: 600;
 }
 
 .priority-btn.priority-none {
-	background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-	border: 2px solid #22c55e;
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.priority-btn.priority-none.selected {
-	border-color: #15803d;
-	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.priority-btn.priority-none.selected::after {
-	color: #15803d;
-	text-shadow: none;
+	background: #22c55e;
 }
 
 .priority-btn.priority-high {
-	background: linear-gradient(135deg, #ef4444, #dc2626);
-	border-color: #fca5a5;
-}
-
-.priority-btn.priority-high.selected {
-	border-color: #991b1b;
-	box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+	background: #dc2626;
 }
 
 .priority-btn.priority-medium {
-	background: linear-gradient(135deg, #f59e0b, #d97706);
-	border-color: #fcd34d;
-}
-
-.priority-btn.priority-medium.selected {
-	border-color: #92400e;
-	box-shadow: 0 4px 16px rgba(217, 119, 6, 0.4);
+	background: #f59e0b;
 }
 
 /* 批次二③：创建弹窗类别行——优先级下方一排小号胶囊，首个「无标签」= 不加 #tag。
@@ -2258,41 +2229,26 @@
 	color: #6b7280;
 }
 
-/* 深色模式 - 优先级按钮 */
-.theme-dark .priority-btn.priority-high {
-	background: linear-gradient(135deg, #dc2626, #b91c1c);
-	border-color: #fca5a5;
+/* 深色模式 - 优先级胶囊（结构同 .category-chip 的深色规则） */
+.theme-dark .priority-btn-wrapper {
+	background: rgba(15, 23, 42, 0.6);
+	border-color: rgba(71, 85, 105, 0.5);
+	color: #cbd5e1;
 }
 
-.theme-dark .priority-btn.priority-high.selected {
-	border-color: #7f1d1d;
-	box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+.theme-dark .priority-btn-wrapper:hover {
+	border-color: #94a3b8;
 }
 
-.theme-dark .priority-btn.priority-medium {
-	background: linear-gradient(135deg, #d97706, #b45309);
-	border-color: #fcd34d;
+.theme-dark .priority-btn-wrapper.selected {
+	background: rgba(37, 99, 235, 0.18);
+	border-color: #3b82f6;
+	color: #bfdbfe;
 }
 
-.theme-dark .priority-btn.priority-medium.selected {
-	border-color: #78350f;
-	box-shadow: 0 4px 12px rgba(217, 119, 6, 0.5);
-}
-
+/* 深色底上普通优先级改用亮绿，避免原浅绿渐变块在暗背景里发灰 */
 .theme-dark .priority-btn.priority-none {
-	background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.15));
-	border: 2px solid #22c55e;
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.theme-dark .priority-btn.priority-none.selected {
-	border-color: #4ade80;
-	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* 深色底上亮绿勾：沿用亮色的 #15803d 几乎不可见 */
-.theme-dark .priority-btn.priority-none.selected::after {
-	color: #4ade80;
+	background: #4ade80;
 }
 
 /* 批次二③：深色模式类别行 */
@@ -2436,14 +2392,6 @@
 	color: #94a3b8;
 }
 
-.theme-dark .priority-btn-text {
-	color: #94a3b8;
-}
-
-.theme-dark .priority-btn-wrapper:hover .priority-btn-text {
-	color: #cbd5e1;
-}
-
 /* 移动端适配 */
 @media (max-width: 600px) {
 	/* 弹窗内区块左右边距统一收窄（原 24px，与时间选择器的 12px 不一致） */
@@ -2451,7 +2399,7 @@
 		padding: 24px 16px 4px;
 	}
 	.task-input-wrapper {
-		margin: 16px;
+		margin: 12px 16px;
 	}
 	.modal-existing-tasks {
 		margin: 16px;
@@ -2464,7 +2412,16 @@
 		margin: 0 16px 16px;
 	}
 	.modal-priority {
-		margin: 0 16px 20px;
+		margin: 0 16px 16px;
+		padding: 12px 14px;
+		gap: 10px;
+	}
+	/* 同 .category-chip：窄屏抬到拇指可稳定命中 */
+	.priority-btn-wrapper {
+		padding: 8px 14px;
+	}
+	.priority-btn-text {
+		font-size: 13px;
 	}
 	.modal-category {
 		margin: 0 16px 16px;
@@ -2483,7 +2440,7 @@
 		font-size: 12px;
 	}
 	.modal-buttons {
-		padding: 0 16px 20px;
+		padding: 0 16px 14px;
 	}
 
 	/* 时间选择器适配（容器边距已在上方统一收窄） */
@@ -2559,10 +2516,6 @@
 	}
 }
 
-.theme-dark .priority-btn-wrapper.selected .priority-btn-text {
-	color: #e2e8f0;
-}
-
 /* 深色模式 - 按钮 */
 .theme-dark .btn-cancel {
 	background: rgba(71, 85, 105, 0.4);
@@ -2571,18 +2524,6 @@
 
 .theme-dark .btn-cancel:hover {
 	background: rgba(71, 85, 105, 0.6);
-	color: #e2e8f0;
-}
-
-.theme-dark .btn-cancel-edit {
-	background: transparent;
-	border: 1px solid rgba(100, 116, 139, 0.6);
-	color: #94a3b8;
-}
-
-.theme-dark .btn-cancel-edit:hover {
-	background: rgba(71, 85, 105, 0.4);
-	border-color: #94a3b8;
 	color: #e2e8f0;
 }
 
@@ -2776,20 +2717,6 @@
    （如「回到本月」按钮点按后一直停留在按下外观）。在无 hover 设备上还原这些效果，
    桌面端不受影响；同时把原本仅 hover 可见的元素改为常显。 */
 @media (hover: none) {
-	/* 批次三：取消编辑 hover 只改底色/边框；触屏 tap 后粘住，还原到未 hover 外观 */
-	.btn-cancel-edit:hover {
-		background: transparent;
-		border-color: #cbd5e1;
-		color: #64748b;
-	}
-
-	/* 批次三：深色款同上还原（.theme-dark 选择器特异度更高，必须单独写） */
-	.theme-dark .btn-cancel-edit:hover {
-		background: transparent;
-		border-color: rgba(100, 116, 139, 0.6);
-		color: #94a3b8;
-	}
-
 	/* 批次二③：胶囊 hover 只改边框；触屏 tap 后 :hover 会粘住，这里对未选中项还原。
 	   排除 .selected：否则本条（位置靠后、同特异度）会压掉选中态的蓝边框 */
 	.category-chip:not(.selected):hover {
@@ -3272,28 +3199,6 @@
 	}
 }
 
-/* ---- v1.6.0 手机端反馈版：明细区行内动作 + 弹窗备注区 ---- */
-/* 铅笔：.task-action-btn 家族在弹窗列表里靠 .task-item-actions 的 opacity 显隐，
-   明细区没有那层容器，且手机端根本没有 hover——这里直接常显，并把 24px 命中区
-   抬到 28px（与弹窗折叠胶囊同一档拇指尺寸） */
-.monthly-tasks-container.view-agenda .agenda-edit-btn {
-	flex-shrink: 0;
-	align-self: center;
-	opacity: 0.55;
-}
-
-.monthly-tasks-container.view-agenda .agenda-item:hover .agenda-edit-btn {
-	opacity: 1;
-}
-
-@media (max-width: 600px) {
-	.monthly-tasks-container.view-agenda .agenda-edit-btn {
-		width: 28px;
-		height: 28px;
-		opacity: 0.7;
-	}
-}
-
 /* ---- 弹窗「备注」区：胶囊收起态与「＋ 设置时间」同视觉族（不另造一套控件语言） ---- */
 .modal-note-container {
 	margin: 0 24px 16px;
@@ -3338,7 +3243,9 @@
 	padding: 12px 14px;
 	font-size: 16px;
 	line-height: 1.5;
-	border: 2px solid transparent;
+	/* 常驻浅描边：原先是 2px 透明边框，未聚焦时看不出这是个输入框，
+	   备注文字像浮在弹窗空白里。边框宽度不变，聚焦时仍只换颜色 */
+	border: 2px solid #e2e8f0;
 	border-radius: 12px;
 	background: var(--background-primary);
 	color: var(--text-normal);
@@ -3360,6 +3267,7 @@
 .theme-dark .note-textarea {
 	background: var(--background-primary);
 	color: var(--text-normal);
+	border-color: rgba(71, 85, 105, 0.5);
 }
 
 .theme-dark .note-textarea::placeholder {
@@ -3369,33 +3277,6 @@
 @media (max-width: 600px) {
 	.modal-note-container {
 		margin: 0 16px 16px;
-	}
-}
-
-/* ---- 编辑态日期抬头右上角的动作组（铅笔/跳转/删除）---- */
-/* .modal-date-info 已是 position:relative，绝对定位挂右上角=框架 X 钮的位置，
-   不额外占行高，也与「这条任务来自哪个文件」的语义挨在一起 */
-.modal-task-actions {
-	position: absolute;
-	top: 10px;
-	right: 12px;
-	display: flex;
-	align-items: center;
-	gap: 2px;
-}
-
-/* 抬头是 22px 大字，窄屏上按钮压在日期文字旁边会撞字：让标题留出按钮位 */
-@media (max-width: 600px) {
-	.modal-task-actions {
-		top: 14px;
-		right: 10px;
-	}
-	.modal-task-actions .task-action-btn {
-		width: 28px;
-		height: 28px;
-	}
-	.modal-date-info .date-main {
-		padding-right: 96px;
 	}
 }
 

@@ -234,7 +234,6 @@ var I18N = {
     "modal.create.add": "\u6dfb\u52a0\u4efb\u52a1",
     "modal.create.allDay": "\u5168\u5929",
     "modal.create.cancel": "\u53d6\u6d88",
-    "modal.create.cancelEdit": "\u53d6\u6d88\u7f16\u8f91",
     "modal.create.category": "\u7c7b\u522b",
     "modal.create.categoryAria": "\u7c7b\u522b {label}",
     "modal.create.collapse": "\u6536\u8d77",
@@ -245,7 +244,6 @@ var I18N = {
     "modal.create.empty": "\u4efb\u52a1\u5185\u5bb9\u4e0d\u80fd\u4e3a\u7a7a\uff08\u5143\u6570\u636e\u6807\u8bb0\u5df2\u88ab\u81ea\u52a8\u5265\u79bb\uff09",
     "modal.create.endBeforeStart": "\u7ed3\u675f\u65e5\u671f\u4e0d\u80fd\u65e9\u4e8e\u5f00\u59cb\u65e5\u671f",
     "modal.create.endBeforeStartTime": "\u7ed3\u675f\u65f6\u95f4\u987b\u665a\u4e8e\u5f00\u59cb\u65f6\u95f4",
-    "modal.create.endDate": "\u7ed3\u675f\u65e5\u671f",
     "modal.create.existingCount": "\u8be5\u65e5\u5df2\u6709 {n} \u4e2a\u4efb\u52a1",
     "modal.create.expand": "\u5c55\u5f00",
     "modal.create.fail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5",
@@ -259,7 +257,6 @@ var I18N = {
     "modal.create.note": "\u5907\u6CE8",
     "modal.create.noteAdd": "\uFF0B\u5907\u6CE8",
     "modal.create.noteAria": "\u4E3A\u8FD9\u6761\u4EFB\u52A1\u5199\u5907\u6CE8",
-    "modal.create.noteEdit": "\u7F16\u8F91\u5907\u6CE8",
     "modal.create.notePlaceholder": "\u8F93\u5165\u5907\u6CE8\uff0c\u53EF\u591A\u884C...",
     "modal.create.placeholder": "\u8f93\u5165\u4efb\u52a1\u5185\u5bb9...",
     "modal.create.pleaseSelect": "\u8bf7\u9009\u62e9\u65e5\u671f",
@@ -346,16 +343,17 @@ var I18N = {
     "settings.showLunar.name": "\u663e\u793a\u519c\u5386",
     "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf",
-    "settings.tips.1": "\u6761\u89C6\u56FE\u70B9\u65E5\u671F\u683C\u5B50\u6DFB\u52A0\u4EFB\u52A1\u3001\u70B9\u683C\u5B50\u91CC\u7684\u4EFB\u52A1\u5207\u6362\u5B8C\u6210 / \u672A\u5B8C\u6210\uFF1B\u65E5\u7A0B\u89C6\u56FE\u70B9\u683C\u5B50\u662F\u9009\u4E2D\u8BE5\u5929\uFF0C\u6DFB\u52A0\u8D70\u4E0B\u65B9\u660E\u7EC6\u533A\u7684\u300C\uFF0B \u6DFB\u52A0\u300D",
+    "settings.tips.1": "条视图点日期格子添加任务、点格子里的任务切换完成 / 未完成；日程视图点格子选中该天，点任务行或明细右上角的「管理 / ＋ 添加」打开当天面板",
     "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52a1\u884c\u5c3e\u7684 #\u6807\u7b7e \u5373\u7c7b\u522b\uff1a\u51fa\u73b0\u7c7b\u522b\u540e\uff0c\u9876\u90e8\u6f0f\u6597\u6309\u94ae\u53ef\u6309\u7c7b\u522b\u7b5b\u9009\uff08\u591a\u9009\uff0c\u9ed8\u8ba4\u5168\u90e8\uff09",
-    "settings.tips.4": "\u70b9\u4efb\u52a1\u884c\u7684\u94c5\u7b14\u56fe\u6807\u53ef\u7f16\u8f91\uff1a\u6539\u5185\u5bb9/\u4f18\u5148\u7ea7/\u65f6\u95f4/\u65e5\u671f/\u7c7b\u522b\uff0c\u4fdd\u5b58=\u5148\u5efa\u65b0\u884c\u518d\u5220\u65e7\u884c\uff0c\u8de8\u5929\u4efb\u52a1\u4ee5\u5f00\u59cb\u65e5\u671f\u4e3a\u51c6",
+    "settings.tips.4": "当天面板里点任务行的铅笔就地编辑（再点一次退回新建）：改内容/优先级/时间/日期/类别/备注，保存=先建新行再删旧行，跨天任务以开始日期为准",
     "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
     "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
     "settings.tips.7": "\u65E5\u7A0B\u89C6\u56FE\uFF1A\u53F3\u4E0A\u89D2\u5207\u6362\u6309\u94AE\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE\u300D\uFF09\u8FDB\u5165\u3002\u683C\u5B50\u91CC\u53EA\u6807\u4E00\u679A\u70B9\u8868\u793A\u8FD9\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u53D8\u7EA2\u70B9\uFF1B\u4E0B\u534A\u533A\u5217\u51FA\u9009\u4E2D\u65E5\u7684\u4EFB\u52A1\u4E0E\u5907\u6CE8",
-    "settings.tips.8": "\u5907\u6CE8\u5199\u5728\u4EFB\u52A1\u884C\u7684\u4E0B\u4E00\u884C\u3001\u4EE5 > \u5F00\u5934\uFF08Markdown \u5F15\u7528\u5757\uFF09\uFF0C\u8FDE\u7EED\u591A\u884C\u5408\u5E76\u6210\u4E00\u6761\uFF1B\u70B9\u660E\u7EC6\u533A\u7684\u5907\u6CE8\u5361\u7247\u5373\u53EF\u5C31\u5730\u4FEE\u6539\uFF0C\u56DE\u8F66\u4FDD\u5B58\u3001Esc \u53D6\u6D88",
+    "settings.tips.8": "备注写在任务行的下一行、以 > 开头（Markdown 引用块），连续多行合并成一条；明细区只读展示备注卡片，要改就在当天面板的备注框里编辑",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
+    "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.clearFilterAria": "\u6E05\u9664\u5F53\u524D\u7C7B\u522B\u7B5B\u9009",
     "view.agenda.emptyDay": "\u8fd9\u5929\u6ca1\u5b89\u6392",
     "view.agenda.emptyFiltered": "\u5F53\u524D\u7B5B\u9009\u4E0B\u8FD9\u5929\u6CA1\u6709\u4EFB\u52A1",
@@ -522,7 +520,6 @@ var I18N = {
     "modal.create.add": "\u65b0\u589e\u4efb\u52d9",
     "modal.create.allDay": "\u5168\u5929",
     "modal.create.cancel": "\u53d6\u6d88",
-    "modal.create.cancelEdit": "\u53d6\u6d88\u7de8\u8f2f",
     "modal.create.category": "\u985e\u5225",
     "modal.create.categoryAria": "\u985e\u5225 {label}",
     "modal.create.collapse": "\u6536\u8d77",
@@ -533,7 +530,6 @@ var I18N = {
     "modal.create.empty": "\u4efb\u52d9\u5167\u5bb9\u4e0d\u80fd\u70ba\u7a7a\uff08\u5143\u6578\u64da\u6a19\u8a18\u5df2\u88ab\u81ea\u52d5\u525d\u96e2\uff09",
     "modal.create.endBeforeStart": "\u7d50\u675f\u65e5\u671f\u4e0d\u80fd\u65e9\u65bc\u958b\u59cb\u65e5\u671f",
     "modal.create.endBeforeStartTime": "\u7d50\u675f\u6642\u9593\u9808\u665a\u65bc\u958b\u59cb\u6642\u9593",
-    "modal.create.endDate": "\u7d50\u675f\u65e5\u671f",
     "modal.create.existingCount": "\u8a72\u65e5\u5df2\u6709 {n} \u500b\u4efb\u52d9",
     "modal.create.expand": "\u5c55\u958b",
     "modal.create.fail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff0c\u8acb\u91cd\u8a66",
@@ -547,7 +543,6 @@ var I18N = {
     "modal.create.note": "\u5099\u8A3B",
     "modal.create.noteAdd": "\uFF0B\u5099\u8A3B",
     "modal.create.noteAria": "\u70BA\u9019\u689D\u4EFB\u52D9\u5BEB\u5099\u8A3B",
-    "modal.create.noteEdit": "\u7DE8\u8F2F\u5099\u8A3B",
     "modal.create.notePlaceholder": "\u8F38\u5165\u5099\u8A3B\uFF0C\u53EF\u591A\u884C...",
     "modal.create.placeholder": "\u8f38\u5165\u4efb\u52d9\u5167\u5bb9\u2026",
     "modal.create.pleaseSelect": "\u8acb\u9078\u64c7\u65e5\u671f",
@@ -634,16 +629,17 @@ var I18N = {
     "settings.showLunar.name": "\u986f\u793a\u8fb2\u66c6",
     "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf",
-    "settings.tips.1": "\u689D\u6AA2\u8996\u9EDE\u65E5\u671F\u683C\u4F4D\u65B0\u589E\u4EFB\u52D9\u3001\u9EDE\u683C\u4F4D\u88E1\u7684\u4EFB\u52D9\u5207\u63DB\u5B8C\u6210 / \u672A\u5B8C\u6210\uFF1B\u65E5\u7A0B\u6AA2\u8996\u9EDE\u683C\u4F4D\u662F\u9078\u53D6\u8A72\u5929\uFF0C\u65B0\u589E\u8D70\u4E0B\u65B9\u660E\u7D30\u5340\u7684\u300C\uFF0B \u65B0\u589E\u300D",
+    "settings.tips.1": "條檢視點日期格位新增任務、點格位裡的任務切換完成 / 未完成；日程檢視點格位選取該天，點任務列或明細右上角的「管理 / ＋ 新增」開啟當天面板",
     "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52d9\u884c\u5c3e\u7684 #\u6a19\u7c64 \u5373\u985e\u5225\uff1a\u51fa\u73fe\u985e\u5225\u5f8c\uff0c\u9802\u90e8\u6f0f\u6597\u6309\u9215\u53ef\u6309\u985e\u5225\u7be9\u9078\uff08\u591a\u9078\uff0c\u9810\u8a2d\u5168\u90e8\uff09",
-    "settings.tips.4": "\u9ede\u4efb\u52d9\u884c\u7684\u925b\u7b46\u5716\u793a\u53ef\u7de8\u8f2f\uff1a\u6539\u5167\u5bb9/\u512a\u5148\u7d1a/\u6642\u9593/\u65e5\u671f/\u985e\u5225\uff0c\u5132\u5b58=\u5148\u5efa\u65b0\u884c\u518d\u522a\u820a\u884c\uff0c\u8de8\u5929\u4efb\u52d9\u4ee5\u958b\u59cb\u65e5\u671f\u70ba\u6e96",
+    "settings.tips.4": "當天面板裡點任務列的鉛筆就地編輯（再點一次退回新增）：改內容/優先級/時間/日期/類別/備註，儲存=先建新行再刪舊行，跨天任務以開始日期為準",
     "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
     "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
     "settings.tips.7": "\u65E5\u7A0B\u6AA2\u8996\uFF1A\u53F3\u4E0A\u89D2\u5207\u63DB\u6309\u9215\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996\u300D\uFF09\u9032\u5165\u3002\u683C\u4F4D\u88E1\u53EA\u6A19\u4E00\u679A\u9EDE\u8868\u793A\u9019\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u8B8A\u7D05\u9EDE\uFF1B\u4E0B\u65B9\u5340\u5217\u51FA\u9078\u53D6\u65E5\u7684\u4EFB\u52D9\u8207\u5099\u8A3B",
-    "settings.tips.8": "\u5099\u8A3B\u5BEB\u5728\u4EFB\u52D9\u884C\u7684\u4E0B\u4E00\u884C\u3001\u4EE5 > \u958B\u982D\uFF08Markdown \u5F15\u7528\u584A\uFF09\uFF0C\u9023\u7E8C\u591A\u884C\u5408\u4F75\u6210\u4E00\u689D\uFF1B\u9EDE\u660E\u7D30\u5340\u7684\u5099\u8A3B\u5361\u7247\u5373\u53EF\u5C31\u5730\u4FEE\u6539\uFF0Center \u5132\u5B58\u3001Esc \u53D6\u6D88",
+    "settings.tips.8": "備註寫在任務行的下一行、以 > 開頭（Markdown 引用塊），連續多行合併成一條；明細區唯讀顯示備註卡片，要改就在當天面板的備註框裡編輯",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
+    "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.clearFilterAria": "\u6E05\u9664\u76EE\u524D\u985E\u5225\u7BE9\u9078",
     "view.agenda.emptyDay": "\u9019\u5929\u6c92\u5b89\u6392",
     "view.agenda.emptyFiltered": "\u76EE\u524D\u7BE9\u9078\u4E0B\u9019\u5929\u6C92\u6709\u4EFB\u52D9",
@@ -810,7 +806,6 @@ var I18N = {
     "modal.create.add": "Add Task",
     "modal.create.allDay": "All Day",
     "modal.create.cancel": "Cancel",
-    "modal.create.cancelEdit": "Cancel Edit",
     "modal.create.category": "Category",
     "modal.create.categoryAria": "Category {label}",
     "modal.create.collapse": "Collapse",
@@ -821,7 +816,6 @@ var I18N = {
     "modal.create.empty": "Task content cannot be empty (metadata stripped)",
     "modal.create.endBeforeStart": "End date cannot be earlier than start date",
     "modal.create.endBeforeStartTime": "End time must be later than start time",
-    "modal.create.endDate": "End Date",
     "modal.create.existingCount": "{n} tasks on this day",
     "modal.create.expand": "Expand",
     "modal.create.fail": "Create task failed, please retry",
@@ -835,7 +829,6 @@ var I18N = {
     "modal.create.note": "Note",
     "modal.create.noteAdd": "+ Note",
     "modal.create.noteAria": "Add a note to this task",
-    "modal.create.noteEdit": "Edit note",
     "modal.create.notePlaceholder": "Write a note, multiple lines allowed...",
     "modal.create.placeholder": "Enter task content\u2026",
     "modal.create.pleaseSelect": "Please select date",
@@ -922,16 +915,17 @@ var I18N = {
     "settings.showLunar.name": "Show Lunar Calendar",
     "settings.tasksLimit.desc": "Maximum tasks shown per date cell",
     "settings.tasksLimit.name": "Tasks Per Day Limit",
-    "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; add via the \uFF0B Add button in the detail pane below",
+    "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; click a task row or the Manage / \uFF0B Add button at the top-right of the detail pane to open the day panel",
     "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
     "settings.tips.3": "#tag at end of task line is category: after categories appear, funnel button at top can filter by category (multi-select, default all)",
-    "settings.tips.4": "Click pencil icon on task line to edit: change content/priority/time/date/category, save=create new line then delete old line, multi-day tasks based on start date",
+    "settings.tips.4": "In the day panel, click a task row's pencil to edit in place (click it again to switch back to create): change content/priority/time/date/category/note, save=create new line then delete old line, multi-day tasks based on start date",
     "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
     "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
     "settings.tips.7": "Agenda view: use the toggle button at the top right, or the command palette entry \"Toggle Calendar / Agenda View\". A dot marks a day with plans, red when overdue; the pane below lists the selected day's tasks and notes",
-    "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. Click a note card in the detail pane to edit it inline: Enter saves, Esc cancels",
+    "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. The detail pane shows note cards read-only; edit them in the note field of the day panel",
     "settings.tips.title": "Usage Tips",
     "view.agenda.addOne": "Add",
+    "view.agenda.manageDay": "Manage",
     "view.agenda.clearFilterAria": "Clear current category filter",
     "view.agenda.emptyDay": "Nothing planned",
     "view.agenda.emptyFiltered": "No tasks on this day under the current filter",
@@ -2987,7 +2981,9 @@ var AGENDA_TOGGLE_ICONS = {
 
 // 明细区「＋ 添加」按钮的加号图标（lucide plus 路径子集，stroke 规格同上）
 var AGENDA_ADD_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
-var AGENDA_EDIT_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>';
+// 明细区吸顶行「管理」按钮的列表图标（lucide list 路径子集）：
+// 不用加号——加号只承诺"新建"，而这颗按钮打开的面板里既能改也能删也能跳转。
+var AGENDA_MANAGE_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>';
 
 /**
  * ============================================================
@@ -3641,7 +3637,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         const nextNote = noteTextToLines(noteText).join("\n");
         const oldNote = noteTextToLines(editOld.note).join("\n");
         const fmtD = (s) => s ? formatDate(dateFromStr(String(s))) : "";
-        const newStart = formatDate(date);
+        const newStart = formatDate(modal.date);
         const newDue = endDate ? formatDate(endDate) : newStart;
         const rowSame = content === editOld.content
           && (category || "") === (editOld.category || "")
@@ -3662,7 +3658,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
           return;
         }
       }
-      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0, noteText || void 0);
+      const success = await this.taskParser.createTaskForDate(modal.date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0, noteText || void 0);
       if (success) {
         // 批次三：编辑=先建新行、再删旧行（3.4 定稿）。删除只认 rawLine：新行插入后
         // 旧行行号常发生偏移；删不到不判失败——新行已在，重复行可见、可手动删除
@@ -3835,12 +3831,19 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         });
       }
     }
+    // 吸顶行那颗按钮承担两件事，文案跟着状态走：
+    //  - 这天有任务 → 「管理」＋列表图标。它打开的是同一个当天面板（列表 + 新建框），
+    //    用户从那里编辑/跳转/删除。早期这里写的是「添加」＋加号，等于把入口钉死在
+    //    "新建"上，于是「日程视图没有编辑功能」成了合理结论，并为此多加了一枚行铅笔。
+    //  - 这天没任务 → 面板里没什么可管理，退回「添加」＋加号。
+    const hasTasks = !!(tasks && tasks.length > 0);
+    const addBtnLabel = hasTasks ? tr("view.agenda.manageDay") : tr("view.agenda.addOne");
     const addBtn = headEl.createDiv("agenda-add-btn");
     addBtn.setAttribute("role", "button");
     addBtn.setAttribute("tabindex", "0");
-    addBtn.setAttribute("aria-label", tr("view.agenda.addOne"));
-    addBtn.innerHTML = AGENDA_ADD_ICON;
-    addBtn.createSpan({ text: tr("view.agenda.addOne") });
+    addBtn.setAttribute("aria-label", addBtnLabel);
+    addBtn.innerHTML = hasTasks ? AGENDA_MANAGE_ICON : AGENDA_ADD_ICON;
+    addBtn.createSpan({ text: addBtnLabel });
     const startCreate = () => this.openCreateTaskModal(dayDate, tasks);
     addBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -3879,18 +3882,19 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // ---- 条目列表 ----
     const listEl = detail.createDiv("agenda-list");
     for (const task of tasks) {
-      this.renderAgendaEntry(listEl, task, tasks);
+      this.renderAgendaEntry(listEl, task, tasks, dayDate);
     }
   }
   /**
    * 一条任务 + 它的备注（备注是宿主的附属，不独立成条目——这样桌面端双列时
    * 两者永远同列，不会被网格拆到两个栏里）。
-   * v1.6.0 手机端反馈版：行尾铅笔 = 打开「添加任务」弹窗编辑态。就地编辑那套
-   * （textarea 塞进卡片）被软键盘挡住、圆角盒还截字，弹窗由框架统一管滚动，
-   * 手机上顶得住；无备注不再画「＋ 写备注」幽灵行——它常年白占一行，
-   * 明细区可显示的内容反而变少（反馈①）。
+   * 无备注不画「＋ 写备注」幽灵行——它常年白占一行，明细区可显示的内容反而变少（反馈①）。
+   * 行本身只承担一个动作：点开 = 打开这一天的面板（与吸顶行「管理」同一个界面，
+   * 从列表里那条的铅笔进编辑）。早先这里另有一套「按行直开编辑态」的入口
+   * （行铅笔 + 点行进单条编辑），它把同一个弹窗拆成"这一条"和"这一天"两副面孔，
+   * 于是出现两个几乎一样的界面依次弹出；入口统一到「这一天」后已删除。
    */
-  renderAgendaEntry(container, task, allTasks) {
+  renderAgendaEntry(container, task, allTasks, dayDate) {
     const entryEl = container.createDiv("agenda-entry");
     const itemEl = entryEl.createDiv("agenda-item");
     if (task.completed) itemEl.addClass("completed");
@@ -3909,11 +3913,11 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         if (checkEl.isConnected) checkEl.disabled = false;
       }
     });
-    // 点整行 = 开编辑弹窗（反馈②：行上要有编辑/跳转/删除入口；跳转与删除在
-    // 弹窗编辑态的日期抬头右侧）。勾选圈只负责勾选，点它不再触发整行动作。
+    // 点整行 = 打开这一天的面板（勾选圈只负责勾选，点它不触发整行动作）。
+    // 与吸顶行「管理」走同一个入口、同一份任务集，不再另开"只针对这一条"的界面
     itemEl.addEventListener("click", (e) => {
       if (e.target === checkEl) return;
-      this.openTaskEditor(task, allTasks);
+      this.openCreateTaskModal(dayDate, allTasks);
     });
     const textEl = itemEl.createEl("span", { cls: "agenda-text", text: task.content });
     textEl.setAttribute("title", task.content);
@@ -3925,18 +3929,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       catEl.setAttribute("title", tr("view.cell.category", { category: task.category }));
       catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
     }
-    // 铅笔按钮：明细区不能靠 hover 显隐（手机端没有 hover），常显；
-    // 类复用弹窗列表那套 .task-action-btn.task-edit-btn，外观零新增
-    const editBtn = itemEl.createEl("button", {
-      cls: "task-action-btn task-edit-btn agenda-edit-btn",
-      type: "button",
-      attr: { title: tr("modal.create.edit"), "aria-label": tr("modal.create.edit") }
-    });
-    editBtn.innerHTML = AGENDA_EDIT_ICON;
-    editBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      this.openTaskEditor(task, allTasks);
-    });
+    // 行尾不再放铅笔：编辑入口收敛到「这一天」的面板里（见函数注释）
     // 只读备注卡片：有备注才出现。点它不做任何事（点行 = 编辑，读字不用弹窗），
     // 所以不再是 role=button，也不挂 tabindex
     if (task.note) {
@@ -3944,18 +3937,6 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       noteEl.textContent = task.note;
       noteEl.setAttribute("title", task.note);
     }
-  }
-  /**
-   * 以任务锚点日期重开「添加任务」弹窗的编辑态（与弹窗列表铅笔同口径：锚点 =
-   * startDate||dueDate，不用被点格子——跨天虚拟挂载时两者不同会把任务平移走样）。
-   */
-  openTaskEditor(task, allTasks) {
-    const anchorStr = task.startDate || task.dueDate;
-    if (!anchorStr) {
-      new import_obsidian2.Notice(tr("modal.create.noDateMark"), 3e3);
-      return;
-    }
-    this.openCreateTaskModal(dateFromStr(anchorStr), allTasks || [], task);
   }
   /** 切回条视图时明细区必须整块摘掉，留着会把网格挤成半屏 */
   removeAgendaDetail() {
@@ -4699,73 +4680,14 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     if (holidayInfo) {
       dateMainEl.createSpan({ text: ` \xB7 ${translateHolidayName(holidayInfo.name)}` });
     }
-    // v1.6.0 手机端反馈版②：编辑态要有跳转/删除。原先这两颗长在「该日已有 N 个
-    // 任务」列表里，而编辑态整段列表不渲染（编辑对象就是那一条），入口等于没有。
-    // 现在挂在日期抬头右上角（框架 X 钮的位置，我们本来就把 X 移除了）：铅笔 =
-    // 展开备注区（等价点「＋ 备注」胶囊），跳转/删除与列表行按钮同口径
-    if (this.editingTask) {
-      const headTask = this.editingTask;
-      const headActions = dateInfoEl.createDiv("modal-task-actions");
-      const hEdit = headActions.createEl("button", { cls: "task-action-btn task-edit-btn", attr: { type: "button", title: tr("modal.create.noteEdit"), "aria-label": tr("modal.create.noteEdit") } });
-      hEdit.innerHTML = AGENDA_EDIT_ICON;
-      hEdit.addEventListener("click", () => {
-        noteOpen = true;
-        if (applyNoteOpen) applyNoteOpen(true);
-      });
-      const hGoto = headActions.createEl("button", { cls: "task-action-btn task-goto-btn", attr: { type: "button", title: tr("modal.create.goto"), "aria-label": tr("modal.create.goto") } });
-      hGoto.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
-      hGoto.addEventListener("click", async () => {
-        const file = this.app.vault.getAbstractFileByPath(headTask.filePath);
-        if (file) {
-          const leaf = this.app.workspace.getLeaf(false);
-          await leaf.openFile(file);
-          // openFile 返回时编辑器可能尚未就绪，短暂重试，避免静默跳过定位（同列表行口径）
-          let tries = 10;
-          const focusTimer = setInterval(() => {
-            const ed = leaf.view && leaf.view.editor;
-            if (ed) {
-              clearInterval(focusTimer);
-              ed.setCursor({ line: headTask.lineNumber, ch: 0 });
-              ed.scrollIntoView({ from: { line: headTask.lineNumber, ch: 0 }, to: { line: headTask.lineNumber, ch: 0 } }, true);
-            } else if (--tries <= 0) {
-              clearInterval(focusTimer);
-            }
-          }, 100);
-        }
-        this.close();
-      });
-      const hDel = headActions.createEl("button", { cls: "task-action-btn task-delete-btn", attr: { type: "button", title: tr("modal.create.delete"), "aria-label": tr("modal.create.delete") } });
-      hDel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`;
-      hDel.addEventListener("click", async () => {
-        if (hDel.disabled) return;
-        hDel.disabled = true;
-        const ok = await this.plugin.taskParser.deleteTask(headTask);
-        if (!ok) {
-          hDel.disabled = false;
-          new import_obsidian3.Notice(tr("notice.opFail"), 3e3);
-          return;
-        }
-        // 已落盘：收弹窗、让视图重读文件，不然日历上还挂着这条
-        this.close();
-        const vLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
-        const v = vLeaf ? vLeaf.view : null;
-        if (v) {
-          try {
-            await v.refresh(true);
-          } catch (e) {
-            console.error(tr("error.delayRefresh"), e);
-          }
-        }
-      });
-    }
-    if (this.existingTasks.length > 0 && !this.editingTask) {
+    if (this.existingTasks.length > 0) {
       const existingTasksEl = this.modalEl.createDiv("modal-existing-tasks");
       const titleRow = existingTasksEl.createDiv("existing-tasks-title-row");
       titleRow.createEl("div", { cls: "existing-tasks-title", text: tr("modal.create.existingCount", { n: this.existingTasks.length }) });
-      // v1.5.2 真机反馈②：手机端弹窗默认折叠「该日已有 N 个任务」列表——
-      // 类别标签让每条行变高，两三条就要在小盒子里上下滑，主输入框被顶出视线。
-      // 判定用视口宽度（与 CSS @media(max-width:600px) 同口径），不用 Platform.isMobile——
-      // 窄窗分屏同样有"列表吃掉输入框"的问题，且可在桌面端实测
+      // v1.5.2 曾因"列表吃掉输入框"按视口宽度默认折叠；现在这个面板是唯一的
+      // 任务管理入口（编辑/跳转/删除都从这里进），折叠就等于把入口藏起来——
+      // 用户看不到"这里能改"，于是又去别处加按钮。改为默认展开，
+      // 折叠开关保留（想腾地方时仍可手动收）。
       // v1.5.4 真机反馈：折叠开关原来只有一颗 11px 的 ▾ 字符，窄屏上几乎看不见，
       // 也没有"可点"的暗示。改成胶囊按钮（chevron 图标 + 展开/收起 文案），整行仍可点，
       // 并补 role/tabindex/键盘：胶囊用 span 而非 button，避免点击冒泡到整行造成二次切换
@@ -4774,7 +4696,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const toggleEl = titleRow.createSpan({ cls: "existing-tasks-toggle" });
       import_obsidian3.setIcon(toggleEl, "chevron-down");
       const toggleTextEl = toggleEl.createSpan({ text: tr("modal.create.expand") });
-      let listOpen = window.innerWidth > 600;
+      let listOpen = true;
       const applyListOpen = () => {
         tasksListEl.style.display = listOpen ? "" : "none";
         toggleEl.toggleClass("is-open", listOpen);
@@ -4800,6 +4722,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         const toShow = showAll ? this.existingTasks : this.existingTasks.slice(0, LIMIT);
         toShow.forEach((task) => {
           const taskEl = tasksListEl.createDiv("existing-task-item");
+          // 就地切换后，"当前在改哪条"必须在列表里看得见——否则抬头标题与列表
+          // 脱节，用户不知道表单里预填的是哪一条
+          if (this.editingTask && task === this.editingTask) taskEl.addClass("editing");
           if (task.completed) {
             taskEl.addClass("completed");
             taskEl.toggleClass("completed-strike", !this.plugin.settings.showCompletedStrike);
@@ -4857,7 +4782,8 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
           const actionsEl = taskEl.createDiv("task-item-actions");
           // 批次三：编辑入口。基准日期用任务锚点（startDate||dueDate），不用
           // 被点格子——跨天虚拟挂载时两者不同会把任务平移走样（3.2.4）。
-          // 重开同弹窗（构建期预填），列表对象原样带走，「取消编辑」可回创建态
+          // 就地切换编辑目标：以前是 close() 再开一个新弹窗，两副几乎一样的界面
+          // 在同一位置前后闪过，用户读作「点了编辑又跳出创建界面」。
           const editBtn = actionsEl.createEl("button", { cls: "task-action-btn task-edit-btn", attr: { title: tr("modal.create.edit"), "aria-label": tr("modal.create.edit") } });
           editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`;
           editBtn.addEventListener("click", (e) => {
@@ -4867,11 +4793,14 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
               new import_obsidian3.Notice(tr("modal.create.noDateMark"), 3e3);
               return;
             }
-            const list = this.existingTasks;
-            const leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
-            const view = leaf ? leaf.view : null;
-            this.close();
-            if (view) view.openCreateTaskModal(dateFromStr(anchorStr), list, task);
+            // 再点一次自己 = 退回新建态。这个开关顶掉了原来那颗「取消编辑」
+            // 按钮——它存在的唯一理由就是"从这一条退回这一天"，现在切换是
+            // 就地做的，不需要第三个底部按钮
+            if (this.editingTask === task) {
+              this.switchToTask(null, null);
+              return;
+            }
+            this.switchToTask(task, anchorStr);
           });
           // 跳转按钮
           const gotoBtn = actionsEl.createEl("button", { cls: "task-action-btn task-goto-btn", attr: { title: tr("modal.create.goto") } });
@@ -5073,7 +5002,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       if (allDayCheckbox) { allDayCheckbox.checked = isAllDay; if (setTimeOpen) setTimeOpen(); }
     }
     const endDateContainer = this.modalEl.createDiv("modal-end-date");
-    endDateContainer.createEl("span", { cls: "end-date-label", text: tr("modal.create.endDate") });
+    // v1.6.0 手机端反馈版：不再画「结束日期」标题行——标题与控件文案（跨天任务）
+    // 说的是同一件事的两面，两行字叠着既多占一行又互相拆台。留控件、去标题，
+    // 整块改成与优先级/类别同构的一行（勾选框 + 勾上后在右侧长出的日期触发器）。
     const endDateWrapper = endDateContainer.createDiv("end-date-wrapper");
     let endDate = void 0;
     let isMultiDay = false;
@@ -5328,22 +5259,6 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       text: tr("modal.create.cancel")
     });
     cancelBtn.addEventListener("click", () => this.close());
-    if (this.editingTask) {
-      // 批次三：编辑态在「取消」与「保存」之间插「取消编辑」——关弹窗后以同
-      // 一份列表回创建态（列表区恢复、表单清空）。「取消」= 放弃编辑直接关
-      // （先建后删未执行到删除步时原行从未被碰过，取消零副作用）
-      const cancelEditBtn = btnGroup.createEl("button", {
-        cls: "btn-cancel btn-cancel-edit",
-        text: tr("modal.create.cancelEdit")
-      });
-      cancelEditBtn.addEventListener("click", () => {
-        const list = this.existingTasks;
-        const leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
-        const view = leaf ? leaf.view : null;
-        this.close();
-        if (view) view.openCreateTaskModal(this.date, list);
-      });
-    }
     const confirmBtn = btnGroup.createEl("button", {
       cls: "btn-confirm",
       text: this.editingTask ? tr("modal.create.save") : tr("modal.create.add")
@@ -5427,6 +5342,28 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     if (!CreateTaskModal.activeInstances) CreateTaskModal.activeInstances = /* @__PURE__ */ new Set();
     CreateTaskModal.activeInstances.add(this);
   }
+
+  /**
+   * 就地切换编辑目标（列表里点另一条的铅笔），复用同一个弹窗实例重建主体。
+   * 先摘掉日期浮层与它挂在 document 上的 click 监听，再换 date / editingTask，
+   * 最后 modalEl.empty() + 重跑 onOpen。onOpen 的构建全程是往 modalEl 里
+   * createDiv，框架装饰的移除按精确类名匹配且都有判空，二次调用既不会重复
+   * 挂载也不会误删内容节点（activeInstances 是 Set，重复 add 无副作用）。
+   */
+  switchToTask(task, anchorStr) {
+    if (this.datePickerCloseHandler) {
+      document.removeEventListener("click", this.datePickerCloseHandler);
+      this.datePickerCloseHandler = null;
+    }
+    const strayPopup = document.body.querySelector(":scope > .date-picker-popup");
+    if (strayPopup) strayPopup.remove();
+    this.editingTask = task;
+    // anchorStr 为空 = 退回新建态，日期保持当前（不跳走）
+    if (anchorStr) this.date = dateFromStr(anchorStr);
+    this.modalEl.empty();
+    this.onOpen();
+  }
+
   onClose() {
     // 清理日期选择器的全局 click 监听器，避免泄漏
     if (this.datePickerCloseHandler) {
