@@ -1332,20 +1332,26 @@
    日期触发器合计约 100px，只为一个可选字段；标题与勾选文案还互相拆台。
    现在标题删掉，勾选框与触发器横排。v1.6.2 起触发器改为常驻（未勾选时置灰），
    不再"勾上才长出来"——横排版式从打开弹窗起就不变，避免勾选瞬间整行跳动 */
+/* v1.6.3 真机反馈：勾选框 32px、结束日期框 40px，并排就是「大小眼」。两框改成
+   读同一个 --mt-end-h（桌面 32、窄屏 34），谁的自然高度矮了由 min-height 补齐，
+   高了由内边距压住——以后要调这行的高度只改这一个变量 */
 .end-date-wrapper {
+	--mt-end-h: 32px;
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
 	position: relative;
 	flex-wrap: wrap;
 }
 
 .multi-day-toggle {
+	box-sizing: border-box;
+	min-height: var(--mt-end-h, 32px);
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	cursor: pointer;
-	padding: 6px 14px;
+	padding: 5px 12px;
 	background: var(--background-primary);
 	border-radius: 8px;
 	border: 1px solid #e2e8f0;
@@ -1393,9 +1399,12 @@
 
 /* 自定义日期选择器触发按钮 */
 .end-date-trigger {
+	box-sizing: border-box;
+	min-height: var(--mt-end-h, 32px);
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	white-space: nowrap;
 	padding: 6px 12px;
 	background: var(--background-primary);
 	border: 1.5px solid #e2e8f0;
@@ -2660,10 +2669,33 @@
 		padding: 2px 0;
 	}
 
-	/* 结束日期选择器触发器 */
+	/* 结束日期行：--mt-end-h 抬到 34，两框同步。触发器内边距 10px 12px → 6px 10px、
+	   字号 14 → 13（改前这框自然高度 40px、勾选框 32px，正是「大小眼」）；
+	   日期同时改紧凑写法，393px 屏上勾选框 110 + 间距 8 + 日期框 109 = 227 ≤ 内容宽 288 */
+	.end-date-wrapper {
+		--mt-end-h: 34px;
+	}
 	.end-date-trigger {
-		padding: 10px 12px;
-		font-size: 14px;
+		padding: 6px 10px;
+		font-size: 13px;
+	}
+}
+
+/* 极窄屏（iPhone SE / 小屏安卓，≤380px）：卡片内容宽只剩 220px，两框加间距仍差一点
+   → 再挤一档（内边距与间距同步收）。实测 100 + 6 + 105 = 211 ≤ 220 → 一行放得下，
+   宁可紧凑也不让这行拆成两行 */
+@media (max-width: 380px) {
+	.end-date-wrapper {
+		--mt-end-h: 32px;
+		gap: 6px;
+	}
+	.multi-day-toggle {
+		padding: 5px 8px;
+		gap: 6px;
+	}
+	.end-date-trigger {
+		padding: 5px 8px;
+		font-size: 13px;
 	}
 }
 
@@ -3358,8 +3390,11 @@
       的整宽幽灵框（虚线 + 占位文案），一眼就知道"这格可以填"。
    2) 展开态原先自己写了 padding:12px 14px / font-size:16px / line-height:1.5 / 2px 边框，
       比任务输入框胖一圈 → 备注框和任务框本就该是同一个控件，这里直接复用 Obsidian 的
-      --input-* 变量（实测任务框渲染出来就是 4px 8px / 1px 边框 / 13px，窄屏 Obsidian 自己
-      把 --input-font-size 抬到 16px，所以 iOS 聚焦缩放那条硬约束由变量本身满足，不再手写） */
+      --input-* 变量（实测任务框渲染出来就是 4px 8px / 1px 边框 / 13px）。
+      v1.6.3 更正两条：Obsidian 1.14.4 的 --input-* 家族里**没有** --input-font-size，
+      窄屏也不会自动抬到 16px，任务框在手机上仍是 13px；而本文件原先写死的 var(...,13px)
+      恒走兜底值。字号真正与任务框同源的是 --font-ui-small（任务框就是被 Obsidian 的
+      input[type=text] 规则按它渲染），所以备注字号改用它，桌面/窄屏都自动跟任务框一致 */
 .modal-note-container {
 	margin: 0 24px 14px;
 	display: flex;
@@ -3384,7 +3419,7 @@
 	gap: 8px;
 	min-height: calc(var(--input-height, 32px));
 	padding: var(--input-padding, 4px 8px);
-	font-size: var(--input-font-size, 13px);
+	font-size: var(--font-ui-small, 13px);
 	line-height: var(--input-line-height, normal);
 	font-family: inherit;
 	text-align: left;
@@ -3430,7 +3465,7 @@
 	resize: none;
 	overflow: hidden;
 	padding: var(--input-padding, 4px 8px);
-	font-size: var(--input-font-size, 13px);
+	font-size: var(--font-ui-small, 13px);
 	line-height: var(--input-line-height, 1.3);
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
 	border: var(--input-border-width, 1px) solid var(--input-border-color, #e4e4e4);
@@ -3470,15 +3505,15 @@
 	.modal-note-container {
 		margin: 0 16px 14px;
 	}
-	/* 窄屏拇指命中：Obsidian 移动端把 --input-font-size 抬到 16px，
-	   但 padding 仍偏薄，这里补到 30px 以上，与 .category-chip 同思路 */
+	/* 窄屏拇指命中靠 padding 撑，不靠字号：原先这里把备注写成 16px，任务框却仍是 13px
+	   （Obsidian 的 input[type=text] 规则权重高于我们的 .task-input），备注比待办大一号，
+	   用户说的「不协调」就是这个。字号交回上面的 --font-ui-small，此处只补命中高度 */
 	.note-show-btn {
 		min-height: 36px;
 		padding: 8px 10px;
 	}
 	.note-textarea {
-		padding: 8px 10px;
-		font-size: 16px;
+		padding: 9px 10px;
 		line-height: 1.4;
 	}
 }
