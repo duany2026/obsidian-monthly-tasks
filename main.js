@@ -255,7 +255,7 @@ var I18N = {
     "modal.create.noDateMark": "\u8be5\u4efb\u52a1\u6ca1\u6709\u65e5\u671f\u6807\u8bb0\uff0c\u65e0\u6cd5\u5b9a\u4f4d\u7f16\u8f91",
     "modal.create.none": "\u666e\u901a",
     "modal.create.note": "\u5907\u6CE8",
-    "modal.create.noteAdd": "\uFF0B\u5907\u6CE8",
+    "modal.create.noteAdd": "\uFF0B\u6DFB\u52A0\u5907\u6CE8",
     "modal.create.noteAria": "\u4E3A\u8FD9\u6761\u4EFB\u52A1\u5199\u5907\u6CE8",
     "modal.create.notePlaceholder": "\u8F93\u5165\u5907\u6CE8\uff0c\u53EF\u591A\u884C...",
     "modal.create.placeholder": "\u8f93\u5165\u4efb\u52a1\u5185\u5bb9...",
@@ -343,14 +343,14 @@ var I18N = {
     "settings.showLunar.name": "\u663e\u793a\u519c\u5386",
     "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf",
-    "settings.tips.1": "条视图点日期格子添加任务、点格子里的任务切换完成 / 未完成；日程视图点格子选中该天，点任务行或明细右上角的「管理 / ＋ 添加」打开当天面板",
+    "settings.tips.1": "条视图点日期格子添加任务、点格子里的任务切换完成 / 未完成；日程视图点格子选中该天，点任务行直接编辑这一条，点明细右上角的「管理 / ＋ 添加」打开当天面板新建",
     "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52a1\u884c\u5c3e\u7684 #\u6807\u7b7e \u5373\u7c7b\u522b\uff1a\u51fa\u73b0\u7c7b\u522b\u540e\uff0c\u9876\u90e8\u6f0f\u6597\u6309\u94ae\u53ef\u6309\u7c7b\u522b\u7b5b\u9009\uff08\u591a\u9009\uff0c\u9ed8\u8ba4\u5168\u90e8\uff09",
-    "settings.tips.4": "当天面板里点任务行的铅笔就地编辑（再点一次退回新建）：改内容/优先级/时间/日期/类别/备注，保存=先建新行再删旧行，跨天任务以开始日期为准",
+    "settings.tips.4": "点日程里的任务行 = 直接编辑这一条；面板里点别的行的铅笔可切换目标（再点一次退回新建）。改内容/优先级/时间/日期/类别/备注，保存=先建新行再删旧行，跨天任务以开始日期为准",
     "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
     "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
     "settings.tips.7": "\u65E5\u7A0B\u89C6\u56FE\uFF1A\u53F3\u4E0A\u89D2\u5207\u6362\u6309\u94AE\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE\u300D\uFF09\u8FDB\u5165\u3002\u683C\u5B50\u91CC\u53EA\u6807\u4E00\u679A\u70B9\u8868\u793A\u8FD9\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u53D8\u7EA2\u70B9\uFF1B\u4E0B\u534A\u533A\u5217\u51FA\u9009\u4E2D\u65E5\u7684\u4EFB\u52A1\u4E0E\u5907\u6CE8",
-    "settings.tips.8": "备注写在任务行的下一行、以 > 开头（Markdown 引用块），连续多行合并成一条；明细区只读展示备注卡片，要改就在当天面板的备注框里编辑",
+    "settings.tips.8": "备注写在任务行的下一行、以 > 开头（Markdown 引用块），连续多行合并成一条；明细区只读展示备注卡片，要改就在当天面板的备注框里编辑（无备注时是一整条虚线框，点一下即可输入）",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
     "view.agenda.manageDay": "\u7ba1\u7406",
@@ -541,7 +541,7 @@ var I18N = {
     "modal.create.noDateMark": "\u8a72\u4efb\u52d9\u6c92\u6709\u65e5\u671f\u6a19\u8a18\uff0c\u7121\u6cd5\u5b9a\u4f4d\u7de8\u8f2f",
     "modal.create.none": "\u666e\u901a",
     "modal.create.note": "\u5099\u8A3B",
-    "modal.create.noteAdd": "\uFF0B\u5099\u8A3B",
+    "modal.create.noteAdd": "\uFF0B\u65B0\u589E\u5099\u8A3B",
     "modal.create.noteAria": "\u70BA\u9019\u689D\u4EFB\u52D9\u5BEB\u5099\u8A3B",
     "modal.create.notePlaceholder": "\u8F38\u5165\u5099\u8A3B\uFF0C\u53EF\u591A\u884C...",
     "modal.create.placeholder": "\u8f38\u5165\u4efb\u52d9\u5167\u5bb9\u2026",
@@ -629,14 +629,14 @@ var I18N = {
     "settings.showLunar.name": "\u986f\u793a\u8fb2\u66c6",
     "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf",
-    "settings.tips.1": "條檢視點日期格位新增任務、點格位裡的任務切換完成 / 未完成；日程檢視點格位選取該天，點任務列或明細右上角的「管理 / ＋ 新增」開啟當天面板",
+    "settings.tips.1": "條檢視點日期格位新增任務、點格位裡的任務切換完成 / 未完成；日程檢視點格位選取該天，點任務列直接編輯這一條，點明細右上角的「管理 / ＋ 新增」開啟當天面板新增",
     "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52d9\u884c\u5c3e\u7684 #\u6a19\u7c64 \u5373\u985e\u5225\uff1a\u51fa\u73fe\u985e\u5225\u5f8c\uff0c\u9802\u90e8\u6f0f\u6597\u6309\u9215\u53ef\u6309\u985e\u5225\u7be9\u9078\uff08\u591a\u9078\uff0c\u9810\u8a2d\u5168\u90e8\uff09",
-    "settings.tips.4": "當天面板裡點任務列的鉛筆就地編輯（再點一次退回新增）：改內容/優先級/時間/日期/類別/備註，儲存=先建新行再刪舊行，跨天任務以開始日期為準",
+    "settings.tips.4": "點日程裡的任務列 = 直接編輯這一條；面板裡點其他列的鉛筆可切換目標（再點一次退回新增）。改內容/優先級/時間/日期/類別/備註，儲存=先建新行再刪舊行，跨天任務以開始日期為準",
     "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
     "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
     "settings.tips.7": "\u65E5\u7A0B\u6AA2\u8996\uFF1A\u53F3\u4E0A\u89D2\u5207\u63DB\u6309\u9215\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996\u300D\uFF09\u9032\u5165\u3002\u683C\u4F4D\u88E1\u53EA\u6A19\u4E00\u679A\u9EDE\u8868\u793A\u9019\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u8B8A\u7D05\u9EDE\uFF1B\u4E0B\u65B9\u5340\u5217\u51FA\u9078\u53D6\u65E5\u7684\u4EFB\u52D9\u8207\u5099\u8A3B",
-    "settings.tips.8": "備註寫在任務行的下一行、以 > 開頭（Markdown 引用塊），連續多行合併成一條；明細區唯讀顯示備註卡片，要改就在當天面板的備註框裡編輯",
+    "settings.tips.8": "備註寫在任務行的下一行、以 > 開頭（Markdown 引用塊），連續多行合併成一條；明細區唯讀顯示備註卡片，要改就在當天面板的備註框裡編輯（無備註時是一整條虛線框，點一下即可輸入）",
     "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
     "view.agenda.manageDay": "\u7ba1\u7406",
@@ -827,7 +827,7 @@ var I18N = {
     "modal.create.noDateMark": "This task has no date marker, cannot locate for editing",
     "modal.create.none": "Normal",
     "modal.create.note": "Note",
-    "modal.create.noteAdd": "+ Note",
+    "modal.create.noteAdd": "+ Add note",
     "modal.create.noteAria": "Add a note to this task",
     "modal.create.notePlaceholder": "Write a note, multiple lines allowed...",
     "modal.create.placeholder": "Enter task content\u2026",
@@ -915,14 +915,14 @@ var I18N = {
     "settings.showLunar.name": "Show Lunar Calendar",
     "settings.tasksLimit.desc": "Maximum tasks shown per date cell",
     "settings.tasksLimit.name": "Tasks Per Day Limit",
-    "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; click a task row or the Manage / \uFF0B Add button at the top-right of the detail pane to open the day panel",
+    "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; click a task row to edit that task directly, or the Manage / \uFF0B Add button at the top-right of the detail pane to open the day panel and create one",
     "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
     "settings.tips.3": "#tag at end of task line is category: after categories appear, funnel button at top can filter by category (multi-select, default all)",
-    "settings.tips.4": "In the day panel, click a task row's pencil to edit in place (click it again to switch back to create): change content/priority/time/date/category/note, save=create new line then delete old line, multi-day tasks based on start date",
+    "settings.tips.4": "Clicking a task row in the agenda edits that task directly; inside the day panel a row's pencil switches the target (click again to go back to create). Edit content/priority/time/date/category/note; save = create a new line then delete the old one, multi-day tasks key off the start date",
     "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
     "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
     "settings.tips.7": "Agenda view: use the toggle button at the top right, or the command palette entry \"Toggle Calendar / Agenda View\". A dot marks a day with plans, red when overdue; the pane below lists the selected day's tasks and notes",
-    "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. The detail pane shows note cards read-only; edit them in the note field of the day panel",
+    "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. The detail pane shows note cards read-only; edit them in the note box of the day panel (when empty it is a full-width dashed field, tap to type)",
     "settings.tips.title": "Usage Tips",
     "view.agenda.addOne": "Add",
     "view.agenda.manageDay": "Manage",
@@ -3913,11 +3913,12 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         if (checkEl.isConnected) checkEl.disabled = false;
       }
     });
-    // 点整行 = 打开这一天的面板（勾选圈只负责勾选，点它不触发整行动作）。
-    // 与吸顶行「管理」走同一个入口、同一份任务集，不再另开"只针对这一条"的界面
+    // 点整行 = 直接编辑这一条（勾选圈只负责勾选，点它不触发整行动作）。
+    // 真机反馈：点任务与点「管理」出来的是同一个新建态，想编辑还要再找铅笔——
+    // "点击一步，却走了两步"。现在行点击带着 editTask 进面板，「管理」仍是新建态
     itemEl.addEventListener("click", (e) => {
       if (e.target === checkEl) return;
-      this.openCreateTaskModal(dayDate, allTasks);
+      this.openCreateTaskModal(dayDate, allTasks, task);
     });
     const textEl = itemEl.createEl("span", { cls: "agenda-text", text: task.content });
     textEl.setAttribute("title", task.content);
@@ -4896,15 +4897,19 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     // textarea 里，保存照样写回——收起只是不占地方，不是放弃编辑
     const noteContainer = this.modalEl.createDiv("modal-note-container");
     const noteLabelEl = noteContainer.createEl("span", { cls: "note-label", text: tr("modal.create.note") });
-    const noteShowBtn = noteContainer.createEl("button", { cls: "note-show-btn", type: "button", text: tr("modal.create.noteAdd") });
+    // 收起态 = 整宽幽灵框（真机反馈：小胶囊像浮在空白里，改与任务输入框同栏同尺寸）
+    const noteShowBtn = noteContainer.createEl("button", { cls: "note-show-btn", type: "button" });
+    noteShowBtn.createSpan({ cls: "note-ghost-text", text: tr("modal.create.noteAdd") });
+    // rows=1 是留白的真凶：textarea 不带 rows 时浏览器默认 2 行，autosize 读到的
+    // scrollHeight 把一行备注撑成 74px（实测），用户说的"上下空很大"就是这个
     noteText = noteContainer.createEl("textarea", {
       cls: "note-textarea",
-      attr: { placeholder: tr("modal.create.notePlaceholder"), "aria-label": tr("modal.create.noteAria"), spellcheck: "false" }
+      attr: { rows: "1", placeholder: tr("modal.create.notePlaceholder"), "aria-label": tr("modal.create.noteAria"), spellcheck: "false" }
     });
     noteText.value = noteHasContent ? this.editingTask.note : "";
     const autosizeNote = () => {
       noteText.style.height = "auto";
-      noteText.style.height = Math.max(noteText.scrollHeight + 2, 44) + "px";
+      noteText.style.height = Math.max(noteText.scrollHeight + 2, 36) + "px";
     };
     noteText.addEventListener("input", autosizeNote);
     applyNoteOpen = (focusNote) => {
