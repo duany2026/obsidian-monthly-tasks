@@ -3272,88 +3272,131 @@
 	}
 }
 
-/* ---- v1.6.0 批次三：备注可写 ---- */
-/* 只读卡片 = 可点：hover 给一层极浅底 + 光标提示，不加重边框（明细区本来就密） */
-.monthly-tasks-container.view-agenda .agenda-note[role="button"] {
-	cursor: pointer;
+/* ---- v1.6.0 手机端反馈版：明细区行内动作 + 弹窗备注区 ---- */
+/* 铅笔：.task-action-btn 家族在弹窗列表里靠 .task-item-actions 的 opacity 显隐，
+   明细区没有那层容器，且手机端根本没有 hover——这里直接常显，并把 24px 命中区
+   抬到 28px（与弹窗折叠胶囊同一档拇指尺寸） */
+.monthly-tasks-container.view-agenda .agenda-edit-btn {
+	flex-shrink: 0;
+	align-self: center;
+	opacity: 0.55;
 }
 
-.monthly-tasks-container.view-agenda .agenda-note[role="button"]:hover {
-	background: var(--background-modifier-hover);
+.monthly-tasks-container.view-agenda .agenda-item:hover .agenda-edit-btn {
+	opacity: 1;
 }
 
-.monthly-tasks-container.view-agenda .agenda-note[role="button"]:focus-visible {
-	outline: 2px solid var(--interactive-accent);
-	outline-offset: 1px;
-}
-
-/* 空态幽灵按钮：没备注的任务也留一个入口，但弱到不跟已有备注抢视线 */
-.monthly-tasks-container.view-agenda .agenda-note.agenda-note-empty {
-	background: none;
-	border-left-color: transparent;
-	color: var(--text-faint);
-	font-size: 12px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-}
-
-.monthly-tasks-container.view-agenda .agenda-note.agenda-note-empty:hover {
-	color: var(--text-muted);
-	background: var(--background-modifier-hover);
-}
-
-.monthly-tasks-container.view-agenda .agenda-note-plus {
-	margin-right: 4px;
-	font-weight: 600;
-}
-
-/* 编辑态：蓝描边 + 白底抬到最上层，一眼知道「正在写、不是看」 */
-.monthly-tasks-container.view-agenda .agenda-note.is-editing {
-	cursor: auto;
-	background: var(--background-primary);
-	border-left-color: var(--interactive-accent);
-	box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent) 25%, transparent);
-	padding: 6px 8px;
-}
-
-.monthly-tasks-container.view-agenda .agenda-note.is-editing:hover {
-	background: var(--background-primary);
-}
-
-@supports not (background: color-mix(in srgb, red 12%, white)) {
-	.monthly-tasks-container.view-agenda .agenda-note.is-editing {
-		box-shadow: 0 0 0 2px var(--interactive-accent);
+@media (max-width: 600px) {
+	.monthly-tasks-container.view-agenda .agenda-edit-btn {
+		width: 28px;
+		height: 28px;
+		opacity: 0.7;
 	}
 }
 
-.monthly-tasks-container.view-agenda .agenda-note-input {
+/* ---- 弹窗「备注」区：胶囊收起态与「＋ 设置时间」同视觉族（不另造一套控件语言） ---- */
+.modal-note-container {
+	margin: 0 24px 16px;
+}
+
+.note-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #475569;
+	margin-bottom: 8px;
 	display: block;
+}
+
+.note-show-btn {
+	background: none;
+	border: 1px dashed #94a3b8;
+	border-radius: 8px;
+	color: #475569;
+	font-size: 12px;
+	padding: 3px 10px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.theme-dark .note-show-btn {
+	border-color: rgba(148, 163, 184, 0.5);
+	color: #cbd5e1;
+}
+
+.theme-dark .note-label {
+	color: #cbd5e1;
+}
+
+/* textarea：字号 16px 是硬约束——iOS WebKit 对 <16px 输入框聚焦会强制放大整页；
+   高度由 JS 按 scrollHeight 自动撑，禁止手动拖出第二个尺寸 */
+.note-textarea {
 	width: 100%;
 	box-sizing: border-box;
+	min-height: 44px;
 	resize: none;
 	overflow: hidden;
-	min-height: 34px;
-	border: 0;
-	outline: none;
-	background: transparent;
-	color: var(--text-normal);
-	font-size: 12px;
+	padding: 12px 14px;
+	font-size: 16px;
 	line-height: 1.5;
-	font-family: inherit;
-	padding: 0;
-	margin: 0;
+	border: 2px solid transparent;
+	border-radius: 12px;
+	background: var(--background-primary);
+	color: var(--text-normal);
+	outline: none;
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+	transition: border-color 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s;
 }
 
-/* 手机端：编辑时字号提到 16px——iOS WebKit 对 <16px 的输入框聚焦会强制放大整页，
-   不压回去就是每次写备注屏幕跳一下 */
+.note-textarea:focus {
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.note-textarea::placeholder {
+	color: #94a3b8;
+	font-weight: 400;
+}
+
+.theme-dark .note-textarea {
+	background: var(--background-primary);
+	color: var(--text-normal);
+}
+
+.theme-dark .note-textarea::placeholder {
+	color: #64748b;
+}
+
 @media (max-width: 600px) {
-	.monthly-tasks-container.view-agenda .agenda-note-input {
-		font-size: 16px;
+	.modal-note-container {
+		margin: 0 16px 16px;
 	}
 }
 
-.theme-dark .monthly-tasks-container.view-agenda .agenda-note.is-editing {
-	background: var(--modal-background);
+/* ---- 编辑态日期抬头右上角的动作组（铅笔/跳转/删除）---- */
+/* .modal-date-info 已是 position:relative，绝对定位挂右上角=框架 X 钮的位置，
+   不额外占行高，也与「这条任务来自哪个文件」的语义挨在一起 */
+.modal-task-actions {
+	position: absolute;
+	top: 10px;
+	right: 12px;
+	display: flex;
+	align-items: center;
+	gap: 2px;
+}
+
+/* 抬头是 22px 大字，窄屏上按钮压在日期文字旁边会撞字：让标题留出按钮位 */
+@media (max-width: 600px) {
+	.modal-task-actions {
+		top: 14px;
+		right: 10px;
+	}
+	.modal-task-actions .task-action-btn {
+		width: 28px;
+		height: 28px;
+	}
+	.modal-date-info .date-main {
+		padding-right: 96px;
+	}
 }
 
 /* ---- v1.6.0 批次四：筛选联动观感 ---- */

@@ -256,6 +256,11 @@ var I18N = {
     "modal.create.multiDay": "\u8de8\u5929\u4efb\u52a1",
     "modal.create.noDateMark": "\u8be5\u4efb\u52a1\u6ca1\u6709\u65e5\u671f\u6807\u8bb0\uff0c\u65e0\u6cd5\u5b9a\u4f4d\u7f16\u8f91",
     "modal.create.none": "\u666e\u901a",
+    "modal.create.note": "\u5907\u6CE8",
+    "modal.create.noteAdd": "\uFF0B\u5907\u6CE8",
+    "modal.create.noteAria": "\u4E3A\u8FD9\u6761\u4EFB\u52A1\u5199\u5907\u6CE8",
+    "modal.create.noteEdit": "\u7F16\u8F91\u5907\u6CE8",
+    "modal.create.notePlaceholder": "\u8F93\u5165\u5907\u6CE8\uff0c\u53EF\u591A\u884C...",
     "modal.create.placeholder": "\u8f93\u5165\u4efb\u52a1\u5185\u5bb9...",
     "modal.create.pleaseSelect": "\u8bf7\u9009\u62e9\u65e5\u671f",
     "modal.create.priority": "\u4f18\u5148\u7ea7",
@@ -355,10 +360,6 @@ var I18N = {
     "view.agenda.emptyDay": "\u8fd9\u5929\u6ca1\u5b89\u6392",
     "view.agenda.emptyFiltered": "\u5F53\u524D\u7B5B\u9009\u4E0B\u8FD9\u5929\u6CA1\u6709\u4EFB\u52A1",
     "view.agenda.hasTaskDot": "\u8fd9\u5929\u6709\u5b89\u6392",
-    "view.agenda.noteAdd": "\u5199\u5907\u6CE8",
-    "view.agenda.noteAddAria": "\u7ED9\u8FD9\u6761\u4EFB\u52A1\u5199\u5907\u6CE8",
-    "view.agenda.noteEdit": "\u7F16\u8F91\u5907\u6CE8",
-    "view.agenda.noteHelp": "\u56DE\u8F66\u4FDD\u5B58 \u00B7 Shift+\u56DE\u8F66\u6362\u884C \u00B7 Esc \u53D6\u6D88",
     "view.agenda.overdueDot": "\u8fd9\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u7c7b\u522b\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
@@ -543,6 +544,11 @@ var I18N = {
     "modal.create.multiDay": "\u8de8\u5929\u4efb\u52d9",
     "modal.create.noDateMark": "\u8a72\u4efb\u52d9\u6c92\u6709\u65e5\u671f\u6a19\u8a18\uff0c\u7121\u6cd5\u5b9a\u4f4d\u7de8\u8f2f",
     "modal.create.none": "\u666e\u901a",
+    "modal.create.note": "\u5099\u8A3B",
+    "modal.create.noteAdd": "\uFF0B\u5099\u8A3B",
+    "modal.create.noteAria": "\u70BA\u9019\u689D\u4EFB\u52D9\u5BEB\u5099\u8A3B",
+    "modal.create.noteEdit": "\u7DE8\u8F2F\u5099\u8A3B",
+    "modal.create.notePlaceholder": "\u8F38\u5165\u5099\u8A3B\uFF0C\u53EF\u591A\u884C...",
     "modal.create.placeholder": "\u8f38\u5165\u4efb\u52d9\u5167\u5bb9\u2026",
     "modal.create.pleaseSelect": "\u8acb\u9078\u64c7\u65e5\u671f",
     "modal.create.priority": "\u512a\u5148\u7d1a",
@@ -642,10 +648,6 @@ var I18N = {
     "view.agenda.emptyDay": "\u9019\u5929\u6c92\u5b89\u6392",
     "view.agenda.emptyFiltered": "\u76EE\u524D\u7BE9\u9078\u4E0B\u9019\u5929\u6C92\u6709\u4EFB\u52D9",
     "view.agenda.hasTaskDot": "\u9019\u5929\u6709\u5b89\u6392",
-    "view.agenda.noteAdd": "\u5BEB\u5099\u8A3B",
-    "view.agenda.noteAddAria": "\u70BA\u9019\u689D\u4EFB\u52D9\u5BEB\u5099\u8A3B",
-    "view.agenda.noteEdit": "\u7DE8\u8F2F\u5099\u8A3B",
-    "view.agenda.noteHelp": "Enter \u5B58\u6A94 \u00B7 Shift+Enter \u63DB\u884C \u00B7 Esc \u53D6\u6D88",
     "view.agenda.overdueDot": "\u9019\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
     "view.cell.category": "\u985e\u5225\uff1a{category}",
     "view.cell.duration": "{days}\u5929",
@@ -830,6 +832,11 @@ var I18N = {
     "modal.create.multiDay": "Multi-day Task",
     "modal.create.noDateMark": "This task has no date marker, cannot locate for editing",
     "modal.create.none": "Normal",
+    "modal.create.note": "Note",
+    "modal.create.noteAdd": "+ Note",
+    "modal.create.noteAria": "Add a note to this task",
+    "modal.create.noteEdit": "Edit note",
+    "modal.create.notePlaceholder": "Write a note, multiple lines allowed...",
     "modal.create.placeholder": "Enter task content\u2026",
     "modal.create.pleaseSelect": "Please select date",
     "modal.create.priority": "Priority",
@@ -929,10 +936,6 @@ var I18N = {
     "view.agenda.emptyDay": "Nothing planned",
     "view.agenda.emptyFiltered": "No tasks on this day under the current filter",
     "view.agenda.hasTaskDot": "Plans on this day",
-    "view.agenda.noteAdd": "Add note",
-    "view.agenda.noteAddAria": "Add a note to this task",
-    "view.agenda.noteEdit": "Edit note",
-    "view.agenda.noteHelp": "Enter to save \u00B7 Shift+Enter for newline \u00B7 Esc to cancel",
     "view.agenda.overdueDot": "Overdue on this day",
     "view.cell.category": "Category: {category}",
     "view.cell.duration": "{days}d",
@@ -2984,6 +2987,7 @@ var AGENDA_TOGGLE_ICONS = {
 
 // 明细区「＋ 添加」按钮的加号图标（lucide plus 路径子集，stroke 规格同上）
 var AGENDA_ADD_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+var AGENDA_EDIT_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>';
 
 /**
  * ============================================================
@@ -3067,9 +3071,6 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
     // 托管弹窗挂在框架层不随 rootEl 回收：视图关闭时一并收起，避免失联
     this.closeActivePopup();
-    // 编辑态必须一起清掉：留着 true 会让这个实例之后的每次渲染都被守卫跳过
-    this.editingNote = false;
-    this.renderAfterNoteEdit = false;
     this.rootEl.empty();
   }
   /** 关闭本视图挂出的所有托管弹窗（日期跳转 / 类别筛选）；两个面板改挂 Modal 后
@@ -3333,13 +3334,6 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 自增 requestId：快速切换月份时，旧请求完成后会因 requestId 不匹配而丢弃渲染结果
     this.renderRequestId = (this.renderRequestId || 0) + 1;
     const myRequestId = this.renderRequestId;
-    // v1.6.0 批次三：正在就地编辑备注时不重绘——vault 修改事件 → 500ms 防抖 →
-    // invalidateCache + refreshView 会整片重画，不拦就等于「写着写着字没了」。
-    // 先递增 requestId 再返回：进行中的旧渲染也会被作废，编辑结束后补的那次才是最终态
-    if (this.editingNote) {
-      this.renderAfterNoteEdit = true;
-      return;
-    }
     const titleEl = this.headerEl.querySelector(".month-title");
     if (titleEl) {
       titleEl.textContent = getMonthTitle(this.currentYear, this.currentMonth);
@@ -3637,9 +3631,38 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 打开创建任务弹窗
    */
   openCreateTaskModal(date, existingTasks = [], editTask = null) {
-    const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category, editOld) => {
+    const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category, editOld, noteText) => {
       const customFolderPath = this.plugin.settings.customTaskFolder || void 0;
-      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0, editOld ? editOld.note : void 0);
+      // v1.6.0 手机端反馈版：备注改在弹窗里写（noteText 恒为字符串，收起时是空串）。
+      // 编辑态逐项比对「任务行本身」有没有变——只有备注变就走 updateTaskNote 原地
+      // 写回：先建后删那条链路会重排行号、换 createdAt，只为改一行备注不值得。
+      // 判定宁可漏判（落到重建路径，结果仍正确）不可误判（用户的改动被吞掉）
+      if (editOld) {
+        const nextNote = noteTextToLines(noteText).join("\n");
+        const oldNote = noteTextToLines(editOld.note).join("\n");
+        const fmtD = (s) => s ? formatDate(dateFromStr(String(s))) : "";
+        const newStart = formatDate(date);
+        const newDue = endDate ? formatDate(endDate) : newStart;
+        const rowSame = content === editOld.content
+          && (category || "") === (editOld.category || "")
+          && priority === editOld.priority
+          && (isAllDay ? "" : time || "") === (editOld.time || "")
+          && fmtD(editOld.startDate || editOld.dueDate) === newStart
+          && fmtD(editOld.dueDate) === newDue;
+        if (rowSame) {
+          if (nextNote === oldNote) return;
+          const kept = await this.taskParser.updateTaskNote(editOld, nextNote);
+          if (!kept) throw new Error("updateTaskNote returned false");
+          try {
+            await this.refresh(true);
+          } catch (refreshErr) {
+            console.error(tr("error.postCreateRefresh"), refreshErr);
+            new import_obsidian2.Notice(tr("notice.createdRefreshFail"), 3e3);
+          }
+          return;
+        }
+      }
+      const success = await this.taskParser.createTaskForDate(date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0, noteText || void 0);
       if (success) {
         // 批次三：编辑=先建新行、再删旧行（3.4 定稿）。删除只认 rawLine：新行插入后
         // 旧行行号常发生偏移；删不到不判失败——新行已在，重复行可见、可手动删除
@@ -3856,14 +3879,18 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // ---- 条目列表 ----
     const listEl = detail.createDiv("agenda-list");
     for (const task of tasks) {
-      this.renderAgendaEntry(listEl, task);
+      this.renderAgendaEntry(listEl, task, tasks);
     }
   }
   /**
    * 一条任务 + 它的备注（备注是宿主的附属，不独立成条目——这样桌面端双列时
    * 两者永远同列，不会被网格拆到两个栏里）。
+   * v1.6.0 手机端反馈版：行尾铅笔 = 打开「添加任务」弹窗编辑态。就地编辑那套
+   * （textarea 塞进卡片）被软键盘挡住、圆角盒还截字，弹窗由框架统一管滚动，
+   * 手机上顶得住；无备注不再画「＋ 写备注」幽灵行——它常年白占一行，
+   * 明细区可显示的内容反而变少（反馈①）。
    */
-  renderAgendaEntry(container, task) {
+  renderAgendaEntry(container, task, allTasks) {
     const entryEl = container.createDiv("agenda-entry");
     const itemEl = entryEl.createDiv("agenda-item");
     if (task.completed) itemEl.addClass("completed");
@@ -3882,10 +3909,11 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         if (checkEl.isConnected) checkEl.disabled = false;
       }
     });
-    // 点整行也算勾选（手机端目标小，勾选圈只有 16px）
+    // 点整行 = 开编辑弹窗（反馈②：行上要有编辑/跳转/删除入口；跳转与删除在
+    // 弹窗编辑态的日期抬头右侧）。勾选圈只负责勾选，点它不再触发整行动作。
     itemEl.addEventListener("click", (e) => {
       if (e.target === checkEl) return;
-      checkEl.click();
+      this.openTaskEditor(task, allTasks);
     });
     const textEl = itemEl.createEl("span", { cls: "agenda-text", text: task.content });
     textEl.setAttribute("title", task.content);
@@ -3897,185 +3925,37 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       catEl.setAttribute("title", tr("view.cell.category", { category: task.category }));
       catEl.style.setProperty("--mt-cat-color", resolveCategoryColor(task.category, this.plugin.settings.categories));
     }
-    // 备注（v1.6.0 批次三：可读 + 可写）。有备注 = 卡片，点它就地编辑；没备注 =
-    // 一枚很轻的「＋ 写备注」幽灵按钮（用户明确要求下半区要能写备注，只读不够用）。
-    // 左侧细竖线仍是「这不是任务」的唯一提示，不写「备注」二字。
-    const noteEl = entryEl.createDiv("agenda-note");
-    this.paintNoteReadonly(noteEl, task);
-    noteEl.addEventListener("click", () => {
-      if (this.editingNote) return;
-      this.startNoteEdit(noteEl, task);
+    // 铅笔按钮：明细区不能靠 hover 显隐（手机端没有 hover），常显；
+    // 类复用弹窗列表那套 .task-action-btn.task-edit-btn，外观零新增
+    const editBtn = itemEl.createEl("button", {
+      cls: "task-action-btn task-edit-btn agenda-edit-btn",
+      type: "button",
+      attr: { title: tr("modal.create.edit"), "aria-label": tr("modal.create.edit") }
     });
-    noteEl.setAttribute("role", "button");
-    noteEl.setAttribute("tabindex", "0");
-    noteEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        if (!this.editingNote) this.startNoteEdit(noteEl, task);
-      }
+    editBtn.innerHTML = AGENDA_EDIT_ICON;
+    editBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.openTaskEditor(task, allTasks);
     });
-  }
-  /** 备注的只读呈现：有内容 = 卡片（title 挂全文），无内容 = 幽灵按钮 */
-  paintNoteReadonly(noteEl, task) {
-    noteEl.empty();
-    noteEl.removeClass("agenda-note-empty");
-    noteEl.removeClass("is-editing");
-    noteEl.removeAttribute("contenteditable");
+    // 只读备注卡片：有备注才出现。点它不做任何事（点行 = 编辑，读字不用弹窗），
+    // 所以不再是 role=button，也不挂 tabindex
     if (task.note) {
+      const noteEl = entryEl.createDiv("agenda-note");
       noteEl.textContent = task.note;
       noteEl.setAttribute("title", task.note);
-      noteEl.setAttribute("aria-label", tr("view.agenda.noteEdit"));
-    } else {
-      noteEl.addClass("agenda-note-empty");
-      noteEl.createSpan({ cls: "agenda-note-plus", text: "\uFF0B" });
-      noteEl.createSpan({ text: tr("view.agenda.noteAdd") });
-      noteEl.setAttribute("aria-label", tr("view.agenda.noteAddAria"));
     }
   }
   /**
-   * 就地编辑备注：不弹窗（手机上弹窗套一层很难受），原卡片换成 textarea。
-   * 用 textarea 而不是 contenteditable：IME 组字、粘贴纯文本、Shift+Enter 换行、
-   * 读取值这四件事浏览器实现各不相同，contenteditable 要写一堆兼容分支才不丢字；
-   * textarea 是唯一「读出来就是用户打的」的那个。
+   * 以任务锚点日期重开「添加任务」弹窗的编辑态（与弹窗列表铅笔同口径：锚点 =
+   * startDate||dueDate，不用被点格子——跨天虚拟挂载时两者不同会把任务平移走样）。
    */
-  startNoteEdit(noteEl, task) {
-    const original = task.note || "";
-    this.editingNote = true;
-    this.renderAfterNoteEdit = false;
-    noteEl.addClass("is-editing");
-    noteEl.removeClass("agenda-note-empty");
-    noteEl.empty();
-    const ta = noteEl.createEl("textarea", {
-      cls: "agenda-note-input",
-      attr: {
-        "aria-label": original ? tr("view.agenda.noteEdit") : tr("view.agenda.noteAddAria"),
-        "title": tr("view.agenda.noteHelp"),
-        spellcheck: "false"
-      }
-    });
-    ta.value = original;
-    const autosize = () => {
-      ta.style.height = "auto";
-      ta.style.height = Math.max(ta.scrollHeight + 2, 34) + "px";
-    };
-    autosize();
-    ta.addEventListener("input", autosize);
-    let done = false;
-    // 开编辑瞬间的「伪 blur」宽限。CDP 插桩时间线（Input.dispatchMouseEvent 真实点击与
-    // JS 合成 click 两条路径都一样）：mousedown 时浏览器先把焦点给到 .agenda-note 本身
-    // （它有 tabindex），click 里换成 textarea 并 ta.focus()，随后 Obsidian 的焦点簿记
-    // 还会再补一次 blur（rel=null，焦点掉回 body）。不拦的话刚建好的 textarea 立刻走
-    // 「点别处=保存」，备注框一闪就收回（真机 bug，合成事件一度测不出）。第二版在 blur
-    // 里同步补 ta.focus() 并封顶次数——实机证明那是 blur→focus→blur 的同步乒乓：额度
-    // 3ms 内烧光，宽限形同虚设。这版改尾部防抖：风暴期间只挂一个 24ms 的延迟 refocus
-    // （跳出 blur 派发再抢回焦点，乒乓自然断开）。同时用捕获阶段的 document mousedown
-    // 记「点到卡片外」：窗口内用户真点了别处，blur 照常走保存，不会把焦点锁死在输入框
-    // 里；收软键盘那种纯 blur 仍走 refocus（手机端收起键盘≠放弃编辑）。内容一旦改过
-    // （value≠原文）或窗口（500ms）一过，立即恢复「blur 即保存」，不吞用户输入。
-    const openedAt = Date.now();
-    let refocusTimer = 0;
-    let refocusTries = 0;
-    let outsideDown = false;
-    const onDocDown = (e) => { if (!noteEl.contains(e.target)) outsideDown = true; };
-    const refocusSoon = () => {
-      if (refocusTimer) clearTimeout(refocusTimer);
-      refocusTimer = setTimeout(() => {
-        refocusTimer = 0;
-        if (done || !ta.isConnected || refocusTries >= 3) return;
-        // 封顶放在延迟回调里（而不是 blur 里同步自增）：实机见过一种「焦点被框架
-        // 反复抢回 body」的抢焦循环（document.hasFocus() 全程 true，约 28ms 一轮，
-        // 只在窗口失过焦之后出现），防抖 refocus 会给它无限续命，宽限窗口（500ms）
-        // 一过反而把未保存的草稿 blur 存出去。每轮 refocus 至少隔 24ms，3 次足够
-        // 赢下正常的单次伪 blur；病态循环则 ~72ms 内落到「blur 即保存」——内容还是
-        // 原文时保存不写盘，等价于安全收回编辑态。
-        refocusTries++;
-        ta.focus();
-        ta.setSelectionRange(ta.value.length, ta.value.length);
-      }, 24);
-    };
-    const onBlur = () => {
-      if (done) return;
-      if (Date.now() - openedAt < 500 && ta.value === original && !outsideDown && ta.isConnected) {
-        refocusSoon();
-        return;
-      }
-      if (refocusTimer) {
-        clearTimeout(refocusTimer);
-        refocusTimer = 0;
-      }
-      // 点别处 = 保存：手机端收起软键盘走的是 blur，判取消会把用户输入丢掉
-      if (stop()) finish(true);
-    };
-    const stop = () => {
-      if (done) return false;
-      done = true;
-      if (refocusTimer) {
-        clearTimeout(refocusTimer);
-        refocusTimer = 0;
-      }
-      ta.removeEventListener("blur", onBlur);
-      document.removeEventListener("mousedown", onDocDown, true);
-      return true;
-    };
-    // retry：写回失败时把 blur 监听挂回去，用户再点一下别处或按回车即可重试
-    const finish = (save) => this.endNoteEdit(noteEl, task, save ? ta.value : original, save, () => {
-      done = false;
-      outsideDown = false;
-      document.addEventListener("mousedown", onDocDown, true);
-      ta.addEventListener("blur", onBlur);
-      ta.focus();
-    });
-    ta.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        // Esc 只放弃编辑：既要阻止冒泡（否则同一次按键会在 noteEl 的 keydown 里
-        // 再进一次编辑），也要阻止默认（否则框架可能把它当成关闭视图）
-        e.preventDefault();
-        e.stopPropagation();
-        if (stop()) finish(false);
-        return;
-      }
-      if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (stop()) finish(true);
-      }
-    });
-    ta.addEventListener("blur", onBlur);
-    document.addEventListener("mousedown", onDocDown, true);
-    ta.focus();
-    // 光标落到文末（全选会把原文当占位符直接覆盖，改一句话要重打一遍很难受）
-    ta.setSelectionRange(ta.value.length, ta.value.length);
-  }
-  /**
-   * 结束编辑。save 且内容有变化才落盘（只读一遍不动文件，避免无意义的 modify 事件
-   * 触发全库重解析）；写回失败**保留编辑态与已输入内容**并重新挂回 blur 监听，让用户
-   * 能再按一次回车重试，而不是把刚打的字全丢了。
-   */
-  async endNoteEdit(noteEl, task, text, save, retry) {
-    this.editingNote = false;
-    const next = noteTextToLines(text).join("\n");
-    if (save && next !== (task.note || "")) {
-      const ok = await this.taskParser.updateTaskNote(task, next);
-      if (!ok) {
-        new import_obsidian2.Notice(tr("notice.opFail"));
-        this.editingNote = true;
-        if (retry) retry();
-        return;
-      }
-      task.note = next;
-    }
-    if (this.renderAfterNoteEdit) {
-      this.renderAfterNoteEdit = false;
-      // 编辑期间被压掉的其它刷新（勾选、防抖刷新）在这里补一次，走全量解析取最新落盘内容
-      this.paintNoteReadonly(noteEl, task);
-      try {
-        await this.refresh();
-      } catch (e) {
-        console.error(tr("error.delayRefresh"), e);
-      }
+  openTaskEditor(task, allTasks) {
+    const anchorStr = task.startDate || task.dueDate;
+    if (!anchorStr) {
+      new import_obsidian2.Notice(tr("modal.create.noDateMark"), 3e3);
       return;
     }
-    this.paintNoteReadonly(noteEl, task);
+    this.openCreateTaskModal(dateFromStr(anchorStr), allTasks || [], task);
   }
   /** 切回条视图时明细区必须整块摘掉，留着会把网格挤成半屏 */
   removeAgendaDetail() {
@@ -4804,6 +4684,12 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     setTimeout(killCloseBtns, 500);
     // 框架在移动端会给 .modal 预留内边距，弹窗内容自带留白，归零以复用原设计的间距
     this.modalEl.style.padding = "0";
+    // v1.6.0 手机端反馈版：备注编辑从「明细区就地编辑」迁到本弹窗。
+    // 声明提到函数级：日期抬头（下方）与备注区（任务输入框之后）两段都要读写它
+    let noteHasContent = !!(this.editingTask && this.editingTask.note);
+    let noteOpen = noteHasContent;
+    let noteText = null;
+    let applyNoteOpen = null;
     const dateInfoEl = this.modalEl.createDiv("modal-date-info");
     const weekday = [tr("modal.create.weekday.sun"), tr("modal.create.weekday.mon"), tr("modal.create.weekday.tue"), tr("modal.create.weekday.wed"), tr("modal.create.weekday.thu"), tr("modal.create.weekday.fri"), tr("modal.create.weekday.sat")][this.date.getDay()];
     const holidayInfo = this.plugin.holidayManager.getHolidayInfo(this.date);
@@ -4812,6 +4698,65 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     dateMainEl.textContent = tr("modal.create.dateLine", { m: this.date.getMonth() + 1, day: this.date.getDate(), weekday: weekday });
     if (holidayInfo) {
       dateMainEl.createSpan({ text: ` \xB7 ${translateHolidayName(holidayInfo.name)}` });
+    }
+    // v1.6.0 手机端反馈版②：编辑态要有跳转/删除。原先这两颗长在「该日已有 N 个
+    // 任务」列表里，而编辑态整段列表不渲染（编辑对象就是那一条），入口等于没有。
+    // 现在挂在日期抬头右上角（框架 X 钮的位置，我们本来就把 X 移除了）：铅笔 =
+    // 展开备注区（等价点「＋ 备注」胶囊），跳转/删除与列表行按钮同口径
+    if (this.editingTask) {
+      const headTask = this.editingTask;
+      const headActions = dateInfoEl.createDiv("modal-task-actions");
+      const hEdit = headActions.createEl("button", { cls: "task-action-btn task-edit-btn", attr: { type: "button", title: tr("modal.create.noteEdit"), "aria-label": tr("modal.create.noteEdit") } });
+      hEdit.innerHTML = AGENDA_EDIT_ICON;
+      hEdit.addEventListener("click", () => {
+        noteOpen = true;
+        if (applyNoteOpen) applyNoteOpen(true);
+      });
+      const hGoto = headActions.createEl("button", { cls: "task-action-btn task-goto-btn", attr: { type: "button", title: tr("modal.create.goto"), "aria-label": tr("modal.create.goto") } });
+      hGoto.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
+      hGoto.addEventListener("click", async () => {
+        const file = this.app.vault.getAbstractFileByPath(headTask.filePath);
+        if (file) {
+          const leaf = this.app.workspace.getLeaf(false);
+          await leaf.openFile(file);
+          // openFile 返回时编辑器可能尚未就绪，短暂重试，避免静默跳过定位（同列表行口径）
+          let tries = 10;
+          const focusTimer = setInterval(() => {
+            const ed = leaf.view && leaf.view.editor;
+            if (ed) {
+              clearInterval(focusTimer);
+              ed.setCursor({ line: headTask.lineNumber, ch: 0 });
+              ed.scrollIntoView({ from: { line: headTask.lineNumber, ch: 0 }, to: { line: headTask.lineNumber, ch: 0 } }, true);
+            } else if (--tries <= 0) {
+              clearInterval(focusTimer);
+            }
+          }, 100);
+        }
+        this.close();
+      });
+      const hDel = headActions.createEl("button", { cls: "task-action-btn task-delete-btn", attr: { type: "button", title: tr("modal.create.delete"), "aria-label": tr("modal.create.delete") } });
+      hDel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`;
+      hDel.addEventListener("click", async () => {
+        if (hDel.disabled) return;
+        hDel.disabled = true;
+        const ok = await this.plugin.taskParser.deleteTask(headTask);
+        if (!ok) {
+          hDel.disabled = false;
+          new import_obsidian3.Notice(tr("notice.opFail"), 3e3);
+          return;
+        }
+        // 已落盘：收弹窗、让视图重读文件，不然日历上还挂着这条
+        this.close();
+        const vLeaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY)[0];
+        const v = vLeaf ? vLeaf.view : null;
+        if (v) {
+          try {
+            await v.refresh(true);
+          } catch (e) {
+            console.error(tr("error.delayRefresh"), e);
+          }
+        }
+      });
     }
     if (this.existingTasks.length > 0 && !this.editingTask) {
       const existingTasksEl = this.modalEl.createDiv("modal-existing-tasks");
@@ -5016,6 +4961,39 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     if (this.editingTask) {
       inputEl.value = this.editingTask.content;
     }
+    // 备注区（反馈①③的落点）：收起态 = 一枚虚线胶囊，与「＋ 设置时间」同视觉族，
+    // 不占额外行高；展开态 = 多行 textarea，字号 ≥16px（iOS WebKit 对 <16px 输入框
+    // 聚焦强制放大整页）。编辑态原有备注自动展开并预填；胶囊收起后内容仍留在
+    // textarea 里，保存照样写回——收起只是不占地方，不是放弃编辑
+    const noteContainer = this.modalEl.createDiv("modal-note-container");
+    const noteLabelEl = noteContainer.createEl("span", { cls: "note-label", text: tr("modal.create.note") });
+    const noteShowBtn = noteContainer.createEl("button", { cls: "note-show-btn", type: "button", text: tr("modal.create.noteAdd") });
+    noteText = noteContainer.createEl("textarea", {
+      cls: "note-textarea",
+      attr: { placeholder: tr("modal.create.notePlaceholder"), "aria-label": tr("modal.create.noteAria"), spellcheck: "false" }
+    });
+    noteText.value = noteHasContent ? this.editingTask.note : "";
+    const autosizeNote = () => {
+      noteText.style.height = "auto";
+      noteText.style.height = Math.max(noteText.scrollHeight + 2, 44) + "px";
+    };
+    noteText.addEventListener("input", autosizeNote);
+    applyNoteOpen = (focusNote) => {
+      noteLabelEl.style.display = noteOpen ? "block" : "none";
+      noteText.style.display = noteOpen ? "block" : "none";
+      noteShowBtn.style.display = noteOpen ? "none" : "";
+      if (noteOpen) {
+        autosizeNote();
+        if (focusNote) noteText.focus();
+        // 光标落到文末（全选会把原文当占位符，改一句话要重打一遍很难受）
+        noteText.setSelectionRange(noteText.value.length, noteText.value.length);
+      }
+    };
+    noteShowBtn.addEventListener("click", () => {
+      noteOpen = true;
+      applyNoteOpen(true);
+    });
+    applyNoteOpen();
     let startTimeEl = null;
     let endTimeEl = null;
     let isAllDay = this.editingTask ? !this.editingTask.time : this.plugin.settings.defaultAllDayTask;
@@ -5386,13 +5364,15 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         .replace(/[📅🛫⏰⏳🔴🟡🟢]/gu, "")
         .replace(/\s+/g, " ")
         .trim();
-      if (!content) {
-        // 剥离后内容为空（如用户只输入了 emoji 标记），提示用户而非静默返回
+      // v1.6.0 手机端反馈版：备注区就在标题下方，编辑态清空标题、只动备注是
+      // 合法意图（边改标题边补两句备注）。识别出来沿用原标题提交；其余空内容照旧提示
+      const noteOnly = !!this.editingTask && !content && noteText != null && noteText.value !== (this.editingTask.note || "");
+      if (!content && !noteOnly) {
         new import_obsidian3.Notice(tr("modal.create.empty"), 3e3);
         inputEl.focus();
         return;
       }
-      if (content) {
+      if (content || noteOnly) {
         let time = void 0;
         if (!isAllDay && startTimeEl && endTimeEl) {
           const s = startTimeEl.value;
@@ -5417,7 +5397,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         // await onSubmit：确保 createTaskForDate 完成后再关闭弹窗，失败时回滚状态允许重试
         // 记住本次类别（内存态，下次打开弹窗预选）；提交链路把 category 交给视图回调
         this.plugin.lastCategory = selectedCategory;
-        Promise.resolve(this.onSubmit(content, isAllDay, time, selectedPriority, endDate, selectedCategory, this.editingTask)).then(() => {
+        Promise.resolve(this.onSubmit(noteOnly ? this.editingTask.content : content, isAllDay, time, selectedPriority, endDate, selectedCategory, this.editingTask, noteText ? noteText.value : "")).then(() => {
           this.close();
         }).catch((err) => {
           console.error(tr("error.createFail"), err);
