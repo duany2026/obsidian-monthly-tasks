@@ -2,7 +2,7 @@
 
 ## 📥 下载安装（小白版）
 
-1. 打开本仓库的 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases)，下载最新版本的 `monthly-tasks-1.6.0.zip`
+1. 打开本仓库的 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases)，下载最新版本的 `monthly-tasks-1.6.1.zip`
 2. 解压，得到文件夹 `monthly-tasks`
 3. 打开你的 Obsidian 笔记库文件夹，进入隐藏目录 `.obsidian/plugins/`（如果没见过这个目录：在 Obsidian 里点左下角仓库图标 →「在系统资源管理器中显示仓库」，进去就能看到 `.obsidian`）
 4. 把解压出的 `monthly-tasks` 文件夹整个放进去，变成 `.obsidian/plugins/monthly-tasks/`（里面应有 `main.js`、`manifest.json`、`styles.css`）
@@ -60,7 +60,7 @@
 
 ### 方式二：手动安装
 
-1. 下载最新版本的 `monthly-tasks-1.6.0.zip`
+1. 下载最新版本的 `monthly-tasks-1.6.1.zip`
 2. 解压到 Obsidian 插件目录 `.obsidian/plugins/monthly-tasks/`
 3. 重启 Obsidian 并启用插件
 
@@ -261,7 +261,15 @@
 
 查看完整的版本更新历史，请参阅 [CHANGELOG.md](./CHANGELOG.md)。
 
-### 最新版本 v1.6.0 (2026-10-05)
+### 最新版本 v1.6.1 (2026-10-06)
+
+**真机反馈第二轮：备注框与编辑入口**
+
+- 备注收起态从「＋ 备注」小胶囊改成与任务输入框同宽同高的**整条虚线幽灵框**，不再孤零零浮在空白里
+- 修掉备注输入框「留白过大」的真凶：`<textarea>` 缺 `rows` 属性时浏览器按两行算高度，一行备注被撑到 74px；现在一行就是 36px，随内容自动撑开，尺寸/边框/圆角与任务输入框同族
+- 日程视图**点任务行 = 直接编辑这一条**（原来点行和点「管理」都是新建态，还要再找铅笔，"点击一步却走了两步"）；「管理」仍是新建态，面板内铅笔用于切换目标 / 退回新建
+
+### 上一版 v1.6.0 (2026-10-05)
 
 **新增：日程视图（第二种月历形态）**
 
