@@ -1339,6 +1339,7 @@
 	--mt-end-h: 32px;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 8px;
 	position: relative;
 	flex-wrap: wrap;
@@ -1764,6 +1765,9 @@
    布局不再用"标题在上 + 大圆点在下"的两段式（单块约 120px），而是把
    「高 / 中 / 无」三组横排在左侧标签右边（单块约 66px），比原布局省 54px。
    结构 .priority-btn-wrapper > .priority-btn（40px 圆）+ .priority-btn-text（下方 11px） */
+/* v1.6.4：卡片是整宽的，内容左对齐会在右边空出一大块（手机上尤其明显）。
+   改成「优先级 + 三组圆点」作为一个整体居中；.priority-group 不再 flex:1 吃满，
+   否则居中的是它、看起来仍是圆点靠左 */
 .modal-priority {
 	margin: 0 24px 16px;
 	padding: 10px 20px;
@@ -1772,6 +1776,7 @@
 	border: 1px solid #e2e8f0;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 16px;
 	flex-wrap: wrap;
 }
@@ -1788,7 +1793,7 @@
 	display: flex;
 	gap: 18px;
 	flex-wrap: wrap;
-	flex: 1 1 auto;
+	flex: 0 1 auto;
 	align-items: flex-start;
 }
 
@@ -1891,6 +1896,8 @@
 /* 批次二③：创建弹窗类别行——优先级下方一排小号胶囊，首个「无标签」= 不加 #tag。
    外观沿用 .modal-priority 的浅灰渐变卡片语汇，保持弹窗内区块一致；胶囊用圆角
    999px 与优先级方块区分开，色点复用 --mt-cat-color（与日历/漏斗/设置同色） */
+/* v1.6.4：跨天行与优先级行居中后，类别行仍左对齐会在同一屏里出现两种对齐基线。
+   三张卡片统一居中；胶囊换行时每行各自居中，展开态读起来是一团而不是左倾的堆 */
 .modal-category {
 	margin: 0 24px 20px;
 	padding: 14px 20px;
@@ -1899,6 +1906,7 @@
 	border: 1px solid #e2e8f0;
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	gap: 12px;
 	flex-wrap: wrap;
 }
