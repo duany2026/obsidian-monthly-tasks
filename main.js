@@ -116,7 +116,7 @@ var I18N = {
   "zh-CN": {
     "cmd.open": "\u6253\u5f00\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
     "cmd.refresh": "\u5237\u65b0\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
-    "cmd.toggle": "\u5faa\u73af\u5207\u6362\u6708\u5386\u89c6\u56fe\uff08\u5927\u6708 / \u5c0f\u6708 / \u5c0f\u5468\uff09",
+    "cmd.toggle": "\u5faa\u73af\u5207\u6362\u6708\u5386\u89c6\u56fe\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u5468 / \u5c0f\u5468\uff09",
     "error.badDateConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u8bc6\u522b\u7684\u65e5\u671f\u4efb\u52a1\u884c ({path}:{line}): {line}",
     "error.builtinHoliday": "\u6708\u5386\u4efb\u52a1\uff1a\u5185\u7f6e\u8282\u5047\u65e5\u6570\u636e\u8bfb\u53d6\u5931\u8d25\uff08holidays.json \u7f3a\u5931\u6216\u635f\u574f\uff09\uff0c\u5bf9\u5e94\u5e74\u4efd\u5c06\u4f9d\u8d56\u7f51\u7edc\u6570\u636e\u6e90",
     "error.createFail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25:",
@@ -388,7 +388,9 @@ var I18N = {
     "view.header.today": "\u56de\u5230\u672c\u6708",
     "view.menu.title": "\u89c6\u56fe",
     "view.mode.agenda": "\u5c0f\u6708\u89c6\u56fe",
+    "view.mode.bigWeek": "\u5927\u5468\u89c6\u56fe",
     "view.mode.desc.agenda": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
+    "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
     "view.mode.desc.list": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
     "view.mode.desc.week": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
     "view.mode.list": "\u5927\u6708\u89c6\u56fe",
@@ -406,6 +408,12 @@ var I18N = {
     "view.month.8": "8\u6708",
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
+    "view.week.load": "\u5171 {n} \u9879 \u00b7 \u5b8c\u6210 {m}",
+    "view.week.lunarSpan": "{a} \u2013 {b}",
+    "view.week.number": "\u7b2c {n} \u5468",
+    "view.week.relative.next": "\u4e0b\u5468",
+    "view.week.relative.prev": "\u4e0a\u5468",
+    "view.week.relative.this": "\u672c\u5468",
     "view.week.title": "{a} \u2013 {b}",
     "view.weekday.fri": "\u4e94",
     "view.weekday.mon": "\u4e00",
@@ -418,7 +426,7 @@ var I18N = {
   "zh-TW": {
     "cmd.open": "\u958b\u555f\u6708\u66c6\u4efb\u52d9\u8996\u5716",
     "cmd.refresh": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u4efb\u52d9\u8996\u5716",
-    "cmd.toggle": "\u8ff4\u5708\u5207\u63db\u6708\u66c6\u6aa2\u8996\uff08\u5927\u6708 / \u5c0f\u6708 / \u5c0f\u9031\uff09",
+    "cmd.toggle": "\u8ff4\u5708\u5207\u63db\u6708\u66c6\u6aa2\u8996\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u9031 / \u5c0f\u9031\uff09",
     "error.badDateConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u8b58\u5225\u7684\u65e5\u671f\u4efb\u52d9\u884c ({path}:{line}): {line}",
     "error.builtinHoliday": "\u6708\u66c6\u4efb\u52d9\uff1a\u5167\u5efa\u7bc0\u5047\u65e5\u6578\u64da\u8b80\u53d6\u5931\u6557\uff08holidays.json \u7f3a\u5931\u6216\u640d\u58de\uff09\uff0c\u5c0d\u61c9\u5e74\u4efd\u5c07\u4f9d\u8cf4\u7db2\u8def\u6578\u64da\u6e90",
     "error.createFail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff1a",
@@ -690,7 +698,9 @@ var I18N = {
     "view.header.today": "\u56de\u5230\u672c\u6708",
     "view.menu.title": "\u6aa2\u8996",
     "view.mode.agenda": "\u5c0f\u6708\u6aa2\u8996",
+    "view.mode.bigWeek": "\u5927\u9031\u6aa2\u8996",
     "view.mode.desc.agenda": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
+    "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
     "view.mode.desc.list": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
     "view.mode.desc.week": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
     "view.mode.list": "\u5927\u6708\u6aa2\u8996",
@@ -708,6 +718,12 @@ var I18N = {
     "view.month.8": "8\u6708",
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
+    "view.week.load": "\u5171 {n} \u9805 \u00b7 \u5b8c\u6210 {m}",
+    "view.week.lunarSpan": "{a} \u2013 {b}",
+    "view.week.number": "\u7b2c {n} \u9031",
+    "view.week.relative.next": "\u4e0b\u9031",
+    "view.week.relative.prev": "\u4e0a\u9031",
+    "view.week.relative.this": "\u672c\u9031",
     "view.week.title": "{a} \u2013 {b}",
     "view.weekday.fri": "\u4e94",
     "view.weekday.mon": "\u4e00",
@@ -720,7 +736,7 @@ var I18N = {
   "en": {
     "cmd.open": "Open Monthly Tasks View",
     "cmd.refresh": "Refresh Monthly Tasks View",
-    "cmd.toggle": "Cycle monthly view (Month / Agenda / Week)",
+    "cmd.toggle": "Cycle monthly view (Month Cells / Month Agenda / Week Cells / Week Agenda)",
     "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {line}",
     "error.builtinHoliday": "Monthly Tasks: Built-in holiday data read failed (holidays.json missing or corrupted), corresponding year will rely on network data source",
     "error.createFail": "Create task failed:",
@@ -992,7 +1008,9 @@ var I18N = {
     "view.header.today": "Today",
     "view.menu.title": "View",
     "view.mode.agenda": "Month \u00b7 Agenda",
+    "view.mode.bigWeek": "Week \u00b7 Cells",
     "view.mode.desc.agenda": "Whole month, tasks in the list below",
+    "view.mode.desc.bigWeek": "One week only, tasks written in the cells",
     "view.mode.desc.list": "Whole month, tasks written in the cells",
     "view.mode.desc.week": "One week only, tasks in the list below",
     "view.mode.list": "Month \u00b7 Cells",
@@ -1010,6 +1028,12 @@ var I18N = {
     "view.month.8": "Aug",
     "view.month.9": "Sep",
     "view.month.title": "{monthName} {year}",
+    "view.week.load": "{n} items \u00b7 {m} done",
+    "view.week.lunarSpan": "{a} \u2013 {b}",
+    "view.week.number": "Week {n}",
+    "view.week.relative.next": "Next week",
+    "view.week.relative.prev": "Last week",
+    "view.week.relative.this": "This week",
     "view.week.title": "{a} \u2013 {b}",
     "view.weekday.fri": "Fri",
     "view.weekday.mon": "Mon",
@@ -2820,6 +2844,16 @@ function getLunarInfo(date) {
     };
   }
 }
+/** 某日所属的农历月名（闰六月 / 六月）；大周视图的「本周」块用它标出这一周跨的农历年月 */
+function lunarMonthLabel(date) {
+  try {
+    const l = solarToLunar(date);
+    const monthName = lunarMonthNames()[l.month - 1];
+    return l.isLeap ? tr("lunar.leap", { monthName }) : tr("lunar.monthSuffix", { monthName });
+  } catch (e) {
+    return "";
+  }
+}
 function isSpecialLunarDay(date) {
   try {
     const lunarDate = solarToLunar(date);
@@ -3047,15 +3081,51 @@ var VIEW_TYPE_MONTHLY = "monthly-tasks-view";
 // list = 当前在日程视图、点了回条视图。
 /* v1.7.0：视图模式常量（settings.viewMode 的合法取值，顺序即菜单/循环顺序）。
    list=大月（整月 + 任务写进格子）agenda=小月（整月 + 格子只出圆点，文字在明细区）
-   week=小周（只留所在那一行的周格子，明细区不变）。v1.7.1 再追加 bigWeek=大周。 */
-var VIEW_MODES = ["list", "agenda", "week"];
+   week=小周（只留所在那一行的周格子，明细区不变）。
+   v1.7.1：bigWeek=大周（只有一周 8 格：左上「本周」标题块 + 7 个日子格，
+   任务写进格子里，整块可上下滚）。
+   数组顺序即菜单顺序与命令循环顺序：先按范围（月 → 周）分组，组内「大」在前，
+   与用户口径「大月 / 小月 / 大周 / 小周」一致。 */
+var VIEW_MODES = ["list", "agenda", "bigWeek", "week"];
 var WEEK_TOGGLE_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="15" x2="8" y2="15.01"></line><line x1="12" y1="15" x2="12" y2="15.01"></line><line x1="16" y1="15" x2="16" y2="15.01"></line></svg>';
 var AGENDA_TOGGLE_ICONS = {
   agenda: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
   list: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>',
-  week: WEEK_TOGGLE_ICON
+  week: WEEK_TOGGLE_ICON,
+  // 大周：日历外框 + 一行两列的分栏与内容点（与「小周」那张「一行三点」区分开）
+  bigWeek: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="10" x2="12" y2="22"></line><line x1="7" y1="15" x2="7" y2="15.01"></line><line x1="17" y1="15" x2="17" y2="15.01"></line></svg>'
 };
 
+/**
+ * 星期全称（周日/周一…）。v1.7.1 大周视图的格子里没有列头可借，每格自带星期；
+ * 明细区吸顶行原本就有一份同样的数组，这里抽成函数供两处共用。
+ */
+function weekdayFullNames() {
+  return [
+    tr("modal.create.weekday.sun"),
+    tr("modal.create.weekday.mon"),
+    tr("modal.create.weekday.tue"),
+    tr("modal.create.weekday.wed"),
+    tr("modal.create.weekday.thu"),
+    tr("modal.create.weekday.fri"),
+    tr("modal.create.weekday.sat")
+  ];
+}
+/**
+ * 「本周 / 上周 / 下周」：拿锚点周与含今天那一周作差，按整周数说话。
+ * 差超过一周时不硬凑「上上周」——那是三个词的事，这里退到「第 N 周」，
+ * N 从锚点所在年的第一个周起点数起（与 firstDayOfWeek 同口径，不是 ISO 周）。
+ */
+function weekRelativeLabel(startKey, firstDayOfWeek) {
+  const todayStart = weekStartFrom(new Date(), firstDayOfWeek);
+  const diffWeeks = Math.round((dateFromStr(startKey).getTime() - dateFromStr(todayStart).getTime()) / (7 * 864e5));
+  if (diffWeeks === 0) return tr("view.week.relative.this");
+  if (diffWeeks === -1) return tr("view.week.relative.prev");
+  if (diffWeeks === 1) return tr("view.week.relative.next");
+  const anchor = dateFromStr(startKey);
+  const yearStart = dateFromStr(weekStartFrom(new Date(anchor.getFullYear(), 0, 1), firstDayOfWeek));
+  return tr("view.week.number", { n: Math.floor(Math.round((anchor.getTime() - yearStart.getTime()) / 864e5) / 7) + 1 });
+}
 /** 视图模式的显示名（菜单行、设置项、命令标题共用一处定义，避免三处文案漂移） */
 function viewModeLabel(mode) {
   return tr("view.mode." + mode);
@@ -3134,7 +3204,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.applyViewModeClass();
     this.convergeSelectedDate();
     // 小周是冷启动默认值也可能命中的视图，锚点必须在首帧前就位
-    if (this.isWeek()) this.ensureWeekAnchor();
+    if (this.isWeekFamily()) this.ensureWeekAnchor();
     await this.render();
   }
   /**
@@ -3294,7 +3364,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.renderWeekdayHeader();
       // 周视图还要重算锚点：整月的行切分随起始日整体平移，旧锚点（如周六起的 10-04）
       // 在周一为始的网格里没有对应行，visibleDays 会退到合成兜底、列与表头错位
-      if (this.isWeek()) {
+      if (this.isWeekFamily()) {
         this.ensureWeekAnchor();
         const t2 = this.headerEl.querySelector(".month-title");
         if (t2) t2.textContent = this.headerTitleText();
@@ -3311,7 +3381,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const leftGroup = this.headerEl.createDiv("header-btn-group");
     const prevBtn = leftGroup.createDiv("nav-btn prev-btn");
     prevBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
-    prevBtn.setAttribute("aria-label", this.isWeek() ? tr("view.header.prevWeek") : tr("view.header.prevMonth"));
+    prevBtn.setAttribute("aria-label", this.isWeekFamily() ? tr("view.header.prevWeek") : tr("view.header.prevMonth"));
     prevBtn.addEventListener("click", () => this.navigatePeriod(-1));
     const titleEl = this.headerEl.createDiv("month-title");
     titleEl.textContent = this.headerTitleText();
@@ -3321,14 +3391,14 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const rightGroup = this.headerEl.createDiv("header-btn-group");
     const nextBtn = rightGroup.createDiv("nav-btn next-btn");
     nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-    nextBtn.setAttribute("aria-label", this.isWeek() ? tr("view.header.nextWeek") : tr("view.header.nextMonth"));
+    nextBtn.setAttribute("aria-label", this.isWeekFamily() ? tr("view.header.nextWeek") : tr("view.header.nextMonth"));
     nextBtn.addEventListener("click", () => this.navigatePeriod(1));
     const todayBtn = rightGroup.createDiv("today-btn");
     // 真机反馈回退：图标化并未省下标题区（.month-title flex:1 吃掉余量），四字文案
     // 可读性更好，恢复 v1.4.2 文本按钮
     // v1.7.0：周视图下同一颗按钮语义变成「回到本周」（四字，宽度不跳），文案分开
-    todayBtn.textContent = this.isWeek() ? tr("view.header.thisWeek") : tr("view.header.today");
-    todayBtn.setAttribute("title", this.isWeek() ? tr("view.header.thisWeek") : tr("view.header.today"));
+    todayBtn.textContent = this.isWeekFamily() ? tr("view.header.thisWeek") : tr("view.header.today");
+    todayBtn.setAttribute("title", this.isWeekFamily() ? tr("view.header.thisWeek") : tr("view.header.today"));
     todayBtn.addEventListener("click", () => this.goToToday());
     // 漏斗筛选按钮（批次二⑤）：当前解析结果里出现 ≥1 个类别才渲染——纯无标签工作流
     // 永远看不到它；渲染与去留由 updateFilterButton 在每次网格渲染前统一收敛
@@ -3360,11 +3430,11 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   }
   /** 顶栏标题文案：月视图=「2026年 10月」，周视图=「10/5 – 10/11」 */
   headerTitleText() {
-    return this.isWeek() ? getWeekTitle(this.weekAnchor()) : getMonthTitle(this.currentYear, this.currentMonth);
+    return this.isWeekFamily() ? getWeekTitle(this.weekAnchor()) : getMonthTitle(this.currentYear, this.currentMonth);
   }
   /** 左右箭头统一入口：月视图按月走，周视图按周走（±7 天） */
   async navigatePeriod(direction) {
-    if (this.isWeek()) {
+    if (this.isWeekFamily()) {
       await this.navigateWeek(direction);
     } else {
       await this.navigateMonth(direction);
@@ -3386,7 +3456,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       this.currentYear = year;
       this.currentMonth = month;
       this.convergeSelectedDate();
-      if (this.isWeek()) this.ensureWeekAnchor();
+      if (this.isWeekFamily()) this.ensureWeekAnchor();
       await this.renderCalendarGrid();
     });
     modal.open();
@@ -3407,6 +3477,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 渲染星期标题
    */
   renderWeekdayHeader() {
+    // 大周视图没有列头：格子是 2 列（手机）/ 4 列（桌面）排布，列与星期不再
+    // 一一对应，星期写在每格抬头（见 renderDayCell 的 bigWeek 分支）。
+    if (this.isBigWeek()) return;
     const weekdayEl = document.createElement("div");
     weekdayEl.className = "weekday-header";
     const firstDayOfWeek = this.plugin.settings.firstDayOfWeek;
@@ -3453,7 +3526,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 同一天必然一模一样，不会出现「月视图有节日名、周视图没有」这类分叉。
    */
   visibleDays(calendar) {
-    if (!this.isWeek()) return calendar.days;
+    if (!this.isWeekFamily()) return calendar.days;
     const start = this.weekAnchor();
     const at = calendar.days.findIndex((d) => formatDate(d.date) === start);
     if (at < 0) {
@@ -3541,6 +3614,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       return;
     }
     if (myRequestId !== this.renderRequestId) return;
+    // 大周视图要统计「这一周共几项、完成几项」：跨天任务在起止区间内每天都挂一次，
+    // 所以按任务对象去重（同一个 task 引用只数一遍），口径与格子里铺出来的条数无关。
+    const weekTaskSet = this.isBigWeek() ? /* @__PURE__ */ new Set() : null;
     for (const day of this.visibleDays(calendar)) {
       const dateStr = formatDate(day.date);
       let tasks = taskMap.taskMap.get(dateStr) || [];
@@ -3553,6 +3629,12 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         tasks = tasks.filter((x) => this.activeCategories.has(x.category));
       }
       this.renderDayCell(day, tasks, hadBeforeFilter);
+      if (weekTaskSet) for (const t of tasks) weekTaskSet.add(t);
+    }
+    // 大周的「本周」块放在格子之后画：它要读上面那一循环的统计结果，
+    // 但插到网格最前面，视觉上仍是左上角第一格（与日子格同构：标题行 + 内容行）。
+    if (weekTaskSet) {
+      this.gridEl.insertBefore(this.renderWeekSummaryCell(weekTaskSet), this.gridEl.firstChild);
     }
 
     // 明细区（v1.6.0 批次二）：网格画完再画它，DOM 顺序天然是
@@ -3599,6 +3681,11 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
     const headerEl = cellEl.createDiv("day-header");
     const headerRow = headerEl.createDiv("day-header-row");
+    // 大周视图没有列头（2/4 列排布，列与星期对不上号），星期名回到格子里自带。
+    if (this.isBigWeek()) {
+      const wdEl = headerRow.createDiv("bigweek-weekday");
+      wdEl.textContent = weekdayFullNames()[day.date.getDay()];
+    }
     const dayNumEl = headerRow.createDiv("day-number");
     dayNumEl.textContent = String(day.day);
     if (this.plugin.settings.showLunar) {
@@ -3702,6 +3789,45 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   /**
    * 渲染任务项
    */
+  /**
+   * 大周视图左上角的「本周」块（v1.7.1）。
+   * ------------------------------------------------------------
+   * 与日子格同构：一行标题 + 几行内容，占满第一格，不空着、也不伪装成一个日子
+   * （无排期、不可点、无边框、底色更浅）。四行内容自上而下：
+   *   1) 本周 / 上周 / 下周 / 第 N 周 —— 文字，永远不是数字
+   *   2) 周区间 10/6 – 10/12 —— 顶栏已有，这里再给一次是因为块本身要能自立读解
+   *   3) 共 N 项 · 完成 M + 一条发丝进度线 —— 这一周的负载
+   *   4) 农历月（跨月时写「八月 – 九月」）—— 跟随「显示农历」开关
+   * 数字来自调用方传进的去重集合：跨天任务在这周里占 3 天也只算 1 项。
+   */
+  renderWeekSummaryCell(taskSet) {
+    const start = this.weekAnchor();
+    const end = weekEndFrom(start);
+    const el = this.gridEl.createDiv("day-cell week-summary");
+    const total = taskSet.size;
+    let done = 0;
+    for (const t of taskSet) if (t.completed) done++;
+    const titleRow = el.createDiv("day-header-row");
+    titleRow.createDiv("week-summary-title").textContent = weekRelativeLabel(start, this.plugin.settings.firstDayOfWeek);
+    el.createDiv("week-summary-range").textContent = getWeekTitle(start);
+    const loadEl = el.createDiv("week-summary-load");
+    loadEl.textContent = tr("view.week.load", { n: total, m: done });
+    const bar = el.createDiv("week-summary-bar");
+    // 0 项时不画线（画一条空槽会让人以为「有安排但都未完成」）；100% 时填满整槽
+    if (total > 0) {
+      bar.createDiv("week-summary-bar-fill").style.width = Math.round(done / total * 100) + "%";
+    } else {
+      bar.addClass("is-empty");
+    }
+    if (this.plugin.settings.showLunar) {
+      const a = lunarMonthLabel(dateFromStr(start));
+      const b = lunarMonthLabel(end);
+      const lunarEl = el.createDiv("week-summary-lunar");
+      lunarEl.textContent = a && b && a !== b ? tr("view.week.lunarSpan", { a, b }) : (a || "");
+      if (!lunarEl.textContent) lunarEl.remove();
+    }
+    return el;
+  }
   renderTaskItem(container, task, dayDate) {
     const taskEl = container.createDiv("task-item");
     // v1.5.2 方案A：.completed 只表意"已完成"（手机端 = 左缘灰竖条 + 变暗），不再受
@@ -3886,7 +4012,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.convergeSelectedDate();
     // 周视图：月都换了，锚点没有留在旧周的道理（convergeSelectedDate 已把选中日
     // 拉进新月，这里据它重算锚点，标题与网格自然对齐）
-    if (this.isWeek()) this.ensureWeekAnchor();
+    if (this.isWeekFamily()) this.ensureWeekAnchor();
     await this.renderCalendarGrid();
   }
   /**
@@ -3898,7 +4024,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.currentMonth = month;
     this.convergeSelectedDate();
     // 「回到本周」：周视图下锚点强制回到含今天那一周（ensureWeekAnchor 走 selectedDate=今天）
-    if (this.isWeek()) this.weekStart = weekStartFrom(new Date(), this.plugin.settings.firstDayOfWeek);
+    if (this.isWeekFamily()) this.weekStart = weekStartFrom(new Date(), this.plugin.settings.firstDayOfWeek);
     await this.renderCalendarGrid();
   }
   /**
@@ -3915,6 +4041,24 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   /** 小周视图（v1.7.0）：上半屏只留所在那一行的周格子，下半屏明细区与小月完全一致 */
   isWeek() {
     return this.plugin.settings.viewMode === "week";
+  }
+  /**
+   * 大周视图（v1.7.1）：同样只看一周，但这一周摊成 8 格（左上「本周」标题块 +
+   * 7 个日子格），任务写在格子里，没有下方明细区。
+   * 与 .view-agenda 那一族无关：格子渲染走大月那条路径（renderTaskItem），
+   * 只有「看哪一周」的锚点逻辑与小周共用。
+   */
+  isBigWeek() {
+    return this.plugin.settings.viewMode === "bigWeek";
+  }
+  /**
+   * 「按周过」的判定：顶栏标题=周区间、箭头按周翻页、锚点维护、visibleDays
+   * 只取 7 天——小周与大周这些行为完全一致，故共用一个谓词，避免每处写两遍。
+   * 注意：格子里画不画圆点、要不要明细区是 isCompactCell() 的事，两者正交。
+   */
+  isWeekFamily() {
+    const m = this.plugin.settings.viewMode;
+    return m === "week" || m === "bigWeek";
   }
   /**
    * 「格子只出圆点」的判定：小月与小周共用同一套格子渲染与明细区，
@@ -3952,7 +4096,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 进紧凑格子类视图时若从未选中过日子，先把选中日收敛到当前月内（否则明细区空白）
     if (this.isCompactCell() && !this.selectedDate) this.convergeSelectedDate();
     // 进周视图：锚点若无或不属当前月，收到当前月（切出周视图不动锚点，回来还在同一周）
-    if (this.isWeek()) this.ensureWeekAnchor();
+    if (this.isWeekFamily()) this.ensureWeekAnchor();
     this.closeActivePopup();
     this.rebuildHeader();
     this.applyViewModeClass();
@@ -3963,7 +4107,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   applyViewModeClass() {
     if (!this.rootEl) return;
     this.rootEl.toggleClass("view-agenda", this.isCompactCell());
-    this.rootEl.toggleClass("view-week", this.isWeek());
+    this.rootEl.toggleClass("view-week", this.isWeek());
+    this.rootEl.toggleClass("view-bigweek", this.isBigWeek());
   }
   /** 周锚点（YYYY-MM-DD，视图内存态）：小周视图显示哪一周由它决定 */
   weekAnchor() {
@@ -4004,7 +4149,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.selectedDate = key;
     // 周视图下点格子可能点到「锚点之外」的日期（跨月周里相邻周的日子不会出现在
     // 本视图，但日期选择器/明细区跳转会）：锚点跟着走，屏幕不留在原地
-    if (this.isWeek()) {
+    if (this.isWeekFamily()) {
       const anchor = this.weekAnchor();
       if (weekStartFrom(dateFromStr(key), this.plugin.settings.firstDayOfWeek) !== anchor) {
         this.weekStart = weekStartFrom(dateFromStr(key), this.plugin.settings.firstDayOfWeek);
@@ -5900,8 +6045,9 @@ function resolveCategoryColor(name, categories) {
 }
 var DEFAULT_SETTINGS = {
   // 视图模式："list"（大月：格子里铺任务行）| "agenda"（小月：格子只出一枚圆点，
-  // 文字在下方明细区）| "week"（小周：上半屏只留所在那一行的周格子）。
-  // v1.6.0 新增、v1.7.0 扩到三值；老 data.json 缺该键时由
+  // 文字在下方明细区）| "bigWeek"（大周：一周 8 格，左上「本周」块 + 7 个铺任务的
+  // 日子格）| "week"（小周：上半屏只留所在那一行的周格子）。
+  // v1.6.0 新增、v1.7.0 扩到三值、v1.7.1 扩到四值；老 data.json 缺该键时由
   // Object.assign({}, DEFAULT_SETTINGS, loadedData) 取此默认值，不需额外兜底。
   viewMode: "list",
   // 界面语言："auto"（跟随 Obsidian 设置）| "zh-CN" | "zh-TW" | "en"

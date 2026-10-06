@@ -3722,3 +3722,211 @@
 		font-size: 11px;
 	}
 }
+
+/* ============================================================
+   v1.7.1 大周视图（.view-bigweek）
+   ------------------------------------------------------------
+   作用域纪律沿用前几版：root 上只有 .view-bigweek 一个类（不带 .view-agenda，
+   因为它既不是圆点格子、也没有明细区），本段每条规则都以它打头，
+   大月 / 小月 / 小周 一行样式都不受影响。
+   布局：8 格 = 左上「本周」标题块 + 7 个日子格。手机 2 列 × 4 行，
+   桌面（≥768px）4 列 × 2 行；整块随容器滚动（容器本来就 overflow-y:auto）。
+   ============================================================ */
+
+/* ---------- 网格：从 7 列改成 2 列，行高交给内容 ---------- */
+.monthly-tasks-container.view-bigweek .calendar-grid {
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+	flex: 0 0 auto;
+	gap: 8px;
+}
+
+/* 8 格等高：grid-auto-rows:1fr 只保证「行」等高，前提是网格有确定高度；
+   这里让每一格自己长到同一底线，短周（无任务）也不会塌成一条缝 */
+.monthly-tasks-container.view-bigweek .day-cell {
+	min-height: 132px;
+	padding: 8px 10px;
+}
+
+/* 大周只有 7 个日子格，跨月日不再是「别的月的杂讯」——这一周本身就是主题，
+   与小周同一口径（顶栏已写明周区间） */
+.monthly-tasks-container.view-bigweek .day-cell.other-month {
+	opacity: 1;
+}
+
+/* ---------- 格内文字：格子宽了，字号可以回到可读档位 ---------- */
+.monthly-tasks-container.view-bigweek .day-number {
+	font-size: 17px;
+}
+
+.monthly-tasks-container.view-bigweek .lunar-info {
+	font-size: 11px;
+}
+
+/* 星期名（大周没有列头，星期写在格子里）：与日号并排，弱于日号 */
+.monthly-tasks-container.view-bigweek .bigweek-weekday {
+	font-size: 11px;
+	color: var(--gray-600);
+	line-height: 1.2;
+	flex: 0 0 auto;
+}
+
+.monthly-tasks-container.view-bigweek .task-item {
+	padding: 3px 6px;
+	font-size: 12px;
+	min-height: 18px;
+}
+
+.monthly-tasks-container.view-bigweek .task-content {
+	font-size: 12px;
+}
+
+.monthly-tasks-container.view-bigweek .task-time {
+	font-size: 10px;
+}
+
+/* ---------- 「本周」标题块 ---------- */
+/* 与日子格同构（标题行 + 内容行），但视觉上是「说明」不是「格子」：
+   无边框、无阴影、底色更浅、左对齐、不可点。刻意保留与格子同样的圆角与
+   内边距，这样它嵌在网格里读起来是同一族，只是少了那层壳。 */
+.monthly-tasks-container.view-bigweek .week-summary {
+	background: var(--bg-tertiary);
+	box-shadow: none;
+	cursor: default;
+	justify-content: flex-start;
+	gap: 2px;
+}
+
+.monthly-tasks-container.view-bigweek .week-summary:hover {
+	box-shadow: none;
+	transform: none;
+}
+
+.monthly-tasks-container.view-bigweek .week-summary:active {
+	transform: none;
+}
+
+.monthly-tasks-container.view-bigweek .week-summary-title {
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--gray-900);
+	line-height: 1.2;
+}
+
+.monthly-tasks-container.view-bigweek .week-summary-range {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--gray-700);
+	line-height: 1.4;
+	font-variant-numeric: tabular-nums;
+}
+
+.monthly-tasks-container.view-bigweek .week-summary-load {
+	margin-top: auto;
+	font-size: 11px;
+	color: var(--gray-600);
+	line-height: 1.4;
+	font-variant-numeric: tabular-nums;
+}
+
+/* 发丝进度线：2px 槽 + 同色填充，不喧宾夺主；0 项时整条隐去（见 JS 的 is-empty） */
+.monthly-tasks-container.view-bigweek .week-summary-bar {
+	height: 2px;
+	border-radius: 1px;
+	background: var(--gray-200);
+	overflow: hidden;
+	margin-top: 3px;
+}
+
+.monthly-tasks-container.view-bigweek .week-summary-bar.is-empty {
+	display: none;
+}
+
+.monthly-tasks-container.view-bigweek .week-summary-bar-fill {
+	height: 100%;
+	border-radius: 1px;
+	background: var(--primary-500);
+}
+
+.monthly-tasks-container.view-bigweek .week-summary-lunar {
+	margin-top: 4px;
+	font-size: 11px;
+	color: var(--gray-600);
+	line-height: 1.3;
+}
+
+/* ---------- 侧栏窄面板（4 个类权重更高，单独补齐） ---------- */
+.workspace-split.mod-right-split .monthly-tasks-container.view-bigweek .calendar-grid,
+.workspace-split.mod-left-split .monthly-tasks-container.view-bigweek .calendar-grid {
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: 1fr;
+	flex: 0 0 auto;
+	gap: 6px;
+}
+
+.workspace-split.mod-right-split .monthly-tasks-container.view-bigweek .day-cell,
+.workspace-split.mod-left-split .monthly-tasks-container.view-bigweek .day-cell {
+	min-height: 124px;
+	padding: 7px 8px;
+	border-radius: var(--radius);
+}
+
+/* ---------- 桌面：4 列 × 2 行 ---------- */
+@media (min-width: 768px) {
+	.monthly-tasks-container.view-bigweek .calendar-grid {
+		grid-template-columns: repeat(4, 1fr);
+		gap: 10px;
+	}
+
+	.monthly-tasks-container.view-bigweek .day-cell {
+		min-height: 148px;
+		padding: 10px 12px;
+	}
+
+	.monthly-tasks-container.view-bigweek .day-number {
+		font-size: 19px;
+	}
+
+	.monthly-tasks-container.view-bigweek .bigweek-weekday {
+		font-size: 12px;
+	}
+
+	.monthly-tasks-container.view-bigweek .lunar-info {
+		font-size: 12px;
+	}
+
+	.monthly-tasks-container.view-bigweek .task-item {
+		padding: 4px 6px;
+		font-size: 12px;
+		min-height: 20px;
+	}
+
+	.monthly-tasks-container.view-bigweek .week-summary {
+		padding: 12px 14px;
+	}
+
+	.monthly-tasks-container.view-bigweek .week-summary-title {
+		font-size: 17px;
+	}
+
+	.monthly-tasks-container.view-bigweek .week-summary-range {
+		font-size: 13px;
+	}
+
+	.monthly-tasks-container.view-bigweek .week-summary-load {
+		font-size: 12px;
+	}
+
+	.monthly-tasks-container.view-bigweek .week-summary-lunar {
+		font-size: 12px;
+	}
+}
+
+/* ---------- 深色：本周块与格子底色拉开一档，不靠描边区分 ---------- */
+.theme-dark .monthly-tasks-container.view-bigweek .week-summary {
+	background: rgba(148, 163, 184, 0.09);
+}
+
+.theme-dark .monthly-tasks-container.view-bigweek .week-summary-bar {
+	background: rgba(148, 163, 184, 0.24);
+}
