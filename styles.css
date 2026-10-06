@@ -516,6 +516,21 @@
 	word-break: break-word;
 }
 
+/* 跨天/定时信息行统一「置顶独占一行」—— v1.7.3 两端对齐
+   原先只有手机端（@media max-width:480 批次四⑦）把 .task-time 折到任务上方，
+   桌面端留在右侧：同一批数据两种读法，且右侧那一列要常年占着宽度、挤短标题。
+   现在把手机端这套升为全局：色带 + 标题一行读到底，时间/N天 在上方小字。
+   字号仍分端（桌面沿用基处 9px，手机端 480 块里另压到 8px）。 */
+.day-cell .task-item {
+	flex-wrap: wrap;
+}
+
+.day-cell .task-item .task-time {
+	order: -1;
+	flex-basis: 100%;
+	margin-left: 0;
+}
+
 /* ========== 类别标签（批次二⑧） ========== */
 /* 视觉通道纪律（v1.5.4 定稿）：「宽处」用尾部小号 #标签 文字，「窄处」（日历格子）只用
    左缘色带，两者不同时出现。文字标签如今只剩创建弹窗的已有任务行（.existing-task-item）
@@ -705,12 +720,9 @@
 	color: var(--primary-700);
 }
 
-/* 跨天任务首日：内容尾部续接箭头，提示任务延续到后续日期 */
-.task-item.multi-day-start .task-content::after {
-	content: ' →';
-	color: var(--primary-500);
-	font-weight: 400;
-}
+/* 跨天任务首日箭头已于 v1.7.3 移除（.multi-day-start 不再产出）：
+   「 →」占尾部宽度、且在「N天」置顶独占一行之后纯属重复信息。
+   尾日记号保留，见下。 */
 
 /* 跨天任务尾日：左侧渐变条改浅收尾，与首日形成首尾区分 */
 .task-item.multi-day-end::before {
@@ -719,10 +731,6 @@
 
 /* 跨天任务 - 深色模式 */
 .theme-dark .task-item.multi-day-task .task-content {
-	color: var(--primary-400);
-}
-
-.theme-dark .task-item.multi-day-start .task-content::after {
 	color: var(--primary-400);
 }
 
@@ -2807,16 +2815,9 @@
 		height: 0;
 	}
 	
-	/* 批次四⑦：带时间任务的时间标签独占一行（实测内容盒 0.83px → 38.86px 整行满宽，
-	   行高 41 → 23.8px，内容不再竖排）。只作用于日历格子，弹窗列表不受影响 */
-	.day-cell .task-item {
-		flex-wrap: wrap;
-	}
-	
+	/* 批次四⑦（v1.7.3 起布局上收全局，见「跨天/定时信息行统一置顶独占一行」段）：
+	   手机端只保留更小的字号与行高 */
 	.day-cell .task-item .task-time {
-		order: -1;
-		flex-basis: 100%;
-		margin-left: 0;
 		font-size: 8px;
 		line-height: 1.1;
 	}
@@ -3590,36 +3591,18 @@
    因此本段只写差异项，圆点、选中日、明细区样式全部继承小月，不再抄一遍。
    ============================================================ */
 
-/* ---------- 只有一行，就把这一行做够 ---------- */
-/* 小月里格子压到 52px 是为了给 5~6 行让位；小周只剩一行，52px 就成了浪费：
-   日号与农历挤在半空里，整块上半屏看着像一条被压扁的表头。这里加高到 92px
-   （手机端 84px），农历/节日名不需要缩放就读得清，明细区仍在下方照常滚。 */
-.monthly-tasks-container.view-week .day-cell {
-	min-height: 92px;
-	padding: 6px 8px;
-}
+/* ---------- 只有一行，行高与小月同一口径 ---------- */
+/* v1.7.0 曾把这一行单独抬到 92px（手机 84px），理由是「只剩一行，52px 浪费」。
+   代价是四视图里出现第五种格子尺寸：同一列宽、同一批内容，小周比小月高一截，
+   切视图时格子像在跳。v1.7.3 起不再覆盖高度与内边距，直接继承上面
+   .view-agenda .day-cell 的 52px / 3px 4px —— 小周就是「只有一行的小月」，
+   宽度本来就同为 7 列 1fr，现在高度也对齐。侧栏那组同口径，一并删掉单独补齐。 */
 
 /* 跨月周（如 10/26–11/1）里的溢出日期：整月视图要淡掉，是因为它「不属于这一屏
    的主题月」；小周只有一行，这一行本身就是主题，淡掉反而像 3 个坏掉的格子。
    月份归属此时已由顶栏的周区间（10/26 – 11/1）说明，格子不再需要自证。 */
 .monthly-tasks-container.view-week .day-cell.other-month {
 	opacity: 1;
-}
-
-/* 侧栏窄面板权重更高（4 个类），单独补齐，口径与小月那段一致 */
-.workspace-split.mod-right-split .monthly-tasks-container.view-week .day-cell,
-.workspace-split.mod-left-split .monthly-tasks-container.view-week .day-cell {
-	min-height: 92px;
-	padding: 6px 8px;
-}
-
-@media (max-width: 600px) {
-	.monthly-tasks-container.view-week .day-cell,
-	.workspace-split.mod-right-split .monthly-tasks-container.view-week .day-cell,
-	.workspace-split.mod-left-split .monthly-tasks-container.view-week .day-cell {
-		min-height: 84px;
-		padding: 4px 3px;
-	}
 }
 
 /* ============================================================
@@ -3710,18 +3693,27 @@
    桌面（≥768px）4 列 × 2 行；整块随容器滚动（容器本来就 overflow-y:auto）。
    ============================================================ */
 
-/* ---------- 网格：从 7 列改成 2 列，行高交给内容 ---------- */
+/* ---------- 网格：从 7 列改成 2 列，整块撑满剩余高度 ---------- */
+/* flex 口径与大月一致（大月 = .calendar-grid 基础段的 flex:1）：
+   v1.7.1~1.7.2 这里是 flex:0 0 auto「内容多高占多高」，于是手机上四行格子
+   合计 566px、可用 674px，屏幕底下空出 108px；桌面两行 286px、可用 552px，
+   空出 266px —— 同一套自适应在大周失效，就是用户说的「手机电脑都不铺满」。
+   改成 flex:1 1 auto + min-height:0 后：行高由 grid-auto-rows:1fr 平分可用高度
+   （手机 4 行各约 163px、桌面 2 行各约 271px），格子内容多于份额时按 min-content
+   顶开、容器照旧滚动 —— 与大月同一行为，任务多时不会被裁。 */
 .monthly-tasks-container.view-bigweek .calendar-grid {
 	grid-template-columns: repeat(2, 1fr);
 	grid-auto-rows: 1fr;
-	flex: 0 0 auto;
+	flex: 1 1 auto;
+	min-height: 0;
 	gap: 7px;
 }
 
 /* 8 格等高：grid-auto-rows:1fr 只保证「行」等高，前提是网格有确定高度；
-   这里让每一格自己长到同一底线，短周（无任务）也不会塌成一条缝。
-   v1.7.2 竖向收一档（132→118）：手机上四行格子加顶栏刚好超出可视高度一点点，
-   出现一小段可滚动的距离；收完这一档后整屏落得下，任务多的日子仍由内容撑高。 */
+   v1.7.3 起网格自己撑满（上面的 flex:1 1 auto），所以这里退化为「地板」：
+   窗口很矮、平分下来每行不足 118px 时由它兜底，容器照旧可滚。
+   （v1.7.2 曾靠这个 118 去消手机滚动条，现在撑满后不再需要收那一档，
+   但保留同值作地板：矮窗口下格子不会塌成一条缝。） */
 .monthly-tasks-container.view-bigweek .day-cell {
 	min-height: 118px;
 	padding: 7px 9px;
@@ -3844,7 +3836,8 @@
 .workspace-split.mod-left-split .monthly-tasks-container.view-bigweek .calendar-grid {
 	grid-template-columns: repeat(2, 1fr);
 	grid-auto-rows: 1fr;
-	flex: 0 0 auto;
+	flex: 1 1 auto;
+	min-height: 0;
 	gap: 6px;
 }
 

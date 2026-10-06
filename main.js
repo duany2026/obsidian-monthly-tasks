@@ -1319,7 +1319,7 @@ function groupTasksByDate(tasks) {
     if (!task.dueDate && !task.startDate)
       continue;
     // 跨天任务挂载到 [startDate, dueDate] 闭区间每日，使中间日与结束日也可见，
-    // renderTaskItem 依据 task.startDate/dueDate 计算 dayIndex 并加 multi-day-start/end 类。
+    // renderTaskItem 依据 task.dueDate 判定末日并加 multi-day-end 类（首日类已随箭头一并移除）。
     // dueDate 缺失时不进跨天分支（上方已保证，本分支按开始日期单日挂载）
     if (task.startDate && task.dueDate && task.startDate !== task.dueDate) {
       const [sy, sm, sd] = task.startDate.split("-").map(Number);
@@ -3791,17 +3791,11 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const duration = multiDay ? getMultiDayDuration(task) : 1;
     if (multiDay) {
       taskEl.addClass("multi-day-task");
-      if (dayDate && task.startDate) {
-        const [sy, sm, sd] = task.startDate.split("-").map(Number);
-        const start = new Date(sy, sm - 1, sd);
-        // DST 切换日 diffTime 可能不是 24 小时整数倍，使用 Math.round 与 getMultiDayDuration 保持一致
-        const dayIndex = Math.round((dayDate.getTime() - start.getTime()) / (1e3 * 60 * 60 * 24));
-        if (dayIndex === 0) {
-          taskEl.addClass("multi-day-start");
-        }
-        if (formatDate(dayDate) === task.dueDate) {
-          taskEl.addClass("multi-day-end");
-        }
+      // v1.7.3：首日不再加 multi-day-start —— 它唯一的用途是挂尾部「 →」箭头，
+      // 而箭头既占宽度又与「N天」信息重复（天数行两端统一后天天可见）。
+      // 尾日记号保留：左缘渐变条改浅收尾，是纯视觉信息、不占文字盒。
+      if (dayDate && formatDate(dayDate) === task.dueDate) {
+        taskEl.addClass("multi-day-end");
       }
     }
     const contentEl = taskEl.createDiv("task-content");
