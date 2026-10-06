@@ -864,25 +864,37 @@
 	font-weight: 400;
 }
 
-/* ---- v1.7.4：弹窗三个文字控件强制同源同字号 ----
-   前三次（v1.6.1 / v1.6.3 / v1.7.2）都在"让备注跟任务框都用 --font-ui-small"上打转，
-   真机上备注始终比待办大。根因不在变量，而在权重：
-   Obsidian app.css 有一条把 textarea 与 input[type='text'] 打包的公共规则
-   （font-size: var(--font-ui-small)，权重 0-1-1），它对任务框的权重高于我们的
-   .task-input（0-1-0），却对备注框低于我们的 .note-textarea（0-1-0 压元素选择器）；
-   两边各自走不同的胜出规则，一旦主题或移动端基线（.is-mobile 下
-   --font-ui-small = --font-text-size × 0.937、--font-ui-medium = --font-text-size）
-   变动，两个框就各自漂移，"同一个变量"根本保证不了同一个渲染值。
-   这次不赌变量：用两级类选择器（0-2-0，稳定压过 app.css 的 0-1-1）把任务框、
-   备注幽灵框、备注展开框钉成同一个显式 px，并带 !important——手机端 Obsidian
-   自带的是另一份 app.css（我们读不到），移动端对 textarea 常有单独抬字号的规则，
-   只有钉死显式值才能保证两个平台的两个框渲染像素完全一致。
-   16px 同时满足 iOS WebKit「输入框 <16px 聚焦会强制放大整页」的老坑 */
-.modal.create-task-modal .task-input,
-.modal.create-task-modal .note-show-btn,
-.modal.create-task-modal .note-textarea {
-	font-size: 16px !important;
-	line-height: 1.4 !important;
+/* ---- v1.7.4：弹窗三个文字控件钉成同一条字号规则 ----
+   v1.6.1 / v1.6.3 / v1.7.2 三轮都在‘让备注和任务框用同一个变量’上打转，真机上
+   备注始终比待办大。根因不在变量，在权重：Obsidian app.css（从 1.13.7 的 asar
+   解出来核对）有一条把 textarea 与 input[type='text'] 打包的公共规则
+   font-size: var(--font-ui-small)，权重 0-1-1——它对任务框压过我们的
+   .task-input（0-1-0），对备注框却被 .note-textarea（0-1-0 压元素选择器）顶掉。
+   两个框各走各的胜出规则，再加上 .is-mobile 下 --font-ui-small 变成
+   calc(--font-text-size * 0.937)（跟用户的文本字号设置漂移），‘同一个变量’
+   从来保证不了‘同一个渲染值’。手机端 Obsidian 还是另一份 app.css（读不到），
+   所以这次不赌权重也不赌变量：一条三级类（0-3-0）带 !important 的规则同时命中三个控件，
+   同一条规则命中同类元素时计算值必然相等，主题和移动端基线都无从插手。
+   窄屏显式抬到 16px，避开 iOS WebKit‘输入框 <16px 聚焦强制放大整页’的老坑；
+   宽屏沿用 --font-ui-small（桌面本来就是 13px，两框原本就一致，不放大） */
+.modal-container .modal.create-task-modal .task-input,
+.modal-container .modal.create-task-modal .note-show-btn,
+.modal-container .modal.create-task-modal .note-textarea {
+	font-size: var(--font-ui-small, 13px) !important;
+	/* 字体族要一起钉：Obsidian 给 input[type='text'] 的那条共享规则（0-1-1）里
+	   带 font-family: inherit，权重压过 .task-input 自己写的 PingFang 栈（0-1-0）；
+	   备注 textarea 只被 textarea（0-0-1）命中，我们的 .note-textarea 反而赢。
+	   于是同一档 px 下任务框走系统继承字体、备注框走 PingFang——两款中文字体
+	   的字面大小不等，看上去就是「备注的字更大」。字号与字体一起锁死才真的对齐 */
+	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+@media (max-width: 600px) {
+	.modal-container .modal.create-task-modal .task-input,
+	.modal-container .modal.create-task-modal .note-show-btn,
+	.modal-container .modal.create-task-modal .note-textarea {
+		font-size: 16px !important;
+	}
 }
 
 /* 按钮组 */
