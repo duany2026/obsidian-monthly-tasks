@@ -234,6 +234,7 @@ var I18N = {
     "modal.create.add": "\u6dfb\u52a0\u4efb\u52a1",
     "modal.create.allDay": "\u5168\u5929",
     "modal.create.cancel": "\u53d6\u6d88",
+    "modal.create.catMore": "\u66f4\u591a",
     "modal.create.category": "\u7c7b\u522b",
     "modal.create.categoryAria": "\u7c7b\u522b {label}",
     "modal.create.collapse": "\u6536\u8d77",
@@ -244,6 +245,7 @@ var I18N = {
     "modal.create.empty": "\u4efb\u52a1\u5185\u5bb9\u4e0d\u80fd\u4e3a\u7a7a\uff08\u5143\u6570\u636e\u6807\u8bb0\u5df2\u88ab\u81ea\u52a8\u5265\u79bb\uff09",
     "modal.create.endBeforeStart": "\u7ed3\u675f\u65e5\u671f\u4e0d\u80fd\u65e9\u4e8e\u5f00\u59cb\u65e5\u671f",
     "modal.create.endBeforeStartTime": "\u7ed3\u675f\u65f6\u95f4\u987b\u665a\u4e8e\u5f00\u59cb\u65f6\u95f4",
+    "modal.create.endNeedToggle": "\u5148\u52fe\u9009\u8de8\u5929",
     "modal.create.existingCount": "\u8be5\u65e5\u5df2\u6709 {n} \u4e2a\u4efb\u52a1",
     "modal.create.expand": "\u5c55\u5f00",
     "modal.create.fail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5",
@@ -341,17 +343,17 @@ var I18N = {
     "settings.showHoliday.name": "\u663e\u793a\u8282\u5047\u65e5",
     "settings.showLunar.desc": "\u5728\u65e5\u671f\u4e0b\u65b9\u663e\u793a\u519c\u5386\u65e5\u671f\u548c\u8282\u6c14",
     "settings.showLunar.name": "\u663e\u793a\u519c\u5386",
-    "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf",
+    "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf\uff1b\u5f53\u5929\u9762\u677f\u7684\u4efb\u52a1\u5217\u8868\u8d85\u8fc7\u8fd9\u4e2a\u6570\u5c31\u9ed8\u8ba4\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u6309\u5b83\u51fa\u73b0",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf",
     "settings.tips.1": "条视图点日期格子添加任务、点格子里的任务切换完成 / 未完成；日程视图点格子选中该天，点任务行直接编辑这一条，点明细右上角的「管理 / ＋ 添加」打开当天面板新建",
-    "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
+"settings.tips.10": "\u8de8\u5929\u4efb\u52a1\u7684\u7ed3\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u91cc\uff1a\u6ca1\u52fe\u9009\u300c\u8de8\u5929\u4efb\u52a1\u300d\u65f6\u5b83\u662f\u7070\u7684\uff0c\u70b9\u4e00\u4e0b\u4f1a\u6296\u4e00\u4e0b\u52fe\u9009\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9009",    "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52a1\u884c\u5c3e\u7684 #\u6807\u7b7e \u5373\u7c7b\u522b\uff1a\u51fa\u73b0\u7c7b\u522b\u540e\uff0c\u9876\u90e8\u6f0f\u6597\u6309\u94ae\u53ef\u6309\u7c7b\u522b\u7b5b\u9009\uff08\u591a\u9009\uff0c\u9ed8\u8ba4\u5168\u90e8\uff09",
     "settings.tips.4": "点日程里的任务行 = 直接编辑这一条；面板里点别的行的铅笔可切换目标（再点一次退回新建）。改内容/优先级/时间/日期/类别/备注，保存=先建新行再删旧行，跨天任务以开始日期为准",
     "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
     "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
     "settings.tips.7": "\u65E5\u7A0B\u89C6\u56FE\uFF1A\u53F3\u4E0A\u89D2\u5207\u6362\u6309\u94AE\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE\u300D\uFF09\u8FDB\u5165\u3002\u683C\u5B50\u91CC\u53EA\u6807\u4E00\u679A\u70B9\u8868\u793A\u8FD9\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u53D8\u7EA2\u70B9\uFF1B\u4E0B\u534A\u533A\u5217\u51FA\u9009\u4E2D\u65E5\u7684\u4EFB\u52A1\u4E0E\u5907\u6CE8",
     "settings.tips.8": "备注写在任务行的下一行、以 > 开头（Markdown 引用块），连续多行合并成一条；明细区只读展示备注卡片，要改就在当天面板的备注框里编辑（无备注时是一整条虚线框，点一下即可输入）",
-    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+"settings.tips.9": "\u5f53\u5929\u9762\u677f\u4f1a\u81ea\u5df1\u6536\u8d77\u4e24\u5904\uff1a\u4efb\u52a1\u6570\u8d85\u8fc7\u8bbe\u7f6e\u91cc\u7684\u300c\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf\u300d\u65f6\uff0c\u5217\u8868\u9ed8\u8ba4\u6536\u8d77\uff08\u70b9\u6807\u9898\u5c55\u5f00\uff09\uff1b\u7c7b\u522b\u8d85\u8fc7\u4e24\u884c\u65f6\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u94ae",    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
     "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.clearFilterAria": "\u6E05\u9664\u5F53\u524D\u7C7B\u522B\u7B5B\u9009",
@@ -520,6 +522,7 @@ var I18N = {
     "modal.create.add": "\u65b0\u589e\u4efb\u52d9",
     "modal.create.allDay": "\u5168\u5929",
     "modal.create.cancel": "\u53d6\u6d88",
+    "modal.create.catMore": "\u66f4\u591a",
     "modal.create.category": "\u985e\u5225",
     "modal.create.categoryAria": "\u985e\u5225 {label}",
     "modal.create.collapse": "\u6536\u8d77",
@@ -530,6 +533,7 @@ var I18N = {
     "modal.create.empty": "\u4efb\u52d9\u5167\u5bb9\u4e0d\u80fd\u70ba\u7a7a\uff08\u5143\u6578\u64da\u6a19\u8a18\u5df2\u88ab\u81ea\u52d5\u525d\u96e2\uff09",
     "modal.create.endBeforeStart": "\u7d50\u675f\u65e5\u671f\u4e0d\u80fd\u65e9\u65bc\u958b\u59cb\u65e5\u671f",
     "modal.create.endBeforeStartTime": "\u7d50\u675f\u6642\u9593\u9808\u665a\u65bc\u958b\u59cb\u6642\u9593",
+    "modal.create.endNeedToggle": "\u5148\u52fe\u9078\u8de8\u5929",
     "modal.create.existingCount": "\u8a72\u65e5\u5df2\u6709 {n} \u500b\u4efb\u52d9",
     "modal.create.expand": "\u5c55\u958b",
     "modal.create.fail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff0c\u8acb\u91cd\u8a66",
@@ -627,17 +631,17 @@ var I18N = {
     "settings.showHoliday.name": "\u986f\u793a\u7bc0\u5047\u65e5",
     "settings.showLunar.desc": "\u5728\u65e5\u671f\u4e0b\u65b9\u986f\u793a\u8fb2\u66c6\u65e5\u671f\u548c\u7bc0\u6c23",
     "settings.showLunar.name": "\u986f\u793a\u8fb2\u66c6",
-    "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf",
+    "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf\uff1b\u7576\u5929\u9762\u677f\u7684\u4efb\u52d9\u6e05\u55ae\u8d85\u904e\u9019\u500b\u6578\u5c31\u9810\u8a2d\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u4f9d\u5b83\u51fa\u73fe",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf",
     "settings.tips.1": "條檢視點日期格位新增任務、點格位裡的任務切換完成 / 未完成；日程檢視點格位選取該天，點任務列直接編輯這一條，點明細右上角的「管理 / ＋ 新增」開啟當天面板新增",
-    "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
+"settings.tips.10": "\u8de8\u5929\u4efb\u52d9\u7684\u7d50\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u88e1\uff1a\u6c92\u52fe\u9078\u300c\u8de8\u5929\u4efb\u52d9\u300d\u6642\u5b83\u662f\u7070\u7684\uff0c\u9ede\u4e00\u4e0b\u6703\u6296\u4e00\u4e0b\u52fe\u9078\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9078",    "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
     "settings.tips.3": "\u4efb\u52d9\u884c\u5c3e\u7684 #\u6a19\u7c64 \u5373\u985e\u5225\uff1a\u51fa\u73fe\u985e\u5225\u5f8c\uff0c\u9802\u90e8\u6f0f\u6597\u6309\u9215\u53ef\u6309\u985e\u5225\u7be9\u9078\uff08\u591a\u9078\uff0c\u9810\u8a2d\u5168\u90e8\uff09",
     "settings.tips.4": "點日程裡的任務列 = 直接編輯這一條；面板裡點其他列的鉛筆可切換目標（再點一次退回新增）。改內容/優先級/時間/日期/類別/備註，儲存=先建新行再刪舊行，跨天任務以開始日期為準",
     "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
     "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
     "settings.tips.7": "\u65E5\u7A0B\u6AA2\u8996\uFF1A\u53F3\u4E0A\u89D2\u5207\u63DB\u6309\u9215\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996\u300D\uFF09\u9032\u5165\u3002\u683C\u4F4D\u88E1\u53EA\u6A19\u4E00\u679A\u9EDE\u8868\u793A\u9019\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u8B8A\u7D05\u9EDE\uFF1B\u4E0B\u65B9\u5340\u5217\u51FA\u9078\u53D6\u65E5\u7684\u4EFB\u52D9\u8207\u5099\u8A3B",
     "settings.tips.8": "備註寫在任務行的下一行、以 > 開頭（Markdown 引用塊），連續多行合併成一條；明細區唯讀顯示備註卡片，要改就在當天面板的備註框裡編輯（無備註時是一整條虛線框，點一下即可輸入）",
-    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
+"settings.tips.9": "\u7576\u5929\u9762\u677f\u6703\u81ea\u5df1\u6536\u8d77\u5169\u8655\uff1a\u4efb\u52d9\u6578\u8d85\u904e\u8a2d\u5b9a\u88e1\u7684\u300c\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf\u300d\u6642\uff0c\u6e05\u55ae\u9810\u8a2d\u6536\u8d77\uff08\u9ede\u6a19\u984c\u5c55\u958b\uff09\uff1b\u985e\u5225\u8d85\u904e\u5169\u884c\u6642\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u9215",    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "view.agenda.addOne": "\u6dfb\u52a0",
     "view.agenda.manageDay": "\u7ba1\u7406",
     "view.agenda.clearFilterAria": "\u6E05\u9664\u76EE\u524D\u985E\u5225\u7BE9\u9078",
@@ -806,6 +810,7 @@ var I18N = {
     "modal.create.add": "Add Task",
     "modal.create.allDay": "All Day",
     "modal.create.cancel": "Cancel",
+    "modal.create.catMore": "More",
     "modal.create.category": "Category",
     "modal.create.categoryAria": "Category {label}",
     "modal.create.collapse": "Collapse",
@@ -816,6 +821,7 @@ var I18N = {
     "modal.create.empty": "Task content cannot be empty (metadata stripped)",
     "modal.create.endBeforeStart": "End date cannot be earlier than start date",
     "modal.create.endBeforeStartTime": "End time must be later than start time",
+    "modal.create.endNeedToggle": "Tick multi-day first",
     "modal.create.existingCount": "{n} tasks on this day",
     "modal.create.expand": "Expand",
     "modal.create.fail": "Create task failed, please retry",
@@ -913,17 +919,17 @@ var I18N = {
     "settings.showHoliday.name": "Show Holidays",
     "settings.showLunar.desc": "Show lunar date and solar terms below date",
     "settings.showLunar.name": "Show Lunar Calendar",
-    "settings.tasksLimit.desc": "Maximum tasks shown per date cell",
+    "settings.tasksLimit.desc": "Maximum tasks shown per date cell; the day panel also collapses its task list beyond this number and shows \"View all\" at the same threshold",
     "settings.tasksLimit.name": "Tasks Per Day Limit",
     "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; click a task row to edit that task directly, or the Manage / \uFF0B Add button at the top-right of the detail pane to open the day panel and create one",
-    "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
+"settings.tips.10": "The multi-day end-date field is always there: while \"Multi-day task\" is unchecked it stays greyed out, and tapping it nudges the checkbox to remind you to tick it first",    "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
     "settings.tips.3": "#tag at end of task line is category: after categories appear, funnel button at top can filter by category (multi-select, default all)",
     "settings.tips.4": "Clicking a task row in the agenda edits that task directly; inside the day panel a row's pencil switches the target (click again to go back to create). Edit content/priority/time/date/category/note; save = create a new line then delete the old one, multi-day tasks key off the start date",
     "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
     "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
     "settings.tips.7": "Agenda view: use the toggle button at the top right, or the command palette entry \"Toggle Calendar / Agenda View\". A dot marks a day with plans, red when overdue; the pane below lists the selected day's tasks and notes",
     "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. The detail pane shows note cards read-only; edit them in the note box of the day panel (when empty it is a full-width dashed field, tap to type)",
-    "settings.tips.title": "Usage Tips",
+"settings.tips.9": "The day panel folds itself in two places: when the task count exceeds the \"Tasks per day\" setting the list starts collapsed (click the title to expand), and categories beyond two rows collapse into one with a \"More N\" button at the end",    "settings.tips.title": "Usage Tips",
     "view.agenda.addOne": "Add",
     "view.agenda.manageDay": "Manage",
     "view.agenda.clearFilterAria": "Clear current category filter",
@@ -4697,7 +4703,12 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const toggleEl = titleRow.createSpan({ cls: "existing-tasks-toggle" });
       import_obsidian3.setIcon(toggleEl, "chevron-down");
       const toggleTextEl = toggleEl.createSpan({ text: tr("modal.create.expand") });
-      let listOpen = true;
+      // v1.6.2 真机反馈：默认展开改回「按设置阈值决定」——当天任务数超过设置里的
+      // 「每日任务显示数量」时默认收起，把首屏留给表单；没超过就默认展开。
+      // 例外：带着编辑目标进来时恒展开——列表里的 .editing 高亮是"我在改哪条"
+      // 的唯一指示，收起来等于把这条信息藏了（v1.6.0 的教训仍然成立）
+      const listLimit = this.plugin.settings.tasksPerDayLimit;
+      let listOpen = !!this.editingTask || this.existingTasks.length <= listLimit;
       const applyListOpen = () => {
         tasksListEl.style.display = listOpen ? "" : "none";
         toggleEl.toggleClass("is-open", listOpen);
@@ -4716,7 +4727,8 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         }
       });
       const tasksListEl = existingTasksEl.createDiv("existing-tasks-list");
-      const LIMIT = 5;
+      // 「查看全部」阈值与折叠阈值同源，都读设置里的每日任务显示数量
+      const LIMIT = listLimit;
       let showAll = false;
       const renderTasks = () => {
         tasksListEl.empty();
@@ -5017,8 +5029,14 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     const multiDayCheckbox = multiDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": tr("modal.create.multiDay") } });
     multiDayToggle.createEl("span", { text: tr("modal.create.multiDay") });
     // 自定义日期选择器触发按钮
-    const endDateTrigger = endDateWrapper.createEl("div", { cls: "end-date-trigger", text: tr("modal.create.pleaseSelect") });
-    endDateTrigger.style.display = "none";
+    // v1.6.2 真机反馈：结束日期原先勾上「跨天任务」才长出来，第一眼像"没居中"、
+    // 甚至以为没有这个控件。改成常驻——未勾选时置灰不可点，勾上即点亮，
+    // 位置从头到尾不动（占位文案也换成提示该先做什么）
+    const endDateTrigger = endDateWrapper.createEl("div", {
+      cls: "end-date-trigger is-disabled",
+      text: tr("modal.create.endNeedToggle"),
+      attr: { "aria-disabled": "true", tabindex: "-1" }
+    });
     let pickerYear = this.date.getFullYear();
     let pickerMonth = this.date.getMonth();
     function formatDisplayDate(y, m, d) {
@@ -5031,7 +5049,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       isMultiDay = true;
       endDate = dateFromStr(this.editingTask.dueDate);
       multiDayCheckbox.checked = true;
-      endDateTrigger.style.display = "flex";
+      endDateTrigger.removeClass("is-disabled");
+      endDateTrigger.removeAttribute("aria-disabled");
+      endDateTrigger.setAttribute("tabindex", "0");
       const eArr = this.editingTask.dueDate.split("-").map(Number);
       endDateTrigger.textContent = formatDisplayDate(eArr[0], eArr[1] - 1, eArr[2]);
       endDateTrigger.setAttribute("data-value", this.editingTask.dueDate);
@@ -5172,10 +5192,28 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       }
       buildPopup();
     }
-    endDateTrigger.addEventListener("click", (e) => { e.stopPropagation(); renderDatePicker(); });
+    endDateTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      // 置灰态被点到：抖一下勾选框，别让人以为按钮坏了
+      if (!isMultiDay) {
+        multiDayToggle.addClass("hint-shake");
+        setTimeout(() => multiDayToggle.removeClass("hint-shake"), 450);
+        return;
+      }
+      renderDatePicker();
+    });
     multiDayCheckbox.addEventListener("change", (e) => {
       isMultiDay = e.target.checked;
-      endDateTrigger.style.display = isMultiDay ? "flex" : "none";
+      endDateTrigger.toggleClass("is-disabled", !isMultiDay);
+      if (isMultiDay) {
+        endDateTrigger.removeAttribute("aria-disabled");
+        endDateTrigger.setAttribute("tabindex", "0");
+        if (!endDate) endDateTrigger.textContent = tr("modal.create.pleaseSelect");
+      } else {
+        endDateTrigger.setAttribute("aria-disabled", "true");
+        endDateTrigger.setAttribute("tabindex", "-1");
+        endDateTrigger.textContent = tr("modal.create.endNeedToggle");
+      }
       if (!isMultiDay) {
         endDate = void 0;
         const popup = document.body.querySelector(":scope > .date-picker-popup");
@@ -5258,6 +5296,41 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         chip.addClass("selected");
       });
     });
+    // v1.6.2 真机反馈：类别一多（或名字一长）这排 chip 就往下堆，卡片被撑高。
+    // 超过两行 → 默认折到一行，尾部挂「更多 N ⌄」；两行以内不出现开关。
+    // 判定用真实布局量（offsetTop 变了就是换行），不靠猜字符宽度；DOM 顺序不动，
+    // 只决定谁显示——但选中项必须留在可见行，否则表单里"选的是哪个"就找不到了
+    const foldCategoryGroup = () => {
+      const chips = [...categoryGroup.querySelectorAll(".category-chip")];
+      if (chips.length < 3) return;
+      const rowOf = (el) => Math.round(el.offsetTop / Math.max(el.offsetHeight, 1));
+      const rows = new Set(chips.map(rowOf));
+      if (rows.size < 3) return;   // 两行以内不折叠
+      const firstRow = chips.filter((c) => rowOf(c) === rowOf(chips[0]));
+      const selected = chips.find((c) => c.hasClass("selected"));
+      // 折叠态也要看得见"当前选的是哪个"：选中项即便不在首行也不隐藏，
+      // 它会自己换到第二行——最多两行，比把选择藏起来划算
+      const hidden = chips.filter((c) => firstRow.indexOf(c) < 0 && c !== selected);
+      if (!hidden.length) return;
+      const toggle = categoryGroup.createEl("button", {
+        cls: "category-chip category-more-btn", type: "button",
+        attr: { "aria-expanded": "false" }
+      });
+      let open = false;
+      const apply = () => {
+        hidden.forEach((c) => { c.style.display = open ? "" : "none"; });
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        toggle.textContent = open ? tr("modal.create.collapse") + " \u2303" : tr("modal.create.catMore") + " " + hidden.length + " \u2304";
+        toggle.toggleClass("is-open", open);
+      };
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        open = !open;
+        apply();
+      });
+      apply();
+    };
+    requestAnimationFrame(foldCategoryGroup);
     const btnGroup = this.modalEl.createDiv("modal-buttons");
     const cancelBtn = btnGroup.createEl("button", {
       cls: "btn-cancel",
@@ -5994,6 +6067,8 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
       tr("settings.tips.6"),
       tr("settings.tips.7"),
       tr("settings.tips.8"),
+      tr("settings.tips.9"),
+      tr("settings.tips.10"),
     ]) {
       tipList.createEl("li", { text: tip });
     }

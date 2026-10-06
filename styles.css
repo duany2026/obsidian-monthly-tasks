@@ -1330,7 +1330,8 @@
 
 /* v1.6.0 手机端反馈版：整块压成一行。原来「结束日期」标题 + 竖排的跨天勾选 +
    日期触发器合计约 100px，只为一个可选字段；标题与勾选文案还互相拆台。
-   现在标题删掉，勾选框与触发器横排（触发器默认隐藏，勾上才在右侧长出） */
+   现在标题删掉，勾选框与触发器横排。v1.6.2 起触发器改为常驻（未勾选时置灰），
+   不再"勾上才长出来"——横排版式从打开弹窗起就不变，避免勾选瞬间整行跳动 */
 .end-date-wrapper {
 	display: flex;
 	align-items: center;
@@ -1415,6 +1416,37 @@
 .end-date-trigger::before {
 	content: '📅 ';
 	margin-right: 6px;
+}
+
+/* v1.6.2 真机反馈：结束日期改成常驻控件后，未勾选「跨天任务」时它得看起来
+   就是"在这儿，但现在还不能用"——所以保留占位与尺寸（不跳动、不改版式），
+   只把整块压灰 + 换 cursor。用 opacity 而不是只改 color，📅 是 emoji 字符，
+   不吃 color。三条 :hover 规则靠 .is-disabled 的同权重后置覆盖回常态 */
+.end-date-trigger.is-disabled {
+	opacity: 0.45;
+	cursor: default;
+	border-style: dashed;
+	background: transparent;
+}
+
+.end-date-trigger.is-disabled:hover {
+	border-color: #e2e8f0;
+	color: #334155;
+	background: transparent;
+}
+
+/* 点到置灰的触发器：抖一下旁边的勾选框，把视线引到"先做什么"上 */
+.multi-day-toggle.hint-shake {
+	animation: mt-hint-shake 0.45s ease;
+	border-color: #f59e0b;
+}
+
+@keyframes mt-hint-shake {
+	0%, 100% { transform: translateX(0); }
+	20% { transform: translateX(-4px); }
+	40% { transform: translateX(4px); }
+	60% { transform: translateX(-3px); }
+	80% { transform: translateX(2px); }
 }
 
 /* 日期选择器弹出层 */
@@ -1683,6 +1715,18 @@
 	color: #60a5fa;
 	background: rgba(59, 130, 246, 0.1);
 }
+/* 深色置灰态：亮色版靠 background:transparent 就够，深色底要跟着压暗，
+   并把 :hover 的蓝边还原——置灰块在深色里 hover 变蓝更像"可点"，正好相反 */
+.theme-dark .end-date-trigger.is-disabled {
+	background: rgba(30, 41, 59, 0.4);
+	border-color: rgba(71, 85, 105, 0.5);
+	color: #94a3b8;
+}
+.theme-dark .end-date-trigger.is-disabled:hover {
+	border-color: rgba(71, 85, 105, 0.5);
+	color: #94a3b8;
+	background: rgba(30, 41, 59, 0.4);
+}
 .theme-dark .date-picker-popup {
 	background: #1e293b;
 	border-color: rgba(71, 85, 105, 0.5);
@@ -1704,21 +1748,25 @@
 
 .theme-dark .task-time { color: #94a3b8; }
 
+/* ===== v1.6.2 优先级：恢复大圆点，但横向单行 =====
+   v1.6.0 曾把圆点缩成胶囊里的 10px 色点，省了 60px 高度，代价是三个圆点
+   变成三个同色小圆斑——"优先级"本是一块要"看"的色板，缩到 10px 就只剩文字了。
+   这次两头都要：圆点回到 40px（渐变 + 选中白勾，视觉重量和原来一致），
+   布局不再用"标题在上 + 大圆点在下"的两段式（单块约 120px），而是把
+   「高 / 中 / 无」三组横排在左侧标签右边（单块约 66px），比原布局省 54px。
+   结构 .priority-btn-wrapper > .priority-btn（40px 圆）+ .priority-btn-text（下方 11px） */
 .modal-priority {
 	margin: 0 24px 16px;
-	padding: 12px 20px;
+	padding: 10px 20px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 	border-radius: 14px;
 	border: 1px solid #e2e8f0;
 	display: flex;
 	align-items: center;
-	gap: 12px;
+	gap: 16px;
 	flex-wrap: wrap;
 }
 
-/* v1.6.0 手机端反馈版：优先级从「标题在上 + 44px 大圆点在下」改为
-   与类别行同构的一行（左标签 + 胶囊横排）。原布局单块约 120px，
-   现在约 52px；两者视觉语言一致后，弹窗不再是一摞风格各异的卡片 */
 .priority-label {
 	font-size: 13px;
 	font-weight: 600;
@@ -1729,67 +1777,106 @@
 
 .priority-group {
 	display: flex;
-	gap: 8px;
+	gap: 18px;
 	flex-wrap: wrap;
 	flex: 1 1 auto;
+	align-items: flex-start;
 }
 
-/* 胶囊本体：外观与 .category-chip 同族，选中态同样是蓝边 + 浅蓝底 */
+/* 一组 = 圆点 + 下方文字，纵向居中 */
 .priority-btn-wrapper {
-	display: inline-flex;
+	display: flex;
+	flex-direction: column;
 	align-items: center;
-	gap: 6px;
-	padding: 5px 12px;
-	border-radius: 999px;
-	border: 1.5px solid #e2e8f0;
-	background: #ffffff;
-	color: #475569;
+	gap: 4px;
 	cursor: pointer;
-	transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
-.priority-btn-wrapper:hover {
-	border-color: #94a3b8;
-}
-
-.priority-btn-wrapper.selected {
-	border-color: #2563eb;
-	background: #eff6ff;
-	color: #1d4ed8;
-}
-
-/* 色点：原 44px 圆钮缩成 10px 点，颜色语义不变 */
 .priority-btn {
-	width: 10px;
-	height: 10px;
+	width: 40px;
+	height: 40px;
 	border-radius: 50%;
-	border: none;
+	border: 3px solid transparent;
 	cursor: pointer;
 	padding: 0;
-	flex-shrink: 0;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+	transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+	position: relative;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.priority-btn:hover {
+	transform: scale(1.12);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.priority-btn.selected {
+	transform: scale(1.08);
+}
+
+.priority-btn.selected::after {
+	content: '✓';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	font-size: 17px;
+	font-weight: bold;
+	color: white;
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .priority-btn-text {
-	font-size: 12px;
+	font-size: 11px;
 	font-weight: 500;
-	line-height: 1.4;
+	color: #64748b;
+	line-height: 1.3;
+	transition: color 0.2s ease;
+}
+
+.priority-btn-wrapper:hover .priority-btn-text {
+	color: #475569;
 }
 
 .priority-btn-wrapper.selected .priority-btn-text {
+	color: #334155;
 	font-weight: 600;
 }
 
+/* 普通 = 浅绿渐变 + 绿描边（不是实色块，选中态才用深色描边和绿勾） */
 .priority-btn.priority-none {
-	background: #22c55e;
+	background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+	border: 2px solid #22c55e;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.priority-btn.priority-none.selected {
+	border-color: #15803d;
+	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.priority-btn.priority-none.selected::after {
+	color: #15803d;
+	text-shadow: none;
 }
 
 .priority-btn.priority-high {
-	background: #dc2626;
+	background: linear-gradient(135deg, #ef4444, #dc2626);
+	border-color: #fca5a5;
+}
+
+.priority-btn.priority-high.selected {
+	border-color: #991b1b;
+	box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
 }
 
 .priority-btn.priority-medium {
-	background: #f59e0b;
+	background: linear-gradient(135deg, #f59e0b, #d97706);
+	border-color: #fcd34d;
+}
+
+.priority-btn.priority-medium.selected {
+	border-color: #92400e;
+	box-shadow: 0 4px 16px rgba(217, 119, 6, 0.4);
 }
 
 /* 批次二③：创建弹窗类别行——优先级下方一排小号胶囊，首个「无标签」= 不加 #tag。
@@ -1859,6 +1946,42 @@
 .category-chip .category-chip-dot.category-chip-dot-none {
 	background: transparent;
 	border: 1.5px solid #94a3b8;
+}
+
+/* v1.6.2：类别超过两行时挂在尾部的开合开关。复用 .category-chip 的尺寸与圆角
+   （它本来就是这排里的一个成员），但虚线边框 + 灰字表明"我不是一个类别"；
+   flex-shrink:0 保证窄屏换行时它不会被挤扁 */
+.category-more-btn {
+	flex-shrink: 0;
+	border-style: dashed;
+	border-color: #cbd5e1;
+	background: transparent;
+	color: #64748b;
+	font-weight: 500;
+}
+
+.category-more-btn:hover {
+	border-color: #94a3b8;
+	color: #334155;
+}
+
+.category-more-btn.is-open {
+	border-style: solid;
+	border-color: #2563eb;
+	background: #eff6ff;
+	color: #1d4ed8;
+}
+
+.theme-dark .category-more-btn {
+	border-color: rgba(100, 116, 139, 0.7);
+	background: transparent;
+	color: #94a3b8;
+}
+
+.theme-dark .category-more-btn.is-open {
+	border-color: #3b82f6;
+	background: rgba(59, 130, 246, 0.18);
+	color: #93c5fd;
 }
 
 /* ========== 响应式设计 ========== */
@@ -2229,26 +2352,54 @@
 	color: #6b7280;
 }
 
-/* 深色模式 - 优先级胶囊（结构同 .category-chip 的深色规则） */
-.theme-dark .priority-btn-wrapper {
-	background: rgba(15, 23, 42, 0.6);
-	border-color: rgba(71, 85, 105, 0.5);
+/* 深色模式 - 优先级大圆点（v1.6.2 恢复）：描边压暗、投影加深，
+   普通档改为半透明绿渐变——原浅绿块在暗底上发灰 */
+.theme-dark .priority-btn.priority-high {
+	background: linear-gradient(135deg, #dc2626, #b91c1c);
+	border-color: #fca5a5;
+}
+
+.theme-dark .priority-btn.priority-high.selected {
+	border-color: #7f1d1d;
+	box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+}
+
+.theme-dark .priority-btn.priority-medium {
+	background: linear-gradient(135deg, #d97706, #b45309);
+	border-color: #fcd34d;
+}
+
+.theme-dark .priority-btn.priority-medium.selected {
+	border-color: #78350f;
+	box-shadow: 0 4px 12px rgba(217, 119, 6, 0.5);
+}
+
+.theme-dark .priority-btn.priority-none {
+	background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.15));
+	border: 2px solid #22c55e;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-dark .priority-btn.priority-none.selected {
+	border-color: #4ade80;
+	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 深色底上亮绿勾：沿用亮色的 #15803d 几乎不可见 */
+.theme-dark .priority-btn.priority-none.selected::after {
+	color: #4ade80;
+}
+
+.theme-dark .priority-btn-text {
+	color: #94a3b8;
+}
+
+.theme-dark .priority-btn-wrapper:hover .priority-btn-text {
 	color: #cbd5e1;
 }
 
-.theme-dark .priority-btn-wrapper:hover {
-	border-color: #94a3b8;
-}
-
-.theme-dark .priority-btn-wrapper.selected {
-	background: rgba(37, 99, 235, 0.18);
-	border-color: #3b82f6;
-	color: #bfdbfe;
-}
-
-/* 深色底上普通优先级改用亮绿，避免原浅绿渐变块在暗背景里发灰 */
-.theme-dark .priority-btn.priority-none {
-	background: #4ade80;
+.theme-dark .priority-btn-wrapper.selected .priority-btn-text {
+	color: #e2e8f0;
 }
 
 /* 批次二③：深色模式类别行 */
@@ -2416,12 +2567,12 @@
 		padding: 12px 14px;
 		gap: 10px;
 	}
-	/* 同 .category-chip：窄屏抬到拇指可稳定命中 */
-	.priority-btn-wrapper {
-		padding: 8px 14px;
+	/* 大圆点自带 40px 命中区，比胶囊更不用补 padding；窄屏只收一点间距 */
+	.priority-group {
+		gap: 14px;
 	}
 	.priority-btn-text {
-		font-size: 13px;
+		font-size: 12px;
 	}
 	.modal-category {
 		margin: 0 16px 16px;
@@ -2718,12 +2869,14 @@
    桌面端不受影响；同时把原本仅 hover 可见的元素改为常显。 */
 @media (hover: none) {
 	/* 批次二③：胶囊 hover 只改边框；触屏 tap 后 :hover 会粘住，这里对未选中项还原。
-	   排除 .selected：否则本条（位置靠后、同特异度）会压掉选中态的蓝边框 */
-	.category-chip:not(.selected):hover {
+	   排除 .selected：否则本条（位置靠后、同特异度）会压掉选中态的蓝边框。
+	   v1.6.2 再排除 .category-more-btn：它是开合开关不是类别，is-open 的实线蓝边
+	   如果被这条还原成灰边，"展开着"和"收着"就看不出区别了 */
+	.category-chip:not(.selected):not(.category-more-btn):hover {
 		border-color: #e2e8f0;
 	}
 
-	.theme-dark .category-chip:not(.selected):hover {
+	.theme-dark .category-chip:not(.selected):not(.category-more-btn):hover {
 		border-color: rgba(71, 85, 105, 0.6);
 	}
 
