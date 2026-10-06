@@ -2965,29 +2965,6 @@
 }
 
 
-/* ========== 设置页使用提示 ========== */
-.mt-settings-tips {
-	background: var(--background-secondary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 8px;
-	padding: 10px 14px;
-	margin-bottom: 16px;
-}
-
-.mt-settings-tips h3 {
-	margin: 0 0 6px;
-	font-size: 14px;
-	color: var(--text-normal);
-}
-
-.mt-settings-tips ul {
-	margin: 0;
-	padding-left: 18px;
-	color: var(--text-muted);
-	font-size: 13px;
-	line-height: 1.8;
-}
-
 /* ============================================================
    v1.6.0 批次一：日程视图（agenda view）
    ------------------------------------------------------------
@@ -3738,14 +3715,16 @@
 	grid-template-columns: repeat(2, 1fr);
 	grid-auto-rows: 1fr;
 	flex: 0 0 auto;
-	gap: 8px;
+	gap: 7px;
 }
 
 /* 8 格等高：grid-auto-rows:1fr 只保证「行」等高，前提是网格有确定高度；
-   这里让每一格自己长到同一底线，短周（无任务）也不会塌成一条缝 */
+   这里让每一格自己长到同一底线，短周（无任务）也不会塌成一条缝。
+   v1.7.2 竖向收一档（132→118）：手机上四行格子加顶栏刚好超出可视高度一点点，
+   出现一小段可滚动的距离；收完这一档后整屏落得下，任务多的日子仍由内容撑高。 */
 .monthly-tasks-container.view-bigweek .day-cell {
-	min-height: 132px;
-	padding: 8px 10px;
+	min-height: 118px;
+	padding: 7px 9px;
 }
 
 /* 大周只有 7 个日子格，跨月日不再是「别的月的杂讯」——这一周本身就是主题，
@@ -3772,9 +3751,9 @@
 }
 
 .monthly-tasks-container.view-bigweek .task-item {
-	padding: 3px 6px;
+	padding: 2px 6px;
 	font-size: 12px;
-	min-height: 18px;
+	min-height: 17px;
 }
 
 .monthly-tasks-container.view-bigweek .task-content {
@@ -3848,11 +3827,16 @@
 	background: var(--primary-500);
 }
 
-.monthly-tasks-container.view-bigweek .week-summary-lunar {
-	margin-top: 4px;
+/* 年内第几周：挂在标题行右侧，与日子格那行的「农历」同位同量级，
+   读起来是「本周 · 第 41 周」而不是多出来的一行 */
+.monthly-tasks-container.view-bigweek .week-summary-num {
 	font-size: 11px;
+	font-weight: 500;
 	color: var(--gray-600);
-	line-height: 1.3;
+	line-height: 1.2;
+	font-variant-numeric: tabular-nums;
+	flex: 0 0 auto;
+	margin-left: 6px;
 }
 
 /* ---------- 侧栏窄面板（4 个类权重更高，单独补齐） ---------- */
@@ -3866,8 +3850,8 @@
 
 .workspace-split.mod-right-split .monthly-tasks-container.view-bigweek .day-cell,
 .workspace-split.mod-left-split .monthly-tasks-container.view-bigweek .day-cell {
-	min-height: 124px;
-	padding: 7px 8px;
+	min-height: 112px;
+	padding: 6px 8px;
 	border-radius: var(--radius);
 }
 
@@ -3879,8 +3863,8 @@
 	}
 
 	.monthly-tasks-container.view-bigweek .day-cell {
-		min-height: 148px;
-		padding: 10px 12px;
+		min-height: 138px;
+		padding: 9px 12px;
 	}
 
 	.monthly-tasks-container.view-bigweek .day-number {
@@ -3917,7 +3901,7 @@
 		font-size: 12px;
 	}
 
-	.monthly-tasks-container.view-bigweek .week-summary-lunar {
+	.monthly-tasks-container.view-bigweek .week-summary-num {
 		font-size: 12px;
 	}
 }

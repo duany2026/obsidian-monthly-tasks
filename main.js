@@ -327,14 +327,8 @@ var I18N = {
     "settings.folder.desc": "\u9009\u62e9\u4efb\u52a1\u6587\u4ef6\u7684\u5b58\u50a8\u4f4d\u7f6e\u3002\u5982\u679c\u5df2\u6709\u5e74\u5ea6\u4efb\u52a1\u6587\u4ef6\uff0c\u63d2\u4ef6\u4f1a\u4f18\u5148\u4f7f\u7528\u5b83\u3002",
     "settings.hideStrike.desc": "\u6253\u5f00\u540e\u5df2\u5b8c\u6210\u4efb\u52a1\u9690\u85cf\u5220\u9664\u7ebf\uff08\u540c\u65f6\u9690\u85cf\u8fc7\u671f\u4efb\u52a1\u7684\u7ea2\u8272\u7ad6\u7ebf\uff1b\u5b8c\u6210\u6001\u672c\u8eab\u4ecd\u6709\u53cd\u9988\uff1a\u624b\u673a\u7aef\u5de6\u7f18\u7070\u7ad6\u6761 + \u53d8\u6697\uff09",
     "settings.hideStrike.name": "\u5df2\u5b8c\u6210\u9690\u85cf\u5220\u9664\u7ebf",
-    "settings.language.auto": "\u81ea\u52a8\uff08\u8ddf\u968f Obsidian\uff09",
-    "settings.language.desc": "\u63d2\u4ef6\u754c\u9762\u6587\u6848\u7684\u8bed\u8a00\u3002\u4e0d\u5f71\u54cd\u4efb\u52a1\u6587\u4ef6\uff1a\u6587\u4ef6\u540d\u3001\u6708\u4efd\u6807\u9898\u3001\u9ed8\u8ba4\u6587\u4ef6\u5939\u540d\u59cb\u7ec8\u4fdd\u6301\u4e2d\u6587\uff0c\u4ee5\u514d\u7834\u574f\u5df2\u6709\u7b14\u8bb0\u3002",
-    "settings.language.en": "English",
-    "settings.language.name": "\u754c\u9762\u8bed\u8a00",
     // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
     // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
-    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
     "settings.loading": "\u52a0\u8f7d\u4e2d...",
     "settings.refreshBtn": "\u5237\u65b0",
     "settings.refreshHoliday.desc": "\u4ece holiday-cn / timor.tech \u6570\u636e\u6e90\u83b7\u53d6\u6700\u65b0\u8282\u5047\u65e5\u6570\u636e",
@@ -353,17 +347,6 @@ var I18N = {
     "settings.showLunar.name": "\u663e\u793a\u519c\u5386",
     "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf\uff1b\u5f53\u5929\u9762\u677f\u7684\u4efb\u52a1\u5217\u8868\u8d85\u8fc7\u8fd9\u4e2a\u6570\u5c31\u9ed8\u8ba4\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u6309\u5b83\u51fa\u73b0",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf",
-    "settings.tips.1": "条视图点日期格子添加任务、点格子里的任务切换完成 / 未完成；日程视图点格子选中该天，点任务行直接编辑这一条，点明细右上角的「管理 / ＋ 添加」打开当天面板新建",
-    "settings.tips.10": "\u8de8\u5929\u4efb\u52a1\u7684\u7ed3\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u91cc\uff1a\u6ca1\u52fe\u9009\u300c\u8de8\u5929\u4efb\u52a1\u300d\u65f6\u5b83\u662f\u7070\u7684\uff0c\u70b9\u4e00\u4e0b\u4f1a\u6296\u4e00\u4e0b\u52fe\u9009\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9009",
-    "settings.tips.2": "\u70b9\u51fb\u9876\u90e8\u6708\u4efd\u6807\u9898\u53ef\u5feb\u901f\u8df3\u8f6c\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u952e\u8fd4\u56de\u4eca\u5929",
-    "settings.tips.3": "\u4efb\u52a1\u884c\u5c3e\u7684 #\u6807\u7b7e \u5373\u7c7b\u522b\uff1a\u51fa\u73b0\u7c7b\u522b\u540e\uff0c\u9876\u90e8\u6f0f\u6597\u6309\u94ae\u53ef\u6309\u7c7b\u522b\u7b5b\u9009\uff08\u591a\u9009\uff0c\u9ed8\u8ba4\u5168\u90e8\uff09",
-    "settings.tips.4": "点日程里的任务行 = 直接编辑这一条；面板里点别的行的铅笔可切换目标（再点一次退回新建）。改内容/优先级/时间/日期/类别/备注，保存=先建新行再删旧行，跨天任务以开始日期为准",
-    "settings.tips.5": "\u4efb\u52a1\u4fdd\u5b58\u5728\u300c\u4efb\u52a1\u300d\u6587\u4ef6\u5939\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52a1\u5217\u8868\uff08\u53ef\u5728\u8bbe\u7f6e\u5207\u6362\u5f52\u6863\u5468\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52a8\u7f16\u8f91\uff0c\u6708\u5386\u81ea\u52a8\u540c\u6b65",
-    "settings.tips.6": "\u7f16\u8f91\u5f39\u7a97\u53ef\u901a\u8fc7\u53d6\u6d88\u6309\u94ae\u3001ESC\u3001\u70b9\u51fb\u906e\u7f69\u6216\u79fb\u52a8\u7aef\u7cfb\u7edf\u8fd4\u56de\u952e\u5173\u95ed",
-    "settings.tips.7": "\u65E5\u7A0B\u89C6\u56FE\uFF1A\u53F3\u4E0A\u89D2\u5207\u6362\u6309\u94AE\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u6362\u6708\u5386\u89C6\u56FE / \u65E5\u7A0B\u89C6\u56FE\u300D\uFF09\u8FDB\u5165\u3002\u683C\u5B50\u91CC\u53EA\u6807\u4E00\u679A\u70B9\u8868\u793A\u8FD9\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u53D8\u7EA2\u70B9\uFF1B\u4E0B\u534A\u533A\u5217\u51FA\u9009\u4E2D\u65E5\u7684\u4EFB\u52A1\u4E0E\u5907\u6CE8",
-    "settings.tips.8": "备注写在任务行的下一行、以 > 开头（Markdown 引用块），连续多行合并成一条；明细区只读展示备注卡片，要改就在当天面板的备注框里编辑（无备注时是一整条虚线框，点一下即可输入）",
-    "settings.tips.9": "\u5f53\u5929\u9762\u677f\u4f1a\u81ea\u5df1\u6536\u8d77\u4e24\u5904\uff1a\u4efb\u52a1\u6570\u8d85\u8fc7\u8bbe\u7f6e\u91cc\u7684\u300c\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf\u300d\u65f6\uff0c\u5217\u8868\u9ed8\u8ba4\u6536\u8d77\uff08\u70b9\u6807\u9898\u5c55\u5f00\uff09\uff1b\u7c7b\u522b\u8d85\u8fc7\u4e24\u884c\u65f6\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u94ae",
-    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "settings.view.desc": "\u6253\u5f00\u6708\u5386\u65f6\u9ed8\u8ba4\u4f7f\u7528\u54ea\u4e00\u6863\u89c6\u56fe\u3002\u9876\u680f\u5207\u6362\u89c6\u56fe\u540e\u8fd9\u91cc\u4f1a\u8ddf\u7740\u53d8\u6210\u4f60\u6700\u540e\u7528\u7684\u90a3\u4e00\u6863\uff0c\u4e0b\u6b21\u6253\u5f00\u5c31\u505c\u5728\u90a3\u513f\u3002",
     "settings.view.name": "\u9ed8\u8ba4\u89c6\u56fe",
     "view.agenda.addOne": "\u6dfb\u52a0",
@@ -409,7 +392,6 @@ var I18N = {
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
     "view.week.load": "\u5171 {n} \u9879 \u00b7 \u5b8c\u6210 {m}",
-    "view.week.lunarSpan": "{a} \u2013 {b}",
     "view.week.number": "\u7b2c {n} \u5468",
     "view.week.relative.next": "\u4e0b\u5468",
     "view.week.relative.prev": "\u4e0a\u5468",
@@ -637,14 +619,8 @@ var I18N = {
     "settings.folder.desc": "\u9078\u64c7\u4efb\u52d9\u6a94\u6848\u7684\u5132\u5b58\u4f4d\u7f6e\u3002\u5982\u679c\u5df2\u6709\u5e74\u5ea6\u4efb\u52d9\u6a94\u6848\uff0c\u5916\u639b\u6703\u512a\u5148\u4f7f\u7528\u5b83\u3002",
     "settings.hideStrike.desc": "\u958b\u555f\u5f8c\u5df2\u5b8c\u6210\u4efb\u52d9\u96b1\u85cf\u522a\u9664\u7dda\uff08\u540c\u6642\u96b1\u85cf\u904e\u671f\u4efb\u52d9\u7684\u7d05\u8272\u8c4e\u7dda\uff1b\u5b8c\u6210\u614b\u672c\u8eab\u4ecd\u6709\u56de\u994b\uff1a\u624b\u6a5f\u7aef\u5de6\u7de3\u7070\u8c4e\u689d + \u8b8a\u6697\uff09",
     "settings.hideStrike.name": "\u5df2\u5b8c\u6210\u96b1\u85cf\u522a\u9664\u7dda",
-    "settings.language.auto": "\u81ea\u52d5\uff08\u8ddf\u96a8 Obsidian\uff09",
-    "settings.language.desc": "\u5916\u639b\u4ecb\u9762\u6587\u5b57\u8a9e\u8a00\u3002\u4e0d\u5f71\u97ff\u4efb\u52d9\u6a94\u6848\uff1a\u6a94\u540d\u3001\u6708\u4efd\u6a19\u984c\u3001\u9810\u8a2d\u8cc7\u6599\u593e\u540d\u7a31\u59cb\u7d42\u4fdd\u6301\u4e2d\u6587\uff0c\u4ee5\u514d\u7834\u58de\u65e2\u6709\u7b46\u8a18\u3002",
-    "settings.language.en": "English",
-    "settings.language.name": "\u4ecb\u9762\u8a9e\u8a00",
     // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
     // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
-    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
     "settings.loading": "\u8f09\u5165\u4e2d\u2026",
     "settings.refreshBtn": "\u91cd\u65b0\u6574\u7406",
     "settings.refreshHoliday.desc": "\u5f9e holiday-cn / timor.tech \u6578\u64da\u6e90\u53d6\u5f97\u6700\u65b0\u7bc0\u5047\u65e5\u6578\u64da",
@@ -663,17 +639,6 @@ var I18N = {
     "settings.showLunar.name": "\u986f\u793a\u8fb2\u66c6",
     "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf\uff1b\u7576\u5929\u9762\u677f\u7684\u4efb\u52d9\u6e05\u55ae\u8d85\u904e\u9019\u500b\u6578\u5c31\u9810\u8a2d\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u4f9d\u5b83\u51fa\u73fe",
     "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf",
-    "settings.tips.1": "條檢視點日期格位新增任務、點格位裡的任務切換完成 / 未完成；日程檢視點格位選取該天，點任務列直接編輯這一條，點明細右上角的「管理 / ＋ 新增」開啟當天面板新增",
-    "settings.tips.10": "\u8de8\u5929\u4efb\u52d9\u7684\u7d50\u675f\u65e5\u671f\u6846\u4e00\u76f4\u5728\u90a3\u88e1\uff1a\u6c92\u52fe\u9078\u300c\u8de8\u5929\u4efb\u52d9\u300d\u6642\u5b83\u662f\u7070\u7684\uff0c\u9ede\u4e00\u4e0b\u6703\u6296\u4e00\u4e0b\u52fe\u9078\u6846\u63d0\u9192\u4f60\u5148\u52fe\u9078",
-    "settings.tips.2": "\u9ede\u64ca\u9802\u90e8\u6708\u4efd\u6a19\u984c\u53ef\u5feb\u901f\u8df3\u8f49\u5e74\u6708\uff0c\u300c\u56de\u5230\u672c\u6708\u300d\u4e00\u9375\u8fd4\u56de\u4eca\u5929",
-    "settings.tips.3": "\u4efb\u52d9\u884c\u5c3e\u7684 #\u6a19\u7c64 \u5373\u985e\u5225\uff1a\u51fa\u73fe\u985e\u5225\u5f8c\uff0c\u9802\u90e8\u6f0f\u6597\u6309\u9215\u53ef\u6309\u985e\u5225\u7be9\u9078\uff08\u591a\u9078\uff0c\u9810\u8a2d\u5168\u90e8\uff09",
-    "settings.tips.4": "點日程裡的任務列 = 直接編輯這一條；面板裡點其他列的鉛筆可切換目標（再點一次退回新增）。改內容/優先級/時間/日期/類別/備註，儲存=先建新行再刪舊行，跨天任務以開始日期為準",
-    "settings.tips.5": "\u4efb\u52d9\u5132\u5b58\u5728\u300c\u4efb\u52d9\u300d\u8cc7\u6599\u593e\u4e0b\u7684\u5e74\u5ea6\u6216\u6708\u5ea6\u4efb\u52d9\u5217\u8868\uff08\u53ef\u5728\u8a2d\u5b9a\u5207\u63db\u6b78\u6a94\u9031\u671f\uff09\uff0c\u53ef\u76f4\u63a5\u624b\u52d5\u7de8\u8f2f\uff0c\u6708\u66c6\u81ea\u52d5\u540c\u6b65",
-    "settings.tips.6": "\u7de8\u8f2f\u5f48\u7a97\u53ef\u900f\u904e\u53d6\u6d88\u6309\u9215\u3001ESC\u3001\u9ede\u64ca\u906e\u7f69\u6216\u884c\u52d5\u88dd\u7f6e\u7cfb\u7d71\u8fd4\u56de\u9375\u95dc\u9589",
-    "settings.tips.7": "\u65E5\u7A0B\u6AA2\u8996\uFF1A\u53F3\u4E0A\u89D2\u5207\u63DB\u6309\u9215\uFF08\u6216\u547D\u4EE4\u9762\u677F\u300C\u5207\u63DB\u6708\u66C6\u6AA2\u8996 / \u65E5\u7A0B\u6AA2\u8996\u300D\uFF09\u9032\u5165\u3002\u683C\u4F4D\u88E1\u53EA\u6A19\u4E00\u679A\u9EDE\u8868\u793A\u9019\u5929\u6709\u5B89\u6392\uFF0C\u903E\u671F\u672A\u5B8C\u6210\u8B8A\u7D05\u9EDE\uFF1B\u4E0B\u65B9\u5340\u5217\u51FA\u9078\u53D6\u65E5\u7684\u4EFB\u52D9\u8207\u5099\u8A3B",
-    "settings.tips.8": "備註寫在任務行的下一行、以 > 開頭（Markdown 引用塊），連續多行合併成一條；明細區唯讀顯示備註卡片，要改就在當天面板的備註框裡編輯（無備註時是一整條虛線框，點一下即可輸入）",
-    "settings.tips.9": "\u7576\u5929\u9762\u677f\u6703\u81ea\u5df1\u6536\u8d77\u5169\u8655\uff1a\u4efb\u52d9\u6578\u8d85\u904e\u8a2d\u5b9a\u88e1\u7684\u300c\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf\u300d\u6642\uff0c\u6e05\u55ae\u9810\u8a2d\u6536\u8d77\uff08\u9ede\u6a19\u984c\u5c55\u958b\uff09\uff1b\u985e\u5225\u8d85\u904e\u5169\u884c\u6642\u6298\u6210\u4e00\u884c\uff0c\u5c3e\u90e8\u6709\u300c\u66f4\u591a N\u300d\u6309\u9215",
-    "settings.tips.title": "\u4f7f\u7528\u63d0\u793a",
     "settings.view.desc": "\u958b\u555f\u6708\u66c6\u6642\u9810\u8a2d\u4f7f\u7528\u54ea\u4e00\u6a94\u6aa2\u8996\u3002\u9802\u6b04\u5207\u63db\u6aa2\u8996\u5f8c\u9019\u88e1\u6703\u8ddf\u8457\u8b8a\u6210\u4f60\u6700\u5f8c\u4f7f\u7528\u7684\u90a3\u4e00\u6a94\uff0c\u4e0b\u6b21\u958b\u555f\u5c31\u505c\u5728\u90a3\u88e1\u3002",
     "settings.view.name": "\u9810\u8a2d\u6aa2\u8996",
     "view.agenda.addOne": "\u6dfb\u52a0",
@@ -719,7 +684,6 @@ var I18N = {
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
     "view.week.load": "\u5171 {n} \u9805 \u00b7 \u5b8c\u6210 {m}",
-    "view.week.lunarSpan": "{a} \u2013 {b}",
     "view.week.number": "\u7b2c {n} \u9031",
     "view.week.relative.next": "\u4e0b\u9031",
     "view.week.relative.prev": "\u4e0a\u9031",
@@ -947,14 +911,8 @@ var I18N = {
     "settings.folder.desc": "Select storage location for task files. If yearly task file already exists, plugin will prioritize using it.",
     "settings.hideStrike.desc": "When enabled, hide strikethrough for completed tasks (also hides red vertical line for overdue tasks; completed state still has feedback: gray vertical bar on left edge + dimmed on mobile)",
     "settings.hideStrike.name": "Hide Strikethrough for Completed",
-    "settings.language.auto": "Auto (follow Obsidian)",
-    "settings.language.desc": "Language for the plugin's own text. Task files are unaffected: file names, month headings and the default folder stay Chinese so existing notes keep working.",
-    "settings.language.en": "English",
-    "settings.language.name": "Interface Language",
     // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
     // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.language.zhCN": "\u7b80\u4f53\u4e2d\u6587",
-    "settings.language.zhTW": "\u7e41\u9ad4\u4e2d\u6587",
     "settings.loading": "Loading\u2026",
     "settings.refreshBtn": "Refresh",
     "settings.refreshHoliday.desc": "Get latest holiday data from holiday-cn / timor.tech data source",
@@ -973,17 +931,6 @@ var I18N = {
     "settings.showLunar.name": "Show Lunar Calendar",
     "settings.tasksLimit.desc": "Maximum tasks shown per date cell; the day panel also collapses its task list beyond this number and shows \"View all\" at the same threshold",
     "settings.tasksLimit.name": "Tasks Per Day Limit",
-    "settings.tips.1": "List view: click a date cell to add a task, click a task in it to toggle done/undone. Agenda view: clicking a cell selects that day; click a task row to edit that task directly, or the Manage / \uFF0B Add button at the top-right of the detail pane to open the day panel and create one",
-    "settings.tips.10": "The multi-day end-date field is always there: while \"Multi-day task\" is unchecked it stays greyed out, and tapping it nudges the checkbox to remind you to tick it first",
-    "settings.tips.2": "Click month title at top to quickly jump to year/month, \"Back to This Month\" to return to today",
-    "settings.tips.3": "#tag at end of task line is category: after categories appear, funnel button at top can filter by category (multi-select, default all)",
-    "settings.tips.4": "Clicking a task row in the agenda edits that task directly; inside the day panel a row's pencil switches the target (click again to go back to create). Edit content/priority/time/date/category/note; save = create a new line then delete the old one, multi-day tasks key off the start date",
-    "settings.tips.5": "Tasks saved in yearly or monthly task lists under \"Tasks\" folder (can switch archive period in settings), can be manually edited, calendar auto-syncs",
-    "settings.tips.6": "Edit modal can be closed via cancel button, ESC, clicking mask, or mobile system back button",
-    "settings.tips.7": "Agenda view: use the toggle button at the top right, or the command palette entry \"Toggle Calendar / Agenda View\". A dot marks a day with plans, red when overdue; the pane below lists the selected day's tasks and notes",
-    "settings.tips.8": "Notes go on the line right after a task and start with > (a Markdown quote). Consecutive > lines merge into one note. The detail pane shows note cards read-only; edit them in the note box of the day panel (when empty it is a full-width dashed field, tap to type)",
-    "settings.tips.9": "The day panel folds itself in two places: when the task count exceeds the \"Tasks per day\" setting the list starts collapsed (click the title to expand), and categories beyond two rows collapse into one with a \"More N\" button at the end",
-    "settings.tips.title": "Usage Tips",
     "settings.view.desc": "Which view the calendar opens with. Switching views from the header updates this to the one you last used.",
     "settings.view.name": "Default view",
     "view.agenda.addOne": "Add",
@@ -1029,7 +976,6 @@ var I18N = {
     "view.month.9": "Sep",
     "view.month.title": "{monthName} {year}",
     "view.week.load": "{n} items \u00b7 {m} done",
-    "view.week.lunarSpan": "{a} \u2013 {b}",
     "view.week.number": "Week {n}",
     "view.week.relative.next": "Next week",
     "view.week.relative.prev": "Last week",
@@ -2844,16 +2790,6 @@ function getLunarInfo(date) {
     };
   }
 }
-/** 某日所属的农历月名（闰六月 / 六月）；大周视图的「本周」块用它标出这一周跨的农历年月 */
-function lunarMonthLabel(date) {
-  try {
-    const l = solarToLunar(date);
-    const monthName = lunarMonthNames()[l.month - 1];
-    return l.isLeap ? tr("lunar.leap", { monthName }) : tr("lunar.monthSuffix", { monthName });
-  } catch (e) {
-    return "";
-  }
-}
 function isSpecialLunarDay(date) {
   try {
     const lunarDate = solarToLunar(date);
@@ -3112,19 +3048,32 @@ function weekdayFullNames() {
   ];
 }
 /**
- * 「本周 / 上周 / 下周」：拿锚点周与含今天那一周作差，按整周数说话。
- * 差超过一周时不硬凑「上上周」——那是三个词的事，这里退到「第 N 周」，
- * N 从锚点所在年的第一个周起点数起（与 firstDayOfWeek 同口径，不是 ISO 周）。
+ * 锚点周在其公历年里的第几周：含 1 月 1 日的那一周就是第 1 周，
+ * 按 firstDayOfWeek 切分（与格子口径一致，不是 ISO 周）。
+ * 跨年那一周（如 2025-12-28 – 2026-01-03）归给它所包含的那个元旦的年份，
+ * 所以它是 2026 年的第 1 周，而不是 2025 年的第 53 周——不会出现「一年 53 周」的怪数。
  */
-function weekRelativeLabel(startKey, firstDayOfWeek) {
+function weekNumberOfYear(startKey, firstDayOfWeek) {
+  const anchor = dateFromStr(startKey);
+  const jan1WeekStart = (y) => weekStartFrom(new Date(y, 0, 1), firstDayOfWeek);
+  // 只有「周起始日早于本周所属元旦」这一种越界情形：锚点周其实属于下一年
+  let year = anchor.getFullYear();
+  if (dateFromStr(jan1WeekStart(year + 1)).getTime() <= anchor.getTime()) year += 1;
+  const yearStart = dateFromStr(jan1WeekStart(year));
+  return Math.floor(Math.round((anchor.getTime() - yearStart.getTime()) / 864e5) / 7) + 1;
+}
+/**
+ * 「本周」块标题行的两段文案：左边相对名（本周 / 上周 / 下周），右边年内周数。
+ * 相对名只覆盖作差 ±1 的三档——再远就退到「第 N 周」当标题（用户原话：不要「上上周」），
+ * 此时右侧不再重复标数，否则会出现「第 3 周 · 第 3 周」。
+ */
+function weekSummaryTitles(startKey, firstDayOfWeek) {
+  const num = tr("view.week.number", { n: weekNumberOfYear(startKey, firstDayOfWeek) });
   const todayStart = weekStartFrom(new Date(), firstDayOfWeek);
   const diffWeeks = Math.round((dateFromStr(startKey).getTime() - dateFromStr(todayStart).getTime()) / (7 * 864e5));
-  if (diffWeeks === 0) return tr("view.week.relative.this");
-  if (diffWeeks === -1) return tr("view.week.relative.prev");
-  if (diffWeeks === 1) return tr("view.week.relative.next");
-  const anchor = dateFromStr(startKey);
-  const yearStart = dateFromStr(weekStartFrom(new Date(anchor.getFullYear(), 0, 1), firstDayOfWeek));
-  return tr("view.week.number", { n: Math.floor(Math.round((anchor.getTime() - yearStart.getTime()) / 864e5) / 7) + 1 });
+  const rel = diffWeeks === 0 ? tr("view.week.relative.this") : diffWeeks === -1 ? tr("view.week.relative.prev") : diffWeeks === 1 ? tr("view.week.relative.next") : null;
+  if (rel) return { title: rel, num };
+  return { title: num, num: "" };
 }
 /** 视图模式的显示名（菜单行、设置项、命令标题共用一处定义，避免三处文案漂移） */
 function viewModeLabel(mode) {
@@ -3793,22 +3742,26 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 大周视图左上角的「本周」块（v1.7.1）。
    * ------------------------------------------------------------
    * 与日子格同构：一行标题 + 几行内容，占满第一格，不空着、也不伪装成一个日子
-   * （无排期、不可点、无边框、底色更浅）。四行内容自上而下：
-   *   1) 本周 / 上周 / 下周 / 第 N 周 —— 文字，永远不是数字
+   * （无排期、不可点、无边框、底色更浅）。三行内容自上而下：
+   *   1) 本周 / 上周 / 下周 / 第 N 周 —— 文字，永远不是数字；右侧灰字标年内第几周
    *   2) 周区间 10/6 – 10/12 —— 顶栏已有，这里再给一次是因为块本身要能自立读解
    *   3) 共 N 项 · 完成 M + 一条发丝进度线 —— 这一周的负载
-   *   4) 农历月（跨月时写「八月 – 九月」）—— 跟随「显示农历」开关
+   * v1.7.2 去掉了农历月那一行：手机上「八月 – 九月」被读成公历八九月，
+   * 而且日子格里已有廿四/廿五…与月初标记，这行是重复信息。
    * 数字来自调用方传进的去重集合：跨天任务在这周里占 3 天也只算 1 项。
    */
   renderWeekSummaryCell(taskSet) {
     const start = this.weekAnchor();
-    const end = weekEndFrom(start);
     const el = this.gridEl.createDiv("day-cell week-summary");
     const total = taskSet.size;
     let done = 0;
     for (const t of taskSet) if (t.completed) done++;
+    const titles = weekSummaryTitles(start, this.plugin.settings.firstDayOfWeek);
     const titleRow = el.createDiv("day-header-row");
-    titleRow.createDiv("week-summary-title").textContent = weekRelativeLabel(start, this.plugin.settings.firstDayOfWeek);
+    titleRow.createDiv("week-summary-title").textContent = titles.title;
+    // 周数走标题行右侧的灰字：与日子格那行（周日 / 4 / 廿四）同构，
+    // 也不新增行、不长高度（手机端这一格的高度是要省着用的）
+    if (titles.num) titleRow.createDiv("week-summary-num").textContent = titles.num;
     el.createDiv("week-summary-range").textContent = getWeekTitle(start);
     const loadEl = el.createDiv("week-summary-load");
     loadEl.textContent = tr("view.week.load", { n: total, m: done });
@@ -3818,13 +3771,6 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       bar.createDiv("week-summary-bar-fill").style.width = Math.round(done / total * 100) + "%";
     } else {
       bar.addClass("is-empty");
-    }
-    if (this.plugin.settings.showLunar) {
-      const a = lunarMonthLabel(dateFromStr(start));
-      const b = lunarMonthLabel(end);
-      const lunarEl = el.createDiv("week-summary-lunar");
-      lunarEl.textContent = a && b && a !== b ? tr("view.week.lunarSpan", { a, b }) : (a || "");
-      if (!lunarEl.textContent) lunarEl.remove();
     }
     return el;
   }
@@ -6050,7 +5996,8 @@ var DEFAULT_SETTINGS = {
   // v1.6.0 新增、v1.7.0 扩到三值、v1.7.1 扩到四值；老 data.json 缺该键时由
   // Object.assign({}, DEFAULT_SETTINGS, loadedData) 取此默认值，不需额外兜底。
   viewMode: "list",
-  // 界面语言："auto"（跟随 Obsidian 设置）| "zh-CN" | "zh-TW" | "en"
+  // 界面语言：v1.7.2 起恒为 "auto"（跟随 Obsidian 界面语言），设置页不再提供选项；
+  // 枚举值 "zh-CN" | "zh-TW" | "en" 仍被 applyLanguage/setLanguage 内部支持（测试与将来复用）
   language: "auto",
   showCompletedTasks: true,
   showCompletedStrike: true,
@@ -6389,11 +6336,10 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
         this.settings[key] = DEFAULT_SETTINGS[key];
       }
     }
-    // language 枚举校验：手编 data.json 写入 "fr" 之类时回退 auto（跟随 Obsidian），
-    // 而不是回退某个固定语言——auto 永远与用户界面一致
-    if (!["auto", "zh-CN", "zh-TW", "en"].includes(this.settings.language)) {
-      this.settings.language = "auto";
-    }
+    // v1.7.2 起界面语言只跟随 Obsidian：设置页不再有该选项，老 data.json 里存过的
+    // 显式选择（zh-CN / en …）在这里统一归位成 auto，避免「看不见却生效」的语言锁定。
+    // 内部/测试要临时指定语言，走 setLanguage()（它在 loadSettings 之后直接改内存态）。
+    this.settings.language = "auto";
     applyLanguage(this.settings.language);
     // tasksPerDayLimit < 1 会让所有任务进入 +N 列表而格子无内容
     if (typeof this.settings.tasksPerDayLimit !== "number" || this.settings.tasksPerDayLimit < 1) {
@@ -6594,37 +6540,14 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    // 使用提示（新用户引导）：核心交互不读 README 也能在设置页看到；附带版本标记便于排查文件同步
-    const tips = containerEl.createDiv("mt-settings-tips");
-    tips.createEl("h3", { text: tr("settings.tips.title") });
-    const tipList = tips.createEl("ul");
-    for (const tip of [
-      tr("settings.tips.1"),
-      tr("settings.tips.2"),
-      tr("settings.tips.3"),
-      tr("settings.tips.4"),
-      tr("settings.tips.5"),
-      tr("settings.tips.6"),
-      tr("settings.tips.7"),
-      tr("settings.tips.8"),
-      tr("settings.tips.9"),
-      tr("settings.tips.10"),
-    ]) {
-      tipList.createEl("li", { text: tip });
-    }
+    // v1.7.2：原来这里是一整块「使用提示」（10 条），手机端打开设置要先划一整屏
+    // 才看到真正的开关。核心交互已随视图自带（点格子、明细区按钮有 aria-label、
+    // 当天面板有占位文案），长文说明归 README。设置页只留设置。
     // 显示设置
     containerEl.createEl("h3", { text: tr("settings.section.display") });
-    // 界面语言：选项文字**故意不翻译**（各语言用自己的书写显示，
-    // 这是语言选择器的通行做法，翻成当前语言会出现「English→英文」这种看不懂的选择）
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.language.name")).setDesc(tr("settings.language.desc")).addDropdown((dropdown) => dropdown
-      .addOption("auto", tr("settings.language.auto"))
-      .addOption("zh-CN", tr("settings.language.zhCN"))
-      .addOption("zh-TW", tr("settings.language.zhTW"))
-      .addOption("en", tr("settings.language.en"))
-      .setValue(this.plugin.settings.language)
-      .onChange(async (value) => {
-        await this.plugin.setLanguage(value);
-      }));
+    // v1.7.2：界面语言不再出现在设置页——插件文案直接跟随 Obsidian 的界面语言。
+    // 少一个选项，也少一类「选了中文但 Obsidian 是英文」的错位；
+    // setLanguage() 仍保留在插件实例上，供测试与将来需要时复用。
     // 默认视图（v1.7.0）：只管「下次打开月历是哪一档」；顶栏菜单切的是当前状态，
     // 不回写这里，避免用户点一下按钮就悄悄改掉了自己的默认设置
     new import_obsidian3.Setting(containerEl).setName(tr("settings.view.name")).setDesc(tr("settings.view.desc")).addDropdown((dropdown) => {
