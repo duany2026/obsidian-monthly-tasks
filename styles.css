@@ -840,6 +840,7 @@
 .task-input {
 	width: 100%;
 	padding: 16px;
+	/* 基准值；真正保证「备注和待办一样大」的是下面 .modal.create-task-modal 的强制同源组 */
 	font-size: 16px;
 	border: 2px solid transparent;
 	border-radius: 12px;
@@ -861,6 +862,27 @@
 .task-input::placeholder {
 	color: #94a3b8;
 	font-weight: 400;
+}
+
+/* ---- v1.7.4：弹窗三个文字控件强制同源同字号 ----
+   前三次（v1.6.1 / v1.6.3 / v1.7.2）都在"让备注跟任务框都用 --font-ui-small"上打转，
+   真机上备注始终比待办大。根因不在变量，而在权重：
+   Obsidian app.css 有一条把 textarea 与 input[type='text'] 打包的公共规则
+   （font-size: var(--font-ui-small)，权重 0-1-1），它对任务框的权重高于我们的
+   .task-input（0-1-0），却对备注框低于我们的 .note-textarea（0-1-0 压元素选择器）；
+   两边各自走不同的胜出规则，一旦主题或移动端基线（.is-mobile 下
+   --font-ui-small = --font-text-size × 0.937、--font-ui-medium = --font-text-size）
+   变动，两个框就各自漂移，"同一个变量"根本保证不了同一个渲染值。
+   这次不赌变量：用两级类选择器（0-2-0，稳定压过 app.css 的 0-1-1）把任务框、
+   备注幽灵框、备注展开框钉成同一个显式 px，并带 !important——手机端 Obsidian
+   自带的是另一份 app.css（我们读不到），移动端对 textarea 常有单独抬字号的规则，
+   只有钉死显式值才能保证两个平台的两个框渲染像素完全一致。
+   16px 同时满足 iOS WebKit「输入框 <16px 聚焦会强制放大整页」的老坑 */
+.modal.create-task-modal .task-input,
+.modal.create-task-modal .note-show-btn,
+.modal.create-task-modal .note-textarea {
+	font-size: 16px !important;
+	line-height: 1.4 !important;
 }
 
 /* 按钮组 */
@@ -3491,9 +3513,8 @@
 	.modal-note-container {
 		margin: 0 16px 14px;
 	}
-	/* 窄屏拇指命中靠 padding 撑，不靠字号：原先这里把备注写成 16px，任务框却仍是 13px
-	   （Obsidian 的 input[type=text] 规则权重高于我们的 .task-input），备注比待办大一号，
-	   用户说的「不协调」就是这个。字号交回上面的 --font-ui-small，此处只补命中高度 */
+	/* 窄屏拇指命中靠 padding 撑，不靠字号。字号已由上面
+	   .modal.create-task-modal 一族钉成统一 16px（v1.7.4），这里只补命中高度 */
 	.note-show-btn {
 		min-height: 36px;
 		padding: 8px 10px;
