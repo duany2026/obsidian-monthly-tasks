@@ -738,8 +738,12 @@
 	background: linear-gradient(180deg, var(--primary-600) 0%, var(--primary-400) 100%);
 }
 
-/* 遮罩层：由 Obsidian Modal 基类的 .modal-bg 提供，这里仅补充与原设计一致的模糊效果 */
-.modal-container .modal-bg {
+/* 遮罩层：由 Obsidian Modal 基类的 .modal-bg 提供，这里仅补充与原设计一致的模糊效果。
+   v1.7.5：只在桌面端加模糊。backdrop-filter 是全屏实时高斯模糊，手机 GPU 要先做一次
+   整屏快照才能出结果，于是它必然比弹窗晚一两帧生效（用户读作「点下去、过一瞬背景才糊」），
+   而弹窗进/出场那 150~160ms 里它每帧都要重算，把动画帧挤掉——低端机直接就是掉帧卡顿。
+   手机端沿用框架自带的半透明遮罩（--background-modifier-cover），观感只差没有糊，不丢层次。 */
+body:not(.is-mobile) .modal-container .modal-bg {
 	backdrop-filter: blur(6px);
 }
 
@@ -829,30 +833,28 @@
 	letter-spacing: -0.5px;
 }
 
-/* 输入框 - 全面优化样式 */
+/* 输入框容器：只负责与弹窗其余区块对齐的左右外边距。
+   原先这里的 padding: 4px + border-radius: 16px 是给"2px 描边 + 12px 大圆角"那版
+   任务框当外环用的，而那十条盒声明全被 Obsidian 的 input[type='text']（0-1-1）顶掉、
+   从来没有渲染出来过——于是这 4px 内边距只剩一个副作用：把任务框挤得比备注框窄 8px、
+   左边缘还差 4px（实测 362 vs 370）。v1.7.5 统一盒模型后必须一起删，两框才真等宽 */
 .task-input-wrapper {
 	margin: 12px 24px 12px;
 	position: relative;
-	padding: 4px;
-	border-radius: 16px;
 }
 
+/* 盒模型、字号、字体全部由上面那条统一规则给出（v1.7.5）。这里只留任务框独有的
+   弹性动效。原先的 padding:16px / border:2px / border-radius:12px / font-size:16px /
+   box-sizing / font-family / background / color / outline 十条从未赢过 Obsidian 的
+   input[type='text']（0-1-1），是看着扎眼、实际不生效的死声明，删。
+   注意不要在这里"留一条边框/背景"当差异：0-1-0 压不过 0-3-0，留了也是死代码。
+   要单独改任务框，就走下面 .modal-container .modal.create-task-modal 的 0-3-0/0-4-0 组 */
 .task-input {
-	width: 100%;
-	padding: 16px;
-	/* 基准值；真正保证「备注和待办一样大」的是下面 .modal.create-task-modal 的强制同源组 */
-	font-size: 16px;
-	border: 2px solid transparent;
-	border-radius: 12px;
-	background: var(--background-primary);
-	color: var(--text-normal);
-	outline: none;
 	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-	box-sizing: border-box;
-	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.task-input:focus {
+/* 0-4-0：压过上面统一组的 border 简写（0-3-0），聚焦描边才能真的出现 */
+.modal-container .modal.create-task-modal .task-input:focus {
 	border-color: #3b82f6;
 	background: var(--background-primary);
 	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
@@ -864,28 +866,35 @@
 	font-weight: 400;
 }
 
-/* ---- v1.7.4：弹窗三个文字控件钉成同一条字号规则 ----
-   v1.6.1 / v1.6.3 / v1.7.2 三轮都在‘让备注和任务框用同一个变量’上打转，真机上
-   备注始终比待办大。根因不在变量，在权重：Obsidian app.css（从 1.13.7 的 asar
-   解出来核对）有一条把 textarea 与 input[type='text'] 打包的公共规则
-   font-size: var(--font-ui-small)，权重 0-1-1——它对任务框压过我们的
-   .task-input（0-1-0），对备注框却被 .note-textarea（0-1-0 压元素选择器）顶掉。
-   两个框各走各的胜出规则，再加上 .is-mobile 下 --font-ui-small 变成
-   calc(--font-text-size * 0.937)（跟用户的文本字号设置漂移），‘同一个变量’
-   从来保证不了‘同一个渲染值’。手机端 Obsidian 还是另一份 app.css（读不到），
-   所以这次不赌权重也不赌变量：一条三级类（0-3-0）带 !important 的规则同时命中三个控件，
-   同一条规则命中同类元素时计算值必然相等，主题和移动端基线都无从插手。
-   窄屏显式抬到 16px，避开 iOS WebKit‘输入框 <16px 聚焦强制放大整页’的老坑；
-   宽屏沿用 --font-ui-small（桌面本来就是 13px，两框原本就一致，不放大） */
+/* ---- v1.7.5：弹窗三个文字控件 = 同一个控件（一条规则钉整套盒模型） ----
+   v1.6.1 / v1.6.3 / v1.7.2 / v1.7.4 四轮都在"取齐"上打转，真机上备注始终显得比
+   待办大。病灶不在某个属性，在"两套胜出规则"：Obsidian app.css（桌面 1.13.7 的
+   asar 里核对）把 textarea 与 input[type='text'] 打包进一条 font-size / font-family /
+   padding / border / border-radius 的规则（权重 0-1-1）。它对任务框**压过**我们的
+   .task-input（0-1-0），对备注框却**被** .note-textarea（0-1-0 压元素选择器）顶掉。
+   实测坐实（1270px / 393px，焦点移开）：
+     任务框 4px 8px · 1px · 圆角 5px · 高 30px   ← Obsidian 赢，我们写的 16px / 2px / 12px 是死代码
+     备注框 9px 10px · 1px · 圆角 5px · 高 36px   ← 我们赢
+   于是两框高度天生差 6px，字号取齐也白取齐。加上手机端 .is-mobile 把
+   --font-ui-small 改成 calc(--font-text-size * 0.937)（跟用户"文本字号"设置漂移），
+   而手机那份 app.css 我们读不到——只有"同一条规则命中三个控件"才保证计算值相等。
+   字号与字体带 !important（要压过读不到的移动端样式）；盒模型不带 !important，
+   好让下面的 :focus 与 .theme-dark 用 0-4-0 选择器自然接管。
+   窄屏显式 16px：iOS WebKit 对 <16px 的输入框聚焦会强制放大整页。 */
 .modal-container .modal.create-task-modal .task-input,
 .modal-container .modal.create-task-modal .note-show-btn,
 .modal-container .modal.create-task-modal .note-textarea {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 9px 12px;
+	min-height: 38px;
+	line-height: 1.4;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 10px;
+	background: var(--background-modifier-form-field);
+	color: var(--text-normal);
+	outline: none;
 	font-size: var(--font-ui-small, 13px) !important;
-	/* 字体族要一起钉：Obsidian 给 input[type='text'] 的那条共享规则（0-1-1）里
-	   带 font-family: inherit，权重压过 .task-input 自己写的 PingFang 栈（0-1-0）；
-	   备注 textarea 只被 textarea（0-0-1）命中，我们的 .note-textarea 反而赢。
-	   于是同一档 px 下任务框走系统继承字体、备注框走 PingFang——两款中文字体
-	   的字面大小不等，看上去就是「备注的字更大」。字号与字体一起锁死才真的对齐 */
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
@@ -2497,13 +2506,13 @@
 }
 
 /* 深色模式 - 输入框 */
-.theme-dark .task-input {
+.modal-container .theme-dark .modal.create-task-modal .task-input {
 	background: rgba(30, 41, 59, 0.9);
 	border-color: transparent;
 	color: #e2e8f0;
 }
 
-.theme-dark .task-input:focus {
+.modal-container .theme-dark .modal.create-task-modal .task-input:focus {
 	background: rgba(30, 41, 59, 1);
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
@@ -2727,7 +2736,7 @@
 	}
 	.end-date-trigger {
 		padding: 6px 10px;
-		font-size: 13px;
+		/* font-size 基准已 13px，窄屏不必重报 */
 	}
 }
 
@@ -2745,7 +2754,6 @@
 	}
 	.end-date-trigger {
 		padding: 5px 8px;
-		font-size: 13px;
 	}
 }
 
@@ -3430,23 +3438,23 @@
 	display: block;
 }
 
-/* 收起态幽灵框：尺寸完全跟随 Obsidian 输入框变量 */
+/* 收起态幽灵框：盒模型走统一组，这里只补它独有的差异——虚线边 + 占位灰。
+   选择器必须同样带 .modal-container .modal.create-task-modal（0-3-0）并排在统一组之后：
+   0-1-0 压不过统一组的 border / color 简写，写成 0-1-0 的话虚线和占位灰都会被顶掉，
+   变成"看着写了、实际不生效"的死声明（v1.7.5 就是靠实测这一步发现的）。
+   原先引的 --input-line-height / --input-border-color 在 Obsidian 里根本不存在
+   （实测 body 上取值为空），恒走兜底值，属于自欺欺人的写法，一并去掉。
+   剩下的 flex 排布与光标形态不和统一组抢，留在 0-1-0 */
+.modal-container .modal.create-task-modal .note-show-btn {
+	border-style: dashed;
+	color: var(--text-muted, #94a3b8);
+}
+
 .note-show-btn {
-	width: 100%;
-	box-sizing: border-box;
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	min-height: calc(var(--input-height, 32px));
-	padding: var(--input-padding, 4px 8px);
-	font-size: var(--font-ui-small, 13px);
-	line-height: var(--input-line-height, normal);
-	font-family: inherit;
 	text-align: left;
-	color: var(--text-muted, #94a3b8);
-	background: var(--background-modifier-form-field, transparent);
-	border: var(--input-border-width, 1px) dashed var(--input-border-color, #d4d4d4);
-	border-radius: var(--input-radius, 5px);
 	cursor: text;
 	transition: border-color 0.2s ease, background 0.2s ease;
 }
@@ -3457,18 +3465,18 @@
 	color: var(--text-faint, #94a3b8);
 }
 
-.note-show-btn:hover {
+.modal-container .modal.create-task-modal .note-show-btn:hover {
 	border-color: #3b82f6;
 	background: rgba(59, 130, 246, 0.06);
 }
 
-.theme-dark .note-show-btn {
+.modal-container .theme-dark .modal.create-task-modal .note-show-btn {
 	border-color: rgba(148, 163, 184, 0.45);
-	background: var(--background-modifier-form-field, rgba(30, 41, 59, 0.6));
-	color: var(--text-faint, #64748b);
+	background: rgba(30, 41, 59, 0.6);
+	color: #94a3b8;
 }
 
-.theme-dark .note-show-btn:hover {
+.modal-container .theme-dark .modal.create-task-modal .note-show-btn:hover {
 	border-color: #3b82f6;
 	background: rgba(59, 130, 246, 0.12);
 }
@@ -3477,26 +3485,15 @@
 	color: #94a3b8;
 }
 
-/* 展开态：与 .task-input 同族。高度由 JS 按 scrollHeight 自动撑（配合 rows=1），
-   禁止手动拖出第二个尺寸 */
+/* 展开态：盒模型走统一组（与任务框同一个控件）。高度由 JS 按 scrollHeight
+   自动撑（配合 rows=1），禁止手动拖出第二个尺寸 */
 .note-textarea {
-	width: 100%;
-	box-sizing: border-box;
 	resize: none;
 	overflow: hidden;
-	padding: var(--input-padding, 4px 8px);
-	font-size: var(--font-ui-small, 13px);
-	line-height: var(--input-line-height, 1.3);
-	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
-	border: var(--input-border-width, 1px) solid var(--input-border-color, #e4e4e4);
-	border-radius: var(--input-radius, 5px);
-	background: var(--background-modifier-form-field, var(--background-primary));
-	color: var(--text-normal);
-	outline: none;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.note-textarea:focus {
+.modal-container .modal.create-task-modal .note-textarea:focus {
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
@@ -3506,13 +3503,15 @@
 	font-weight: 400;
 }
 
-.theme-dark .note-textarea {
-	background: var(--background-modifier-form-field, rgba(30, 41, 59, 0.9));
-	color: var(--text-normal);
+/* 备注框与任务框同一套深色取值（v1.7.5：两框在深色下也要同一颜色，
+   原先备注用 #e4e4e4 系亮灰边、任务用 transparent，深浅两套各差一档） */
+.modal-container .theme-dark .modal.create-task-modal .note-textarea {
+	background: rgba(30, 41, 59, 0.9);
+	color: #e2e8f0;
 	border-color: rgba(71, 85, 105, 0.5);
 }
 
-.theme-dark .note-textarea:focus {
+.modal-container .theme-dark .modal.create-task-modal .note-textarea:focus {
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
@@ -3525,16 +3524,8 @@
 	.modal-note-container {
 		margin: 0 16px 14px;
 	}
-	/* 窄屏拇指命中靠 padding 撑，不靠字号。字号已由上面
-	   .modal.create-task-modal 一族钉成统一 16px（v1.7.4），这里只补命中高度 */
-	.note-show-btn {
-		min-height: 36px;
-		padding: 8px 10px;
-	}
-	.note-textarea {
-		padding: 9px 10px;
-		line-height: 1.4;
-	}
+	/* 窄屏：统一组已给出 16px 字号 + 9px 12px 内边距 + 38px 命中高度，
+	   这里不再重复声明（v1.7.5 清掉的正是这类"看着像补丁、其实是覆盖"的重复） */
 }
 
 /* ---- v1.6.0 批次四：筛选联动观感 ---- */
@@ -3598,12 +3589,7 @@
 		padding: 6px 10px;
 		max-width: 84px;
 	}
-	.monthly-tasks-container.view-agenda .agenda-day-title {
-		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
+	/* 这四条在 3160 行的基准规则里已经无条件给出，窄屏重复一遍不产生任何差异 */
 }
 
 .theme-dark .monthly-tasks-container.view-agenda .agenda-filter-chip {
@@ -3710,9 +3696,6 @@
 @media (max-width: 480px) {
 	.modal.category-filter-modal.view-menu-modal {
 		min-width: 210px;
-	}
-	.vm-row .vm-desc {
-		font-size: 11px;
 	}
 }
 
@@ -3907,7 +3890,6 @@
 
 	.monthly-tasks-container.view-bigweek .task-item {
 		padding: 4px 6px;
-		font-size: 12px;
 		min-height: 20px;
 	}
 

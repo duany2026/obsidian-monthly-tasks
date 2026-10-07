@@ -151,6 +151,7 @@ var I18N = {
     "error.settingsLoad": "\u8bbe\u7f6e\u52a0\u8f7d\u5931\u8d25\uff0c\u4f7f\u7528\u9ed8\u8ba4\u8bbe\u7f6e:",
     "error.settingsSave": "\u8bbe\u7f6e\u4fdd\u5b58\u5931\u8d25:",
     "error.toggleFail": "\u5207\u6362\u4efb\u52a1\u72b6\u6001\u5931\u8d25:",
+    "file.autoCreated": "\u7531\u300c\u6708\u5386\u4efb\u52a1\u300d\u63d2\u4ef6\u81ea\u52a8\u521b\u5efa\u3002",
     "holiday.workday": "\u73ed",
     "lunar.branch.1": "\u5b50",
     "lunar.branch.10": "\u9149",
@@ -288,7 +289,7 @@ var I18N = {
     "modal.filter.selected": "\u5df2\u9009 {n}",
     "modal.filter.title": "\u6309\u7c7b\u522b\u7b5b\u9009",
     "modal.filter.untagged": "\u65e0\u6807\u7b7e",
-    "notice.badDate": "\u6708\u5386\u4efb\u52a1\uff1a\u53d1\u73b0 \U0001f4c5/\U0001f6eb \u540e\u65e5\u671f\u65e0\u6cd5\u8bc6\u522b\uff08\u542b\u975e\u6cd5\u65e5\u671f\u5982 2026-02-30\uff09\u7684\u4efb\u52a1\u884c\uff0c\u5df2\u5ffd\u7565\uff08\u8be6\u60c5\u89c1\u63a7\u5236\u53f0\uff09",
+    "notice.badDate": "\u6708\u5386\u4efb\u52a1\uff1a\u53d1\u73b0 \uD83D\uDCC5/\uD83D\uDEEB \u540e\u65e5\u671f\u65e0\u6cd5\u8bc6\u522b\uff08\u542b\u975e\u6cd5\u65e5\u671f\u5982 2026-02-30\uff09\u7684\u4efb\u52a1\u884c\uff0c\u5df2\u5ffd\u7565\uff08\u8be6\u60c5\u89c1\u63a7\u5236\u53f0\uff09",
     "notice.cantOpenView": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u6253\u5f00\u89c6\u56fe\uff0c\u8bf7\u91cd\u542f Obsidian \u540e\u91cd\u8bd5",
     "notice.catExists": "\u7c7b\u522b\u300c{name}\u300d\u5df2\u5b58\u5728",
     "notice.catInvalid": "\u7c7b\u522b\u540d\u4e0d\u5408\u6cd5\uff1a\u4e0d\u80fd\u4e3a\u7a7a\u3001\u4e0d\u80fd\u542b\u7a7a\u683c\u6216 #\u3001\u4e0d\u80fd\u662f\u7eaf\u6570\u5b57",
@@ -443,6 +444,7 @@ var I18N = {
     "error.settingsLoad": "\u8a2d\u5b9a\u8f09\u5165\u5931\u6557\uff0c\u4f7f\u7528\u9810\u8a2d\u503c\uff1a",
     "error.settingsSave": "\u8a2d\u5b9a\u5132\u5b58\u5931\u6557\uff1a",
     "error.toggleFail": "\u5207\u63db\u4efb\u52d9\u72c0\u614b\u5931\u6557\uff1a",
+    "file.autoCreated": "\u7531\u300c\u6708\u66c6\u4efb\u52d9\u300d\u63d2\u4ef6\u81ea\u52d5\u5275\u5efa\u3002",
     "holiday.workday": "\u73ed",
     "lunar.branch.1": "\u5b50",
     "lunar.branch.10": "\u9149",
@@ -580,7 +582,7 @@ var I18N = {
     "modal.filter.selected": "\u5df2\u9078 {n}",
     "modal.filter.title": "\u6309\u985e\u5225\u7be9\u9078",
     "modal.filter.untagged": "\u7121\u6a19\u7c64",
-    "notice.badDate": "\u6708\u66c6\u4efb\u52d9\uff1a\u767c\u73fe \U0001f4c5/\U0001f6eb \u5f8c\u65e5\u671f\u7121\u6cd5\u8b58\u5225\uff08\u542b\u975e\u6cd5\u65e5\u671f\u5982 2026-02-30\uff09\u7684\u4efb\u52d9\u884c\uff0c\u5df2\u5ffd\u7565\uff08\u8a73\u60c5\u898b\u4e3b\u63a7\u53f0\uff09",
+    "notice.badDate": "\u6708\u66c6\u4efb\u52d9\uff1a\u767c\u73fe \uD83D\uDCC5/\uD83D\uDEEB \u5f8c\u65e5\u671f\u7121\u6cd5\u8b58\u5225\uff08\u542b\u975e\u6cd5\u65e5\u671f\u5982 2026-02-30\uff09\u7684\u4efb\u52d9\u884c\uff0c\u5df2\u5ffd\u7565\uff08\u8a73\u60c5\u898b\u4e3b\u63a7\u53f0\uff09",
     "notice.cantOpenView": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u958b\u555f\u8996\u5716\uff0c\u8acb\u91cd\u555f Obsidian \u5f8c\u91cd\u8a66",
     "notice.catExists": "\u985e\u5225\u300c{name}\u300d\u5df2\u5b58\u5728",
     "notice.catInvalid": "\u985e\u5225\u540d\u4e0d\u5408\u6cd5\uff1a\u4e0d\u80fd\u70ba\u7a7a\u3001\u4e0d\u80fd\u542b\u7a7a\u683c\u6216 #\u3001\u4e0d\u80fd\u662f\u7d14\u6578\u5b57",
@@ -735,6 +737,7 @@ var I18N = {
     "error.settingsLoad": "Settings load failed, using defaults:",
     "error.settingsSave": "Settings save failed:",
     "error.toggleFail": "Toggle task status failed:",
+    "file.autoCreated": "Auto-created by the Monthly Tasks plugin.",
     "holiday.workday": "Work",
     "lunar.branch.1": "Zi",
     "lunar.branch.10": "You",
@@ -872,7 +875,7 @@ var I18N = {
     "modal.filter.selected": "{n} Selected",
     "modal.filter.title": "Filter by Category",
     "modal.filter.untagged": "No Tag",
-    "notice.badDate": "Monthly Tasks: Found task with unrecognizable \U0001f4c5/\U0001f6eb date (including invalid dates like 2026-02-30), ignored (see console)",
+    "notice.badDate": "Monthly Tasks: Found task with unrecognizable \uD83D\uDCC5/\uD83D\uDEEB date (including invalid dates like 2026-02-30), ignored (see console)",
     "notice.cantOpenView": "Monthly Tasks: Cannot open view, please restart Obsidian and try again",
     "notice.catExists": "Category \"{name}\" already exists",
     "notice.catInvalid": "Invalid category name: cannot be empty, cannot contain spaces or #, cannot be pure numbers",
@@ -1300,7 +1303,12 @@ function isTaskCompleted(line) {
 /* 跨天任务挂载天数上限：超过后仅挂载首尾两日。手写的超长区间（如 1900-2100）
    整段挂载会生成数万条 map 记录并逐条渲染进格子，把内存与渲染时间线性放大 */
 const MULTI_DAY_MOUNT_LIMIT = 366;
-let oversizedRangeNoticeShown = false;
+/**
+ * 已提示过的超长跨天区间。用集合而不是单个布尔：同一个区间反复渲染不重复弹窗，
+ * 不同区间各提示一次。封顶 32 条只为止住极端手写文件的 Notice 刷屏，
+ * 正常 vault 到不了；到顶后不再记录，但 Notice 仍照常弹（只是不再去重）。
+ */
+const oversizedNoticed = /* @__PURE__ */ new Set();
 
 /**
  * 将任务列表按日期分组
@@ -1333,8 +1341,9 @@ function groupTasksByDate(tasks) {
         if (spanDays > MULTI_DAY_MOUNT_LIMIT) {
           mountTask(task.startDate, task);
           mountTask(task.dueDate, task);
-          if (!oversizedRangeNoticeShown) {
-            oversizedRangeNoticeShown = true;
+          const oversizedKey = `${task.startDate}~${task.dueDate}`;
+          if (!oversizedNoticed.has(oversizedKey)) {
+            if (oversizedNoticed.size < 32) oversizedNoticed.add(oversizedKey);
             new import_obsidian.Notice(tr("notice.oversized", { limit: MULTI_DAY_MOUNT_LIMIT }));
           }
           console.warn(tr("error.oversizedConsole", { start: task.startDate, due: task.dueDate, limit: MULTI_DAY_MOUNT_LIMIT, path: task.filePath, line: task.lineNumber + 1, content: task.content }));
@@ -2095,7 +2104,7 @@ var TaskParser = class {
         }
         const initialContent = `# ${targetFileName.slice(0, -3)}
 
-> 由「月历任务」插件自动创建。
+> ${tr("file.autoCreated")}
 
 `.replace(/\n/g, fileEol);
         await this.app.vault.create(filePath, initialContent);
@@ -2719,18 +2728,15 @@ var HOLIDAY_NAME_TW = {
   "\u5341\u4E00\u56FD\u5E86\u8282": "\u5341\u4E00\u570B\u6176\u7BC0",
   "\u52B3\u52A8\u8282": "\u52DE\u52D5\u7BC0",
   "\u4E94\u4E00\u52B3\u52A8\u8282": "\u4E94\u4E00\u52DE\u52D5\u7BC0",
-  "\u814A\u516B": "\u8129\u516B",
-  "\u9F99\u62AC\u5934": "\u9F8D\u64C1\u982D",
+  "\u814A\u516B": "\u81D8\u516B",
+  "\u9F99\u62AC\u5934": "\u9F8D\u62AC\u982D",
   "\u513F\u7AE5\u8282": "\u5152\u7AE5\u7BC0",
   "\u6559\u5E08\u8282": "\u6559\u5E2B\u7BC0",
-  "\u5EFA\u519B\u8282": "\u570B\u8ECD\u6230\u65E5",
+  "\u5EFA\u519B\u8282": "\u5EFA\u8ECD\u7BC0",
   "\u5973\u795E\u8282": "\u5973\u795E\u7BC0",
-  "\u5987\u5973\u8282": "\u5973\u5B69\u5B50\u7BC0",
-  "\u56DE\u9E4B\u8282": "\u56DE\u9D00\u7BC0",
+  "\u5987\u5973\u8282": "\u5A66\u5973\u7BC0",
+  "\u56DE\u9E4B\u8282": "\u56DE\u9D93\u7BC0",
   "\u6653\u516B\u8282": "\u66C9\u516B\u7BC0",
-  "\u73AF\u5883\u65E5": "\u74B0\u5883\u65E5",
-  "\u60DC\u5149\u8282": "\u61B8\u5149\u7BC0",
-  "\u51AC\u81F3": "\u61AC\u81F3",
   "\u5143\u5BB5\u8282": "\u5143\u5BB5\u7BC0",
   "\u7AEF\u5348\u8282": "\u7AEF\u5348\u7BC0",
   "\u4E2D\u79CB\u8282": "\u4E2D\u79CB\u7BC0",
@@ -2738,7 +2744,15 @@ var HOLIDAY_NAME_TW = {
   "\u6E05\u660E\u8282": "\u6E05\u660E\u7BC0",
   "\u8282\u5047\u65E5": "\u7BC0\u5047\u65E5",
   "\u5468\u672B": "\u9031\u672B",
-  "\u8C03\u4F11": "\u8ABF\u4F11"
+  "\u8C03\u4F11": "\u8ABF\u4F11",
+  /* v1.7.5 补齐：API 与内置兜底数据会给出这些**基础名**（不带「节」字），
+     原先 TW 表一条都没有，繁中界面直接露出简体。这里只收繁简不同形的四条，
+     其余繁简同形（元旦/除夕/元宵/清明/端午/七夕/中元/中秋/寒衣/下元/小年/
+     南方小年/假日/班/休）靠 translateHolidayName 回退原样输出，不入表。 */
+  "\u6625\u8282": "\u6625\u7BC0",
+  "\u79CB\u62A5": "\u79CB\u5831",
+  "\u91CD\u9633": "\u91CD\u967D",
+  "\u7231\u7433\u8282": "\u611B\u7433\u7BC0"
 };
 
 /**
@@ -5305,7 +5319,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
               let tries = 10;
               const focusTimer = setInterval(() => {
                 const view = leaf.view;
-                if (view && view.editor) {
+                // containerEl 不在文档里 = 这个 leaf 已被分离或切走，
+                // 再 setCursor / scrollIntoView 操作的是废弃 view
+                if (view && view.editor && view.containerEl?.isConnected) {
                   clearInterval(focusTimer);
                   view.editor.setCursor({ line: task.lineNumber, ch: 0 });
                   view.editor.scrollIntoView({ from: { line: task.lineNumber, ch: 0 }, to: { line: task.lineNumber, ch: 0 } }, true);
