@@ -41,7 +41,7 @@
 ### 方式一：BRAT
 
 1. 安装 [BRAT](https://obsidian.md/plugins?id=obsidian42-brat) 插件
-2. 在 BRAT 设置中添加本插件的 GitHub 仓库地址（发布到 GitHub 后填写实际地址）
+2. 在 BRAT 设置中添加本插件的 GitHub 仓库地址：`duany2026/obsidian-monthly-tasks`
 3. 启用插件即可
 
 ### 方式二：手动安装
@@ -332,6 +332,15 @@
 ## 发布打包
 
 打包发布时只包含 `main.js`、`manifest.json`、`styles.css`、`holidays.json`（可选 `versions.json`），**不要携带本地 `data.json`**——其中存有作者本机的设置（如节假日自动刷新开关）与节假日缓存，会让新用户安装后即继承作者设置、启动就联网预取。插件的联网口径是：**默认不预取**（启动预取由「启动时自动刷新」控制，默认关）；浏览到未内置年份（2022-2026 以外）时会**按需**向 holiday-cn / timor.tech 请求该年数据。
+
+---
+
+## 作者
+
+**duany2026** （[@duany2026](https://github.com/duany2026)）
+
+- 仓库：<https://github.com/duany2026/obsidian-monthly-tasks>
+- 反馈问题或建议：<https://github.com/duany2026/obsidian-monthly-tasks/issues>
 
 ---
 

@@ -21,6 +21,12 @@
 - 拆除 v1.7.9d 起的临时诊断（右下角版本角标＋几何读数条）；量测方法更名 `_mtTrimMobileCells` → `_mtMeasureMobileCells`（已不裁切），随之退场的还有只服务读数的 `fit` 计数循环
 - manifest / CHANGELOG / versions.json / README / 源代码头注释版本号统一至 1.7.10
 
+### 仓库维护（2026-10-11）
+- **作者署名统一**：`manifest.json`、`LICENSE`、`main.js` 与 `styles.css` 头注释里的作者由 `duany` 统一为 GitHub 账号名 `duany2026`；`manifest.json` 增补 `authorUrl` 字段
+- 修正 `styles.css` 头注释版本号（停留 `1.4.1` → `1.7.10`）
+- README 补「作者」章节；BRAT 安装说明中的占位文字替换为真实仓库地址
+- 新增 `.github/workflows/release.yml`：推送 `v*` 标签即自动打包并发布发行版（发行说明从本文件对应版本条目提取）
+
 ## [1.7.9] - 2026-10-10
 
 两态不一致的追加固防：v1.7.8 真机复测未生效后的换路修复＋同步可证性。

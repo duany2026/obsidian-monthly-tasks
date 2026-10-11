@@ -44,12 +44,18 @@ jobs:
 
       - name: 创建 / 更新 Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          # 优先使用仓库 Secret 里的 RELEASE_TOKEN（属于你本人的令牌），
+          # 这样发行版页面显示的发布人是「duany2026」而不是 github-actions[bot]。
+          # 未配置该 Secret 时自动回退到内置 token（发布人显示为机器人）。
+          GH_TOKEN: ${{ secrets.RELEASE_TOKEN || github.token }}
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/monthly-tasks-*.zip --clobber
+            gh release edit "$TAG" \
+              --title "月历任务 ${TAG}" \
+              --notes-file RELEASE_NOTES.md
           else
             gh release create "$TAG" dist/monthly-tasks-*.zip \
               --title "月历任务 ${TAG}" \

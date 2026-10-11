@@ -4,6 +4,7 @@
 	"version": "1.7.10",
 	"minAppVersion": "0.15.0",
 	"description": "滴答清单风格的月视图任务管理插件，支持农历、节假日和调休显示",
-	"author": "duany",
+	"author": "duany2026",
+	"authorUrl": "https://github.com/duany2026",
 	"isDesktopOnly": false
 }
