@@ -455,26 +455,37 @@
 	flex: 1;
 	overflow-y: auto;
 	overflow-x: hidden;
-	scrollbar-width: thin;
-	scrollbar-color: var(--gray-200) transparent;
+	/* 审计 M14：格子内**不显示**滚动条（v1.7.6 起，此前只在手机端媒体查询里隐藏）。
+	   原因是 Chromium 121 起的级联规则：元素上只要有非 auto 的 scrollbar-width 或
+	   任何 scrollbar-color，就整体忽略该元素所有 ::-webkit-scrollbar* 伪元素样式、
+	   改走原生滚动条。原先这里写的是 `scrollbar-width: thin` + `scrollbar-color`，
+	   于是下面那段自定义 3px 细条**从未生效**，实际渲染成原生 thin = 10px。
+	   经典（非 overlay）滚动条要从内容盒里扣宽度，而 .day-tasks 是每格独立的滚动
+	   容器 → 只有内容溢出的那一格被扣 10px、同排邻居不扣；格子字号 10px、一个汉字
+	   恰约 10px，所以「原本一行四个字、有了滚动条只剩三个」是精确的，不是观感误差。
+	   隐藏后实测条占 0px，格与格之间不再有宽窄差。
+	   代价：格内看不见滚动条（滚轮／触控板／触摸仍能滚）——这个代价手机端早在
+	   「批次四⑥」就接受过，现在只是两端统一。
+	   两条声明必须同时给：`scrollbar-width: none` 管 Firefox 与 Chromium 121+，
+	   `::-webkit-scrollbar{width:0}` 管更老的 Chromium/Safari；只改一条会在另一端漏。
+	   （另注：不能指望 `!important` 让 3px 生效——这不是层叠优先级之争，是渲染模式
+	   开关，标准属性一旦非 auto，伪元素根本不参与渲染。） */
+	scrollbar-width: none;
 }
 
-/* 自定义滚动条 */
+/* 审计 M14：宽度归零。原先这里是 3px 加 track/thumb/thumb:hover 三段配色，
+   全部是被上面 scrollbar-color 掐死的死代码；隐藏方案下也没有可着色的滑块，
+   一并删除，免得后来者以为改这里能调出细滚动条。
+   真要恢复「3px 细条」方案，需把 scrollbar-width 与 scrollbar-color 一起归 auto
+   （只归一个更糟：条会退回原生默认 15px），再把那三段配色加回来。 */
 .day-tasks::-webkit-scrollbar {
-	width: 3px;
-}
-
-.day-tasks::-webkit-scrollbar-track {
-	background: transparent;
-}
-
-.day-tasks::-webkit-scrollbar-thumb {
-	background: var(--gray-200);
-	border-radius: 2px;
-}
-
-.day-tasks::-webkit-scrollbar-thumb:hover {
-	background: var(--gray-400);
+	width: 0;
+	height: 0;
+	/* 2026-10-10 真机补丁：Android WebView（<Chromium 121）上 width:0 仍给经典滚动条
+	   保留 5px 内容宽（诊断实测 bar=5、文字盒 40.7→35.7px）；display:none 连占位一并
+	   关掉。Chromium 121+ 由上面 .day-tasks 的 scrollbar-width:none 接管（伪元素不参与
+	   渲染），不会走到这条，两端互不干扰。 */
+	display: none;
 }
 
 .task-item {
@@ -2820,6 +2831,16 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	
 	.calendar-grid {
 		gap: 1px;
+		/* 手机端行高（2026-10-10 第二稿，替代同日早先的 auto 方案）：等高 1fr＋截断。
+		   auto 方案（满格撑高本行）能保住每行 4 字，但行高参差、总高超出时整屏滚动，
+		   两样都不要。改回 1fr 恢复等高、网格铺满视口不滚；装不下的任务不再走
+		   .day-tasks 内滚（该 WebView <Chromium 121，经典滚动条必扣 5px 内容宽，
+		   一行 4 字变 3 字，scrollbar-width 与 ::-webkit-scrollbar 都压不住——这是
+		   「切走再回变 3 字」的根因，见全局 .day-tasks 段 2026-10-10 补丁注），改为
+		   overflow:hidden＋main.js _mtTrimMobileCells() 按实际高度截断、显示「+N」
+		   点击查看（与既有 tasksPerDayLimit 的 +N 同一交互）。首开时高度链未定、
+		   1fr 本就按内容解析；约束异步生效后 ResizeObserver 会再裁一次，两态一致。 */
+		grid-auto-rows: 1fr;
 	}
 	
 	/* 批次四③：格子内边距横向 4→2（实测精确 +4px/格；纵向 3px 不动，不碰 min-height） */
@@ -2846,15 +2867,31 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	/* 批次四⑤：手机端取消优先级/跨天左边框 —— v1.5.4 起该规则已上收为全局（两端一致），
 	   见「日历格子里的类别：左缘色带」段 */
 	
-	/* 批次四⑥：隐藏格子内滚动条（沙箱实测 +0px——styled scrollbar 本就不占位，
-	   保留此规则是防个别 Android WebView 出现经典滚动条吃掉 3px，预算表不计收益） */
+	/* 批次四⑥（v1.7.6 起上收为全局，见「任务列表」段的 .day-tasks）：隐藏格子内滚动条。
+	   原注释那句「沙箱实测 +0px——styled scrollbar 本就不占位」不成立，已删：
+	   Chromium 121 起，元素上有非 auto 的 scrollbar-width 或任何 scrollbar-color 时，
+	   整套 ::-webkit-scrollbar* 直接失效、退回原生滚动条，桌面端因此是占位 10px 的
+	   原生 thin 条，每格少显示一个汉字（审计 M14）。规则本身没写错，只是当初只加在
+	   手机端媒体查询里，现在两端统一走全局那份。 */
+
+	/* 手机端禁用格子内滚动（2026-10-10 第二稿）：.day-tasks 用 overflow:hidden 后永不
+	   出现滚动条 → 老 WebView 的 5px 占位条无从生效，每行 4 字由此保证。
+	   2026-10-10 v1.7.9i 起，装不下的任务不再由 JS 按高度藏进「+N」，而是留在盒子里
+	   由 _mtEnableMobilePan 手动平移查看（hidden 元素脚本照样能滚、且不出条），
+	   底部那条渐隐（.mt-pan-hint）就是替代滚动条的「还能滑」提示。桌面端不进本媒体
+	   查询，维持 overflow-y:auto 内滚（scrollbar-width:none 在桌面 Chromium 上有效）。 */
 	.day-tasks {
-		scrollbar-width: none;
+		overflow: hidden;
 	}
 	
-	.day-tasks::-webkit-scrollbar {
-		width: 0;
-		height: 0;
+	/* 格子内无滚动条滑动的替代提示（2026-10-10，v1.7.9h）：既然不显示滚动条，
+	   就得给个「这里还能滑」的信号——真溢出且已滑到顶（.day-tasks 起点在格子内容
+	   起点，scrollTop>0 即说明上面还有货）时，底部压一条 10px 渐隐。
+	   必须挂在 .day-cell 上：.day-tasks 自身 overflow:hidden，里面的 ::after
+	   会随内容一起被裁走，永远看不见。 */
+	.day-cell.mt-pan-hint:not(.mt-pan-scrolled) {
+		-webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 10px), rgba(0, 0, 0, 0.35) 100%);
+		mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 10px), rgba(0, 0, 0, 0.35) 100%);
 	}
 	
 	/* 批次四⑦（v1.7.3 起布局上收全局，见「跨天/定时信息行统一置顶独占一行」段）：

@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.6.0
+ * 版本：1.7.10
  * 作者：duany
  * 许可证：MIT
  *
@@ -22,7 +22,7 @@
  *
  * 代码架构：
  *
- * 1. TaskModel (TaskParser.ts)
+ * 1. TaskModel
  *    - 任务数据模型和解析工具函数
  *    - 包含：generateTaskId, parsePriority, cleanTaskContent（同时剥行尾 #tag 得类别）
  *    - 提取日期：extractDueDate, extractStartDate
@@ -97,8 +97,6 @@ __export(main_exports, {
   default: () => MonthlyTasksPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian3 = require("obsidian");
-
 var import_obsidian = require("obsidian");
 
 /**
@@ -117,7 +115,7 @@ var I18N = {
     "cmd.open": "\u6253\u5f00\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
     "cmd.refresh": "\u5237\u65b0\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
     "cmd.toggle": "\u5faa\u73af\u5207\u6362\u6708\u5386\u89c6\u56fe\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u5468 / \u5c0f\u5468\uff09",
-    "error.badDateConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u8bc6\u522b\u7684\u65e5\u671f\u4efb\u52a1\u884c ({path}:{line}): {line}",
+    "error.badDateConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u8bc6\u522b\u7684\u65e5\u671f\u4efb\u52a1\u884c ({path}:{line}): {text}",
     "error.builtinHoliday": "\u6708\u5386\u4efb\u52a1\uff1a\u5185\u7f6e\u8282\u5047\u65e5\u6570\u636e\u8bfb\u53d6\u5931\u8d25\uff08holidays.json \u7f3a\u5931\u6216\u635f\u574f\uff09\uff0c\u5bf9\u5e94\u5e74\u4efd\u5c06\u4f9d\u8d56\u7f51\u7edc\u6570\u636e\u6e90",
     "error.createFail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25:",
     "error.delayRefresh": "\u5ef6\u8fdf\u5237\u65b0\u5931\u8d25:",
@@ -148,6 +146,8 @@ var I18N = {
     "error.postCreateRefresh": "\u521b\u5efa\u540e\u5237\u65b0\u89c6\u56fe\u5931\u8d25:",
     "error.rawLineNotFound": "\u6309 rawLine \u672a\u627e\u5230\u4efb\u52a1\u884c: {path}",
     "error.refreshHoliday": "\u5237\u65b0\u8282\u5047\u65e5\u6570\u636e\u5931\u8d25:",
+    "error.refreshView": "\u5237\u65b0\u6708\u5386\u89c6\u56fe\u5931\u8d25:",
+    "error.renderGrid": "\u91cd\u7ed8\u65e5\u5386\u7f51\u683c\u5931\u8d25:",
     "error.settingsLoad": "\u8bbe\u7f6e\u52a0\u8f7d\u5931\u8d25\uff0c\u4f7f\u7528\u9ed8\u8ba4\u8bbe\u7f6e:",
     "error.settingsSave": "\u8bbe\u7f6e\u4fdd\u5b58\u5931\u8d25:",
     "error.toggleFail": "\u5207\u6362\u4efb\u52a1\u72b6\u6001\u5931\u8d25:",
@@ -241,6 +241,7 @@ var I18N = {
     "modal.create.collapse": "\u6536\u8d77",
     "modal.create.dateLine": "{m}\u6708{day}\u65e5 \xb7 {weekday}",
     "modal.create.delete": "\u5220\u9664\u4efb\u52a1",
+    "modal.create.deleteFail": "\u5220\u9664\u5931\u8d25\uff0c\u8be5\u4efb\u52a1\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c06\u5237\u65b0\u5217\u8868",
     "modal.create.displayDate": "{y}/{m}/{d}",
     "modal.create.edit": "\u7f16\u8f91\u4efb\u52a1",
     "modal.create.empty": "\u4efb\u52a1\u5185\u5bb9\u4e0d\u80fd\u4e3a\u7a7a\uff08\u5143\u6570\u636e\u6807\u8bb0\u5df2\u88ab\u81ea\u52a8\u5265\u79bb\uff09",
@@ -267,6 +268,7 @@ var I18N = {
     "modal.create.save": "\u4fdd\u5b58",
     "modal.create.setTime": "+ \u8bbe\u7f6e\u65f6\u95f4",
     "modal.create.time": "\u65f6\u95f4",
+    "modal.create.timeInvalidKept": "\u4efb\u52a1\u91cc\u7684\u65f6\u95f4\u503c {time} \u4e0d\u662f\u6709\u6548\u7684\u65f6\u949f\u65f6\u95f4\uff0c\u5df2\u539f\u6837\u4fdd\u7559\uff1b\u5982\u9700\u4fee\u6539\u8bf7\u76f4\u63a5\u7f16\u8f91\u7b14\u8bb0\u4e2d\u8be5\u884c",
     "modal.create.to": "\u81f3",
     "modal.create.toggleComplete": "\u5207\u6362\u5b8c\u6210\u72b6\u6001",
     "modal.create.toggleFail": "\u64cd\u4f5c\u5931\u8d25\uff0c\u8be5\u4efb\u52a1\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c06\u5237\u65b0\u5217\u8868",
@@ -393,6 +395,7 @@ var I18N = {
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
     "view.week.load": "\u5171 {n} \u9879 \u00b7 \u5b8c\u6210 {m}",
+    "view.week.loadHiddenHint": "\u5176\u4e2d {m} \u9879\u5df2\u5b8c\u6210\uff0c\u6309\u5f53\u524d\u8bbe\u7f6e\u672a\u5728\u683c\u5b50\u4e2d\u663e\u793a",
     "view.week.number": "\u7b2c {n} \u5468",
     "view.week.relative.next": "\u4e0b\u5468",
     "view.week.relative.prev": "\u4e0a\u5468",
@@ -410,7 +413,7 @@ var I18N = {
     "cmd.open": "\u958b\u555f\u6708\u66c6\u4efb\u52d9\u8996\u5716",
     "cmd.refresh": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u4efb\u52d9\u8996\u5716",
     "cmd.toggle": "\u8ff4\u5708\u5207\u63db\u6708\u66c6\u6aa2\u8996\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u9031 / \u5c0f\u9031\uff09",
-    "error.badDateConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u8b58\u5225\u7684\u65e5\u671f\u4efb\u52d9\u884c ({path}:{line}): {line}",
+    "error.badDateConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u8b58\u5225\u7684\u65e5\u671f\u4efb\u52d9\u884c ({path}:{line}): {text}",
     "error.builtinHoliday": "\u6708\u66c6\u4efb\u52d9\uff1a\u5167\u5efa\u7bc0\u5047\u65e5\u6578\u64da\u8b80\u53d6\u5931\u6557\uff08holidays.json \u7f3a\u5931\u6216\u640d\u58de\uff09\uff0c\u5c0d\u61c9\u5e74\u4efd\u5c07\u4f9d\u8cf4\u7db2\u8def\u6578\u64da\u6e90",
     "error.createFail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff1a",
     "error.delayRefresh": "\u5ef6\u9072\u91cd\u65b0\u6574\u7406\u5931\u6557\uff1a",
@@ -441,6 +444,8 @@ var I18N = {
     "error.postCreateRefresh": "\u5efa\u7acb\u5f8c\u91cd\u65b0\u6574\u7406\u8996\u5716\u5931\u6557\uff1a",
     "error.rawLineNotFound": "\u6309 rawLine \u672a\u627e\u5230\u4efb\u52d9\u884c\uff1a{path}",
     "error.refreshHoliday": "\u91cd\u65b0\u6574\u7406\u7bc0\u5047\u65e5\u6578\u64da\u5931\u6557\uff1a",
+    "error.refreshView": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u6aa2\u8996\u5931\u6557\uff1a",
+    "error.renderGrid": "\u91cd\u7e6a\u6708\u66c6\u7db2\u683c\u5931\u6557\uff1a",
     "error.settingsLoad": "\u8a2d\u5b9a\u8f09\u5165\u5931\u6557\uff0c\u4f7f\u7528\u9810\u8a2d\u503c\uff1a",
     "error.settingsSave": "\u8a2d\u5b9a\u5132\u5b58\u5931\u6557\uff1a",
     "error.toggleFail": "\u5207\u63db\u4efb\u52d9\u72c0\u614b\u5931\u6557\uff1a",
@@ -534,6 +539,7 @@ var I18N = {
     "modal.create.collapse": "\u6536\u8d77",
     "modal.create.dateLine": "{m}\u6708{day}\u65e5 \xb7 {weekday}",
     "modal.create.delete": "\u522a\u9664\u4efb\u52d9",
+    "modal.create.deleteFail": "\u522a\u9664\u5931\u6557\uff0c\u8a72\u4efb\u52d9\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c07\u91cd\u65b0\u6574\u7406\u5217\u8868",
     "modal.create.displayDate": "{y}/{m}/{d}",
     "modal.create.edit": "\u7de8\u8f2f\u4efb\u52d9",
     "modal.create.empty": "\u4efb\u52d9\u5167\u5bb9\u4e0d\u80fd\u70ba\u7a7a\uff08\u5143\u6578\u64da\u6a19\u8a18\u5df2\u88ab\u81ea\u52d5\u525d\u96e2\uff09",
@@ -560,6 +566,7 @@ var I18N = {
     "modal.create.save": "\u5132\u5b58",
     "modal.create.setTime": "+ \u8a2d\u5b9a\u6642\u9593",
     "modal.create.time": "\u6642\u9593",
+    "modal.create.timeInvalidKept": "\u4efb\u52d9\u88e1\u7684\u6642\u9593\u503c {time} \u4e0d\u662f\u6709\u6548\u7684\u6642\u9418\u6642\u9593\uff0c\u5df2\u539f\u6a23\u4fdd\u7559\uff1b\u5982\u9700\u4fee\u6539\u8acb\u76f4\u63a5\u7de8\u8f2f\u7b46\u8a18\u4e2d\u8a72\u884c",
     "modal.create.to": "\u81f3",
     "modal.create.toggleComplete": "\u5207\u63db\u5b8c\u6210\u72c0\u614b",
     "modal.create.toggleFail": "\u64cd\u4f5c\u5931\u6557\uff0c\u8a72\u4efb\u52d9\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c07\u91cd\u65b0\u6574\u7406\u5217\u8868",
@@ -686,6 +693,7 @@ var I18N = {
     "view.month.9": "9\u6708",
     "view.month.title": "{year}\u5e74 {monthName}",
     "view.week.load": "\u5171 {n} \u9805 \u00b7 \u5b8c\u6210 {m}",
+    "view.week.loadHiddenHint": "\u5176\u4e2d {m} \u9805\u5df2\u5b8c\u6210\uff0c\u4f9d\u76ee\u524d\u8a2d\u5b9a\u672a\u5728\u683c\u5b50\u4e2d\u986f\u793a",
     "view.week.number": "\u7b2c {n} \u9031",
     "view.week.relative.next": "\u4e0b\u9031",
     "view.week.relative.prev": "\u4e0a\u9031",
@@ -703,7 +711,7 @@ var I18N = {
     "cmd.open": "Open Monthly Tasks View",
     "cmd.refresh": "Refresh Monthly Tasks View",
     "cmd.toggle": "Cycle monthly view (Month Cells / Month Agenda / Week Cells / Week Agenda)",
-    "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {line}",
+    "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {text}",
     "error.builtinHoliday": "Monthly Tasks: Built-in holiday data read failed (holidays.json missing or corrupted), corresponding year will rely on network data source",
     "error.createFail": "Create task failed:",
     "error.delayRefresh": "Delayed refresh failed:",
@@ -734,6 +742,8 @@ var I18N = {
     "error.postCreateRefresh": "Post-create refresh view failed:",
     "error.rawLineNotFound": "Task line not found by rawLine: {path}",
     "error.refreshHoliday": "Refresh holiday data failed:",
+    "error.refreshView": "Refresh calendar view failed:",
+    "error.renderGrid": "Render calendar grid failed:",
     "error.settingsLoad": "Settings load failed, using defaults:",
     "error.settingsSave": "Settings save failed:",
     "error.toggleFail": "Toggle task status failed:",
@@ -827,6 +837,7 @@ var I18N = {
     "modal.create.collapse": "Collapse",
     "modal.create.dateLine": "{m}/{day} \xb7 {weekday}",
     "modal.create.delete": "Delete Task",
+    "modal.create.deleteFail": "Delete failed, the task may have been modified; refreshing the list",
     "modal.create.displayDate": "{m}/{d}/{y}",
     "modal.create.edit": "Edit Task",
     "modal.create.empty": "Task content cannot be empty (metadata stripped)",
@@ -853,6 +864,7 @@ var I18N = {
     "modal.create.save": "Save",
     "modal.create.setTime": "+ Set Time",
     "modal.create.time": "Time",
+    "modal.create.timeInvalidKept": "Time value {time} in this task is not a valid clock time, so it was kept as-is. Edit that line in the note to change it.",
     "modal.create.to": "to",
     "modal.create.toggleComplete": "Toggle completion status",
     "modal.create.toggleFail": "Operation failed, task may have been modified, refreshing list",
@@ -979,6 +991,7 @@ var I18N = {
     "view.month.9": "Sep",
     "view.month.title": "{monthName} {year}",
     "view.week.load": "{n} items \u00b7 {m} done",
+    "view.week.loadHiddenHint": "{m} of them are done and hidden from the cells under the current setting",
     "view.week.number": "Week {n}",
     "view.week.relative.next": "Next week",
     "view.week.relative.prev": "Last week",
@@ -1133,7 +1146,7 @@ let invalidDateNoticeShown = false;
 function cleanTaskContent(rawLine) {
   // 以「去掉尾部空白」后的偏移为准定位标签，再回到原串截取，避免尾随空格错位
   const norm = rawLine.replace(/\s+$/u, "");
-  const bodyOnly = norm.replace(/^\s*- \[[ x]\]\s*/i, "");
+  const bodyOnly = norm.replace(/^\s*[-*] \[[ x]\]\s*/i, "");
   const prefixLen = norm.length - bodyOnly.length;
   let category = "";
   let cleanedLine = norm;
@@ -1156,9 +1169,13 @@ function cleanTaskContent(rawLine) {
       break;
     }
   }
-  // 与 CreateTaskModal 提交侧的剥离保持一致：🟢 优先级、➕ 创建日期 / ✅ 完成日期
-  // （Tasks 插件格式）一并清理，避免外部格式粘贴后 emoji 混入任务显示文本
-  const content = cleanedLine.replace(/^\s*- \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*[^\s📅🛫🔴🟡✅🟢➕]+(?:\s*~\s*[^\s📅🛫🔴🟡✅🟢➕]+)?/gu, "").replace(/🔴|🟡|🟢/gu, "").replace(/\s+/g, " ").trim();
+  // 与 CreateTaskModal 提交侧（submitTask）的剥离保持同一口径：🟢 优先级、
+  // ➕ 创建日期 / ✅ 完成日期（Tasks 插件格式）一并清理，避免外部格式粘贴后 emoji 混入
+  // 任务显示文本。两侧字符集必须逐字对齐（审计 H3）：此前提交侧漏了 ✅/➕，用户标题
+  // 只写「✅ 2026-01-01」时提交侧放行、这里却把内容剥空 → parseTaskLine 返回
+  // null → 该行永久留在库里但不出现在任何视图中，也无法从界面编辑或删除。
+  // 改任一侧的字符集时，务必同时改另一侧。
+  const content = cleanedLine.replace(/^\s*[-*] \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*[^\s📅🛫🔴🟡✅🟢➕]+(?:\s*~\s*[^\s📅🛫🔴🟡✅🟢➕]+)?/gu, "").replace(/🔴|🟡|🟢/gu, "").replace(/\s+/g, " ").trim();
   return { content, category };
 }
 
@@ -1211,12 +1228,12 @@ function extractTime(rawLine) {
 
 /**
  * 判断是否为任务行
- * 匹配格式：- [ ] 或 - [x]（支持大小写）
+ * 匹配格式：- [ ] 或 - [x]（列表符号支持 - 与 *，与 rawLine 同步/勾选改写正则对齐；勾选标记不区分大小写）
  * @param line - 文本行
  * @returns 是否为任务
  */
 function isTaskLine(line) {
-  return /^\s*- \[[ x]\]\s*/i.test(line);
+  return /^\s*[-*] \[[ x]\]\s*/i.test(line);
 }
 
 /**
@@ -1293,11 +1310,16 @@ function writeNoteAfter(lines, taskIdx, noteText, crlf) {
 
 /**
  * 判断任务是否已完成
+ * 列表符号与 isTaskLine、勾选切换里的 rawLine 同步、_toggleTaskImpl 的勾选改写三处同口径，
+ * `-` 与 `*` 都认。此前只认 `-`：手输的 `* [x]` 在 parseTaskLine 的 completed 字段永远解析成未完成（日历上
+ * 勾了也显示未勾），且再点一次时 _toggleTaskImpl 判为未完成、走 `\[ \]` 那条替换——
+ * 行里已是 `[x]`，替换不中 → newLine===line → return false，界面无任何反馈地
+ * 永久卡死（审计 H1）。一个字符集修掉两条症状。
  * @param line - 文本行
  * @returns 是否已完成
  */
 function isTaskCompleted(line) {
-  return /^\s*- \[x\]\s*/i.test(line);
+  return /^\s*[-*] \[x\]\s*/i.test(line);
 }
 
 /* 跨天任务挂载天数上限：超过后仅挂载首尾两日。手写的超长区间（如 1900-2100）
@@ -1493,7 +1515,7 @@ var TaskParser = class {
     if (this.parsingPromise && !forceRefresh) {
       return this.parsingPromise;
     }
-    this.parsingPromise = (async () => {
+    const mine = (async () => {
       // 并发序号守卫：forceRefresh 允许另起在途解析后，先启动的（内容较旧的）
       // 解析可能更晚完成；写缓存前校验「自己仍是最后启动的那次」，旧快照不得覆盖新结果
       const mySeq = (this.parseSeq = (this.parseSeq || 0) + 1);
@@ -1510,7 +1532,9 @@ var TaskParser = class {
           }
         }
         if (mySeq !== this.parseSeq) {
-          return this.cache;
+          // 本快照已作废（缓存曾失效或有更新的解析启动）：优先跟随更新的在途解析，
+          // 其次用已写入的新缓存，兜底另起解析——绝不能返回可能为 null 的 this.cache 了事
+          return this.parsingPromise ?? this.cache ?? this.parseAllTasks(true);
         }
         const taskMap = groupTasksByDate(tasks);
         const now = Date.now();
@@ -1522,10 +1546,12 @@ var TaskParser = class {
         this.lastParseTime = now;
         return this.cache;
       } finally {
-        this.parsingPromise = null;
+        // 只清自己的引用：若已有更新解析在飞，不得把新引用错清为 null
+        if (this.parsingPromise === mine) this.parsingPromise = null;
       }
     })();
-    return this.parsingPromise;
+    this.parsingPromise = mine;
+    return mine;
   }
   /**
    * 解析单个文件中的任务
@@ -1607,7 +1633,7 @@ var TaskParser = class {
         invalidDateNoticeShown = true;
         new import_obsidian.Notice(tr("notice.badDate"));
       }
-      console.warn(tr("error.badDateConsole", { path: filePath, line: lineNumber + 1, line: line }));
+      console.warn(tr("error.badDateConsole", { path: filePath, line: lineNumber + 1, text: line }));
     }
     if (!content)
       return null;
@@ -1666,9 +1692,9 @@ var TaskParser = class {
       }
       let newLine;
       if (isTaskCompleted(line)) {
-        newLine = line.replace(/- \[[xX]\]/, "- [ ]");
+        newLine = line.replace(/([-*]) \[[xX]\]/, "$1 [ ]");
       } else {
-        newLine = line.replace(/- \[ \]/, "- [x]");
+        newLine = line.replace(/([-*]) \[ \]/, "$1 [x]");
       }
       // 若替换未生效（行内容不匹配），避免静默成功
       if (newLine === line) return false;
@@ -1683,6 +1709,14 @@ var TaskParser = class {
   }
   /**
    * 删除指定任务（按行号删除）
+   * @returns {Promise<{ok:true, delta:number}|false>}
+   *   成功返回 { ok: true, delta }；失败返回 false。
+   *   delta = 本次写入让「被删行以下」所有行产生的**净位移**（由实现按 lines.length
+   *   前后差实测，不是猜的），调用方据此补偿自己手里那份任务快照的 lineNumber。
+   *   审计 M4：位移有三种形态——纯任务行 -1；带备注块（> 降级 + 补一个空行）净 0；
+   *   无备注且触发孤儿空行自愈 -2。旧实现让调用方一律按 -1 补偿，后两种必然错位，
+   *   错位后下一次删除过不了 _deleteTaskImpl 的行号身份校验而静默 return false。
+   *   返回对象而非 true 是刻意的：唯一调用方写的是 `if (ok)`，真值语义不变。
    */
   async deleteTask(task) {
     // 串行化：避免与其他写操作并发导致基于过期文件内容删除
@@ -1699,6 +1733,10 @@ var TaskParser = class {
       }
       const content = await this.app.vault.read(file);
       const lines = content.split("\n");
+      // 审计 M4：记录删除前的总行数，末尾用 lines.length 之差把**真实位移**返回给调用方。
+      // 本函数只在 task.lineNumber 及其之后增删行，所以「之后的行数差」恒等于
+      // 「被删行以下所有行的净位移」，不需要对三种形态分别做算术。
+      const lineCountBefore = lines.length;
       if (task.lineNumber >= lines.length) {
         console.error(tr("error.lineRange", { line: task.lineNumber }));
         return false;
@@ -1746,7 +1784,8 @@ var TaskParser = class {
       }
       await this.app.vault.modify(file, lines.join("\n"));
       this.invalidateCache();
-      return true;
+      // 审计 M4：把真实位移交出去（-1 / 0 / -2 三形态见 deleteTask 的 JSDoc）
+      return { ok: true, delta: lines.length - lineCountBefore };
     } catch (error) {
       console.error(tr("error.deleteFail"), error);
       return false;
@@ -1919,7 +1958,7 @@ var TaskParser = class {
         // 避免与插件生成的 "## 2026年04月" 重复创建同月 section。
         // 两处模式都必须锚定行尾（[ \t]*\r?$ 兼容 CRLF）：否则用户手写的日期级标题
         // "## 2026年1月1日 元旦计划会" 会被当成 1 月节，新任务被塞进那段纪要下面
-        const sectionMatch = fileContent.match(new RegExp(`^## ${y}\u5E740*${parseInt(m)}\u6708[ \\t]*\\r?$`, "m"));
+        const sectionMatch = fileContent.match(new RegExp(`^## ${y}\u5E740*${parseInt(m, 10)}\u6708[ \\t]*\\r?$`, "m"));
         const sectionIdx = sectionMatch ? sectionMatch.index : -1;
         if (sectionIdx === -1) {
           // 月份section不存在，需要创建
@@ -1928,10 +1967,10 @@ var TaskParser = class {
           const months = [];
           let match;
           while ((match = monthRegex.exec(fileContent)) !== null) {
-            months.push({ year: parseInt(match[1]), month: parseInt(match[2]), pos: match.index });
+            months.push({ year: parseInt(match[1], 10), month: parseInt(match[2], 10), pos: match.index });
           }
-          const newYear = parseInt(y);
-          const newMonth = parseInt(m);
+          const newYear = parseInt(y, 10);
+          const newMonth = parseInt(m, 10);
           let insertPos = fileContent.length;
           // 找到第一个比新月份大的section
           for (const mo of months) {
@@ -2093,15 +2132,7 @@ var TaskParser = class {
       try {
         await this.ensureFolderExists(folderPath);
         // 行尾跟随库内已有年度任务文件（CRLF 库首文件即混行尾的源头）；无参照文件时用 LF
-        let fileEol = "\n";
-        for (const cachedPath of this.taskFileCache.values()) {
-          const sibling = this.app.vault.getAbstractFileByPath(cachedPath);
-          if (sibling instanceof import_obsidian.TFile) {
-            const head = await this.app.vault.cachedRead(sibling);
-            if (head.includes("\r\n")) fileEol = "\r\n";
-            break;
-          }
-        }
+        const fileEol = await this.detectVaultEol(folderPath);
         const initialContent = `# ${targetFileName.slice(0, -3)}
 
 > ${tr("file.autoCreated")}
@@ -2121,6 +2152,59 @@ var TaskParser = class {
     return null;
   }
   /**
+   * 审计 L1：推断「新建任务文件」该用哪种行尾。
+   *
+   * 原实现遍历 `this.taskFileCache`，但那个缓存被 invalidateCache() 在**每次**
+   * 库事件后清空，plugin 的 onload 里也清一次——建档时机（首次写入某周期）
+   * 通常紧跟在库扫描/文件变更之后，所以循环几乎总是空转，直接落到 `"\n"`。
+   * 结果就是在 CRLF 库里造出 LF 文件，**正是原注释声称要防的「混行尾的源头」**。
+   * 另外原循环里那句 `break` 是无条件的：第一个 TFile 样本就替全库定调，
+   * 一个 LF 兄弟文件足以把整个 CRLF 库带偏。
+   *
+   * 现在改成直接扫库、计票取多数：
+   * ① 优先取同族文件（文件名以「任务列表.md」结尾，即插件自己维护的年度/月度列表），
+   *    它们才是「续写时要保持一致」的参照；
+   * ② ①无样本时退到目标文件夹下的任意 .md（用户手工建的任务目录多半整体同风格）；
+   * ③ 两级都无样本、或 CRLF/LF 平票 → 回退 LF（Obsidian 桌面端默认写 LF，
+   *    回退到 LF 不会把已有 CRLF 文件改坏，因为后续写入用的是**各文件自己**的行尾）。
+   * 读取上限 MAX_SAMPLES 个文件：建档是低频操作，但也不能为它扫遍超大库。
+   *
+   * @param {string} folderPath 即将建档的文件夹（用于第 ② 级取样）
+   * @returns {Promise<string>} "\r\n" 或 "\n"
+   */
+  async detectVaultEol(folderPath) {
+    const MAX_SAMPLES = 24;
+    const tally = async (files) => {
+      let crlf = 0;
+      let lf = 0;
+      for (const f of files) {
+        if (crlf + lf >= MAX_SAMPLES) break;
+        try {
+          const text = await this.app.vault.cachedRead(f);
+          // 只认「纯 CRLF / 纯 LF」两种明确票；空文件或单个 \r 结尾的不计票，
+          // 免得一个空模板把票型带偏。
+          if (text.includes("\r\n")) crlf++;
+          else if (text.includes("\n")) lf++;
+        } catch (e) {
+          // 读不了（已删除/无权限/非文本）就跳过这个样本，不影响其余
+        }
+      }
+      return [crlf, lf];
+    };
+    let all = [];
+    try {
+      all = this.app.vault.getMarkdownFiles() || [];
+    } catch (e) {
+      return "\n";
+    }
+    let [crlf, lf] = await tally(all.filter((f) => f.name.endsWith("\u4EFB\u52A1\u5217\u8868.md")));
+    if (crlf + lf === 0 && folderPath) {
+      const norm = String(folderPath).replace(/\/+$/, "");
+      [crlf, lf] = await tally(all.filter((f) => f.parent && f.parent.path === norm));
+    }
+    return crlf > lf ? "\r\n" : "\n";
+  }
+  /**
    * 确保文件夹存在
    */
   async ensureFolderExists(folderPath) {
@@ -2138,6 +2222,11 @@ var TaskParser = class {
    * 使缓存失效
    */
   invalidateCache() {
+    // 作废在途解析：序号+1 使「基于失效前快照」的在途结果被守卫拦截、不写缓存；
+    // 清空在途引用，下次调用重新解析而非复用旧快照
+    // （大库/移动端全库解析慢于 500ms 防抖窗口，此前失效后仍会短暂展示旧任务）
+    this.parseSeq = (this.parseSeq || 0) + 1;
+    this.parsingPromise = null;
     this.cache = null;
     this.lastParseTime = 0;
     // 清除任务文件路径缓存
@@ -2219,8 +2308,6 @@ var TaskParser = class {
     return `${year}-${month}-${day}`;
   }
 };
-
-var import_obsidian2 = require("obsidian");
 
 // ==================== 日历工具模块 ====================
 
@@ -2752,7 +2839,9 @@ var HOLIDAY_NAME_TW = {
   "\u6625\u8282": "\u6625\u7BC0",
   "\u79CB\u62A5": "\u79CB\u5831",
   "\u91CD\u9633": "\u91CD\u967D",
-  "\u7231\u7433\u8282": "\u611B\u7433\u7BC0"
+  "\u7231\u7433\u8282": "\u611B\u7433\u7BC0",
+  "\u60DC\u5149\u8282": "\u60DC\u5149\u7BC0",
+  "\u73AF\u5883\u65E5": "\u74B0\u5883\u65E5"
 };
 
 /**
@@ -2764,8 +2853,27 @@ var HOLIDAY_NAME_TW = {
 function translateHolidayName(name) {
   if (typeof name !== "string" || !name) return name;
   if (I18N_LANG === "zh-CN") return name;
-  if (I18N_LANG === "en") return HOLIDAY_NAME_EN[name] || name;
-  return HOLIDAY_NAME_TW[name] || name;
+  const table = I18N_LANG === "en" ? HOLIDAY_NAME_EN : HOLIDAY_NAME_TW;
+  const direct = table[name];
+  if (direct) return direct;
+  // 审计 L2：合并名兜底。内置 holidays.json 把 2025-10-06 写作「国庆节/中秋节」，
+  // 网络源还会给出「国庆节,中秋节」这类拼接名。两张译文表不可能穷举组合，
+  // 而「国庆节/中秋节」**不是**繁简同形（不像元旦/除夕/班），原样回退＝繁体界面
+  // 直接露出简体、英文界面露出中文。这里按分隔符拆开逐段查表再拼回去。
+  // 任一段查不到就整体原样返回：沿用上面单名的既定策略，宁可不翻，也不要输出
+  // 「國慶節/Mid-Autumn Festival」这种半截译文。分隔符统一用「/」拼回，
+  // 与内置数据的写法一致（格子很窄，不再加空格）。
+  const parts = name.split(/[\/\uFF0F,\uFF0C\u3001]/);
+  if (parts.length < 2) return name;
+  const out = [];
+  for (const part of parts) {
+    const key = part.trim();
+    if (!key) return name;
+    const hit = table[key];
+    if (!hit) return name;
+    out.push(hit);
+  }
+  return out.join("/");
 }
 
 function getTraditionalHoliday(lunarDate) {
@@ -2911,7 +3019,7 @@ var HolidayManager = class {
     let timeoutId;
     try {
       const res = await Promise.race([
-        import_obsidian2.requestUrl({ url }),
+        import_obsidian.requestUrl({ url }),
         new Promise((_, reject) => {
           timeoutId = setTimeout(() => reject(new Error(timeoutLabel)), timeoutMs);
         })
@@ -3065,7 +3173,17 @@ function weekdayFullNames() {
  * 锚点周在其公历年里的第几周：含 1 月 1 日的那一周就是第 1 周，
  * 按 firstDayOfWeek 切分（与格子口径一致，不是 ISO 周）。
  * 跨年那一周（如 2025-12-28 – 2026-01-03）归给它所包含的那个元旦的年份，
- * 所以它是 2026 年的第 1 周，而不是 2025 年的第 53 周——不会出现「一年 53 周」的怪数。
+ * 所以它是 2026 年的第 1 周，而不是 2025 年的第 53 周。
+ *
+ * 审计 L9：但「一年 53 周」确实会出现——原注释断言它不会，是错的。本函数的「年」
+ * 是从 jan1WeekStart(Y) 到 jan1WeekStart(Y+1) 的**周起点区间**；当元旦落在周中、
+ * 该周起点被推到上一年时，这个区间能长达 371 天＝整整 53 周。
+ * 例（firstDayOfWeek=1，周一起）：jan1WeekStart(2023)=2022-12-26、
+ * jan1WeekStart(2024)=2024-01-01，于是 2023-12-25 那一周算下来是第 53 周。
+ * 暴力枚举 1999-2061 × fdow∈{0,1,6} 的全部周起点：三种起始日都会命中 53
+ * （fdow=0 首见 2000-12-24，fdow=1 首见 2000-12-25，fdow=6 首见 1999-12-25），
+ * **且从不超过 53**。所以这里的算术是对的、调用方不必防御更大的怪值，只是文案上
+ * 别再把 53 说成不可能——右侧标着「第 53 周」是符合本口径的正确显示。
  */
 function weekNumberOfYear(startKey, firstDayOfWeek) {
   const anchor = dateFromStr(startKey);
@@ -3126,7 +3244,7 @@ var AGENDA_MANAGE_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="
  * - openDatePicker()：打开日期选择器
  * ============================================================
  */
-var MonthlyView = class extends import_obsidian2.ItemView {
+var MonthlyView = class extends import_obsidian.ItemView {
   constructor(leaf, taskParser, plugin) {
     super(leaf);
     this.taskParser = taskParser;
@@ -3162,6 +3280,20 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 使用自有字段 rootEl，而非覆写 ItemView 基类的 containerEl（视图根元素，含视图头部）：
     // 框架后续经 view.containerEl 操作视图时必须拿到正确元素
     this.rootEl = this.contentEl.createDiv("monthly-tasks-container");
+    // 审计 L12：显式的「视图已关闭」标志。rootEl 只在上面这一处赋值、onClose 只做
+    // .empty() 而**从不置 null**，所以 `if (!this.rootEl)` 挡不住关闭后的渲染；
+    // renderRequestId 自增也只能作废**已在途**的渲染，关闭之后才启动的那一轮拿到新 id、
+    // 后面没人超越它 → 令牌检查全部通过，整块网格被画进已分离的 DOM（白做功，还会顺带
+    // 触发一次节假日按需补数）。这里给一个与 DOM 状态无关的布尔量，渲染入口统一看它。
+    this.viewClosed = false;
+    // 手机端格子量测（2026-10-10）：观察 rootEl 尺寸变化并复量。「切走再回」后
+    // .view-content 的高度约束是异步生效的，渲染瞬间量到的行高之后会变，靠这里补刀；
+    // gridEl 由 _mtWatchGridSize 在每轮复量时一并纳入观察——松布局阶段网格在 rootEl
+    // 内部长高而 rootEl 自身高度不变，只盯 rootEl 会漏掉这轮变化（v1.7.8 两态不一致）
+    if (typeof ResizeObserver !== "undefined") {
+      this._mtTrimObserver = new ResizeObserver(() => this._mtMeasureMobileCells("obs"));
+      this._mtTrimObserver.observe(this.rootEl);
+    }
     // 视图形态与选中日：root class 决定样式作用域，selectedDate 决定明细区看哪天。
     // 两者都必须在首次 render 之前就位，否则第一帧会按条视图渲染再翻牌（闪一下）
     this.applyViewModeClass();
@@ -3174,6 +3306,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 视图关闭
    */
   async onClose() {
+    // 审计 L12：先立标志，再作废在途渲染——两者顺序很重要：下面的定时器/弹窗清理里
+    // 任何一处间接触发渲染，都该立刻被 viewClosed 挡回去。
+    this.viewClosed = true;
     // 递增 renderRequestId 使进行中的渲染 await 后判定失效（myRequestId !== this.renderRequestId），
     // 避免向已分离 DOM 继续添加节点
     this.renderRequestId = (this.renderRequestId || 0) + 1;
@@ -3182,14 +3317,31 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       for (const t of this.pendingTimers) clearTimeout(t);
       this.pendingTimers.clear();
     }
+    // 手机端等高截断的尺寸观察器（onOpen 里建）：随视图一并拆掉，不留悬挂回调
+    if (this._mtTrimObserver) {
+      this._mtTrimObserver.disconnect();
+      this._mtTrimObserver = null;
+      this._mtObservedGrid = null;
+    }
+    // 延迟复裁的挂起帧/定时器（_mtScheduleRetrim 排的）：一并撤掉，不留迟到的重裁
+    if (this._mtRetrimRaf != null) cancelAnimationFrame(this._mtRetrimRaf);
+    if (this._mtRetrimTimer != null) clearTimeout(this._mtRetrimTimer);
+    this._mtRetrimRaf = null;
+    this._mtRetrimTimer = null;
     // 托管弹窗挂在框架层不随 rootEl 回收：视图关闭时一并收起，避免失联
     this.closeActivePopup();
     this.rootEl.empty();
   }
-  /** 关闭本视图挂出的所有托管弹窗（日期跳转 / 类别筛选）；两个面板改挂 Modal 后
-   * 仍保留此入口：onClose、header 重建与回归测试统一从这里收起 */
+  /** 关闭本视图挂出的所有托管弹窗（日期跳转 / 类别筛选 / 视图菜单 / 新建-编辑任务）；
+   * 两个面板改挂 Modal 后仍保留此入口：onClose、header 重建与回归测试统一从这里收起。
+   * CreateTaskModal 必须在列（审计 M3）：它有同一套 activeInstances 登记（见其 onOpen 首句），
+   * 插件 onunload 也确实关它，唯独视图 onClose 此前漏了。漏关的后果是
+   * 「打开新建/编辑弹窗后直接关掉月历标签页」→ 弹窗留在屏幕上、背后没有日历；若其内联
+   * 日期浮层开着，浮层装的 document 级 click 监听不会被摘（只有 onClose 摘），且提交
+   * 仍会写库、随后 await refresh(true) 没有 isConnected 守卫，把整块网格重建进已分离的
+   * rootEl 再丢弃。onClose 全程判空 + .has() 守卫，重复 close 无副作用，可放心加。 */
   closeActivePopup() {
-    for (const cls of [DatePickerModal, CategoryFilterModal, ViewMenuModal]) {
+    for (const cls of [DatePickerModal, CategoryFilterModal, ViewMenuModal, CreateTaskModal]) {
       if (cls.activeInstances) {
         for (const inst of Array.from(cls.activeInstances)) {
           try { inst.close(); } catch (e) {
@@ -3284,12 +3436,27 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.closeActivePopup();
     this.rebuildHeader();
     this.applyViewModeClass();
-    this.renderCalendarGrid();
+    // 审计 L5：本函数是同步的（被 render 尾部和各处状态翻转调用），没法 await；
+    // 走 Safe 版把 reject 收敛掉。注意 _renderCalendarGridCore 的 renderRequestId
+    // 自增在第一个 await 之前**同步**发生，所以调用方紧接着的令牌复检仍然有效
+    // （L4 的失败分支就依赖这一点），换成 Safe 版不影响时序。
+    this.renderCalendarGridSafe("updateFilterButton");
   }
   /**
    * 渲染整个视图
    */
   async render() {
+    // 审计 L6 + L12：两道守卫，各挡一种「渲染时视图不该再画」的情形。
+    // ① `!this.rootEl`：onOpen 之前就跑到（refresh 由 vault 事件/命令触发，视图对象
+    //    可能刚被 getLeavesOfType 取到还没 onOpen 完）。紧邻的两个助手
+    //    applyViewModeClass 和 applyViewToggleIcon 都自带这道判空，这里原先没有，
+    //    却直接 .childElementCount 解引用。
+    // ② `this.viewClosed`：onClose **之后**跑到。注意 rootEl 在 onClose 里只做
+    //    .empty() 而从不置 null，所以判空挡不住这一档；靠的是 onOpen/onClose 维护的
+    //    显式标志（详见 onClose 的审计 L12 注释）。
+    // 两档的报错都不好查：render() 的调用方多数没 await，抛出去只以 unhandled
+    // rejection 的形式在控制台留一行红字。
+    if (!this.rootEl || this.viewClosed) return;
     const langChanged = this.lastLang !== I18N_LANG;
     const firstDayChanged = this.lastFirstDayOfWeek !== this.plugin.settings.firstDayOfWeek;
     // 视图形态每次渲染都对齐一次（幂等）：root class 与切换按钮图标只在重建分支里
@@ -3440,6 +3607,12 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 渲染星期标题
    */
   renderWeekdayHeader() {
+    // 审计 L6 + L12：与 render() 同因——末尾的 insertBefore/appendChild 要解引用 rootEl，
+    // 而 rootEl 关闭后不置 null，故判空与 viewClosed 都得看。本方法被 render() 和
+    // rebuildHeader() 两处调用，两个调用方各自也守了一遍；这里是同步方法、没有 await，
+    // 单独看似乎多余，但列头是「半画状态」里最显眼的一块（网格没了、星期还在），
+    // 在入口再收一次口径最省。
+    if (!this.rootEl || this.viewClosed) return;
     // 大周视图没有列头：格子是 2 列（手机）/ 4 列（桌面）排布，列与星期不再
     // 一一对应，星期写在每格抬头（见 renderDayCell 的 bigWeek 分支）。
     if (this.isBigWeek()) return;
@@ -3467,17 +3640,38 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   /**
    * v1.5.2 方案A：删除线开关热切换时只增删 .completed-strike 类名，
    * 不重建网格/弹窗（完成态灰条+变暗由 .completed 恒承担，与开关无关）
+   *
+   * 审计 L14：拆成「本视图」与「弹窗」两趟，各自作用域明确。
+   * 原实现三次 querySelectorAll 全打在 document 上，于是分屏开两个月历时，任一 leaf
+   * 重画网格都会顺手把**另一个** leaf 和所有开着的弹窗重新上一遍样式。类名操作幂等，
+   * 所以眼下看不出错——但那是运气：两个 leaf 的 settings 同源，哪天出现「每视图独立
+   * 开关」就直接串味；而且重画是高频路径，每帧多扫两遍全文档并不便宜。
+   * 弹窗那一趟**必须**保持全局扫描：CreateTaskModal 挂在 document.body 上、不在
+   * this.rootEl 里（插件侧 _applyStrikeToViews 的原注释说的就是这件事）。
+   * 但网格重画用不着它——弹窗建列表时自己就按当前开关 toggleClass 过（见
+   * CreateTaskModal 里建 existing-task-item 的两处），唯一需要同步弹窗的时机是
+   * 「开关在弹窗开着时被改动」，那走的是设置项那条路。
+   * @param {{view?: boolean, modal?: boolean}} [opts] 省略＝两趟都做（设置项热切换语义）
    */
-  _applyStrikeClasses() {
+  _applyStrikeClasses(opts) {
     const strike = this.plugin.settings.showCompletedStrike;
-    const targets = [...document.querySelectorAll(".day-cell .task-item.completed"),
-      ...document.querySelectorAll(".existing-task-item.completed"),
-      // 明细区的勾选行也走同一条删除线开关（v1.6.0 批次二）：
-      // 日程视图里已完成 = 变暗 + 按开关决定是否划线，与条视图口径一致
-      ...document.querySelectorAll(".agenda-item.completed")];
-    for (const el of targets) {
-      if (strike) el.removeClass("completed-strike");
-      else el.addClass("completed-strike");
+    const apply = (els) => {
+      for (const el of els) {
+        if (strike) el.removeClass("completed-strike");
+        else el.addClass("completed-strike");
+      }
+    };
+    const wantView = !opts || opts.view !== false;
+    const wantModal = !opts || opts.modal !== false;
+    if (wantView && this.rootEl) {
+      // 条视图的格子（.day-cell .task-item）与日程视图的明细行（.agenda-item）
+      // 都在 rootEl 下：明细区也走同一条删除线开关（v1.6.0 批次二），
+      // 已完成 = 变暗 + 按开关决定是否划线，与条视图口径一致
+      apply(this.rootEl.querySelectorAll(".day-cell .task-item.completed, .agenda-item.completed"));
+    }
+    if (wantModal) {
+      // 「该日已有 N 个任务」列表，挂在 body 上的弹窗里，只能全局扫
+      apply(document.querySelectorAll(".existing-task-item.completed"));
     }
   }
 
@@ -3520,6 +3714,12 @@ var MonthlyView = class extends import_obsidian2.ItemView {
    * 都只在 renderHeader 里生成一次，只改 root class 会留下上一个视图的头部措辞。
    */
   rebuildHeader() {
+    // 审计 L6 + L12：setViewMode 在调它之前有 `await this.plugin.saveSettings()`，视图
+    // 若在这个空档被关掉，这一串 .empty()/createDiv 全打在已分离的 rootEl 上——不报错，
+    // 但等于白建一套 DOM，还会把 gridEl 指向脱离文档的节点，后续渲染继续往里写。
+    // 判空只挡「onOpen 之前」，关闭之后靠 viewClosed。提前返回后 gridEl 保持 null，
+    // 下游 _renderCalendarGridCore 的 `if (!this.gridEl) return false;` 能安全接住。
+    if (!this.rootEl || this.viewClosed) return;
     this.rootEl.empty();
     this.gridEl = null;
     this.detailEl = null;
@@ -3531,19 +3731,56 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     this.lastLang = I18N_LANG;
   }
   async renderCalendarGrid() {
-    await this._renderCalendarGridCore();
-    // v1.5.2 方案A：网格重绘后把当前删除线开关态补挂到 .completed 元素上
-    this._applyStrikeClasses();
+    // 审计 L14：core 现在返回「这一轮到底画没画」。被判为陈旧而提前返回时，视图里的
+    // .completed 节点全是上一轮留下的、类名本来就正确，再扫一遍纯属白做。
+    const rendered = await this._renderCalendarGridCore();
+    // v1.5.2 方案A：网格重绘后把当前删除线开关态补挂到 .completed 元素上。
+    // modal:false——重画网格不改动删除线开关，弹窗那份 DOM 不归这一趟管
+    if (rendered) this._applyStrikeClasses({ modal: false });
+    // 手机端格子量测（常驻逻辑）：渐隐提示与「+N」都要按最终布局算
+    if (rendered) {
+      this._mtMeasureMobileCells("render");
+      // 渲染后延迟复量，不依赖观察器报信（老 WebView 上信号靠不住）
+      this._mtScheduleRetrim();
+    }
+  }
+  /**
+   * 审计 L5：不阻塞调用方地重画网格，并把 reject 收敛成一条 console.error。
+   * renderCalendarGrid 是 async，而下列调用点都处在**同步**上下文里（事件监听、
+   * setViewMode、节假日按需补数回调、筛选弹窗的行点击），根本没法 await；裸调一旦
+   * 内部抛错就变成 unhandled rejection——除了控制台一行红字没有任何反馈，网格还可能
+   * 停在半画状态。作者在 toggleTask 的延迟刷新里已经为同一件事包了 try/catch
+   * （error.delayRefresh），这里给网格重绘补上等价的兜底，七处调用点统一走它。
+   * @param {string} reason 只进日志，用于区分是哪条链路触发的重绘
+   */
+  renderCalendarGridSafe(reason) {
+    this.renderCalendarGrid().catch((err) => {
+      console.error(tr("error.renderGrid"), reason || "", err);
+    });
   }
   async _renderCalendarGridCore() {
     // 自增 requestId：快速切换月份时，旧请求完成后会因 requestId 不匹配而丢弃渲染结果
     this.renderRequestId = (this.renderRequestId || 0) + 1;
     const myRequestId = this.renderRequestId;
+    // 审计 L12：令牌自增只能作废**已在途**的渲染。关闭之后才启动的那一轮拿到的是全新
+    // id，后面再没人超越它，于是下面每一处 `myRequestId !== this.renderRequestId` 都会
+    // 判定通过，整块网格被画进已分离的 rootEl（并顺带发起一次节假日按需补数）。
+    // 这里用 onOpen/onClose 维护的显式标志把那道口子堵上；顺带判 rootEl，
+    // 因为紧接着就要解引用 this.headerEl。
+    // 返回值＝「这一轮到底画没画」，供 renderCalendarGrid 决定要不要再走删除线那趟
+    // （审计 L14）。所有提前退出一律 false。
+    if (this.viewClosed || !this.rootEl) return false;
     const titleEl = this.headerEl.querySelector(".month-title");
     if (titleEl) {
       titleEl.textContent = this.headerTitleText();
     }
-    this.gridEl.empty();
+    // 审计 M8：清空网格**推迟到 await 之后**（见下面 gridEl.empty() 处的同类注释）。
+    // 旧实现在任何 await 之前就 gridEl.empty()，而 refresh(true) 会先 invalidateCache()，
+    // 于是 parseAllTasks(false) 必走全量扫描（getMarkdownFiles + 逐文件读）：
+    // 库里任何 md 一保存，500ms 防抖后整个网格先空白再重画，闪烁时长随库增大。
+    // 推迟之后这段窗口里用户看到的仍是上一帧的网格（内容通常与即将画出的一致），
+    // 代价是「标题已换月、格子还是上一个月」的短暂错位——只在换月**且**恰逢全量
+    // 重扫时可见，比整块空白可接受。
     const calendar = generateMonthCalendar(this.currentYear, this.currentMonth, this.plugin.settings.firstDayOfWeek);
     // 42 天网格可能跨年（如查看 12 月时下月溢出日期属次年），对所有涉及的年份都按需 ensure，
     // 避免溢出日期无节假日标注
@@ -3559,7 +3796,9 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     const ensured = Promise.all(Array.from(yearsToEnsure).map((y) => this.plugin.holidayManager.ensureYearData(y)));
     ensured.then((fetched) => {
       if (fetched.some(Boolean) && myRequestId === this.renderRequestId && this.rootEl && this.rootEl.isConnected) {
-        this.renderCalendarGrid();
+        // 审计 L5：这里没有 return，外层 .catch 接不到它的 reject（那条 catch 只管
+        // ensureYearData 的失败），裸调等于放任 unhandled rejection。
+        this.renderCalendarGridSafe("holiday-year-ensured");
       }
     }).catch(() => {
     });
@@ -3570,15 +3809,40 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       taskMap = await this.taskParser.parseAllTasks(false);
     } catch (e) {
       console.error(tr("error.loadTasks"), e);
-      if (myRequestId !== this.renderRequestId) return;
+      if (myRequestId !== this.renderRequestId) return false;
+      // 审计 L4：失败分支也要收敛漏斗。updateFilterButton 状态翻转时会 rebuildHeader()
+      // 并同步起一轮新渲染（renderRequestId 在那一刻就自增了），所以它必须排在
+      // 「画失败态」之前，画完再检一次令牌——否则错误提示会被写进已经摘掉的旧 gridEl。
+      this.updateFilterButton();
+      if (myRequestId !== this.renderRequestId) return false;
+      if (!this.gridEl || !this.gridEl.isConnected) return false;
       this.gridEl.empty();
       const errEl = this.gridEl.createDiv("error-hint");
       errEl.textContent = tr("view.cell.loadError");
-      return;
+      // 审计 L4：明细区同步收敛成同一个失败态。此前这里直接 return，
+      // 下方面板还列着上一轮的旧任务，与网格的「任务加载失败」自相矛盾，
+      // 用户会以为那些任务仍然存在。
+      if (this.isCompactCell())
+        this.renderAgendaError();
+      else
+        this.removeAgendaDetail();
+      // 审计 L14：错误态里没有任何 .completed 节点，删除线那趟没必要跑，返回 false
+      return false;
     }
-    if (myRequestId !== this.renderRequestId) return;
+    if (myRequestId !== this.renderRequestId) return false;
+    // 审计 M8：清空推迟到此处——令牌已确认自己是最新一轮、数据也已到手，
+    // 从 empty() 到最后一格画完之间没有任何 await，用户看不到空白帧。
+    if (!this.gridEl) return false;
+    this.gridEl.empty();
     // 大周视图要统计「这一周共几项、完成几项」：跨天任务在起止区间内每天都挂一次，
     // 所以按任务对象去重（同一个 task 引用只数一遍），口径与格子里铺出来的条数无关。
+    // 审计 L3：这里**故意不按 showCompletedTasks 过滤**，而格子那一侧会过滤
+    // （renderDayCell 里的 displayTasksList）。看着矛盾，实则三个数自洽：关掉
+    // 「显示已完成任务」后被藏起来的恰好全是已完成项，于是
+    //     n（本周总项）− m（已完成）== 格子里实际铺出的行数，
+    // 用户能从汇总反推出「有几条被藏了」。反过来若改成只统计可见集合，同一周会写成
+    // 「共 2 项 · 完成 0」——把 3 条已完成说成 0 条，从「口径需要解释」退化成直接谎报，
+    // 更糟。所以缺的不是统计口径而是解释，补在 renderWeekSummaryCell 的 title 上。
     const weekTaskSet = this.isBigWeek() ? /* @__PURE__ */ new Set() : null;
     for (const day of this.visibleDays(calendar)) {
       const dateStr = formatDate(day.date);
@@ -3616,6 +3880,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // 解析完成后再收敛漏斗：类别首次出现/清零的这一帧重建 header，
     // updateFilterButton 内部会递归补画一次（状态一致后不再递归，深度封顶 2）
     this.updateFilterButton();
+    // 审计 L14：走到这里说明格子确实铺出来了，删除线开关态需要补挂一次
+    return true;
   }
   /**
    * 渲染日期格子
@@ -3696,7 +3962,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       // 条视图保持原行为：点空白格子仍直接开创建弹窗。
       cellEl.addEventListener("click", () => {
         if (this.selectDay(dateKey)) {
-          this.renderCalendarGrid();
+          // 审计 L5：监听器是同步回调，抛错没人接
+          this.renderCalendarGridSafe("agenda-select-day");
         }
       });
       return;
@@ -3706,29 +3973,32 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     if (!this.plugin.settings.showCompletedTasks) {
       displayTasksList = tasks.filter((t) => !t.completed);
     }
+    // 手机端格子量测（2026-10-10）：_mtMeasureMobileCells 需要本格总任务数/日期/完整列表
+    // （补「+N」与点击看全部用）；DOM 随重绘整体重建，随元素存取即可
+    tasksEl.dataset.mtTotal = String(displayTasksList.length);
+    tasksEl.mtDayDate = day.date;
+    tasksEl.mtTaskList = displayTasksList;
+    // 1.7.9h：手机端格子内无滚动条滑动
+    this._mtEnableMobilePan(tasksEl);
     const limit = this.plugin.settings.tasksPerDayLimit;
-    // 保持 displayTasksList 原始排序（time/lineNumber），用 Set 标记跨天任务。
-    // 跨天任务不占 tasksPerDayLimit 配额（避免挤占单日任务），但施加软上限（limit）防止极端场景撑爆格子。
-    // 单日任务用独立计数器，超过 limit 的部分计入 remainingCount。
-    const multiDaySet = new Set(displayTasksList.filter((t) => isMultiDayTask(t)));
-    let multiDayShown = 0;
-    let singleDayShown = 0;
+    // 审计 M13：改成**单一**总预算——一格最多画 limit 行，超出的全部计入 remainingCount。
+    // 旧实现给跨天任务和单日任务各发一份 limit 配额（multiDayShown / singleDayShown
+    // 两个独立计数器），于是一格实际最多画 2 × limit 行，而设置项对用户的承诺是
+    // 「每个日期格子最多显示的任务数量」（settings.tasksLimit.desc，三种语言同一口径），
+    // 日面板的折叠阈值（listLimit）与「查看全部」阈值（LIMIT）用的也都是单一预算——
+    // 格子与面板互相矛盾。实测 limit=5、5 条单天 + 12 条跨天 → 旧版 9 行 + 「+7」。
+    // 作者原意（跨天任务不挤占单日任务）在这里让位于「文案即契约」：跨天任务在起止
+    // 区间内每天都挂一次，本就比单日任务更容易刷屏；而且格子越小越不会触发内滚条
+    // （见 M14：滚动条会吃掉一个汉字的宽度）。displayTasksList 已按 time/lineNumber
+    // 排好序，所以「取前 limit 条」是用户最容易预测的规则。
+    let shownCount = 0;
     let remainingCount = 0;
     for (const task of displayTasksList) {
-      if (multiDaySet.has(task)) {
-        if (multiDayShown < limit) {
-          this.renderTaskItem(tasksEl, task, day.date);
-          multiDayShown++;
-        } else {
-          remainingCount++;
-        }
+      if (shownCount < limit) {
+        this.renderTaskItem(tasksEl, task, day.date);
+        shownCount++;
       } else {
-        if (singleDayShown < limit) {
-          this.renderTaskItem(tasksEl, task, day.date);
-          singleDayShown++;
-        } else {
-          remainingCount++;
-        }
+        remainingCount++;
       }
     }
     if (remainingCount > 0) {
@@ -3748,6 +4018,257 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       }
       this.openCreateTaskModal(day.date, displayTasksList);
     });
+  }
+  /**
+   * 手机端等高截断的网格观察（2026-10-10，v1.7.8）：ResizeObserver 只盯 rootEl 不够——
+   * 「切走再回」的松布局阶段里，网格在 rootEl 内部长高（行高从约 90px 恢复到 311/321px），
+   * rootEl 自身高度不变，观察器不触发，截断结果就停留在按矮盒子算出的「2+1」上（10/9
+   * 首开 3 条、切回 2+1 的差异源）。这里把 gridEl 一并纳入观察：行高恢复等分的瞬间
+   * 即触发重裁。gridEl 在挂载/换语言/切视图形态时会重建，重建后必有网格重绘 → 重裁 →
+   * 回到这里重新观察，换新时先退订旧的；observe 已观察的元素是规范 no-op，不会重复挂。
+   */
+  _mtWatchGridSize() {
+    try {
+      if (this.viewClosed || !this._mtTrimObserver || !this.gridEl) return;
+      if (this._mtObservedGrid && this._mtObservedGrid !== this.gridEl) {
+        this._mtTrimObserver.unobserve(this._mtObservedGrid);
+      }
+      this._mtTrimObserver.observe(this.gridEl);
+      this._mtObservedGrid = this.gridEl;
+    } catch (err) {
+      console.error("[monthly-tasks] grid observer failed:", err);
+    }
+  }
+  /**
+   * 手机端格子量测（2026-10-10，v1.7.9k；前身是「等高截断」）：只量不裁。
+   * 用户实测后选定的口径是「装不下的靠滑动看，不要按高度藏进 +N」，所以本方法不再
+   * 隐藏任何条目：超出可视区的任务留在 .day-tasks 里，由 _mtEnableMobilePan 手动平移
+   * （overflow:hidden 不生成滚动条——这台老 WebView 只要出条就必占 5px 内容宽，
+   * 「一行 4 字变 3 字」的根因）。本方法负责三件事：
+   *   ①量出任务盒高与末条位置（clipped），供「+N」与渐隐提示（.mt-pan-hint，挂在
+   *     .day-cell 上）使用；
+   *   ②「+N」只在**条数余量**（total > items.length，即设置里「每格最多 N 条」截掉的
+   *     那几条）大于 0 时出现——那是用户对设置的显式契约，不由本方法擅自取消；
+   *   ③「+N」待在列表末尾原位（v1.7.9k 起不再做任何绝对定位，见下方注释）。
+   * 桌面端（>480px）直接返回，并摘掉手机端留下的提示类。
+   * 触发：网格重绘后（renderCalendarGrid 尾部）＋ 尺寸变化（ResizeObserver 观察 rootEl
+   * 与 gridEl）＋ 渲染后延迟复量（_mtScheduleRetrim）。pass 标明本轮由谁发起
+   * （render/raf/timer/obs），只进失败日志。
+   */
+  _mtMeasureMobileCells(pass) {
+    try {
+      if (this.viewClosed || !this.gridEl || !this.gridEl.isConnected) return;
+      if (!window.matchMedia || !window.matchMedia("(max-width: 480px)").matches) {
+        // 1.7.9h：宽屏不截断，也要把手机端留下的渐隐类摘掉（窄→宽切换会残留遮罩）
+        for (const c of Array.from(this.gridEl.querySelectorAll(".mt-pan-hint"))) {
+          c.classList.remove("mt-pan-hint");
+          c.classList.remove("mt-pan-scrolled");
+        }
+        return;
+      }
+      // 网格长高（松布局→等分恢复）时 rootEl 不动，先把 gridEl 纳入观察再量
+      this._mtWatchGridSize();
+      for (const tasksEl of Array.from(this.gridEl.querySelectorAll(".day-tasks"))) {
+        const items = [];
+        let chip = null;
+        for (const child of Array.from(tasksEl.children)) {
+          if (child.classList.contains("task-item")) {
+            if (child.style.display === "none") child.style.display = "";
+            items.push(child);
+          } else if (child.classList.contains("more-tasks")) {
+            chip = child;
+          }
+        }
+        if (items.length === 0) continue;
+        const total = parseInt(tasksEl.dataset.mtTotal || "", 10) || items.length;
+        const box = tasksEl.getBoundingClientRect();
+        if (box.height <= 0) continue; // 视图隐藏/尚未布局（与诊断条同款守卫）
+        // 1.7.9g：可用高度 = ceil(盒高) + 1。真机两态读数（v1.7.9d）显示
+        // 同一格的盒高在 77.4 与 81 之间跳（框架底部工具栏折叠使视口微动 17px，六行分摊
+        // 每行约 2.8px），而末条底部真值恰落在两者之间（读数 i 尾 78，即 77.5~78.4）——
+        // 旧判据 box.height + 1 拿「向下取整的盒高」去比「未取整的条目底」，边界格因此随
+        // 视口状态在 2/3 之间翻脸。ceil 把盒高还原到真实上界，1px 吸收条目侧亚像素舍入；
+        // 极端情况下最后一行底部让出不足 1px 的 padding，肉眼不可见，换来两态判定一致。
+        const allow = Math.ceil(box.height) + 1;
+        const ensureChip = () => {
+          if (!chip) {
+            chip = tasksEl.createDiv("more-tasks");
+            chip.addEventListener("click", (e) => {
+              e.stopPropagation();
+              this.openCreateTaskModal(tasksEl.mtDayDate, tasksEl.mtTaskList || []);
+            });
+          }
+          if (chip.style.display === "none") chip.style.display = "";
+          return chip;
+        };
+        // 「+N」只为**条数余量**存在（设置里「每格最多 N 条」截掉的那些），并且**留在
+        // 列表末尾原位**。v1.7.9i 曾把它绝对定位「拉回可视区」，真机表现是位置乱飘
+        // （用户 2026-10-10：超过设置条数后 +1 位置十分奇怪）——.day-tasks 不是定位
+        // 包含块（有 position:relative 的是外层 .day-cell），绝对定位的 top 因此按日格
+        // 左上角算、压到日期号上。截断取消后既无需预留高度、也无需挪位置：它在文档流
+        // 里就是列表末尾，滑到底自然看得见。
+        const remainingByLimit = total - items.length;
+        if (remainingByLimit > 0) ensureChip();
+        // 1.7.9h：还有内容被 overflow 裁掉＝末条底部超出可用高度
+        const clipped = items[items.length - 1].getBoundingClientRect().bottom - box.top > allow;
+        // 1.7.9h：真溢出时给格子底部加一条渐隐，替代滚动条作「这里能滑」
+        // 的提示（挂在 .day-cell 上：overflow:hidden 的 .day-tasks 里放 ::after 会随内容
+        // 一起被裁掉，永远看不见）
+        const cellBox = tasksEl.parentElement;
+        if (cellBox) cellBox.classList.toggle("mt-pan-hint", clipped);
+        if (remainingByLimit > 0) {
+          ensureChip().textContent = `+${remainingByLimit}`;
+        } else if (chip) {
+          // 条数余量为 0：渲染期不会建「+N」，能走到这里的只会是本方法上一轮建的，藏掉
+          chip.style.display = "none";
+        }
+      }
+    } catch (err) {
+      console.error("[monthly-tasks] mobile cell measure failed:", pass, err);
+    }
+  }
+  /**
+   * 手机端格子内无滚动条滑动（2026-10-10，v1.7.9h 起，v1.7.9j 重写流畅度）：
+   * 老 WebView 走原生 overflow 滚动必占 5px 内容宽（「一行 4 字变 3 字」的根因），
+   * 故 .day-tasks 保持 overflow:hidden，由触摸手动改 scrollTop——hidden 元素脚本
+   * 可滚、且结构上永不生成滚动条。
+   * 流畅度三条（v1.7.9j，用户实测「不太流畅」后定位）：
+   *   ①几何只量一次：scrollHeight/clientHeight 每 move 都读会强制同步重排，
+   *     与紧随的 scrollTop 写入形成读写交替掉帧，故起手存进 m，过程只读 scrollTop；
+   *   ②写入合帧：touchmove 比渲染帧更密，只更新目标值 want，真正写 scrollTop
+   *     交给 requestAnimationFrame，一帧最多一次；preventDefault 必须留在 touchmove
+   *     的同步路径里（事件对象到 rAF 回调时已不可取消，那时调等于没调）；
+   *   ③惯性：原生滚动有惯性而脚本滚动没有，手指一停就死、观感发涩，故按最近一次
+   *     位移算速度，抬手后以每帧 ×0.94 衰减，撞边界即停（不做回弹）。
+   * 手势边界：只在真溢出时接管；横向分量大于纵向即放行（左右滑换月等框架手势不受影响）；
+   * 越出 [0, max] 不硬拖（交还外层，避免与页面滚动互抢）；平移超 6px 后落点的 click
+   * 在 capture 阶段一次性拦掉，免得拖完误开新建弹窗或误勾任务。
+   */
+  _mtEnableMobilePan(el) {
+    if (!("ontouchstart" in window) || !window.matchMedia) return;
+    if (!window.matchMedia("(max-width: 480px)").matches) return;
+    if (el._mtPan) return; // 幂等：DOM 随重绘重建，正常不会重复挂，防万一
+    el._mtPan = true;
+    const cell = el.parentElement;
+    const m = { sy: 0, sx: 0, top0: 0, max: 0, panning: false, want: 0 };
+    let raf = null;
+    let momentum = null;
+    let lastY = 0;
+    let lastT = 0;
+    let v = 0; // px/ms，正=手指向下（往回滚）
+    const hint = () => {
+      if (cell) cell.classList.toggle("mt-pan-scrolled", el.scrollTop > 0);
+    };
+    const stopRaf = () => {
+      if (raf != null) { cancelAnimationFrame(raf); raf = null; }
+    };
+    const stopMomentum = () => {
+      if (momentum != null) { cancelAnimationFrame(momentum); momentum = null; }
+    };
+    const apply = () => {
+      raf = null;
+      if (m.want < 0 || m.want > m.max) return; // 边界处不硬拖：交还给外层
+      el.scrollTop = m.want;
+      hint();
+    };
+    el.addEventListener("touchstart", (e) => {
+      if (e.touches.length !== 1) return;
+      stopMomentum();
+      stopRaf();
+      m.max = el.scrollHeight - el.clientHeight;
+      if (m.max <= 1) return; // 没有溢出就别抢手势
+      el._mtPanMoved = false; // 起手先清：上一轮若没派发 click，别让它吞掉这一次正常点击
+      const t = e.touches[0];
+      m.sy = t.clientY;
+      m.sx = t.clientX;
+      m.top0 = el.scrollTop;
+      m.panning = false;
+      v = 0;
+      lastY = t.clientY;
+      lastT = t.timeStamp || Date.now();
+      hint();
+    }, { passive: true });
+    el.addEventListener("touchmove", (e) => {
+      const t = e.touches[0];
+      const dy = m.sy - t.clientY;
+      const dx = m.sx - t.clientX;
+      if (!m.panning) {
+        if (Math.abs(dy) < 4) return;
+        if (Math.abs(dx) > Math.abs(dy)) return; // 横向手势放行
+        m.panning = true;
+      }
+      const now = t.timeStamp || Date.now();
+      const dt = now - lastT;
+      if (dt > 0) v = (lastY - t.clientY) / dt; // 与 scrollTop 同向：手指上滑为正
+      lastY = t.clientY;
+      lastT = now;
+      m.want = m.top0 + dy;
+      if (Math.abs(dy) > 6) el._mtPanMoved = true; // 交给 capture click 监听判定误触
+      if (raf == null) raf = requestAnimationFrame(apply); // 合帧写入
+      e.preventDefault(); // 必须在同步路径：阻止纵向整页滚动
+    }, { passive: false });
+    const end = () => {
+      stopRaf();
+      if (m.panning && Math.abs(v) > 0.05) {
+        let prev = Date.now();
+        const step = () => {
+          const now = Date.now();
+          const dt = Math.min(48, now - prev) || 16; // 后台回来会有大间隔，夹住免得瞬移
+          prev = now;
+          v *= Math.pow(0.94, dt / 16); // 每帧衰减 6%
+          const next = el.scrollTop + v * dt;
+          if (next <= 0 || next >= m.max || Math.abs(v) < 0.02) {
+            el.scrollTop = Math.max(0, Math.min(m.max, next));
+            hint();
+            momentum = null;
+            return; // 撞边界即停，不做回弹
+          }
+          el.scrollTop = next;
+          hint();
+          momentum = requestAnimationFrame(step);
+        };
+        momentum = requestAnimationFrame(step);
+      }
+      m.panning = false;
+      // click 在 touchend 之后派发：留 100ms 让捕获监听判定，随后自动过期
+      if (el._mtPanMoved) setTimeout(() => { el._mtPanMoved = false; }, 100);
+    };
+    el.addEventListener("touchend", end, { passive: true });
+    el.addEventListener("touchcancel", end, { passive: true });
+    el.addEventListener("click", (e) => {
+      if (!el._mtPanMoved) return;
+      el._mtPanMoved = false;
+      e.stopPropagation();
+      e.preventDefault();
+    }, true);
+  }
+  /**
+   * 渲染后延迟复量（2026-10-10，v1.7.9；v1.7.9i 起「复裁」变「复量」）：这台老
+   * WebView 上 ResizeObserver 的信号靠不住，故每次网格重绘后在下一帧、再下一帧与约
+   * 1.2 秒后各量一次，让渐隐提示与「+N」跟着最终布局走（截断已取消，复量不再改显示）。
+   * 观察器保留，继续负责旋转/分栏等活跃 resize；本方法专收「渲染瞬间度量过早」。
+   */
+  _mtScheduleRetrim() {
+    try {
+      if (this.viewClosed) return;
+      if (this._mtRetrimRaf != null) cancelAnimationFrame(this._mtRetrimRaf);
+      if (this._mtRetrimTimer != null) clearTimeout(this._mtRetrimTimer);
+      this._mtRetrimRaf = null;
+      this._mtRetrimTimer = null;
+      const tick = (p) => {
+        this._mtRetrimRaf = null;
+        this._mtRetrimTimer = null;
+        if (!this.viewClosed) this._mtMeasureMobileCells(p);
+      };
+      if (typeof requestAnimationFrame === "function") {
+        this._mtRetrimRaf = requestAnimationFrame(() => {
+          this._mtRetrimRaf = requestAnimationFrame(() => tick("raf"));
+        });
+      }
+      this._mtRetrimTimer = setTimeout(() => tick("timer"), 1200);
+    } catch (err) {
+      console.error("[monthly-tasks] retrim schedule failed:", err);
+    }
   }
   /**
    * 渲染任务项
@@ -3779,6 +4300,13 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     el.createDiv("week-summary-range").textContent = getWeekTitle(start);
     const loadEl = el.createDiv("week-summary-load");
     loadEl.textContent = tr("view.week.load", { n: total, m: done });
+    // 审计 L3：关掉「显示已完成任务」时，格子里看不到那 m 条，汇总却仍按全周统计
+    // （口径与理由见 _renderCalendarGridCore 里 weekTaskSet 那段注释）。这里补一句
+    // title 把差值解释清楚——不占布局、不长这一格的高度（大周格子的高度是要省着用的），
+    // 且只在「确实藏了东西」（done > 0）时才挂，避免无谓的悬停文本。
+    if (!this.plugin.settings.showCompletedTasks && done > 0) {
+      loadEl.setAttribute("title", tr("view.week.loadHiddenHint", { m: done }));
+    }
     const bar = el.createDiv("week-summary-bar");
     // 0 项时不画线（画一条空槽会让人以为「有安排但都未完成」）；100% 时填满整槽
     if (total > 0) {
@@ -3840,12 +4368,17 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   }
   /**
    * 切换任务完成状态
+   * @returns {Promise<boolean>} 是否成功。调用方（日程视图复选框、弹窗任务列表）
+   * 拿这个值回滚勾选态；日历格子的点击链路忽略返回值，行为不变。
+   * 返回 true 的三种情形都意味着「不需要调用方回滚」：
+   *   ① 写入成功且已排延迟刷新；② 写入成功但视图已分离（跳过刷新，磁盘上是对的）；
+   *   ③ 同一任务已有切换在途——那次刷新的结果才是真相，此时回滚只会闪一下。
    */
   async toggleTask(task) {
     // 并发防护：同一任务在切换过程中（读-改-写）再次点击会导致竞态，
     // 用文件路径+行号作为键，期间重复点击直接忽略。
     const taskKey = `${task.filePath}:${task.lineNumber}`;
-    if (this.togglingTasks && this.togglingTasks.has(taskKey)) return;
+    if (this.togglingTasks && this.togglingTasks.has(taskKey)) return true;
     if (!this.togglingTasks) this.togglingTasks = /* @__PURE__ */ new Set();
     this.togglingTasks.add(taskKey);
     try {
@@ -3856,7 +4389,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         this.taskParser.invalidateCache();
         // 视图已关闭（await 期间 onClose 已执行）：跳过延迟刷新，避免操作已分离 DOM
         // pendingTimers 在 onClose 中已 clear()，但 Set 实例仍存在，所以用 isConnected 判断
-        if (!this.rootEl || !this.rootEl.isConnected) return;
+        if (!this.rootEl || !this.rootEl.isConnected) return true;
         // 跟踪定时器 ID 供 onClose 清理，避免视图关闭后仍向已分离 DOM 渲染
         if (!this.pendingTimers) this.pendingTimers = /* @__PURE__ */ new Set();
         const timerId = setTimeout(async () => {
@@ -3869,8 +4402,10 @@ var MonthlyView = class extends import_obsidian2.ItemView {
           }
         }, 200);
         this.pendingTimers.add(timerId);
+        return true;
       } else {
-        new import_obsidian2.Notice(tr("notice.opFail"));
+        new import_obsidian.Notice(tr("notice.opFail"));
+        return false;
       }
     } finally {
       this.togglingTasks.delete(taskKey);
@@ -3906,7 +4441,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
             await this.refresh(true);
           } catch (refreshErr) {
             console.error(tr("error.postCreateRefresh"), refreshErr);
-            new import_obsidian2.Notice(tr("notice.createdRefreshFail"), 3e3);
+            new import_obsidian.Notice(tr("notice.createdRefreshFail"), 3e3);
           }
           return;
         }
@@ -3922,7 +4457,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
           // dropNote：新行已带上同一份备注，旧行那段必须一起摘掉，否则文件里会
           // 出现「降级副本 + 新行副本」两份；无备注时该选项无副作用
           const removed = await this.taskParser.deleteTaskByRawLine(editOld.filePath, editOld.rawLine, editOld.lineNumber, { created: createdToken, dropNote: true });
-          if (!removed) new import_obsidian2.Notice(tr("notice.editSavedBut"), 5e3);
+          if (!removed) new import_obsidian.Notice(tr("notice.editSavedBut"), 5e3);
         }
         // 任务出现在日历中即反馈，不再弹成功提示；refresh 失败仍有单独提示
         // refresh 失败不应让用户误以为任务创建失败（任务已写入文件），
@@ -3931,7 +4466,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
           await this.refresh(true);
         } catch (refreshErr) {
           console.error(tr("error.postCreateRefresh"), refreshErr);
-          new import_obsidian2.Notice(tr("notice.createdRefreshFail"), 3e3);
+          new import_obsidian.Notice(tr("notice.createdRefreshFail"), 3e3);
         }
       } else {
         // 抛错让 CreateTaskModal 的 .catch 分支接管：保留弹窗、回滚 submitted/disabled 状态，允许用户重试
@@ -4061,7 +4596,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
   applyViewModeClass() {
     if (!this.rootEl) return;
     this.rootEl.toggleClass("view-agenda", this.isCompactCell());
-    this.rootEl.toggleClass("view-week", this.isWeek());
+    this.rootEl.toggleClass("view-week", this.isWeek());
+
     this.rootEl.toggleClass("view-bigweek", this.isBigWeek());
   }
   /** 周锚点（YYYY-MM-DD，视图内存态）：小周视图显示哪一周由它决定 */
@@ -4162,7 +4698,8 @@ var MonthlyView = class extends import_obsidian2.ItemView {
         const clear = (e) => {
           e.stopPropagation();
           this.setCategoryFilter(new Set());
-          this.renderCalendarGrid();
+          // 审计 L5：同步事件回调里裸调 async 重绘，抛错即成 unhandled rejection
+          this.renderCalendarGridSafe("agenda-clear-filter");
         };
         chip.addEventListener("click", clear);
         chip.addEventListener("keydown", (e) => {
@@ -4250,7 +4787,14 @@ var MonthlyView = class extends import_obsidian2.ItemView {
       if (checkEl.disabled) return;
       checkEl.disabled = true;
       try {
-        await this.toggleTask(task);
+        // 兑现上一行注释承诺的「失败回滚」：toggleTask 现在把成败返回出来，失败时
+        // 把勾选态退回 task.completed 这个真实值。此前只 await 不看结果，DOM 就停在
+        // 用户点出来的那一侧，要等 200ms 后的 refresh 才纠正；refresh 抛错或视图已
+        // 断开（_renderCalendarGridCore 里 await 之后的 isConnected 分支）时，
+        // 勾选框会一直与文件相反（审计 M6）。
+        // Notice 不在这里弹：toggleTask 的失败分支已经弹过 notice.opFail，再弹是双份。
+        const ok = await this.toggleTask(task);
+        if (!ok && checkEl.isConnected) checkEl.checked = task.completed;
       } finally {
         if (checkEl.isConnected) checkEl.disabled = false;
       }
@@ -4260,7 +4804,15 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     // "点击一步，却走了两步"。现在行点击带着 editTask 进面板，「管理」仍是新建态
     itemEl.addEventListener("click", (e) => {
       if (e.target === checkEl) return;
-      this.openCreateTaskModal(dayDate, allTasks, task);
+      // 基准日期一律用**任务锚点**（startDate||dueDate），不用被点的那一天。
+      // 跨天任务被 groupTasksByDate 虚拟挂载到区间内每一天，用 dayDate 建弹窗会让
+      // onOpen 全程锚在被点的那天：什么都不改直接保存 → rowSame 必然失败 →
+      // 走 createTaskForDate(modal.date) 重建 → 🛫 被平移、createdAt 被替换；
+      // 纯改备注也走同一条路径。跨度超过 MULTI_DAY_MOUNT_LIMIT 时点到期日那行
+      // 还会得到 start==due，dateMarker 被丢、任务塌缩成单天（审计 H2）。
+      // 与弹窗内铅笔按钮（switchToTask 一侧）同一口径；无锚点才退回 dayDate。
+      const anchorStr = task.startDate || task.dueDate;
+      this.openCreateTaskModal(anchorStr ? dateFromStr(String(anchorStr)) : dayDate, allTasks, task);
     });
     const textEl = itemEl.createEl("span", { cls: "agenda-text", text: task.content });
     textEl.setAttribute("title", task.content);
@@ -4282,6 +4834,21 @@ var MonthlyView = class extends import_obsidian2.ItemView {
     }
   }
   /** 切回条视图时明细区必须整块摘掉，留着会把网格挤成半屏 */
+  /**
+   * 明细区的失败态（审计 L4）：任务加载失败时，明细区不能继续列上一轮的旧任务，
+   * 也不能退化成「这天没安排」（那是另一种谎报）。与网格共用 .error-hint 样式和
+   * 同一句 view.cell.loadError 文案，两处口径一致。
+   * rootEl / isConnected 双守卫：调用点在渲染失败分支里，此时视图可能已被分离。
+   */
+  renderAgendaError() {
+    if (!this.detailEl || !this.detailEl.isConnected) {
+      if (!this.rootEl || !this.rootEl.isConnected) return;
+      this.detailEl = this.rootEl.createDiv("agenda-detail");
+    }
+    this.detailEl.empty();
+    const errEl = this.detailEl.createDiv("error-hint");
+    errEl.textContent = tr("view.cell.loadError");
+  }
   removeAgendaDetail() {
     if (this.detailEl) {
       this.detailEl.remove();
@@ -4340,7 +4907,7 @@ var MonthlyView = class extends import_obsidian2.ItemView {
  * - modal-buttons：底部按钮组
  * ============================================================
  */
-var DatePickerModal = class extends import_obsidian3.Modal {
+var DatePickerModal = class extends import_obsidian.Modal {
   constructor(app, currentYear, currentMonth, onSubmit) {
     super(app);
     this.year = currentYear;
@@ -4541,7 +5108,7 @@ var DatePickerModal = class extends import_obsidian3.Modal {
       refreshMonthStyles();
     });
     yearInput.addEventListener("change", () => {
-      let val = parseInt(yearInput.value);
+      let val = parseInt(yearInput.value, 10);
       if (isNaN(val)) val = this.currentYear;
       val = Math.max(1900, Math.min(2100, val));
       this.year = val;
@@ -4685,11 +5252,24 @@ var DatePickerModal = class extends import_obsidian3.Modal {
       confirmBtn.style.transform = "none";
       confirmBtn.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
     });
-    confirmBtn.addEventListener("click", () => {
+    confirmBtn.addEventListener("click", async () => {
       // 防止双击导致 onSubmit 触发两次（close 异步前仍可接收点击）
       if (confirmBtn.disabled) return;
       confirmBtn.disabled = true;
-      this.onSubmit(this.year, this.month);
+      // onSubmit（openDatePicker 传入的那个回调）是 async 的，内含
+      // await renderCalendarGrid()。此前这里既不 await 也不 catch：任何 reject 都变成
+      // 未处理的 Promise 拒绝，而 currentYear/currentMonth 已经被改掉、选择器已经被
+      // 关掉 → 留下陈旧或半画的网格，用户零反馈（审计 M10）。改成与 CreateTaskModal
+      // 提交路径同口径：先跑完回调再关弹窗；失败给 Notice 并恢复按钮可点，让用户能
+      // 重试而不是对着坏网格干瞪眼。
+      try {
+        await this.onSubmit(this.year, this.month);
+      } catch (e) {
+        console.error("[monthly-tasks] DatePickerModal onSubmit failed", e);
+        new import_obsidian.Notice(tr("notice.opFail"), 3e3);
+        confirmBtn.disabled = false;
+        return;
+      }
       this.close();
     });
   }
@@ -4755,7 +5335,7 @@ function CF_KICK(anim) {
   return anim;
 }
 
-var CategoryFilterModal = class extends import_obsidian3.Modal {
+var CategoryFilterModal = class extends import_obsidian.Modal {
   constructor(app, view, anchorEl) {
     super(app);
     this.view = view;
@@ -4875,7 +5455,9 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
     };
     mkRow(tr("modal.filter.all"), active.size === 0, null, () => {
       V.setCategoryFilter(/* @__PURE__ */ new Set());
-      V.renderCalendarGrid();
+      // 审计 L5：改走 Safe 版——弹窗行回调是同步的，且 this.close() 紧随其后，
+      // 重绘的 reject 在这里没有任何接收者
+      V.renderCalendarGridSafe("filter-modal-all");
       // 「全部」= 终结性重置，点完即关
       this.close();
     });
@@ -4885,7 +5467,7 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
         if (next.has("")) next.delete("");
         else next.add("");
         V.setCategoryFilter(next);
-        V.renderCalendarGrid();
+        V.renderCalendarGridSafe("filter-modal-untagged");
         this.renderRows();
       }, true);
     }
@@ -4896,7 +5478,7 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
         if (next.has(name)) next.delete(name);
         else next.add(name);
         V.setCategoryFilter(next);
-        V.renderCalendarGrid();
+        V.renderCalendarGridSafe("filter-modal-category");
         this.renderRows();
       });
     }
@@ -4946,17 +5528,26 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
     if (CategoryFilterModal.activeInstances)
       CategoryFilterModal.activeInstances.delete(this);
     const container = this.containerEl;
-    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (container && container.isConnected && !reduce) {
-      // 面板淡出微缩 + 遮罩淡出并行；两者都播完（或最迟 LEAVE_MS 超时兜底）才真正卸载
-      this.playLeave(this.modalEl, container);
-      setTimeout(() => {
-        try { super.close(); } catch (e) {
-        }
-      }, 160);
-    } else {
-      super.close();
+    // 一律走带 try/catch 的 CF_MOTION_OFF()（审计 M12）。此前这里是裸 matchMedia，
+    // 而上面两行已经把自己从 activeInstances 摘掉、closing 置了 true：一旦它抛错，
+    // super.close() 永不执行 → 每次重试都在 closing 上直接返回 → 四处清理又都看不见
+    // 这个实例 → 遮罩永久卡死，除了重载插件无解。ViewMenuModal.close() 用的
+    // 就是安全版助手，这个不一致本身就是破绽。外面再包一层 try/catch 兜住 playLeave
+    // 等意外：动画怎么失败都不要紧，卸载必须发生。
+    try {
+      if (container && container.isConnected && !CF_MOTION_OFF()) {
+        // 面板淡出微缩 + 遮罩淡出并行；两者都播完（或最迟 LEAVE_MS 超时兜底）才真正卸载
+        this.playLeave(this.modalEl, container);
+        setTimeout(() => {
+          try { super.close(); } catch (e) {
+          }
+        }, 160);
+        return;
+      }
+    } catch (e) {
+      console.error("[monthly-tasks] CategoryFilterModal.close leave animation failed", e);
     }
+    super.close();
   }
   onClose() {
     this.contentEl.empty();
@@ -4977,7 +5568,7 @@ var CategoryFilterModal = class extends import_obsidian3.Modal {
  * 这条是 v1.5.x 用真机踩出来的教训，不该在新面板上重犯。
  * 单选语义：点一行即切视图并收起面板，当前视图行打勾 + 左侧细条强调。
  */
-var ViewMenuModal = class extends import_obsidian3.Modal {
+var ViewMenuModal = class extends import_obsidian.Modal {
   constructor(app, view, anchorEl) {
     super(app);
     this.view = view;
@@ -5121,7 +5712,7 @@ var ViewMenuModal = class extends import_obsidian3.Modal {
   }
 };
 
-var CreateTaskModal = class extends import_obsidian3.Modal {
+var CreateTaskModal = class extends import_obsidian.Modal {
   constructor(app, date, onSubmit, plugin, existingTasks = [], editTask = null) {
     super(app);
     this.app = app;
@@ -5138,9 +5729,23 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     this.deleteChain = Promise.resolve();
   }
   onOpen() {
+    // 登记到静态活动实例表——必须是 onOpen 的第一条语句（审计 M11）。
+    // 本方法约 370 行，此前登记写在最后一句，而另外三个弹窗都在第一句登记。
+    // 中间任何一处抛错（getHolidayInfo / setIcon / resolveCategoryColor）都会留下一个
+    // 开着、可交互、但对全部四处清理（closeActivePopup、setViewMode、语言切换、onunload）
+    // 都不可见的弹窗，除了重载插件无法关闭。switchToTask 会重跑 onOpen，activeInstances
+    // 是 Set，重复 add 无副作用。
+    if (!CreateTaskModal.activeInstances) CreateTaskModal.activeInstances = /* @__PURE__ */ new Set();
+    CreateTaskModal.activeInstances.add(this);
     // 继承 Obsidian Modal：移动端系统返回键、ESC、点击遮罩关闭均由框架自动处理
-    // 保存当前焦点元素，便于关闭后恢复焦点（无障碍/键盘导航）
-    this.previouslyFocused = document.activeElement;
+    // 保存当前焦点元素，便于关闭后恢复焦点（无障碍/键盘导航）。
+    // 只在拿到「真实触发元素」时登记（审计 L8）：switchToTask 先 modalEl.empty()
+    // 移除当前聚焦的铅笔按钮、再重跑 onOpen，此刻 activeElement 已退回 document.body；
+    // 若照旧无条件覆盖，onClose 就会把键盘用户丢回文档开头。已登记过则保持不变。
+    if (!this.previouslyFocused) {
+      const ae = document.activeElement;
+      if (ae && ae !== document.body) this.previouslyFocused = ae;
+    }
     const self = this;
     this.modalEl.addClass("create-task-modal");
     // 收掉 Modal 框架自带的空标题/内容占位（移动端会撑出弹窗顶部一大块空白）
@@ -5192,7 +5797,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       titleRow.setAttribute("role", "button");
       titleRow.setAttribute("tabindex", "0");
       const toggleEl = titleRow.createSpan({ cls: "existing-tasks-toggle" });
-      import_obsidian3.setIcon(toggleEl, "chevron-down");
+      import_obsidian.setIcon(toggleEl, "chevron-down");
       const toggleTextEl = toggleEl.createSpan({ text: tr("modal.create.expand") });
       // v1.6.2 真机反馈：默认展开改回「按设置阈值决定」——当天任务数超过设置里的
       // 「每日任务显示数量」时默认收起，把首屏留给表单；没超过就默认展开。
@@ -5246,7 +5851,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
               // 失败时回滚 checkbox 状态与 UI，避免与文件不一致
               if (!ok) {
                 checkboxEl.checked = task.completed;
-                new import_obsidian3.Notice(tr("modal.create.toggleFail"));
+                new import_obsidian.Notice(tr("modal.create.toggleFail"));
                 setTimeout(() => renderTasks(), 200);
                 return;
               }
@@ -5294,7 +5899,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
             e.stopPropagation();
             const anchorStr = task.startDate || task.dueDate;
             if (!anchorStr) {
-              new import_obsidian3.Notice(tr("modal.create.noDateMark"), 3e3);
+              new import_obsidian.Notice(tr("modal.create.noDateMark"), 3e3);
               return;
             }
             // 再点一次自己 = 退回新建态。这个开关顶掉了原来那颗「取消编辑」
@@ -5344,27 +5949,46 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
             this.deleteChain = this.deleteChain.then(async () => {
               const deletedLineNumber = task.lineNumber;
               const deletedFilePath = task.filePath;
-              const ok = await this.plugin.taskParser.deleteTask(task);
-              if (ok) {
+              // 审计 M4：成功时是 { ok:true, delta }，失败仍是 false（`if` 真值语义不变）。
+              // delta 是本次写入的真实净位移，不再由调用方猜 -1。
+              const res = await this.plugin.taskParser.deleteTask(task);
+              if (res) {
                 taskEl.addClass("task-deleting");
                 await new Promise((r) => setTimeout(r, 200));
                 const idx = this.existingTasks.indexOf(task);
                 if (idx > -1) this.existingTasks.splice(idx, 1);
-                // 修复：删除一行后，同文件中行号大于被删行的任务行号需 -1，
-                // 否则后续删除会按失效的 lineNumber 操作。
-                for (const t of this.existingTasks) {
-                  if (t.filePath === deletedFilePath && t.lineNumber > deletedLineNumber) {
-                    t.lineNumber -= 1;
+                // 修复：删除后同文件中行号大于被删行的任务，行号按真实位移补偿，
+                // 否则后续删除/跳转会按失效的 lineNumber 操作（跳转光标偏行、
+                // 下一次删除过不了身份校验而静默失败）。
+                // delta 取值：纯任务行 -1；带备注块（> 降级 + 补空行）净 0；孤儿空行自愈 -2。
+                const delta = typeof res.delta === "number" ? res.delta : -1;
+                if (delta !== 0) {
+                  for (const t of this.existingTasks) {
+                    if (t.filePath === deletedFilePath && t.lineNumber > deletedLineNumber) {
+                      t.lineNumber += delta;
+                    }
                   }
                 }
                 const titleEl2 = titleRow.querySelector(".existing-tasks-title");
                 if (titleEl2) titleEl2.textContent = tr("modal.create.existingCount", { n: this.existingTasks.length });
                 renderTasks();
               } else {
+                // 审计 M5：删除失败不能一声不响。旧实现只把按钮恢复可点，用户看到的
+                // 就是「点了删除、什么都没发生、也没提示」。与勾选失败（toggleFail）
+                // 同一套口径：提示 + 200ms 后重画列表——这条任务没被 splice 掉，重画即还原。
+                // isConnected 守卫：弹窗可能已经关掉，别再往分离的 DOM 里画。
+                new import_obsidian.Notice(tr("modal.create.deleteFail"), 3e3);
                 deleteBtn.disabled = false;
+                if (this.modalEl && this.modalEl.isConnected) {
+                  setTimeout(() => {
+                    if (this.modalEl && this.modalEl.isConnected) renderTasks();
+                  }, 200);
+                }
               }
             }).catch((err) => {
               console.error(tr("error.deleteFail"), err);
+              // 审计 M5：抛错路径同样要给用户可见反馈（此前只 console.error）
+              new import_obsidian.Notice(tr("modal.create.deleteFail"), 3e3);
               deleteBtn.disabled = false;
             });
           });
@@ -5440,11 +6064,14 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     // setTimeOpen 定义在时间区渲染块内，但编辑态同步块也要调它——提到函数级声明
     let setTimeOpen = null;
     // 真机反馈修正：编辑全天任务不再弹出时间区（v1.5.0 的「编辑态恒渲染」过头了）。
-    // 渲染条件 = 默认全天关闭，或被编辑任务本身带 ⏰（后者必须渲染，否则保存会静默
-    // 丢时间）。v1.5.2 起全天任务加时间改走时间区内的「+ 设置时间」，不再要求先关设置
-    // v1.5.2 真机反馈：全天态不再展示置灰时间框（在手机上那就是"跳出的时间选择器"）。
-    // 时间区默认折叠为一行「全天」勾选，点「+ 设置时间」才展开输入框；渲染条件不变：
-    // 默认全天开启且编辑无时间任务时整段不出现（v1.5.1 行为保留）
+    // v1.5.2 起全天态已经改为「折叠」——setTimeOpen() 把时间标签与两个 input 整组
+    // display:none，屏幕上只剩一行「全天」勾选 ＋ 右侧「+ 设置时间」按钮，手机上不会
+    // 再跳出置灰的时间选择器。
+    //   审计 M7（v1.7.6）曾把本条件改成恒渲染 true，好让「+ 设置时间」按钮和全天
+    //   开关在「默认全天」下也出现。2026-10-10 作者裁定回退：新建弹窗长度优先——
+    //   默认全天时整段时间区（含那行折叠的勾选）就不该出现，弹窗太长占地方；编辑态
+    //   只在任务本身带时间时渲染。想建/改定时任务，先到设置里关掉「默认全天」。
+    //   M7 指出的入口缺失属作者认可的取舍，后续审计勿再把这里改成恒渲染。
     const renderTimeSection = !this.plugin.settings.defaultAllDayTask || this.editingTask && this.editingTask.time;
     if (renderTimeSection) {
       // 计算默认时间：系统时间取整到下一小时，结束时间+4小时（结束跨午夜截断到 23:59，
@@ -5499,13 +6126,31 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       });
       setTimeOpen();
     }
+    // M9 用：每轮 onOpen 先清空，避免 switchToTask 复用实例时留着上一条任务的原值
+    this.timePrefillLost = "";
     if (this.editingTask && startTimeEl && endTimeEl) {
       // 批次三：编辑态时间区整体同步——有时间按 ~ 拆回填（extractTime 已归一化
-      // HH:MM）；无时间（isAllDay=true）也要把勾选/禁用/透明度对齐，否则「默认
-      // 非全天」设置下编辑全天任务会出现复选框未勾但提交按全天的观感不一致
+      // HH:MM）；无时间（isAllDay=true）也要把勾选/禁用对齐，否则「默认非全天」
+      // 设置下编辑全天任务会出现复选框未勾但提交按全天的观感不一致
       const tp0 = this.editingTask.time ? String(this.editingTask.time).split("~") : [];
       startTimeEl.value = tp0[0] || startTimeEl.value;
-      endTimeEl.value = tp0[1] || endTimeEl.value;
+      // 单时间点任务没有 tp0[1]：extractTime 接受裸 HH:MM，所以 task.time === "09:00"
+      // 是文件里的合法形态。此前这里写 `|| endTimeEl.value`，于是结束框沿用「按当前
+      // 时刻算出的 defaultStartHour+4」默认值（见上面 renderTimeSection 里算默认时间
+      // 那几行），保存时凭空写出 ⏰ 09:00~13:00 这个用户从没选过的时间段；更糟的是
+      // 在约 05:00 之前编辑时默认结束时间 ≤ 开始时间，提交侧的 e<=s 校验反过来
+      // **拒绝保存**并报「结束时间早于开始时间」——哪怕用户只改了备注（审计 M1）。
+      // 改成清空，让界面显示真实状态；提交侧对「原本就是单时间点」的任务放行只填
+      // 开始时间，原样写回 ⏰ 09:00（见 submitTask 的 origSinglePoint 分支）。
+      endTimeEl.value = tp0[1] || "";
+      // 审计 M9：`<input type=time>` 会做值净化——赋 "25:99" 得到 ""（extractTime 归一化时
+      // 只查数字形状、不查时钟范围，所以手改文件能造出这种值）。原任务带 ⏰ 而两个
+      // 框都空 ⇒ 值被净化掉了，照旧提交会让 ⏰ 标记连同时间一起消失且无任何提示。
+      // 记下原值，提交侧原样写回并弹 Notice（只改备注也不会再丢时间）。
+      // 只有一侧被净化时不进这里：提交侧的半填校验会拦住，同样不是静默。
+      if (this.editingTask.time && !startTimeEl.value && !endTimeEl.value) {
+        this.timePrefillLost = String(this.editingTask.time);
+      }
       startTimeEl.disabled = isAllDay;
       endTimeEl.disabled = isAllDay;
       // v1.5.2：全天态改为折叠（时间框不进布局），透明度两行作废
@@ -5528,17 +6173,54 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     const endDateTrigger = endDateWrapper.createEl("div", {
       cls: "end-date-trigger is-disabled",
       text: tr("modal.create.endNeedToggle"),
-      attr: { "aria-disabled": "true", tabindex: "-1" }
+      // 审计 L7：原先只有 tabindex/aria-disabled，没有 role——读屏软件报「通用 div」，
+      // 而勾上跨天后 tabindex 又变成 0 进了 Tab 序，Enter/Space 按下却毫无反应。
+      // 补 role=button，并在下面配一个 keydown 让它真的能被键盘激活。
+      attr: { role: "button", "aria-disabled": "true", tabindex: "-1" }
     });
     let pickerYear = this.date.getFullYear();
     let pickerMonth = this.date.getMonth();
+    // 审计 L10：内联结束日期选择器的年份上下界。原来 ◀▶ 翻月没有任何钳制，
+    // 连点约 175 次就能翻到 2200 年并写出 `📅 2200-03-05`；而主日历的
+    // navigateMonth 把可翻范围钳在 1900-2100，于是这条任务在界面上
+    // 再也点不到，成了只有手改文件才能删的幽灵。农历数据本身也只覆盖 1900-2100
+    // （solarToLunar 越界直接抛错），越界还会连带农历列空白。口径与 DatePickerModal
+    // 的年份钳制一致。
+    const PICKER_MIN_YEAR = 1900;
+    const PICKER_MAX_YEAR = 2100;
+    /** 把 pickerYear/pickerMonth 整体钳回合法区间：只钳年份会把月份留在越界侧 */
+    function clampPicker() {
+      if (pickerYear < PICKER_MIN_YEAR) { pickerYear = PICKER_MIN_YEAR; pickerMonth = 0; }
+      else if (pickerYear > PICKER_MAX_YEAR) { pickerYear = PICKER_MAX_YEAR; pickerMonth = 11; }
+    }
+    // 初值也过一道：this.date 正常来自日历格子（本就在界内），但编辑一条**此前**
+    // 越界写入的任务时锚点可能带进来，先收敛掉比事后在网格里画出空月份稳妥。
+    clampPicker();
     function formatDisplayDate(y, m, d) {
       return tr("modal.create.displayDate", { y: y, m: m + 1, d: d });
     }
     // 批次三：编辑跨天任务 → 勾上跨天、展开触发器、预填结束日期。
     // 开始日期不单独进表单（本期只做结束日期一侧，3.3⑥）：this.date 已是
     // 打开弹窗时传入的任务锚点，结束日期校验基准 self.date 天然正确
-    if (this.editingTask && this.editingTask.startDate && this.editingTask.dueDate && this.editingTask.startDate !== this.editingTask.dueDate) {
+    //
+    // 审计 L11：手改文件能造出 📅 早于 🛫 的任务。选择器一侧（updateGrid 里 cell
+    // 点击的 endBeforeStart 校验）拒绝挑这种日期，预填这一侧原来却照单全收，于是
+    // 「打开→只改个备注→保存」会把这个非法区间原样写回去，永远修不掉；而非法区间
+    // 在库里是有实害的：跨天展开得到 0 天，任务只在开始日出现一次，界面上看不出
+    // 还挂着个结束日。
+    // 处理成「不按跨天加载」＋一条 Notice 明确告知，不静默丢——用户重新勾上跨天、
+    // 用选择器挑一个不早于开始日的日期即可恢复。dateFromStr 对畸形串会给 Invalid
+    // Date，比较恒为 false，所以这里额外用 isNaN 显式判过再下结论。
+    let editRangeInverted = false;
+    if (this.editingTask && this.editingTask.startDate && this.editingTask.dueDate) {
+      const sDate = dateFromStr(String(this.editingTask.startDate));
+      const dDate = dateFromStr(String(this.editingTask.dueDate));
+      editRangeInverted = !isNaN(sDate.getTime()) && !isNaN(dDate.getTime()) && dDate < sDate;
+    }
+    if (editRangeInverted) {
+      new import_obsidian.Notice(tr("modal.create.endBeforeStart"), 4e3);
+    }
+    if (!editRangeInverted && this.editingTask && this.editingTask.startDate && this.editingTask.dueDate && this.editingTask.startDate !== this.editingTask.dueDate) {
       isMultiDay = true;
       endDate = dateFromStr(this.editingTask.dueDate);
       multiDayCheckbox.checked = true;
@@ -5547,7 +6229,9 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       endDateTrigger.setAttribute("tabindex", "0");
       const eArr = this.editingTask.dueDate.split("-").map(Number);
       endDateTrigger.textContent = formatDisplayDate(eArr[0], eArr[1] - 1, eArr[2]);
-      endDateTrigger.setAttribute("data-value", this.editingTask.dueDate);
+      // 审计 L16：原先这里还写了一个 data-value=YYYY-MM-DD，但全文（含 styles.css）
+      // 没有任何地方读它——提交侧走的是闭包变量 endDate，样式侧也没有 [data-value]
+      // 选择器。属被砍掉的功能残留，删掉以免后来者以为它是权威值源而去读它。
     }
     // 更新日期网格（年月切换时调用，不重建弹出层）
     function updateGrid(popup) {
@@ -5572,14 +6256,13 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
           const newEndDate = new Date(pickerYear, pickerMonth, d);
           // 校验结束日期不早于开始日期（self.date 为开始日期，self 在 open() 开头绑定 this）
           if (newEndDate < new Date(self.date.getFullYear(), self.date.getMonth(), self.date.getDate())) {
-            new import_obsidian3.Notice(tr("modal.create.endBeforeStart"), 3e3);
+            new import_obsidian.Notice(tr("modal.create.endBeforeStart"), 3e3);
             return;
           }
           endDate = newEndDate;
-          const m = String(pickerMonth + 1).padStart(2, "0");
-          const dd = String(d).padStart(2, "0");
           endDateTrigger.textContent = formatDisplayDate(pickerYear, pickerMonth, d);
-          endDateTrigger.setAttribute("data-value", `${pickerYear}-${m}-${dd}`);
+          // 审计 L16：这里原先还会 setAttribute("data-value", `${pickerYear}-${m}-${dd}`)
+          // （连带两个只为它存在的 m/dd 局部变量），全文无人读取，一并删掉。
           popup.remove();
           // 真正移除全局 click 监听器，避免选中日期后监听器残留泄漏
           if (self.datePickerCloseHandler) {
@@ -5595,10 +6278,12 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       if (yearSelect) {
         // ◀▶ 翻月跨年后，年份选项（仅在弹层构建时生成 pickerYear±1）不含新年份，
         // 需重建选项，否则下拉停留在旧年份、与网格显示不一致
-        const years = Array.from(yearSelect.options).map((o) => parseInt(o.value));
+        const years = Array.from(yearSelect.options).map((o) => parseInt(o.value, 10));
         if (!years.includes(pickerYear)) {
           yearSelect.replaceChildren();
-          for (let y = pickerYear - 1; y <= pickerYear + 1; y++) {
+          // 审计 L10：选项也按 1900-2100 截断，免得下拉里出现 1899/2101 这类
+          // 选上去立刻被钳回、看着像"选了没反应"的年份
+          for (let y = Math.max(PICKER_MIN_YEAR, pickerYear - 1); y <= Math.min(PICKER_MAX_YEAR, pickerYear + 1); y++) {
             const opt = document.createElement("option");
             opt.value = String(y);
             opt.text = tr("modal.date.yearSuffix", { y: y });
@@ -5633,7 +6318,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       const yearSelect = navRow.createEl("select", { cls: "picker-select picker-select-year" });
       const monthSelect = navRow.createEl("select", { cls: "picker-select picker-select-month" });
       const nextBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "\u25B6" });
-      for (let y = pickerYear - 1; y <= pickerYear + 1; y++) {
+      for (let y = Math.max(PICKER_MIN_YEAR, pickerYear - 1); y <= Math.min(PICKER_MAX_YEAR, pickerYear + 1); y++) {
         const opt = yearSelect.createEl("option", { value: String(y), text: tr("modal.date.yearSuffix", { y: y }) });
         if (y === pickerYear) opt.selected = true;
       }
@@ -5641,20 +6326,31 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         const opt = monthSelect.createEl("option", { value: String(m), text: tr("modal.date.monthSuffix", { m: m + 1 }) });
         if (m === pickerMonth) opt.selected = true;
       }
+      // 审计 L10：三个入口统一在改完 pickerYear/pickerMonth 之后过一道 clampPicker()。
+      // 年份下拉本来只会给出 pickerYear±1，钳制加在选项生成处就够；◀▶ 才是能一路
+      // 翻出界的那个（每次翻月都重建 ±1 选项，等于没有边界）。
       prevBtn.addEventListener("click", () => {
         pickerMonth--;
         if (pickerMonth < 0) { pickerMonth = 11; pickerYear--; }
+        clampPicker();
         syncSelects(popup);
         updateGrid(popup);
       });
       nextBtn.addEventListener("click", () => {
         pickerMonth++;
         if (pickerMonth > 11) { pickerMonth = 0; pickerYear++; }
+        clampPicker();
         syncSelects(popup);
         updateGrid(popup);
       });
-      yearSelect.addEventListener("change", () => { pickerYear = parseInt(yearSelect.value); updateGrid(popup); });
-      monthSelect.addEventListener("change", () => { pickerMonth = parseInt(monthSelect.value); updateGrid(popup); });
+      yearSelect.addEventListener("change", () => {
+        pickerYear = parseInt(yearSelect.value, 10);
+        clampPicker();
+        // 钳制若真发生了，下拉框显示的还是刚选的越界年份，必须回写一次才与网格一致
+        syncSelects(popup);
+        updateGrid(popup);
+      });
+      monthSelect.addEventListener("change", () => { pickerMonth = parseInt(monthSelect.value, 10); updateGrid(popup); });
       // 星期标题（跟随设置「每周第一天」轮转，与主月历一致）
       const weekRow = popup.createDiv("date-picker-week");
       const fdowHeader = self.plugin.settings.firstDayOfWeek || 0;
@@ -5665,14 +6361,27 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       // 日期网格（首次渲染）
       updateGrid(popup);
       // 点击外部关闭（popup 已挂 document.body，需显式排除 popup 与触发按钮自身）
-      self.datePickerCloseHandler = (e) => {
+      // 审计 L13：原来是 `self.datePickerCloseHandler = (e) => {...}` 再
+      // `setTimeout(() => document.addEventListener("click", self.datePickerCloseHandler), 0)`。
+      // 若弹层在这同一个 tick 内被关掉（onClose 会摘监听并把该字段置 null），定时器
+      // 摘掉的是一个从未装上的监听，随后 addEventListener("click", null) 按规范是
+      // 空操作——不泄漏，但纯粹是靠那次 null 读取侥幸活下来的。改成闭包持有
+      // closeHandler，并在真正装上之前复检两件事：① 它仍是当前生效的那个 handler
+      // （没有被新弹层取代），② 弹层还在文档里。任一不成立就不装。
+      const closeHandler = (e) => {
         if (!popup.contains(e.target) && !endDateTrigger.contains(e.target)) {
-        popup.remove();
-        document.removeEventListener("click", self.datePickerCloseHandler);
-        self.datePickerCloseHandler = null;
+          popup.remove();
+          document.removeEventListener("click", closeHandler);
+          // 只在自己仍是登记值时清字段，否则会抹掉后来那个弹层的 handler
+          if (self.datePickerCloseHandler === closeHandler) self.datePickerCloseHandler = null;
         }
       };
-      setTimeout(() => document.addEventListener("click", self.datePickerCloseHandler), 0);
+      self.datePickerCloseHandler = closeHandler;
+      setTimeout(() => {
+        if (self.datePickerCloseHandler !== closeHandler) return;
+        if (!popup.isConnected) return;
+        document.addEventListener("click", closeHandler);
+      }, 0);
       return popup;
     }
     function renderDatePicker() {
@@ -5694,6 +6403,16 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         return;
       }
       renderDatePicker();
+    });
+    // 审计 L7：role=button 就得能被键盘激活。Enter/Space 直接转成一次 .click()，
+    // 与鼠标走**同一条**逻辑（含置灰态抖勾选框的反馈），避免两处行为漂移。
+    // preventDefault 是必需的：空格默认会滚动弹层，Enter 在某些容器里会触发提交。
+    // 老式 IE/Edge 把空格报成 "Spacebar"，一并收下。
+    endDateTrigger.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " " && e.key !== "Spacebar") return;
+      e.preventDefault();
+      e.stopPropagation();
+      endDateTrigger.click();
     });
     multiDayCheckbox.addEventListener("change", (e) => {
       isMultiDay = e.target.checked;
@@ -5745,9 +6464,8 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       wrapper.addEventListener("click", () => {
         selectedPriority = p.value;
         priorityWrappers.forEach((w) => {
-          var _a;
           w.removeClass("selected");
-          (_a = w.querySelector(".priority-btn")) == null ? void 0 : _a.removeClass("selected");
+          w.querySelector(".priority-btn")?.removeClass("selected");
         });
         wrapper.addClass("selected");
         btn.addClass("selected");
@@ -5838,23 +6556,32 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       // 防重复提交：双击或 Enter 连按时只生效一次
       if (submitTask.submitted) return;
       // 过滤换行符与连续空白：避免用户粘贴多行内容破坏 checklist 单行格式
-      // 同时剥离用户输入中的任务元数据 emoji 标记（📅🛫⏰⏳🔴🟡及紧随的日期/时间），
+      // 同时剥离用户输入中的任务元数据 emoji 标记（📅🛫⏰⏳🔴🟡🟢✅➕ 及紧随的日期/时间），
       // 避免与插件自动拼接的元数据冲突，导致解析时拿到用户输入的错误日期/优先级。
+      // 字符集必须与解析侧 cleanTaskContent 逐字对齐（审计 H3）：解析侧还剥
+      // ✅ 完成日期 / ➕ 创建日期（Tasks 插件格式），提交侧此前漏了这两个。后果最重的
+      // 形态是标题只输入「✅ 2026-01-01」——下面 modal.create.empty 那道校验看的是剥离后的 content，
+      // 而 ✅ 不在剥离集里，content 非空 → 校验放行 → 写成
+      // `- [ ] ✅ 2026-01-01 📅 2026-04-21` → 再解析时 ✅ 与 📅 一起被剥光，
+      // parseTaskLine 因 content 为空返回 null：这一行永久留在库里，却不出现在
+      // 任何格子/列表/筛选中，也无法从界面编辑或删除（孤儿行）。较轻的形态是
+      // 「开会 ✅ 2026-01-01」显示成「开会」，下次编辑预填「开会」，一保存就把完成日期销毁。
+      // 补齐后 content 变空 → 那道校验正常弹「内容不能为空」，用户当场看到反馈。
       const rawContent = inputEl.value.trim().replace(/[\r\n]+/g, " ").replace(/\s+/g, " ");
       const content = rawContent
         // 剥离"emoji + 日期/时间"组合（含范围），字符类含优先级 emoji 以覆盖"🔴 2026-04-21"场景
         // 添加 /u 标志：emoji 为代理对字符，不加 /u 会被当作两个独立的代理项，可能误匹配其他字符
-        .replace(/[📅🛫⏰⏳🔴🟡🟢]\s*\d{4}-\d{2}-\d{2}(?:\s*~\s*\d{4}-\d{2}-\d{2})?/gu, "")
-        .replace(/[📅🛫⏰⏳🔴🟡🟢]\s*\d{1,2}:\d{2}(?:\s*~\s*\d{1,2}:\d{2})?/gu, "")
+        .replace(/[📅🛫⏰⏳🔴🟡🟢✅➕]\s*\d{4}-\d{1,2}-\d{1,2}(?:\s*~\s*\d{4}-\d{1,2}-\d{1,2})?/gu, "")
+        .replace(/[📅🛫⏰⏳🔴🟡🟢✅➕]\s*\d{1,2}:\d{2}(?:\s*~\s*\d{1,2}:\d{2})?/gu, "")
         // 兜底剥离孤立的元数据 emoji（无后续日期/时间的"📅 复盘"），避免与插件自动拼接的元数据冲突
-        .replace(/[📅🛫⏰⏳🔴🟡🟢]/gu, "")
+        .replace(/[📅🛫⏰⏳🔴🟡🟢✅➕]/gu, "")
         .replace(/\s+/g, " ")
         .trim();
       // v1.6.0 手机端反馈版：备注区就在标题下方，编辑态清空标题、只动备注是
       // 合法意图（边改标题边补两句备注）。识别出来沿用原标题提交；其余空内容照旧提示
       const noteOnly = !!this.editingTask && !content && noteText != null && noteText.value !== (this.editingTask.note || "");
       if (!content && !noteOnly) {
-        new import_obsidian3.Notice(tr("modal.create.empty"), 3e3);
+        new import_obsidian.Notice(tr("modal.create.empty"), 3e3);
         inputEl.focus();
         return;
       }
@@ -5865,17 +6592,31 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
           const e = endTimeEl.value;
           // 校验结束时间晚于开始时间（字符串比较适用于 HH:MM 格式）
           if (s && e && e <= s) {
-            new import_obsidian3.Notice(tr("modal.create.endBeforeStartTime"), 3e3);
+            new import_obsidian.Notice(tr("modal.create.endBeforeStartTime"), 3e3);
             return;
           }
-          // 校验只填了开始或结束时间（半填），避免写入 "⏰ ~12:00" / "⏰ 09:00~" 破坏解析与排序
+          // 校验只填了开始或结束时间（半填），避免写入 "⏰ ~12:00" / "⏰ 09:00~" 破坏解析与排序。
+          // 例外（审计 M1）：原任务的时间本就是「单时间点」（⏰ 09:00，extractTime 允许
+          // 裸 HH:MM）——预填时结束框被我们主动清空，此时的 s-only 是原样状态而非半填，
+          // 必须放行并写回裸 HH:MM，否则用户只想改条备注也会被这条校验拦下。
+          const origTimeStr = this.editingTask && this.editingTask.time ? String(this.editingTask.time) : "";
+          const origSinglePoint = /^\d{1,2}:\d{1,2}$/.test(origTimeStr);
           if ((s && !e) || (!s && e)) {
-            new import_obsidian3.Notice(tr("modal.create.fillBoth"), 3e3);
-            return;
-          }
-          // 两者都为空视为不填时间，避免写入 "⏰ ~" 脏数据
-          if (s && e) {
+            if (s && !e && origSinglePoint) {
+              time = s;
+            } else {
+              new import_obsidian.Notice(tr("modal.create.fillBoth"), 3e3);
+              return;
+            }
+          } else if (s && e) {
+            // 两者都填 → 时间段。都为空视为不填时间，避免写入 "⏰ ~" 脏数据
             time = `${s}~${e}`;
+          } else if (this.timePrefillLost) {
+            // 审计 M9：两框皆空但原任务带 ⏰，说明值被 <input type=time> 净化掉了
+            // （extractTime 只查数字形状、不查时钟范围，手改文件能造出 ⏰ 25:99）。
+            // 原样写回并提示，而不是静默把时间标记一起删掉。
+            time = this.timePrefillLost;
+            new import_obsidian.Notice(tr("modal.create.timeInvalidKept", { time: this.timePrefillLost }), 6e3);
           }
         }
         submitTask.submitted = true;
@@ -5883,11 +6624,25 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
         // await onSubmit：确保 createTaskForDate 完成后再关闭弹窗，失败时回滚状态允许重试
         // 记住本次类别（内存态，下次打开弹窗预选）；提交链路把 category 交给视图回调
         this.plugin.lastCategory = selectedCategory;
-        Promise.resolve(this.onSubmit(noteOnly ? this.editingTask.content : content, isAllDay, time, selectedPriority, endDate, selectedCategory, this.editingTask, noteText ? noteText.value : "")).then(() => {
+        // 审计 L15：onSubmit 的**同步**抛错此前会绕过下面的 .catch（.catch 只接得住
+        // Promise 链上的拒绝），而 submitted/disabled 已经置上了 → 确认按钮永久死掉、
+        // 只能重开弹窗。标志仍放在调用之前（这样同步重入也会被 submitted 挡住），
+        // 但用 try/catch 兜住同步异常并就地回滚，与 .catch 分支同一套善后。
+        let submitPromise;
+        try {
+          submitPromise = Promise.resolve(this.onSubmit(noteOnly ? this.editingTask.content : content, isAllDay, time, selectedPriority, endDate, selectedCategory, this.editingTask, noteText ? noteText.value : ""));
+        } catch (err) {
+          console.error(tr("error.createFail"), err);
+          new import_obsidian.Notice(tr("modal.create.fail"), 3e3);
+          submitTask.submitted = false;
+          confirmBtn.disabled = false;
+          return;
+        }
+        submitPromise.then(() => {
           this.close();
         }).catch((err) => {
           console.error(tr("error.createFail"), err);
-          new import_obsidian3.Notice(tr("modal.create.fail"), 3e3);
+          new import_obsidian.Notice(tr("modal.create.fail"), 3e3);
           submitTask.submitted = false;
           confirmBtn.disabled = false;
         });
@@ -5895,7 +6650,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
     };
     // 仅桌面端自动聚焦输入框：移动端聚焦会立即拉起输入法，遮挡弹窗且不易收起；
     // 移动端由用户点击输入框时再唤起键盘
-    if (!import_obsidian3.Platform.isMobile) {
+    if (!import_obsidian.Platform.isMobile) {
       setTimeout(() => {
         inputEl.focus();
       }, 100);
@@ -5909,9 +6664,7 @@ var CreateTaskModal = class extends import_obsidian3.Modal {
       }
       // Escape 关闭由 Modal 基类统一处理，避免双重 close
     });
-    // 注册到静态活动实例表，供插件卸载时统一清理
-    if (!CreateTaskModal.activeInstances) CreateTaskModal.activeInstances = /* @__PURE__ */ new Set();
-    CreateTaskModal.activeInstances.add(this);
+    // activeInstances 的登记已上移到 onOpen 首句（审计 M11），此处不再重复
   }
 
   /**
@@ -6006,7 +6759,8 @@ var DEFAULT_SETTINGS = {
   // v1.6.0 新增、v1.7.0 扩到三值、v1.7.1 扩到四值；老 data.json 缺该键时由
   // Object.assign({}, DEFAULT_SETTINGS, loadedData) 取此默认值，不需额外兜底。
   viewMode: "list",
-  // 界面语言：v1.7.2 起恒为 "auto"（跟随 Obsidian 界面语言），设置页不再提供选项；
+  // 界面语言：v1.7.2 起恒为 "auto"（跟随 Obsidian 界面语言），设置页不再提供选项；
+
   // 枚举值 "zh-CN" | "zh-TW" | "en" 仍被 applyLanguage/setLanguage 内部支持（测试与将来复用）
   language: "auto",
   showCompletedTasks: true,
@@ -6057,7 +6811,7 @@ var DEFAULT_SETTINGS = {
  * - addCommand：注册命令（跳转到今天等）
  * ============================================================
  */
-var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
+var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
   /**
    * 插件加载
    */
@@ -6074,28 +6828,32 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       this.unloaded = false;
       (async () => {
         const currentYear = new Date().getFullYear();
-        const results = await Promise.all([
-          this.holidayManager.updateFromNetwork(currentYear - 1),
-          this.holidayManager.updateFromNetwork(currentYear),
-          this.holidayManager.updateFromNetwork(currentYear + 1)
-        ]);
+        const years = [currentYear - 1, currentYear, currentYear + 1];
+        const results = await Promise.all(years.map((y) => this.holidayManager.updateFromNetwork(y)));
         // 卸载后中止：不再访问 this.settings / this.saveSettings
         if (this.unloaded) return;
         const anySuccess = results.some((r) => r === true);
         if (anySuccess) {
-          // 仅更新本次请求的三年，保留其他年份已有数据，避免 data.json 持续膨胀
+          // 仅更新本次请求的三年，保留其他年份已有数据，避免 data.json 持续膨胀。
+          // 审计 M2：必须逐年判 results[i] === true 才写该年。_requestYear 只在
+          // cache.set(year, apiData) 之后才返回 true，所以「true ⇒ cache 里是本次抓到的网络数据」。
+          // 旧实现无差别遍历三年读 cache：某年网络失败时，cache 里躺着的是
+          // loadBuiltinHolidays() 灌进去的内置 holidays.json 数据，照样被固化进 data.json；
+          // 此后 loadSettings 先用 holidaysData 填 cache、loadBuiltinHolidays() 只在
+          // !cache.has(y) 时补，于是将来版本修正过的内置数据被这条脏数据永久遮蔽。
           const newHolidaysData = { ...this.settings.holidaysData };
-          for (const year of [currentYear - 1, currentYear, currentYear + 1]) {
-            const holidays = this.holidayManager.cache.get(year);
+          for (let i = 0; i < years.length; i++) {
+            if (results[i] !== true) continue;
+            const holidays = this.holidayManager.cache.get(years[i]);
             if (holidays) {
-              newHolidaysData[year] = holidays;
+              newHolidaysData[years[i]] = holidays;
             }
           }
           this.settings.holidaysData = newHolidaysData;
           await this.saveSettings();
         } else {
           // 全部失败时给用户可见的提示，避免默默无闻
-          new import_obsidian3.Notice(tr("notice.holidayAutoFail"), 5e3);
+          new import_obsidian.Notice(tr("notice.holidayAutoFail"), 5e3);
         }
       })();
     }
@@ -6148,7 +6906,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     // 普通笔记里的手写任务在手动刷新/重开视图时仍会被全库扫描收录，不会丢
     this.registerEvent(
       this.app.vault.on("modify", (file) => {
-        if (file instanceof import_obsidian3.TFile && file.extension === "md" && this.isPossibleTaskFile(file)) {
+        if (file instanceof import_obsidian.TFile && file.extension === "md" && this.isPossibleTaskFile(file)) {
           debouncedRefresh();
         }
       })
@@ -6157,9 +6915,9 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     // 文件夹列表缓存——否则新建文件夹后「任务文件夹」下拉要等 TTL 到期才能看到
     this.registerEvent(
       this.app.vault.on("create", (file) => {
-        if (file instanceof import_obsidian3.TFile && file.extension === "md" && this.isPossibleTaskFile(file)) {
+        if (file instanceof import_obsidian.TFile && file.extension === "md" && this.isPossibleTaskFile(file)) {
           debouncedRefresh();
-        } else if (file instanceof import_obsidian3.TFolder && this.settingTab) {
+        } else if (file instanceof import_obsidian.TFolder && this.settingTab) {
           this.settingTab.folderOptionsCache = null;
           this.settingTab.folderOptionsCacheTime = 0;
         }
@@ -6183,7 +6941,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     // 仅在文件位于任务相关路径时才触发刷新，避免全库 md 文件改动都引起防抖重置
     this.registerEvent(
       this.app.metadataCache.on("changed", (file) => {
-        if (!(file instanceof import_obsidian3.TFile) || file.extension !== "md") return;
+        if (!(file instanceof import_obsidian.TFile) || file.extension !== "md") return;
         if (this.isPossibleTaskFile(file)) {
           debouncedRefresh();
         }
@@ -6232,6 +6990,17 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       const dpInstances = Array.from(DatePickerModal.activeInstances);
       DatePickerModal.activeInstances.clear();
       for (const inst of dpInstances) {
+        try {
+          inst.close();
+        } catch (e) {
+        }
+      }
+    }
+    // 视图菜单弹窗与其他三类弹窗一致，卸载时关闭仍打开的实例
+    if (ViewMenuModal.activeInstances && ViewMenuModal.activeInstances.size > 0) {
+      const vmInstances = Array.from(ViewMenuModal.activeInstances);
+      ViewMenuModal.activeInstances.clear();
+      for (const inst of vmInstances) {
         try {
           inst.close();
         } catch (e) {
@@ -6336,7 +7105,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       loadedData = await this.loadData();
     } catch (e) {
       console.error(tr("error.settingsLoad"), e);
-      new import_obsidian3.Notice(tr("notice.settingsLoadFail"), 5e3);
+      new import_obsidian.Notice(tr("notice.settingsLoadFail"), 5e3);
       loadedData = {};
     }
     this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
@@ -6419,8 +7188,8 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     }
     if (this.settings.holidaysData) {
       for (const [year, holidays] of Object.entries(this.settings.holidaysData)) {
-        if (!this.holidayManager.cache.has(parseInt(year))) {
-          this.holidayManager.cache.set(parseInt(year), holidays);
+        if (!this.holidayManager.cache.has(parseInt(year, 10))) {
+          this.holidayManager.cache.set(parseInt(year, 10), holidays);
         }
       }
     }
@@ -6437,7 +7206,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       const raw = await this.app.vault.adapter.read(`${this.manifest.dir}/holidays.json`);
       const data = JSON.parse(raw);
       for (const [year, holidays] of Object.entries(data)) {
-        const y = parseInt(year);
+        const y = parseInt(year, 10);
         if (!Array.isArray(holidays) || !holidays.every((h) => h && typeof h.date === "string" && typeof h.name === "string" && typeof h.isOff === "boolean" && (h.type === "legal" || h.type === "workday"))) {
           console.warn(tr("error.holidaysJsonFormat", { year: year }));
           continue;
@@ -6461,7 +7230,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       await this.saveData(this.settings);
     } catch (e) {
       console.error(tr("error.settingsSave"), e);
-      new import_obsidian3.Notice(tr("notice.settingsSaveFail"), 5e3);
+      new import_obsidian.Notice(tr("notice.settingsSaveFail"), 5e3);
     }
   }
   /**
@@ -6484,7 +7253,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
       await leaf.setViewState({ type: VIEW_TYPE_MONTHLY });
       workspace.revealLeaf(leaf);
     } else {
-      new import_obsidian3.Notice(tr("notice.cantOpenView"), 3e3);
+      new import_obsidian.Notice(tr("notice.cantOpenView"), 3e3);
     }
   }
   /**
@@ -6493,12 +7262,19 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
    */
   _applyStrikeToViews() {
     const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_MONTHLY);
+    let modalDone = false;
     for (const leaf of leaves) {
       const view = leaf.view;
-      if (view && typeof view._applyStrikeClasses === "function") view._applyStrikeClasses();
+      if (view && typeof view._applyStrikeClasses === "function") {
+        // 审计 L14：每个视图只扫自己 rootEl 下那份 DOM，不再互相串；
+        // 弹窗（CreateTaskModal 挂在 document.body 上，不在任何 rootEl 里）那一趟
+        // 是全局的，交给第一个视图做一次即可——类名操作幂等，做 N 次只是白扫 N 遍 body。
+        view._applyStrikeClasses({ modal: !modalDone });
+        modalDone = true;
+      }
     }
-    // 弹窗里的 +N/已有任务列表不在视图 DOM 内：_applyStrikeClasses 用全局
-    // querySelector 扫描已一并覆盖，此处无需额外处理
+    // 一个视图都没开时不需要兜底：弹窗只能从格子里点出来，而视图 onClose 会连带关掉
+    // 本视图挂出的所有弹窗（审计 M3），所以「无视图却有弹窗」这一档不存在。
   }
 
   /**
@@ -6524,7 +7300,16 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
     for (const leaf of leaves) {
       const view = leaf.view;
       if (view instanceof MonthlyView) {
-        await view.refresh(true);
+        // 审计 L6：try/catch 包在**循环体内**，两处收益——
+        // ① 多开月历时（Obsidian 支持同一视图在左右窗格各开一个），第一个 leaf
+        //    刷新失败不会连带跳过其余 leaf，用户看到的是"某一格没更新"而不是"全都没更新"；
+        // ② 本方法有十余处调用方（设置项切换、vault 事件、命令）都**没有 await**，
+        //    抛出去就是 unhandled rejection。在这里收敛掉，等价于给所有调用点兜底。
+        try {
+          await view.refresh(true);
+        } catch (e) {
+          console.error(tr("error.refreshView"), e);
+        }
       }
     }
   }
@@ -6538,7 +7323,7 @@ var MonthlyTasksPlugin = class extends import_obsidian3.Plugin {
  * 任务存储位置、节假日数据刷新等），此处不再罗列键名，避免注释与实现脱节。
  * ============================================================
  */
-var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
+var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
@@ -6560,7 +7345,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     // setLanguage() 仍保留在插件实例上，供测试与将来需要时复用。
     // 默认视图（v1.7.0）：只管「下次打开月历是哪一档」；顶栏菜单切的是当前状态，
     // 不回写这里，避免用户点一下按钮就悄悄改掉了自己的默认设置
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.view.name")).setDesc(tr("settings.view.desc")).addDropdown((dropdown) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.view.name")).setDesc(tr("settings.view.desc")).addDropdown((dropdown) => {
       for (const m of VIEW_MODES) {
         dropdown.addOption(m, viewModeLabel(m));
       }
@@ -6581,40 +7366,40 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
         }
       });
     });
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.showCompleted.name")).setDesc(tr("settings.showCompleted.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedTasks).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.showCompleted.name")).setDesc(tr("settings.showCompleted.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedTasks).onChange(async (value) => {
       this.plugin.settings.showCompletedTasks = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.hideStrike.name")).setDesc(tr("settings.hideStrike.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.hideStrike.name")).setDesc(tr("settings.hideStrike.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
       this.plugin.settings.showCompletedStrike = value;
       await this.plugin.saveSettings();
       this.plugin._applyStrikeToViews();
     }));
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.showLunar.name")).setDesc(tr("settings.showLunar.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showLunar).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.showLunar.name")).setDesc(tr("settings.showLunar.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showLunar).onChange(async (value) => {
       this.plugin.settings.showLunar = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.showHoliday.name")).setDesc(tr("settings.showHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showHoliday).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.showHoliday.name")).setDesc(tr("settings.showHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showHoliday).onChange(async (value) => {
       this.plugin.settings.showHoliday = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
     // 任务与存储设置
     containerEl.createEl("h3", { text: tr("settings.section.storage") });
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.defaultAllDay.name")).setDesc(tr("settings.defaultAllDay.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.defaultAllDayTask).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.defaultAllDay.name")).setDesc(tr("settings.defaultAllDay.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.defaultAllDayTask).onChange(async (value) => {
       this.plugin.settings.defaultAllDayTask = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.firstDow.name")).setDesc(tr("settings.firstDow.desc")).addDropdown((dropdown) => dropdown.addOption("0", tr("modal.create.weekday.sun")).addOption("1", tr("modal.create.weekday.mon")).addOption("6", tr("modal.create.weekday.sat")).setValue(String(this.plugin.settings.firstDayOfWeek)).onChange(async (value) => {
-      this.plugin.settings.firstDayOfWeek = parseInt(value);
+    new import_obsidian.Setting(containerEl).setName(tr("settings.firstDow.name")).setDesc(tr("settings.firstDow.desc")).addDropdown((dropdown) => dropdown.addOption("0", tr("modal.create.weekday.sun")).addOption("1", tr("modal.create.weekday.mon")).addOption("6", tr("modal.create.weekday.sat")).setValue(String(this.plugin.settings.firstDayOfWeek)).onChange(async (value) => {
+      this.plugin.settings.firstDayOfWeek = parseInt(value, 10);
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.tasksLimit.name")).setDesc(tr("settings.tasksLimit.desc")).addDropdown((dropdown) => dropdown.addOption("3", "3").addOption("4", "4").addOption("5", "5").addOption("6", "6").addOption("7", "7").addOption("8", "8").addOption("9", "9").addOption("10", "10").setValue(String(this.plugin.settings.tasksPerDayLimit)).onChange(async (value) => {
-      this.plugin.settings.tasksPerDayLimit = parseInt(value);
+    new import_obsidian.Setting(containerEl).setName(tr("settings.tasksLimit.name")).setDesc(tr("settings.tasksLimit.desc")).addDropdown((dropdown) => dropdown.addOption("3", "3").addOption("4", "4").addOption("5", "5").addOption("6", "6").addOption("7", "7").addOption("8", "8").addOption("9", "9").addOption("10", "10").setValue(String(this.plugin.settings.tasksPerDayLimit)).onChange(async (value) => {
+      this.plugin.settings.tasksPerDayLimit = parseInt(value, 10);
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
@@ -6622,7 +7407,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     // 类别真身是任务行尾的 #tag：这里增删改都不碰任何笔记；删掉某类别只是取消它的排序与配色，
     // 笔记里残留的标签仍会被解析、仍出现在筛选面板（自动补到列表尾部）
     containerEl.createEl("h3", { text: tr("settings.section.category") });
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.catKnown.name")).setDesc(tr("settings.catKnown.desc"));
+    new import_obsidian.Setting(containerEl).setName(tr("settings.catKnown.name")).setDesc(tr("settings.catKnown.desc"));
     const categoryListEl = containerEl.createDiv("mt-category-list");
     const renderCategoryList = () => {
       categoryListEl.empty();
@@ -6686,11 +7471,11 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
         const raw = nameInput.value.trim();
         // 与 Obsidian 标签规则一致：非空、不含空格、非纯数字、不含 #；重名明确拒绝而非静默吞掉
         if (!raw || /\s/.test(raw) || /^\d+$/.test(raw) || raw.includes("#")) {
-          new import_obsidian3.Notice(tr("notice.catInvalid"), 4e3);
+          new import_obsidian.Notice(tr("notice.catInvalid"), 4e3);
           return;
         }
         if (this.plugin.settings.categories.some((c) => c.name === raw)) {
-          new import_obsidian3.Notice(tr("notice.catExists", { name: raw }), 3e3);
+          new import_obsidian.Notice(tr("notice.catExists", { name: raw }), 3e3);
           return;
         }
         const used = this.plugin.settings.categories.map((c) => c.color);
@@ -6708,7 +7493,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     };
     renderCategoryList();
     // 任务归档周期：决定新任务写入哪个文件；切换不影响已有文件
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.section.archive")).setDesc(tr("settings.archive.desc")).addDropdown((dropdown) => dropdown.addOption("year", tr("settings.archive.year")).addOption("month", tr("settings.archive.month")).setValue(this.plugin.settings.taskFilePeriod).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.section.archive")).setDesc(tr("settings.archive.desc")).addDropdown((dropdown) => dropdown.addOption("year", tr("settings.archive.year")).addOption("month", tr("settings.archive.month")).setValue(this.plugin.settings.taskFilePeriod).onChange(async (value) => {
       this.plugin.settings.taskFilePeriod = value === "month" ? "month" : "year";
       await this.plugin.saveSettings();
       // 粒度切换后必须清路径缓存，否则新任务会写回旧粒度的文件
@@ -6718,7 +7503,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     }));
     // 自定义任务文件夹设置
     const folderOptions = this.getFolderOptions();
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.section.folder")).setDesc(tr("settings.folder.desc")).addDropdown((dropdown) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.section.folder")).setDesc(tr("settings.folder.desc")).addDropdown((dropdown) => {
       dropdown.addOption("", tr("settings.folder.default"));
       for (const [path, name] of Object.entries(folderOptions)) {
         dropdown.addOption(path, name);
@@ -6739,30 +7524,31 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
     });
     // 节假日数据设置
     containerEl.createEl("h3", { text: tr("settings.section.holiday") });
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.autoHoliday.name")).setDesc(tr("settings.autoHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.autoUpdateHolidays).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.autoHoliday.name")).setDesc(tr("settings.autoHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.autoUpdateHolidays).onChange(async (value) => {
       this.plugin.settings.autoUpdateHolidays = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian3.Setting(containerEl).setName(tr("settings.refreshHoliday.name")).setDesc(tr("settings.refreshHoliday.desc")).addButton((button) => {
+    new import_obsidian.Setting(containerEl).setName(tr("settings.refreshHoliday.name")).setDesc(tr("settings.refreshHoliday.desc")).addButton((button) => {
       button.setButtonText(tr("settings.refreshBtn"));
       button.buttonEl.addEventListener("click", async () => {
         const currentYear = new Date().getFullYear();
+        const years = [currentYear - 1, currentYear, currentYear + 1];
         button.setDisabled(true);
         button.setButtonText(tr("settings.loading"));
         try {
           // updateFromNetwork 内部 try/catch 吞掉异常返回 false，需检查返回值判断真实成败
-          const results = await Promise.all([
-            this.plugin.holidayManager.updateFromNetwork(currentYear - 1),
-            this.plugin.holidayManager.updateFromNetwork(currentYear),
-            this.plugin.holidayManager.updateFromNetwork(currentYear + 1)
-          ]);
+          const results = await Promise.all(years.map((y) => this.plugin.holidayManager.updateFromNetwork(y)));
           if (results.some((r) => r === true)) {
-            // 至少一年成功才合并保存：仅更新本次请求的三年，保留其他年份已有数据，避免 data.json 持续膨胀
+            // 至少一年成功才合并保存：仅更新本次请求的三年，保留其他年份已有数据，避免 data.json 持续膨胀。
+            // 审计 M2（与 onload 的自动预取同一缺陷、同一修法）：逐年判 results[i] === true 才写该年，
+            // 否则失败年份 cache 里的内置 holidays.json 数据会被固化进 data.json，
+            // 并因 loadSettings「先持久化后内置」的填充顺序永久遮蔽将来修正过的内置数据。
             const newHolidaysData = { ...this.plugin.settings.holidaysData };
-            for (const year of [currentYear - 1, currentYear, currentYear + 1]) {
-              const holidays = this.plugin.holidayManager.cache.get(year);
+            for (let i = 0; i < years.length; i++) {
+              if (results[i] !== true) continue;
+              const holidays = this.plugin.holidayManager.cache.get(years[i]);
               if (holidays) {
-                newHolidaysData[year] = holidays;
+                newHolidaysData[years[i]] = holidays;
               }
             }
             this.plugin.settings.holidaysData = newHolidaysData;
@@ -6770,16 +7556,16 @@ var MonthlyTasksSettingTab = class extends import_obsidian3.PluginSettingTab {
             this.plugin.refreshView();
             const failedCount = results.filter((r) => r !== true).length;
             if (failedCount > 0) {
-              new import_obsidian3.Notice(tr("notice.holidayPartial", { ok: results.length - failedCount, total: results.length }), 3e3);
+              new import_obsidian.Notice(tr("notice.holidayPartial", { ok: results.length - failedCount, total: results.length }), 3e3);
             } else {
-              new import_obsidian3.Notice(tr("notice.holidayRefreshed"), 3e3);
+              new import_obsidian.Notice(tr("notice.holidayRefreshed"), 3e3);
             }
           } else {
-            new import_obsidian3.Notice(tr("notice.holidayRefreshFail"), 5e3);
+            new import_obsidian.Notice(tr("notice.holidayRefreshFail"), 5e3);
           }
         } catch (e) {
           console.warn(tr("error.refreshHoliday"), e);
-          new import_obsidian3.Notice(tr("notice.holidayRefreshFail"), 5e3);
+          new import_obsidian.Notice(tr("notice.holidayRefreshFail"), 5e3);
         } finally {
           button.setDisabled(false);
           button.setButtonText(tr("settings.refreshBtn"));

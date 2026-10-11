@@ -1,0 +1,14 @@
+# Obsidian 运行时用户数据（含本机设置与节假日缓存，不应分发）
+data.json
+
+# Obsidian 工作区
+.obsidian/
+
+# 依赖与构建产物
+node_modules/
+*.zip
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
