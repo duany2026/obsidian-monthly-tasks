@@ -1,0 +1,57 @@
+name: Release
+
+# 推送 v* 标签时自动打包插件并创建 Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 打包插件
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          VER="${TAG#v}"
+          rm -rf dist
+          mkdir -p dist/monthly-tasks
+          cp main.js manifest.json styles.css holidays.json versions.json README.md LICENSE dist/monthly-tasks/
+          cd dist
+          zip -r "monthly-tasks-${VER}.zip" monthly-tasks
+          ls -l
+
+      - name: 从 CHANGELOG 提取发行说明
+        run: |
+          set -euo pipefail
+          VER="${GITHUB_REF_NAME#v}"
+          awk -v ver="$VER" '
+            $0 ~ "^## \\[" ver "\\]" { f=1; next }
+            f && /^## \[/ { exit }
+            f { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            printf '月历任务 %s\n' "$VER" > RELEASE_NOTES.md
+          fi
+          head -20 RELEASE_NOTES.md
+
+      - name: 创建 / 更新 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${GITHUB_REF_NAME}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/monthly-tasks-*.zip --clobber
+          else
+            gh release create "$TAG" dist/monthly-tasks-*.zip \
+              --title "月历任务 ${TAG}" \
+              --notes-file RELEASE_NOTES.md
+          fi
