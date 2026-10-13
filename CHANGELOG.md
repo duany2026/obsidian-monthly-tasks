@@ -13,6 +13,12 @@
 
 ## 仓库运营记录（不属于插件变更，不计入 Release 说明）
 
+### 2026-10-13
+- **1.7.11 上传通道**：本机 `github.com:443` 直连被阻断而 `api.github.com` 可达，改走 GitHub 官方的 SSH-over-443 入口（`ssh.github.com:443`，`~/.ssh/config` 里把 `github.com` 映射过去）；账号上新增一枚名为 `office-pc` 的认证密钥后 `git push` 可用
+- **本地 `master` 与线上 `main` 已分叉**（线上多 4 个 10-11 的仓库整理提交，本地多一个 1de40ea 的 1.7.10 提交）：以**线上 `main` 为基线**把 1.7.11 的工作区做成单个提交叠上去，不用 force push；`versions.json` 与 `.gitignore` 按「线上 ∪ 本地」合并，保住线上独有的 1.3.3—1.3.6、1.7.6—1.7.9 与 `.obsidian/`、`node_modules/`、`desktop.ini`
+- **修掉 release.yml 的令牌回退**：原写法 `secrets.RELEASE_TOKEN || github.token` 里的 `||` 只在 Secret **完全不存在**时才回退，10-11 配的那枚令牌失效后照样被选中，于是打包都成功、最后一步卡在「401 Bad credentials」，Release 发不出来。现在改成「先试个人令牌，失败自动退回内置 `GITHUB_TOKEN`，并在日志里写明是回退」——令牌过期不再让发布链静默断掉，代价只是发布人显示为 `github-actions[bot]`
+- **待办**：仓库 Secret `RELEASE_TOKEN` 仍是那枚失效令牌（想继续让发布人显示本人就需要换一枚）。本会话里在网页端「编辑／删除 Secret」持续报「You can\'t perform that action at this time」，需要在正常浏览器里手动完成；期间新建的 `monthly-tasks-release-ci` 令牌一次性值未接入，属废钥匙，请在 Settings → Personal access tokens 里删掉
+
 ### 2026-10-11
 - **作者署名统一**：`manifest.json`、`LICENSE`、`main.js` 与 `styles.css` 头注释里的作者由 `duany` 统一为 GitHub 账号名 `duany2026`；`manifest.json` 增补 `authorUrl` 字段
 - 修正 `styles.css` 头注释版本号（停留 `1.4.1` → `1.7.10`）

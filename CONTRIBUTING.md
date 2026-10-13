@@ -42,7 +42,8 @@ README 里**不留**「当前版本 vX.Y.Z」：重复一处，就多一处发�
 2. 打标签 `vX.Y.Z` 并推送 —— `.github/workflows/release.yml` 会自动打包并创建/更新 Release。
 3. Release 说明取自 `CHANGELOG.md` 中对应 `## [X.Y.Z]` 小节的正文（**整段抓取**）。因此面向用户的条目写在这里；仓库运营类事项写到文件顶部的「仓库运营记录」一节，不要混进版本条目。
 4. 压缩包命名 `monthly-tasks-X.Y.Z.zip`，标题「月历任务 vX.Y.Z」，每个 Release 只挂这一个附件。
-5. 若希望 Release 页面显示的是你本人而非 `github-actions[bot]`，需在仓库 Secrets 配置 `RELEASE_TOKEN`（工作流会自动优先使用它）。
+5. 若希望 Release 页面显示的是你本人而非 `github-actions[bot]`，需在仓库 Secrets 配置 `RELEASE_TOKEN`（工作流会先试它）。**该令牌会过期**：失效时工作流不再整条卡住，而是自动退回内置 `GITHUB_TOKEN` 完成发布，日志里会写明「个人令牌不可用，已退回内置令牌发布」——看到这句话就该换一枚 `RELEASE_TOKEN`。
+6. 本机若直连 `github.com:443` 被阻断，可走 GitHub 官方的 SSH-over-443 入口：`~/.ssh/config` 里把 `Host github.com` 映射到 `Hostname ssh.github.com`、`Port 443`，再把公钥加进账号即可正常 `git push`。
 
 ## 手机端测试（重要）
 
