@@ -1,14 +1,25 @@
-# Obsidian 运行时用户数据（含本机设置与节假日缓存，不应分发）
+# 插件运行时数据：含作者本机设置与节假日缓存，绝不入库
+# （它一旦被同步进用户库会覆盖其偏好，并被 CI 打进发行包）
 data.json
 
-# Obsidian 工作区
-.obsidian/
+# 一次性工具脚本（从环境变量读 MCP 配置，非插件源码）
+.mcp_*.py
 
-# 依赖与构建产物
-node_modules/
+# 内部审计文档（内部记录，不随插件发布）
+*审计报告*.md
+
+# 本地备份与临时产物
+.workbuddy/
+*.bak
 *.zip
+dist/
 
-# 系统文件
+# 系统与编辑器
 .DS_Store
 Thumbs.db
+*.swp
+
+# 工作区与依赖（线上原有条目，合并保留）
+.obsidian/
+node_modules/
 desktop.ini

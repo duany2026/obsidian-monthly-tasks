@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.7.10
+ * 版本：1.7.11
  * 作者：duany2026
  * 许可证：MIT
  *
@@ -297,18 +297,19 @@ var I18N = {
     "notice.catInvalid": "\u7c7b\u522b\u540d\u4e0d\u5408\u6cd5\uff1a\u4e0d\u80fd\u4e3a\u7a7a\u3001\u4e0d\u80fd\u542b\u7a7a\u683c\u6216 #\u3001\u4e0d\u80fd\u662f\u7eaf\u6570\u5b57",
     "notice.createdRefreshFail": "\u4efb\u52a1\u5df2\u521b\u5efa\uff0c\u5237\u65b0\u5931\u8d25\u8bf7\u624b\u52a8\u5207\u6362\u6708\u4efd",
     "notice.editSavedBut": "\u7f16\u8f91\u5df2\u4fdd\u5b58\uff0c\u4f46\u539f\u4efb\u52a1\u884c\u672a\u80fd\u81ea\u52a8\u5220\u9664\uff0c\u8bf7\u68c0\u67e5\u662f\u5426\u91cd\u590d",
-    "notice.holidayAutoFail": "\u8282\u5047\u65e5\u6570\u636e\u81ea\u52a8\u5237\u65b0\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc\u6216\u5728\u8bbe\u7f6e\u4e2d\u624b\u52a8\u5237\u65b0",
     "notice.holidayPartial": "\u8282\u5047\u65e5\u6570\u636e\u5df2\u5237\u65b0\uff08{ok}/{total} \u5e74\u6210\u529f\uff09",
+    "notice.holidayNoData": "\u8282\u5047\u65e5\u6570\u636e\u5df2\u66f4\u65b0\uff1b{years} \u5b98\u65b9\u5c1a\u672a\u516c\u544a\uff0c\u5df2\u8df3\u8fc7",
     "notice.holidayRefreshFail": "\u5237\u65b0\u8282\u5047\u65e5\u6570\u636e\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc",
     "notice.holidayRefreshed": "\u8282\u5047\u65e5\u6570\u636e\u5df2\u5237\u65b0\uff01",
     "notice.opFail": "\u64cd\u4f5c\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5",
     "notice.oversized": "\u6708\u5386\u4efb\u52a1\uff1a\u8de8\u5929\u4efb\u52a1\u533a\u95f4\u8d85\u8fc7 {limit} \u5929\uff0c\u4ec5\u663e\u793a\u5f00\u59cb\u4e0e\u7ed3\u675f\u65e5\u671f\uff08\u8be6\u60c5\u89c1\u63a7\u5236\u53f0\uff09",
     "notice.settingsLoadFail": "\u8bbe\u7f6e\u52a0\u8f7d\u5931\u8d25\uff0c\u5df2\u56de\u9000\u9ed8\u8ba4\u8bbe\u7f6e",
+    "notice.settingsBackup": "\u8bbe\u7f6e\u8bfb\u53d6\u5931\u8d25\uff0c\u5df2\u56de\u9000\u9ed8\u8ba4\u503c\uff1b\u539f\u6587\u4ef6\u5df2\u53e6\u5b58\u4e3a data.corrupt-\u65f6\u95f4\u6233.json\uff0c\u9700\u8981\u65f6\u53ef\u624b\u52a8\u6062\u590d",
     "notice.settingsSaveFail": "\u8bbe\u7f6e\u4fdd\u5b58\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u78c1\u76d8\u7a7a\u95f4\u4e0e\u6587\u4ef6\u6743\u9650",
     "settings.archive.desc": "\u51b3\u5b9a\u65b0\u4efb\u52a1\u5199\u5165\u54ea\u4e2a\u6587\u4ef6\u3002\u5207\u6362\u540e\u4e0d\u5f71\u54cd\u5df2\u6709\u6587\u4ef6\uff0c\u5386\u53f2\u4efb\u52a1\u4ecd\u4f1a\u5168\u90e8\u663e\u793a\u3002",
     "settings.archive.month": "\u6309\u6708\uff082026\u5e7410\u6708\u4efb\u52a1\u5217\u8868.md\uff09",
     "settings.archive.year": "\u6309\u5e74\uff082026\u5e74\u4efb\u52a1\u5217\u8868.md\uff09",
-    "settings.autoHoliday.desc": "\u542f\u52a8\u65f6\u9884\u53d6\u4eca\u5e74\u524d\u540e\u4e09\u5e74\u7684\u8282\u5047\u65e5\u6570\u636e\uff08\u6570\u636e\u6e90\uff1aholiday-cn \u2192 timor.tech\uff09\uff1b\u6d4f\u89c8\u5176\u4ed6\u5e74\u4efd\u65f6\u4e5f\u4f1a\u6309\u9700\u83b7\u53d6\u7f3a\u5931\u5e74\u4efd\u7684\u6570\u636e",
+    "settings.autoHoliday.desc": "\u542f\u52a8\u65f6\u9884\u53d6\u4eca\u5e74\u524d\u540e\u4e09\u5e74\u7684\u8282\u5047\u65e5\u6570\u636e\uff08\u6570\u636e\u6e90\uff1aholiday-cn \u2192 timor.tech\uff09\uff0c\u4e0d\u5f39\u63d0\u793a\uff1b\u6d4f\u89c8\u5176\u4ed6\u5e74\u4efd\u65f6\u4e5f\u4f1a\u6309\u9700\u83b7\u53d6\u7f3a\u5931\u5e74\u4efd\u7684\u6570\u636e",
     "settings.autoHoliday.name": "\u542f\u52a8\u65f6\u81ea\u52a8\u5237\u65b0\u8282\u5047\u65e5",
     "settings.catAdd": "\u6dfb\u52a0",
     "settings.catColor": "\u989c\u8272 {name}",
@@ -595,18 +596,19 @@ var I18N = {
     "notice.catInvalid": "\u985e\u5225\u540d\u4e0d\u5408\u6cd5\uff1a\u4e0d\u80fd\u70ba\u7a7a\u3001\u4e0d\u80fd\u542b\u7a7a\u683c\u6216 #\u3001\u4e0d\u80fd\u662f\u7d14\u6578\u5b57",
     "notice.createdRefreshFail": "\u4efb\u52d9\u5df2\u5efa\u7acb\uff0c\u91cd\u65b0\u6574\u7406\u5931\u6557\u8acb\u624b\u52d5\u5207\u63db\u6708\u4efd",
     "notice.editSavedBut": "\u7de8\u8f2f\u5df2\u5132\u5b58\uff0c\u4f46\u539f\u4efb\u52d9\u884c\u672a\u80fd\u81ea\u52d5\u522a\u9664\uff0c\u8acb\u6aa2\u67e5\u662f\u5426\u91cd\u8907",
-    "notice.holidayAutoFail": "\u7bc0\u5047\u65e5\u6578\u64da\u81ea\u52d5\u91cd\u65b0\u6574\u7406\u5931\u6557\uff0c\u8acb\u6aa2\u67e5\u7db2\u8def\u6216\u5728\u8a2d\u5b9a\u4e2d\u624b\u52d5\u91cd\u65b0\u6574\u7406",
     "notice.holidayPartial": "\u7bc0\u5047\u65e5\u6578\u64da\u5df2\u91cd\u65b0\u6574\u7406\uff08{ok}/{total} \u5e74\u6210\u529f\uff09",
+    "notice.holidayNoData": "\u7bc0\u5047\u65e5\u8cc7\u6599\u5df2\u66f4\u65b0\uff1b{years} \u5b98\u65b9\u5c1a\u672a\u516c\u544a\uff0c\u5df2\u7565\u904e",
     "notice.holidayRefreshFail": "\u91cd\u65b0\u6574\u7406\u7bc0\u5047\u65e5\u6578\u64da\u5931\u6557\uff0c\u8acb\u6aa2\u67e5\u7db2\u8def",
     "notice.holidayRefreshed": "\u7bc0\u5047\u65e5\u6578\u64da\u5df2\u91cd\u65b0\u6574\u7406\uff01",
     "notice.opFail": "\u64cd\u4f5c\u5931\u6557\uff0c\u8acb\u91cd\u8a66",
     "notice.oversized": "\u6708\u66c6\u4efb\u52d9\uff1a\u8de8\u5929\u4efb\u52d9\u5340\u9593\u8d85\u904e {limit} \u5929\uff0c\u50c5\u986f\u793a\u958b\u59cb\u8207\u7d50\u675f\u65e5\u671f\uff08\u8a73\u60c5\u898b\u4e3b\u63a7\u53f0\uff09",
     "notice.settingsLoadFail": "\u8a2d\u5b9a\u8f09\u5165\u5931\u6557\uff0c\u5df2\u56de\u9000\u9810\u8a2d\u503c",
+    "notice.settingsBackup": "\u8a2d\u5b9a\u8b80\u53d6\u5931\u6557\uff0c\u5df2\u56de\u9000\u9810\u8a2d\u503c\uff1b\u539f\u6a94\u6848\u5df2\u53e6\u5b58\u70ba data.corrupt-\u6642\u9593\u6233.json\uff0c\u9700\u8981\u6642\u53ef\u624b\u52d5\u9084\u539f",
     "notice.settingsSaveFail": "\u8a2d\u5b9a\u5132\u5b58\u5931\u6557\uff0c\u8acb\u6aa2\u67e5\u78c1\u789f\u7a7a\u9593\u8207\u6a94\u6848\u6b0a\u9650",
     "settings.archive.desc": "\u6c7a\u5b9a\u65b0\u4efb\u52d9\u5beb\u5165\u54ea\u500b\u6a94\u6848\u3002\u5207\u63db\u5f8c\u4e0d\u5f71\u97ff\u5df2\u6709\u6a94\u6848\uff0c\u6b77\u53f2\u4efb\u52d9\u4ecd\u6703\u5168\u90e8\u986f\u793a\u3002",
     "settings.archive.month": "\u6309\u6708\uff082026\u5e7410\u6708\u4efb\u52d9\u5217\u8868.md\uff09",
     "settings.archive.year": "\u6309\u5e74\uff082026\u5e74\u4efb\u52d9\u5217\u8868.md\uff09",
-    "settings.autoHoliday.desc": "\u555f\u52d5\u6642\u9810\u53d6\u4eca\u5e74\u524d\u5f8c\u4e09\u5e74\u7684\u7bc0\u5047\u65e5\u6578\u64da\uff08\u6578\u64da\u6e90\uff1aholiday-cn \u2192 timor.tech\uff09\uff1b\u700f\u89bd\u5176\u4ed6\u5e74\u4efd\u6642\u4e5f\u6703\u6309\u9700\u53d6\u5f97\u7f3a\u5931\u5e74\u4efd\u7684\u6578\u64da",
+    "settings.autoHoliday.desc": "\u555f\u52d5\u6642\u9810\u53d6\u4eca\u5e74\u524d\u5f8c\u4e09\u5e74\u7684\u7bc0\u5047\u65e5\u6578\u64da\uff08\u6578\u64da\u6e90\uff1aholiday-cn \u2192 timor.tech\uff09\uff0c\u4e0d\u5f48\u63d0\u793a\uff1b\u700f\u89bd\u5176\u4ed6\u5e74\u4efd\u6642\u4e5f\u6703\u6309\u9700\u53d6\u5f97\u7f3a\u5931\u5e74\u4efd\u7684\u6578\u64da",
     "settings.autoHoliday.name": "\u555f\u52d5\u6642\u81ea\u52d5\u91cd\u65b0\u6574\u7406\u7bc0\u5047\u65e5",
     "settings.catAdd": "\u65b0\u589e",
     "settings.catColor": "\u984f\u8272 {name}",
@@ -893,18 +895,19 @@ var I18N = {
     "notice.catInvalid": "Invalid category name: cannot be empty, cannot contain spaces or #, cannot be pure numbers",
     "notice.createdRefreshFail": "Task created, refresh failed, please switch month manually",
     "notice.editSavedBut": "Edit saved, but original task line could not be auto-deleted, please check for duplicates",
-    "notice.holidayAutoFail": "Holiday data auto-refresh failed, please check network or refresh manually in settings",
     "notice.holidayPartial": "Holiday data refreshed ({ok}/{total} years successful)",
+    "notice.holidayNoData": "Holiday data updated; {years} not yet announced, skipped",
     "notice.holidayRefreshFail": "Refresh holiday data failed, please check network",
     "notice.holidayRefreshed": "Holiday data refreshed!",
     "notice.opFail": "Operation failed, please retry",
     "notice.oversized": "Monthly Tasks: Multi-day range exceeds {limit} days, showing start and end only (see console)",
     "notice.settingsLoadFail": "Settings load failed, reverted to defaults",
+    "notice.settingsBackup": "Settings failed to load and reverted to defaults; the original file was preserved as data.corrupt-<timestamp>.json",
     "notice.settingsSaveFail": "Settings save failed, please check disk space and file permissions",
     "settings.archive.desc": "Determines which file new tasks are written to. Switching doesn't affect existing files, historical tasks will still all display.",
     "settings.archive.month": "By Month (2026\u5e7410\u6708\u4efb\u52a1\u5217\u8868.md)",
     "settings.archive.year": "By Year (2026\u5e74\u4efb\u52a1\u5217\u8868.md)",
-    "settings.autoHoliday.desc": "Prefetch holiday data for three years before and after this year on startup (data source: holiday-cn \u2192 timor.tech); also fetch missing year data on demand when browsing other years",
+    "settings.autoHoliday.desc": "Prefetch holiday data for three years before and after this year on startup (data source: holiday-cn \u2192 timor.tech), runs silently with no popup; also fetch missing year data on demand when browsing other years",
     "settings.autoHoliday.name": "Auto-refresh Holidays on Startup",
     "settings.catAdd": "Add",
     "settings.catColor": "Color {name}",
@@ -1175,7 +1178,12 @@ function cleanTaskContent(rawLine) {
   // 只写「✅ 2026-01-01」时提交侧放行、这里却把内容剥空 → parseTaskLine 返回
   // null → 该行永久留在库里但不出现在任何视图中，也无法从界面编辑或删除。
   // 改任一侧的字符集时，务必同时改另一侧。
-  const content = cleanedLine.replace(/^\s*[-*] \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*[^\s📅🛫🔴🟡✅🟢➕]+(?:\s*~\s*[^\s📅🛫🔴🟡✅🟢➕]+)?/gu, "").replace(/🔴|🟡|🟢/gu, "").replace(/\s+/g, " ").trim();
+  // 1.7.11：⏰ 的剥离已收窄到「时间形状」（HH:MM 或 HH:MM~HH:MM）。原写法把 ⏰ 后面
+  // 紧跟的任意非空白词一律吃掉，于是标题里合法的「⏰ 待定」「⏰ 会后」在每次编辑保存
+  // 后被永久删除（编辑走重建行，预填的是已剥过的 content）。本文件 extractTimeInfo
+  // 的注释早已写明只接受 HH:MM，两处接受域至此对齐。收窄只会让 content 更不容易被剥空，
+  // 与上面「两侧字符集必须逐字对齐（审计 H3）」不冲突——那条防的是孤儿行，本改动方向更安全。
+  const content = cleanedLine.replace(/^\s*[-*] \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*\d{1,2}:\d{2}(?:\s*~\s*\d{1,2}:\d{2})?/gu, "").replace(/🔴|🟡|🟢/gu, "").replace(/\s+/g, " ").trim();
   return { content, category };
 }
 
@@ -1520,6 +1528,9 @@ var TaskParser = class {
       // 解析可能更晚完成；写缓存前校验「自己仍是最后启动的那次」，旧快照不得覆盖新结果
       const mySeq = (this.parseSeq = (this.parseSeq || 0) + 1);
       try {
+        // 1.7.11：每轮扫描复位。旧写法是模块级标志、一次会话只提示一次，之后所有
+        // 「带日期标记但日期非法」的行都只剩 console——用户看不到数据被跳过的规模
+        invalidDateNoticeShown = false;
         const tasks = [];
         const files = this.app.vault.getMarkdownFiles();
         for (const file of files) {
@@ -1672,7 +1683,7 @@ var TaskParser = class {
         console.error(tr("error.fileNotFound", { path: task.filePath }));
         return false;
       }
-      const content = await this.app.vault.read(file);
+      const wrote = await this._mutateFile(file, (content) => {  // v1.7.11：改写见 _mutateFile
       const lines = content.split("\n");
       if (task.lineNumber >= lines.length) {
         console.error(tr("error.lineRange", { line: task.lineNumber }));
@@ -1699,7 +1710,9 @@ var TaskParser = class {
       // 若替换未生效（行内容不匹配），避免静默成功
       if (newLine === line) return false;
       lines[task.lineNumber] = newLine;
-      await this.app.vault.modify(file, lines.join("\n"));
+      return lines.join("\n");
+      });
+      if (!wrote) return false;
       this.invalidateCache();
       return true;
     } catch (error) {
@@ -1731,7 +1744,8 @@ var TaskParser = class {
         console.error(tr("error.fileNotFound", { path: task.filePath }));
         return false;
       }
-      const content = await this.app.vault.read(file);
+      let deltaOut = 0; // 回调内算出的真实位移，写成功后再交出去
+      const wrote = await this._mutateFile(file, (content) => {  // v1.7.11
       const lines = content.split("\n");
       // 审计 M4：记录删除前的总行数，末尾用 lines.length 之差把**真实位移**返回给调用方。
       // 本函数只在 task.lineNumber 及其之后增删行，所以「之后的行数差」恒等于
@@ -1782,10 +1796,12 @@ var TaskParser = class {
           prevLine.trim() === "" && nextLine.trim() === "") {
         lines.splice(selfHealIdx, 1);
       }
-      await this.app.vault.modify(file, lines.join("\n"));
+      deltaOut = lines.length - lineCountBefore; // 审计 M4：-1 / 0 / -2 三形态见 deleteTask 的 JSDoc
+      return lines.join("\n");
+      });
+      if (!wrote) return false;
       this.invalidateCache();
-      // 审计 M4：把真实位移交出去（-1 / 0 / -2 三形态见 deleteTask 的 JSDoc）
-      return { ok: true, delta: lines.length - lineCountBefore };
+      return { ok: true, delta: deltaOut };
     } catch (error) {
       console.error(tr("error.deleteFail"), error);
       return false;
@@ -1821,7 +1837,7 @@ var TaskParser = class {
         console.error(tr("error.fileNotFound2", { path: filePath }));
         return false;
       }
-      const content = await this.app.vault.read(file);
+      const wrote = await this._mutateFile(file, (content) => {  // v1.7.11
       const linesArr = content.split("\n");
       let idx = -1;
       if (preferredLineNumber >= 0 && preferredLineNumber < linesArr.length &&
@@ -1840,6 +1856,27 @@ var TaskParser = class {
             idx = n;
             bestDist = dist;
           }
+        }
+      }
+      if (idx === -1) {
+        // 1.7.11：原文逐字（去尾空白）匹配不到时，再按「任务身份」（正文＋截止日）兜一次。
+        // 用户在编辑器里手改过该行（换缩进、把 - 改成 *、补了空格）或同步盘做过自动格式化
+        // 时，旧写法直接放弃 → 编辑是「先建新行再删旧行」，于是文件里留下两条重复任务，
+        // 月历凭空多一项、勾选只作用其一，且无自动去重。
+        // 铁律：只在**全文件唯一命中**时才动手；身份相同的仍有多行就照原样放弃，绝不猜。
+        const wantDue = extractDueDate(rawLine);
+        const wantContent = cleanTaskContent(want).content;
+        if (wantContent) {
+          let only = -1;
+          let hits = 0;
+          for (let n = 0; n < linesArr.length; n++) {
+            if (!isTaskLine(linesArr[n]) || isNewRow(n)) continue;
+            if (cleanTaskContent(linesArr[n]).content !== wantContent) continue;
+            if (extractDueDate(linesArr[n]) !== wantDue) continue;
+            hits++;
+            only = n;
+          }
+          if (hits === 1) idx = only;
         }
       }
       if (idx === -1) {
@@ -1863,13 +1900,44 @@ var TaskParser = class {
           prevLine.trim() === "" && nextLine.trim() === "") {
         linesArr.splice(idx, 1);
       }
-      await this.app.vault.modify(file, linesArr.join("\n"));
+      return linesArr.join("\n");
+      });
+      if (!wrote) return false;
       this.invalidateCache();
       return true;
     } catch (error) {
       console.error(tr("error.deleteOldFail"), error);
       return false;
     }
+  }
+  /**
+   * 以「落盘瞬间的磁盘内容」为准做一次性改写（2026-10-12，v1.7.11）。
+   * 旧写法是 read → 同步字符串手术 → modify，两端之间隔着 await：这期间外部
+   * （编辑器另一栏、Obsidian Sync、其它插件、脚本）对同一文件的改动，会被
+   * 「我读到的旧全文＋我这一处改动」整体盖掉。writeQueue 只串行化插件自己的写，
+   * 管不住外部——而弹窗里的「跳转」按钮正是把归档文件开进编辑器，这个并发场景
+   * 是插件自己引导出来的。
+   * vault.process 的回调拿到的就是写入前的最新内容，且同文件写互斥，是官方给的
+   * 正解；老版本没有该 API 时退回原 read/modify 路径（不比修复前更糟）。
+   * @param transform - (当前内容) => 新内容字符串；返回非字符串表示放弃本次写
+   * @returns 是否真的写了
+   */
+  async _mutateFile(file, transform) {
+    const vault = this.app.vault;
+    if (typeof vault.process === "function") {
+      let wrote = false;
+      await vault.process(file, (data) => {
+        const out = transform(data);
+        if (typeof out !== "string") return data; // 放弃：原样返回即不产生写入
+        wrote = true;
+        return out;
+      });
+      return wrote;
+    }
+    const out = transform(await vault.read(file));
+    if (typeof out !== "string") return false;
+    await vault.modify(file, out);
+    return true;
   }
   /**
    * v1.6.0 批次三：写回某任务的备注（> 引用块）。排进 writeQueue 与勾选/删除/创建互斥，
@@ -1890,7 +1958,7 @@ var TaskParser = class {
         console.error(tr("error.fileNotFound", { path: task.filePath }));
         return false;
       }
-      const content = await this.app.vault.read(file);
+      const wrote = await this._mutateFile(file, (content) => {  // v1.7.11
       const lines = content.split("\n");
       const idx = findTaskLineIdx(lines, task);
       if (idx === -1) {
@@ -1899,7 +1967,9 @@ var TaskParser = class {
         return false;
       }
       writeNoteAfter(lines, idx, noteText, content.includes("\r\n"));
-      await this.app.vault.modify(file, lines.join("\n"));
+      return lines.join("\n");
+      });
+      if (!wrote) return false;
       this.invalidateCache();
       return true;
     } catch (error) {
@@ -1923,9 +1993,14 @@ var TaskParser = class {
         console.error(tr("error.fileNotFound2", { path: filePath }));
         return false;
       }
-      let fileContent = await this.app.vault.read(file);
-      // 批次三：记录新行落点（0 基行号），供编辑「先建后删」排除刚写入的新行
+      // 批次三：记录新行落点（0 基行号），供编辑「先建后删」排除刚写入的新行。
+      // 必须声明在回调之外：它是回调里赋值、回调后消费的跨作用域值。
+      // v1.7.11 补：taskLine 同理——写完之后还要把它交给 lastCreatedInfo，
+      // 只提 createdIndex 不提 taskLine 会让那一行抛 ReferenceError，被外层 catch
+      // 吞成 return false，表现为「文件已写入、界面却说创建失败」
       let createdIndex = -1;
+      let createdLine = "";
+      const wrote = await this._mutateFile(file, (fileContent) => {  // v1.7.11
       // 归一化入参日期（防外部调用传不补零格式），保证排序比较与月份标题匹配正确
       const normDate = (s) => /^\d{4}-\d{1,2}-\d{1,2}$/.test(s) ? normalizeDateStr(s) : s;
       dueDate = normDate(dueDate);
@@ -1942,7 +2017,7 @@ var TaskParser = class {
       const categoryMarker = category ? ` #${category}` : "";
       // 批次三：编辑=删除+重建，重建必须保留勾选态——已完成任务写 `- [x]`；
       // 新建链路 completed 为 undefined（falsy），行为与旧版逐字节一致
-      let taskLine = `- [${completed ? "x" : " "}] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${categoryMarker}`.trimEnd();
+      let taskLine = createdLine = `- [${completed ? "x" : " "}] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${categoryMarker}`.trimEnd();
       // v1.6.0 批次三：编辑=删除+重建时备注必须跟着新行走（否则改一次日期备注就没了）。
       // 这里只把备注渲染成待写回的原文行数组，具体插入位置由各分支按 CRLF 补 \r。
       const noteBody = noteTextToLines(note);
@@ -2002,7 +2077,11 @@ var TaskParser = class {
           const afterSection = fileContent.slice(sectionIdx);
           // 月份分界用行首 "---" 匹配（兼容 LF/CRLF）：CRLF 换行的文件里 indexOf("\n---\n") 永远失配，
           // section 会一直延伸到文件尾，导致任务被插进后面的月份 section
-          const sepMatch = afterSection.match(/^---[ \t]*\r?$/m);
+          // 1.7.11：分隔线按 Markdown 规则认三种（--- / *** / ___，三个及以上），旧写法只认
+          // 字面 "---"：用户手改成 **** 或删掉分隔线时 sectionEnd 一路取到文件尾，新任务
+          // 被物理插进下个月（甚至最后一个月）的标题之下，归档文件的月分组与任务日期
+          // 长期不一致——月历按日期标记分组所以界面看不出，手翻文件才觉得「数据乱了」
+          const sepMatch = afterSection.match(/^(?:-{3,}|\*{3,}|_{3,})[ \t]*\r?$/m);
           const sectionEnd = sepMatch && sepMatch.index > 1 ? sectionIdx + sepMatch.index - 1 : fileContent.length;
           const sectionContent = fileContent.slice(sectionIdx, sectionEnd);
           const newTime = time && !isAllDay ? time.split("~")[0] : null;
@@ -2071,9 +2150,11 @@ var TaskParser = class {
         createdIndex = (fileContent.match(/\n/g) || []).length + (needEol ? 1 : 0);
         fileContent = fileContent + (needEol ? eol : "") + taskLine + eol;
       }
-      await this.app.vault.modify(file, fileContent);
+      return fileContent;
+      });
+      if (!wrote) return false;
       // 一次性交接给紧随其后的编辑删除步骤（调用方取走后经 options.created 显式传回）
-      this.lastCreatedInfo = createdIndex >= 0 ? { filePath, index: createdIndex, text: taskLine } : null;
+      this.lastCreatedInfo = createdIndex >= 0 ? { filePath, index: createdIndex, text: createdLine } : null;
       this.invalidateCache();
       return true;
     } catch (error) {
@@ -2144,6 +2225,14 @@ var TaskParser = class {
         return filePath;
       } catch (error) {
         console.error(tr("error.folderCreate", { folder: folderPath }), error);
+        // 1.7.11：create 抛错最常见的原因是「文件其实已经存在」（Sync 刚建好、
+        // vault 索引还没跟上）。旧写法把它当致命错误直接放弃 → 用户只看到「创建失败」，
+        // 重试才好。先按目标路径回查一次，存在就直接用它。
+        const existing = this.app.vault.getAbstractFileByPath(filePath);
+        if (existing instanceof import_obsidian.TFile) {
+          this.taskFileCache.set(`${period}|${periodId}`, existing.path);
+          return existing.path;
+        }
         if (folderPath === candidates[candidates.length - 1]) {
           return null;
         }
@@ -2271,12 +2360,27 @@ var TaskParser = class {
         }
       }
     }
-    // 2b. 否则（或未在指定文件夹下找到）回退到第一条同名文件命中
+    // 2b. 否则（或未在指定文件夹下找到）回退到同名文件命中。
+    // 1.7.11：同名文件可能有好几个（模板副本、归档备份、旧目录残留），旧写法取
+    // getMarkdownFiles() 顺序里的第一条——该顺序无保证，任务会被静默写进模板文件，
+    // 用户配置的归集位置被绕过。改为按「像不像正主」择优：默认「任务」文件夹下的命中
+    // 优先，其次路径最浅；落在配置文件夹之外时留一条开发日志便于事后追查。
+    let fallback = null;
+    let fallbackRank = Infinity;
     for (const file of files) {
-      if (file.name === targetFileName) {
-        this.taskFileCache.set(cacheKey, file.path);
-        return file.path;
+      if (file.name !== targetFileName) continue;
+      const rank = (file.path.startsWith("任务/") ? 0 : 1000) + file.path.split("/").length;
+      if (rank < fallbackRank) {
+        fallbackRank = rank;
+        fallback = file;
       }
+    }
+    if (fallback) {
+      if (normalizedCustom && !this.isPathInFolder(fallback.path, normalizedCustom)) {
+        console.warn("[monthly-tasks] 任务文件回退命中位于所配置文件夹之外:", fallback.path);
+      }
+      this.taskFileCache.set(cacheKey, fallback.path);
+      return fallback.path;
     }
 
     return null;
@@ -2954,6 +3058,11 @@ var HolidayManager = class {
     this.FAILURE_TTL = 5 * 60 * 1e3;
     // 进行中的请求：year -> Promise<boolean>（是否实际取回新数据），并发调用复用同一 Promise
     this.fetchingYears = /* @__PURE__ */ new Map();
+    // 1.7.11：正常应答但该年暂无数据的年份（官方尚未公告下一年安排）。与 failureCache
+    // 的「请求失败」分开记，否则刷新提示会把正常状态报成故障
+    this.emptyYears = /* @__PURE__ */ new Set();
+    // 上次成功取到 holiday-cn 的镜像主机（v1.7.11）：下次直接走它，避免每次都并发探测
+    this.cnHost = null;
   }
   /**
    * 确保某年节假日数据可用（无缓存则从数据源获取）。
@@ -3066,14 +3175,32 @@ var HolidayManager = class {
    * 源链的意义：内置数据不再承担逐年维护义务，新年份由社区数据源自动覆盖
    */
   async fetchYearFromSources(year) {
+    // responded：是否有源**正常应答**（哪怕该年数组为空）。用它把「网络/源故障」和
+    // 「官方尚未公告该年安排」分开——后者是正常状态（如 2027 的 days 就是空数组），
+    // 旧写法一律返回 null，刷新提示便把它计入失败并说「部分成功」，用户读到的是「坏了」。
+    let responded = false;
     try {
       const cn = await this._fetchHolidayCN(year);
-      if (cn && cn.length > 0) return cn;
+      responded = true;
+      if (cn && cn.length > 0) {
+        this.emptyYears.delete(year);
+        return cn;
+      }
     } catch (e) {
       console.warn(tr("error.holidayCN", { year: year }), e);
     }
-    const timor = await this.fetchFromAPI(year);
-    if (timor && timor.length > 0) return timor;
+    try {
+      const timor = await this.fetchFromAPI(year);
+      responded = true;
+      if (timor && timor.length > 0) {
+        this.emptyYears.delete(year);
+        return timor;
+      }
+    } catch (e) {
+      console.warn(tr("error.holidayApi", { year: year }), e);
+    }
+    if (responded) this.emptyYears.add(year);
+    else this.emptyYears.delete(year);
     return null;
   }
   /**
@@ -3083,9 +3210,53 @@ var HolidayManager = class {
    * 取 @master 引用：历史年份的社区修正（公告勘误）能同步进来
    */
   async _fetchHolidayCN(year) {
-    const url = `https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/${year}.json`;
-    // 同样走 requestUrl + 8s 超时（见 _fetchJson）
-    const json = await this._fetchJson(url, 8e3, tr("error.holidayTimeout2", { year: year }));
+    // 1.7.11：同一份 holiday-cn 数据有多个镜像主机，而**主域名在部分网络下不可达**。
+    // 2026-10-12 实测：cdn.jsdelivr.net / gcore.jsdelivr.net / raw.githubusercontent.com
+    // 连接直接失败（几百毫秒内返回 000），fastly.jsdelivr.net 同一文件 200。旧写法只试
+    // 一个主机，该域名被阻断时整条源链就只剩已被 Cloudflare 拦掉的 timor.tech，刷新必然
+    // 失败——表现为「时好时坏」，因为可达性随网络路径变化。按顺序试，任一主机成功即返回。
+    const hosts = [
+      "https://cdn.jsdelivr.net/gh/NateScarlet/holiday-cn@master/",
+      "https://fastly.jsdelivr.net/gh/NateScarlet/holiday-cn@master/",
+      "https://gcore.jsdelivr.net/gh/NateScarlet/holiday-cn@master/",
+      "https://raw.githubusercontent.com/NateScarlet/holiday-cn/master/",
+    ];
+    // v1.7.11：不再串行试主机。静默丢包的网络下每个主机会各耗满超时（四个串行最坏
+    // 24 秒/年），用户看到的就是「点刷新要等很久」。改成两步：
+    //   快路径——上次成功的主机单独试一次（多数情况一发命中）；
+    //   兜底——其余主机**并发竞速**，最快返回者胜出，最坏也只等一次超时。
+    const TIMEOUT = 5e3;
+    const label = () => tr("error.holidayTimeout2", { year: year });
+    let json = null;
+    if (this.cnHost) {
+      try {
+        json = await this._fetchJson(this.cnHost + year + ".json", TIMEOUT, label());
+      } catch (e) {
+        this.cnHost = null; // 上次能通现在不通：丢掉快路径，走竞速
+      }
+    }
+    if (json === null) {
+      json = await new Promise((resolve, reject) => {
+        const list = hosts.filter((h) => h !== this.cnHost);
+        let pending = list.length;
+        let settled = false;
+        let lastErr = null;
+        list.forEach((host) => {
+          this._fetchJson(host + year + ".json", TIMEOUT, label()).then((r) => {
+            if (settled) return;
+            settled = true;
+            this.cnHost = host; // 记住这次通的，下次走快路径
+            resolve(r);
+          }).catch((e) => {
+            lastErr = e;
+            if (--pending === 0 && !settled) {
+              settled = true;
+              reject(lastErr || new Error(tr("error.holidayCN", { year: year })));
+            }
+          });
+        });
+      });
+    }
     if (!json || !Array.isArray(json.days)) throw new Error(tr("error.holidayCNFormat"));
     const holidays = [];
     for (const d of json.days) {
@@ -3328,6 +3499,12 @@ var MonthlyView = class extends import_obsidian.ItemView {
     if (this._mtRetrimTimer != null) clearTimeout(this._mtRetrimTimer);
     this._mtRetrimRaf = null;
     this._mtRetrimTimer = null;
+    // 1.7.11：格子平移的惯性/合帧句柄（当前平移者）随视图一并撤掉，
+    // 不留迟到的 rAF 往已分离节点上写 scrollTop
+    if (this._mtPanStop) {
+      this._mtPanStop();
+      this._mtPanStop = null;
+    }
     // 托管弹窗挂在框架层不随 rootEl 回收：视图关闭时一并收起，避免失联
     this.closeActivePopup();
     this.rootEl.empty();
@@ -3501,7 +3678,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       }
       this.lastFirstDayOfWeek = this.plugin.settings.firstDayOfWeek;
     }
-    await this.renderCalendarGrid();
+    await this.renderCalendarGridSafe("render"); // 1.7.11：兜底统一走 safe 包装
   }
   /**
    * 渲染头部导航
@@ -3587,7 +3764,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       this.currentMonth = month;
       this.convergeSelectedDate();
       if (this.isWeekFamily()) this.ensureWeekAnchor();
-      await this.renderCalendarGrid();
+      await this.renderCalendarGridSafe("openDatePicker"); // 1.7.11：兜底统一走 safe 包装
     });
     modal.open();
   }
@@ -3600,7 +3777,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       this.taskParser.invalidateCache();
       await this.render();
     } else {
-      await this.renderCalendarGrid();
+      await this.renderCalendarGridSafe("refresh"); // 1.7.11：兜底统一走 safe 包装
     }
   }
   /**
@@ -3754,7 +3931,12 @@ var MonthlyView = class extends import_obsidian.ItemView {
    * @param {string} reason 只进日志，用于区分是哪条链路触发的重绘
    */
   renderCalendarGridSafe(reason) {
-    this.renderCalendarGrid().catch((err) => {
+    // 1.7.11：把这条 Promise 返回出去。旧实现不返回，异步调用点没法 await 它，
+    // 于是 7 处 `await this.renderCalendarGrid()` 仍走裸调用——一旦内部抛错，
+    // 调用它的事件监听又是无人接收的 async 回调，结果就是 unhandled rejection
+    // ＋头部已重建、网格停在半画状态。返回后 await 它既保住「画完再继续」的时序，
+    // 又拿到同一份兜底日志。
+    return this.renderCalendarGrid().catch((err) => {
       console.error(tr("error.renderGrid"), reason || "", err);
     });
   }
@@ -3938,6 +4120,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
       const filtering = this.activeCategories && this.activeCategories.size > 0;
       if (tasks.length > 0) {
         const markEl = cellEl.createDiv("day-mark");
+        // 1.7.11：generic 元素上的 aria-label 多数读屏软件直接忽略；小月视图里
+        // 「逾期/有任务」是唯一的提示，没有角色就等于对读屏用户不存在
+        markEl.setAttribute("role", "img");
         // 红点判定必须带「本格日期 == 任务截止日」这一半：跨天任务在它占用的每一天
         // 都出现在 tasks 里（groupTasksByDate 按闭区间逐日挂载），只判 isOverdue(dueDate)
         // 会让一个逾期跨天任务在它占的每一天都变红，连排一片。
@@ -4040,6 +4225,19 @@ var MonthlyView = class extends import_obsidian.ItemView {
     }
   }
   /**
+   * 取/建本格末尾的「+N」节点（2026-10-11，v1.7.11）：原先是量测循环里的闭包
+   * ensureChip，拆成读/写两趟后闭包里的 chip 已跨趟，故提成方法按元素取。
+   * 点击行为与渲染期建的「+N」一致：开该日任务弹窗，不冒泡触发建任务。
+   */
+  _mtEnsureMoreChip(tasksEl) {
+    const chip = tasksEl.createDiv("more-tasks");
+    chip.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.openCreateTaskModal(tasksEl.mtDayDate, tasksEl.mtTaskList || []);
+    });
+    return chip;
+  }
+  /**
    * 手机端格子量测（2026-10-10，v1.7.9k；前身是「等高截断」）：只量不裁。
    * 用户实测后选定的口径是「装不下的靠滑动看，不要按高度藏进 +N」，所以本方法不再
    * 隐藏任何条目：超出可视区的任务留在 .day-tasks 里，由 _mtEnableMobilePan 手动平移
@@ -4064,15 +4262,25 @@ var MonthlyView = class extends import_obsidian.ItemView {
           c.classList.remove("mt-pan-hint");
           c.classList.remove("mt-pan-scrolled");
         }
+        // 1.7.11：宽屏也不留「当前平移者」，窄→宽切换后旧惯性不该继续跑
+        if (this._mtPanStop) {
+          this._mtPanStop();
+          this._mtPanStop = null;
+        }
         return;
       }
       // 网格长高（松布局→等分恢复）时 rootEl 不动，先把 gridEl 纳入观察再量
       this._mtWatchGridSize();
+      // 1.7.11：两趟走——第一趟只读几何、第二趟集中写类名与文本。旧写法每格「读→写→读」
+      // 交替，42 格一轮就是几十次强制同步重排，而本方法还被未节流的 ResizeObserver 驱动
+      // （分栏拖拽期间每帧一轮），在老 WebView 上足以拖慢手势。
+      const reads = [];
       for (const tasksEl of Array.from(this.gridEl.querySelectorAll(".day-tasks"))) {
         const items = [];
         let chip = null;
         for (const child of Array.from(tasksEl.children)) {
           if (child.classList.contains("task-item")) {
+            // 上一版按高度截断的遗留兜底：那时会 display:none，现在不再隐藏任何东西
             if (child.style.display === "none") child.style.display = "";
             items.push(child);
           } else if (child.classList.contains("more-tasks")) {
@@ -4080,47 +4288,33 @@ var MonthlyView = class extends import_obsidian.ItemView {
           }
         }
         if (items.length === 0) continue;
-        const total = parseInt(tasksEl.dataset.mtTotal || "", 10) || items.length;
         const box = tasksEl.getBoundingClientRect();
-        if (box.height <= 0) continue; // 视图隐藏/尚未布局（与诊断条同款守卫）
-        // 1.7.9g：可用高度 = ceil(盒高) + 1。真机两态读数（v1.7.9d）显示
-        // 同一格的盒高在 77.4 与 81 之间跳（框架底部工具栏折叠使视口微动 17px，六行分摊
-        // 每行约 2.8px），而末条底部真值恰落在两者之间（读数 i 尾 78，即 77.5~78.4）——
-        // 旧判据 box.height + 1 拿「向下取整的盒高」去比「未取整的条目底」，边界格因此随
-        // 视口状态在 2/3 之间翻脸。ceil 把盒高还原到真实上界，1px 吸收条目侧亚像素舍入；
-        // 极端情况下最后一行底部让出不足 1px 的 padding，肉眼不可见，换来两态判定一致。
-        const allow = Math.ceil(box.height) + 1;
-        const ensureChip = () => {
-          if (!chip) {
-            chip = tasksEl.createDiv("more-tasks");
-            chip.addEventListener("click", (e) => {
-              e.stopPropagation();
-              this.openCreateTaskModal(tasksEl.mtDayDate, tasksEl.mtTaskList || []);
-            });
-          }
+        if (box.height <= 0) continue; // 视图隐藏/尚未布局
+        const total = parseInt(tasksEl.dataset.mtTotal || "", 10) || items.length;
+        // 1.7.11：「还有内容在可视区外」改用与滚动位置无关的量。旧判据是
+        // 「末条视口底 − 盒顶 > allow」，随滚动变化：用户滑到中途时若赶上复量轮
+        // （1.2 秒定时器或观察器），提示类被单向摘掉，滑回顶部也不回来——
+        // mt-pan-scrolled 只压制「已滚动」那一半，两个类一旦错位提示就永久消失。
+        // scrollHeight − clientHeight 不受滚动影响，且天然把「+N」自身算进内容高度，
+        // 顺带堵死「+N 被挤出可视区却判为不溢出、既不提示也永远点不到」的死角。
+        const clipped = tasksEl.scrollHeight - tasksEl.clientHeight > 1;
+        reads.push({ tasksEl, chip, remainingByLimit: total - items.length, clipped });
+      }
+      // 1.7.11：媒体查询按**宽度**下 overflow:hidden，而平移手势要求设备有触摸能力。
+      // 桌面窄侧栏/分栏（<480px 且无触摸屏）里两者不重合：格子既没有滚动条也没有手势，
+      // 被裁的任务根本够不着，此时再压一条「这里还能滑」的渐隐就是撒谎。
+      const pannable = "ontouchstart" in window;
+      for (const r of reads) {
+        // 提示类挂在滚动容器自身（.day-tasks）：mask-image 只该压淡任务区底部，
+        // 压在 .day-cell 上会连整格投影、调休斜纹和最需要看清的末行文字一起遮掉
+        r.tasksEl.classList.toggle("mt-pan-hint", r.clipped && pannable);
+        if (r.remainingByLimit > 0) {
+          const chip = r.chip || this._mtEnsureMoreChip(r.tasksEl);
           if (chip.style.display === "none") chip.style.display = "";
-          return chip;
-        };
-        // 「+N」只为**条数余量**存在（设置里「每格最多 N 条」截掉的那些），并且**留在
-        // 列表末尾原位**。v1.7.9i 曾把它绝对定位「拉回可视区」，真机表现是位置乱飘
-        // （用户 2026-10-10：超过设置条数后 +1 位置十分奇怪）——.day-tasks 不是定位
-        // 包含块（有 position:relative 的是外层 .day-cell），绝对定位的 top 因此按日格
-        // 左上角算、压到日期号上。截断取消后既无需预留高度、也无需挪位置：它在文档流
-        // 里就是列表末尾，滑到底自然看得见。
-        const remainingByLimit = total - items.length;
-        if (remainingByLimit > 0) ensureChip();
-        // 1.7.9h：还有内容被 overflow 裁掉＝末条底部超出可用高度
-        const clipped = items[items.length - 1].getBoundingClientRect().bottom - box.top > allow;
-        // 1.7.9h：真溢出时给格子底部加一条渐隐，替代滚动条作「这里能滑」
-        // 的提示（挂在 .day-cell 上：overflow:hidden 的 .day-tasks 里放 ::after 会随内容
-        // 一起被裁掉，永远看不见）
-        const cellBox = tasksEl.parentElement;
-        if (cellBox) cellBox.classList.toggle("mt-pan-hint", clipped);
-        if (remainingByLimit > 0) {
-          ensureChip().textContent = `+${remainingByLimit}`;
-        } else if (chip) {
+          chip.textContent = `+${r.remainingByLimit}`;
+        } else if (r.chip) {
           // 条数余量为 0：渲染期不会建「+N」，能走到这里的只会是本方法上一轮建的，藏掉
-          chip.style.display = "none";
+          r.chip.style.display = "none";
         }
       }
     } catch (err) {
@@ -4146,69 +4340,88 @@ var MonthlyView = class extends import_obsidian.ItemView {
    */
   _mtEnableMobilePan(el) {
     if (!("ontouchstart" in window) || !window.matchMedia) return;
-    if (!window.matchMedia("(max-width: 480px)").matches) return;
     if (el._mtPan) return; // 幂等：DOM 随重绘重建，正常不会重复挂，防万一
-    el._mtPan = true;
-    const cell = el.parentElement;
-    const m = { sy: 0, sx: 0, top0: 0, max: 0, panning: false, want: 0 };
+    // 1.7.11：挂载处不再判 480px。监听只在渲染时挂一次，而手机横竖屏旋转、分栏拖拽
+    // 都会跨 480px 边界（全仓没有 onResize，跨过去不会有第二次挂载机会）：宽→窄时
+    // .day-tasks 的 overflow:hidden 已生效、原生滚动条被结构消除，却没有平移监听，
+    // 被裁任务彻底不可达；窄→宽时旧监听又与原生内滚互抢。改为常驻挂载，
+    // 媒体条件挪进 touchstart 逐次判定，来回穿越都正确。
+    const view = this;
+    const m = { sy: 0, sx: 0, top0: 0, max: 0, want: 0, armed: false, panning: false };
     let raf = null;
     let momentum = null;
+    let expireTimer = null;
     let lastY = 0;
     let lastT = 0;
-    let v = 0; // px/ms，正=手指向下（往回滚）
+    let v = 0; // px/ms，正=手指上滑（内容往下滚）
     const hint = () => {
-      if (cell) cell.classList.toggle("mt-pan-scrolled", el.scrollTop > 0);
+      // 渐隐提示的两个类都挂在滚动容器自身（.day-tasks）上，见 styles.css 手机块
+      el.classList.toggle("mt-pan-scrolled", el.scrollTop > 0);
     };
-    const stopRaf = () => {
+    const stopAll = () => {
       if (raf != null) { cancelAnimationFrame(raf); raf = null; }
-    };
-    const stopMomentum = () => {
       if (momentum != null) { cancelAnimationFrame(momentum); momentum = null; }
+      if (expireTimer != null) { clearTimeout(expireTimer); expireTimer = null; }
+      m.armed = false;
+      m.panning = false;
     };
-    const apply = () => {
-      raf = null;
-      if (m.want < 0 || m.want > m.max) return; // 边界处不硬拖：交还给外层
-      el.scrollTop = m.want;
+    const commit = () => {
+      // 落账已排队但未写出的位移。旧实现在 touchend 里直接撤掉 rAF，末段位移被丢弃，
+      // 抬手瞬间内容回跳约一帧
+      if (raf != null) { cancelAnimationFrame(raf); raf = null; }
+      if (!m.armed) return;
+      const target = Math.max(0, Math.min(m.max, m.want));
+      if (el.scrollTop !== target) el.scrollTop = target;
       hint();
     };
     el.addEventListener("touchstart", (e) => {
-      if (e.touches.length !== 1) return;
-      stopMomentum();
-      stopRaf();
+      if (e.touches.length !== 1) { stopAll(); return; } // 第二指落下：整段作废，不留半截状态
+      if (!window.matchMedia("(max-width: 480px)").matches) return; // 宽屏交还给原生内滚
+      stopAll();
+      // 惯性/合帧句柄是闭包私有的：在 A 格甩出惯性后立刻按 B 格，只停得下 B 的，
+      // A 会在用户看不见的地方继续滑。用视图上的「当前平移者」互相顶掉。
+      if (view._mtPanStop && view._mtPanStop !== stopAll) view._mtPanStop();
+      view._mtPanStop = stopAll;
       m.max = el.scrollHeight - el.clientHeight;
-      if (m.max <= 1) return; // 没有溢出就别抢手势
-      el._mtPanMoved = false; // 起手先清：上一轮若没派发 click，别让它吞掉这一次正常点击
+      if (m.max <= 1) return; // 本格无溢出：不接管，armed 保持 false（见 touchmove 守卫）
       const t = e.touches[0];
+      m.armed = true;
       m.sy = t.clientY;
       m.sx = t.clientX;
       m.top0 = el.scrollTop;
-      m.panning = false;
+      m.want = m.top0;
       v = 0;
       lastY = t.clientY;
       lastT = t.timeStamp || Date.now();
+      el._mtPanMoved = false; // 起手先清：上一轮若没派发 click，别让它吞掉这一次正常点击
       hint();
     }, { passive: true });
     el.addEventListener("touchmove", (e) => {
+      // 关键守卫：未接管的序列绝不 preventDefault。旧代码缺这一条，而 touchstart 的
+      // 「无溢出早退」发生在 m.sy 赋值之前，于是 m.sy 还是初值 0，dy = 0 - clientY
+      // ≈ -500 必然越过阈值 → 空格子也把容器滚动掐死（矮视口/大周视图下方内容不可达）
+      if (!m.armed) return;
       const t = e.touches[0];
       const dy = m.sy - t.clientY;
       const dx = m.sx - t.clientX;
       if (!m.panning) {
         if (Math.abs(dy) < 4) return;
-        if (Math.abs(dx) > Math.abs(dy)) return; // 横向手势放行
+        if (Math.abs(dx) > Math.abs(dy)) { m.armed = false; return; } // 横向：本序列彻底交还
         m.panning = true;
       }
       const now = t.timeStamp || Date.now();
       const dt = now - lastT;
-      if (dt > 0) v = (lastY - t.clientY) / dt; // 与 scrollTop 同向：手指上滑为正
+      if (dt > 0) v = (lastY - t.clientY) / dt;
       lastY = t.clientY;
       lastT = now;
       m.want = m.top0 + dy;
       if (Math.abs(dy) > 6) el._mtPanMoved = true; // 交给 capture click 监听判定误触
-      if (raf == null) raf = requestAnimationFrame(apply); // 合帧写入
-      e.preventDefault(); // 必须在同步路径：阻止纵向整页滚动
+      if (raf == null) raf = requestAnimationFrame(commit); // 合帧写入：一帧最多一次
+      e.preventDefault(); // 必须在同步路径：事件到 rAF 回调时已不可取消
     }, { passive: false });
     const end = () => {
-      stopRaf();
+      if (!m.armed) return;
+      commit();
       if (m.panning && Math.abs(v) > 0.05) {
         let prev = Date.now();
         const step = () => {
@@ -4230,8 +4443,15 @@ var MonthlyView = class extends import_obsidian.ItemView {
         momentum = requestAnimationFrame(step);
       }
       m.panning = false;
-      // click 在 touchend 之后派发：留 100ms 让捕获监听判定，随后自动过期
-      if (el._mtPanMoved) setTimeout(() => { el._mtPanMoved = false; }, 100);
+      m.armed = false;
+      if (view._mtPanStop === stopAll) view._mtPanStop = null;
+      // click 在 touchend 之后派发。这台老 WebView 上该间隔可以超过 100ms（长按后抬手、
+      // 双击缩放判定窗口），旧值 100ms 会先过期、导致滑完格子仍误开新建弹窗；放宽到
+      // 300ms，并在下一次起手/停止时清掉，不留悬空定时器
+      if (el._mtPanMoved) {
+        if (expireTimer != null) clearTimeout(expireTimer);
+        expireTimer = setTimeout(() => { el._mtPanMoved = false; expireTimer = null; }, 300);
+      }
     };
     el.addEventListener("touchend", end, { passive: true });
     el.addEventListener("touchcancel", end, { passive: true });
@@ -4502,7 +4722,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 周视图：月都换了，锚点没有留在旧周的道理（convergeSelectedDate 已把选中日
     // 拉进新月，这里据它重算锚点，标题与网格自然对齐）
     if (this.isWeekFamily()) this.ensureWeekAnchor();
-    await this.renderCalendarGrid();
+    await this.renderCalendarGridSafe("navigateMonth"); // 1.7.11：兜底统一走 safe 包装
   }
   /**
    * 回到今天
@@ -4514,7 +4734,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.convergeSelectedDate();
     // 「回到本周」：周视图下锚点强制回到含今天那一周（ensureWeekAnchor 走 selectedDate=今天）
     if (this.isWeekFamily()) this.weekStart = weekStartFrom(new Date(), this.plugin.settings.firstDayOfWeek);
-    await this.renderCalendarGrid();
+    await this.renderCalendarGridSafe("goToToday"); // 1.7.11：兜底统一走 safe 包装
   }
   /**
    * 视图模式（v1.6.0 批次一）
@@ -4579,7 +4799,11 @@ var MonthlyView = class extends import_obsidian.ItemView {
   /** 视图模式的唯一写入口：菜单与命令都走这里，避免两处各自 saveSettings */
   async setViewMode(mode) {
     if (!VIEW_MODES.includes(mode)) mode = "list";
-    if (this.plugin.settings.viewMode === mode) return;
+    // 1.7.11：早退判据从「全局设置」改成「本视图已应用的模式」。分屏开两个月历时，
+    // 设置页遍历 leaves 逐个调本方法：第一个 leaf 已把 settings.viewMode 写成目标值，
+    // 第二个 leaf 一看「已经等于目标值」就直接返回，既不 rebuildHeader 也不重绘，
+    // 那块面板永远停在旧视图——而这里的注释宣称它是视图模式的唯一写入口。
+    if (this.appliedViewMode === mode && this.plugin.settings.viewMode === mode) return;
     this.plugin.settings.viewMode = mode;
     await this.plugin.saveSettings();
     // 进紧凑格子类视图时若从未选中过日子，先把选中日收敛到当前月内（否则明细区空白）
@@ -4590,11 +4814,15 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.rebuildHeader();
     this.applyViewModeClass();
     this.applyViewToggleIcon();
-    await this.renderCalendarGrid();
+    await this.renderCalendarGridSafe("setViewMode"); // 1.7.11：兜底统一走 safe 包装
   }
   /** root class 的唯一写入口：header 重建、语言切换重绘后都要靠它恢复视图形态 */
   applyViewModeClass() {
     if (!this.rootEl) return;
+    // 1.7.11：顺手记下「本视图当前真正应用的模式」。本方法是 root class 的唯一写入口，
+    // 所有路径（onOpen 重建、语言切换、setViewMode）都经过这里，故 setViewMode 的早退
+    // 判据可以放心用它，不必担心与 DOM 实际状态脱节
+    this.appliedViewMode = this.plugin.settings.viewMode;
     this.rootEl.toggleClass("view-agenda", this.isCompactCell());
     this.rootEl.toggleClass("view-week", this.isWeek());
 
@@ -4626,7 +4854,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.weekStart = weekStartFrom(next, this.plugin.settings.firstDayOfWeek);
     this.currentYear = next.getFullYear();
     this.currentMonth = next.getMonth();
-    await this.renderCalendarGrid();
+    await this.renderCalendarGridSafe("navigateWeek"); // 1.7.11：兜底统一走 safe 包装
   }
   /**
    * 选中日（日程视图专用）。入参是 YYYY-MM-DD 字符串而不是 Date：格子渲染时
@@ -6852,8 +7080,9 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
           this.settings.holidaysData = newHolidaysData;
           await this.saveSettings();
         } else {
-          // 全部失败时给用户可见的提示，避免默默无闻
-          new import_obsidian.Notice(tr("notice.holidayAutoFail"), 5e3);
+          // 2026-10-13：自动刷新（启动预取）全链路静默——失败只留控制台日志，不再弹提示。
+          // 需要反馈的场景走设置页「刷新节假日数据」按钮：那是用户主动点的，才该有提示
+          console.warn("monthly-tasks: holiday auto-refresh failed (silent by design)", years.join(","));
         }
       })();
     }
@@ -7107,6 +7336,11 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       console.error(tr("error.settingsLoad"), e);
       new import_obsidian.Notice(tr("notice.settingsLoadFail"), 5e3);
       loadedData = {};
+      // 1.7.11：读失败 ≠ 没有数据。旧写法把 {} 当成真实状态继续跑，之后任何一次
+      // saveSettings（哪怕只是点一下顶栏切视图）都会把默认值整份写回盘，
+      // customTaskFolder／categories／holidaysData 静默丢失且无从恢复。
+      // 立标志，让下一次保存先把原文件另存一份（见 _preserveUnreadableDataFile）
+      this.settingsLoadFailed = true;
     }
     this.settings = Object.assign({}, DEFAULT_SETTINGS, loadedData);
     // 校验设置字段：用户手动编辑 data.json 可能写入越界值/错误类型，导致渲染异常
@@ -7120,9 +7354,18 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     // 内部/测试要临时指定语言，走 setLanguage()（它在 loadSettings 之后直接改内存态）。
     this.settings.language = "auto";
     applyLanguage(this.settings.language);
-    // tasksPerDayLimit < 1 会让所有任务进入 +N 列表而格子无内容
-    if (typeof this.settings.tasksPerDayLimit !== "number" || this.settings.tasksPerDayLimit < 1) {
-      this.settings.tasksPerDayLimit = 5;
+    // tasksPerDayLimit < 1 会让所有任务进入 +N 列表而格子无内容。
+    // 1.7.11：校验区间与 UI 对齐——下拉只提供 3–10，旧校验只拒 <1，于是手编 data.json
+    // 能存进 1/2/11/9999：setValue(String(...)) 选不中任何 option，下拉回显空白（用户
+    // 看不出当前值到底是多少），9999 还会一路直通渲染循环。非整数同样回退；
+    // 默认值改从 DEFAULT_SETTINGS 取，不再硬编码 5（改默认时不会分叉）。
+    {
+      const allowed = [3, 4, 5, 6, 7, 8, 9, 10];
+      const n = this.settings.tasksPerDayLimit;
+      if (typeof n !== "number" || !Number.isInteger(n) || !allowed.includes(n)) {
+        const d = DEFAULT_SETTINGS.tasksPerDayLimit;
+        this.settings.tasksPerDayLimit = allowed.includes(d) ? d : 5;
+      }
     }
     // firstDayOfWeek 仅接受 0(日)/1(一)/6(六)，其余值会导致星期行与网格错位
     if (![0, 1, 6].includes(this.settings.firstDayOfWeek)) {
@@ -7163,7 +7406,10 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       this.settings.customTaskFolder = "";
     } else {
       const normalized = this.settings.customTaskFolder.trim().replace(/\/+$/, "");
-      this.settings.customTaskFolder = normalized && !normalized.includes("\\") && !normalized.startsWith("/") ? normalized : "";
+      // 1.7.11：再拒一层点目录（.obsidian/.trash/.git）——手编 data.json 把落点指到
+      // 配置目录或回收站，会把任务文件写进不该去的地方；路径段以 . 开头即视为非法
+      const hasDotSegment = normalized.split("/").some((seg) => seg.startsWith("."));
+      this.settings.customTaskFolder = normalized && !normalized.includes("\\") && !normalized.startsWith("/") && !hasDotSegment ? normalized : "";
     }
     // holidaysData 逐年校验：某年的值非数组或元素缺 date 字符串时，getHolidayInfo
     // 的展开操作会抛 TypeError，被渲染路径放大为整块月历不显示
@@ -7223,14 +7469,42 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
    * 保存设置
    */
   async saveSettings() {
+    // 1.7.11：串行化。多处 onChange 与节假日预取 IIFE 会并发调用本方法，每次都全量
+    // 序列化同一份 settings，落盘顺序无保证——表现为「改过的设置重启后回滚」。
+    // 排成一条链即可，链上不 re-throw（见 _saveSettingsNow），故不会断链。
+    this._saveChain = (this._saveChain || Promise.resolve()).then(() => this._saveSettingsNow());
+    return this._saveChain;
+  }
+  async _saveSettingsNow() {
     // 磁盘满/权限问题/文件被占用时 saveData 可能抛错，捕获后提示用户。
     // 不 re-throw：调用方（9 个 onChange + 1 个 IIFE）未 try/catch，re-throw 会变成 unhandled rejection 污染控制台。
     // Notice 已足够告知用户持久化失败，调用方继续执行 refreshView 基于内存新值渲染（可接受，下次重启会回滚）。
     try {
+      if (this.settingsLoadFailed) {
+        this.settingsLoadFailed = false;
+        await this._preserveUnreadableDataFile();
+      }
       await this.saveData(this.settings);
     } catch (e) {
       console.error(tr("error.settingsSave"), e);
       new import_obsidian.Notice(tr("notice.settingsSaveFail"), 5e3);
+    }
+  }
+  /**
+   * 把读不动的 data.json 原样留档（2026-10-12，v1.7.11）：loadData 抛错时内存里是纯
+   * 默认值，任何一次保存都会整份覆盖真实设置——其中 customTaskFolder 归零后新任务会
+   * 写去默认「任务」文件夹，用户看到的是「我的任务不见了」。覆盖之前先复制一份带
+   * 时间戳的副本并明确告知，把不可逆变成可恢复。
+   */
+  async _preserveUnreadableDataFile() {
+    try {
+      const raw = await this.adapter.read("data.json");
+      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
+      await this.adapter.write(`data.corrupt-${stamp}.json`, raw);
+      new import_obsidian.Notice(tr("notice.settingsBackup"), 8e3);
+    } catch (e) {
+      // 连原始文件都读不出来（多半是真的不存在）：无档可留，照常写新数据即可
+      console.error(tr("error.settingsLoad"), e);
     }
   }
   /**
@@ -7555,13 +7829,27 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
             await this.plugin.saveSettings();
             this.plugin.refreshView();
             const failedCount = results.filter((r) => r !== true).length;
-            if (failedCount > 0) {
+            // 1.7.11：刷新一次取「今年及前后各一年」，而下一年的安排通常还没公告
+            // （holiday-cn 该年返回空数组）。这类年份从 emptyYears 里认，不再计入失败
+            const hm = this.plugin.holidayManager;
+            const noData = years.filter((y, i) => results[i] !== true && hm.emptyYears.has(y));
+            const failed = years.filter((y, i) => results[i] !== true && !hm.emptyYears.has(y));
+            if (failed.length === 0 && noData.length > 0) {
+              new import_obsidian.Notice(tr("notice.holidayNoData", { years: noData.join("、") }), 4e3);
+            } else if (failedCount > 0) {
               new import_obsidian.Notice(tr("notice.holidayPartial", { ok: results.length - failedCount, total: results.length }), 3e3);
             } else {
               new import_obsidian.Notice(tr("notice.holidayRefreshed"), 3e3);
             }
           } else {
-            new import_obsidian.Notice(tr("notice.holidayRefreshFail"), 5e3);
+            // 三年全部「有源应答但无数据」也不是故障（例如刚跨到还没有公告的年份）
+            const hm = this.plugin.holidayManager;
+            const noData = years.filter((y) => hm.emptyYears.has(y));
+            if (noData.length === years.length) {
+              new import_obsidian.Notice(tr("notice.holidayNoData", { years: noData.join("、") }), 4e3);
+            } else {
+              new import_obsidian.Notice(tr("notice.holidayRefreshFail"), 5e3);
+            }
           }
         } catch (e) {
           console.warn(tr("error.refreshHoliday"), e);

@@ -708,6 +708,10 @@
 	font-size: 10px;
 	color: var(--gray-400);
 	padding: 2px;
+	/* 与 .task-item 同规格（见其 flex-shrink: 0）：.day-tasks 是 flex 纵向列，
+	   内容超出时若不钉住，被压扁的只会是这一枚「+N」——它是唯一能看全该日任务的
+	   入口，压缩后判高与实际可视高度也不同源（v1.7.11） */
+	flex-shrink: 0;
 }
 
 /* 跨天任务样式 */
@@ -2057,6 +2061,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	color: #94a3b8;
 }
 
+/* v1.7.11 补：浅色 hover 把文字压到 #334155（近黑），深色块此前只覆写了常态与
+   .is-open 两态，漏了 hover——深色界面下鼠标一悬停，「更多 ▾」就变成
+   深底上的近黑字，等于点一下就消失 */
+.theme-dark .category-more-btn:hover {
+	border-color: #cbd5e1;
+	background: rgba(100, 116, 139, 0.18);
+	color: #e2e8f0;
+}
+
 .theme-dark .category-more-btn.is-open {
 	border-color: #3b82f6;
 	background: rgba(59, 130, 246, 0.18);
@@ -2253,6 +2266,22 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	animation: fadeIn 0.2s ease-out;
 }
 
+/* 加载失败兜底态（main.js 在网格与明细区各建一个 .error-hint）。
+   v1.7.11 补：此前 CSS 里根本没有这条规则，而 .calendar-grid 是 7 列 grid，
+   裸 div 会掉进第 1 列——「任务加载失败」被压成 1/7 宽的左上角一小坨，
+   最需要被用户看见的状态反而最难读。跨整行居中后两种宿主（网格／明细）都成立。 */
+.error-hint {
+	grid-column: 1 / -1;
+	align-self: center;
+	padding: 14px 10px;
+	text-align: center;
+	font-size: 12px;
+	line-height: 1.5;
+	color: var(--danger);
+	background: var(--holiday-bg);
+	border-radius: var(--radius);
+}
+
 /* ========== 深色模式适配 ========== */
 .theme-dark .monthly-tasks-container {
 	--bg-primary: #1e1e1e;
@@ -2261,8 +2290,13 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	--gray-50: #2d2d2d;
 	--gray-100: #3d3d3d;
 	--gray-200: #4d4d4d;
+	/* v1.7.11 补：灰阶在 200→400、600→900 之间断档，而大周视图「本周」的日期区间行
+	   用的正是 --gray-700（浅色 #374151）。深色下它压在深底上几乎不可读，同一块里
+	   相邻的「本周任务数」用的 --gray-600 却有覆写，一深一浅——是遗漏不是设计 */
+	--gray-300: #666666;
 	--gray-400: #888888;
 	--gray-600: #b0b0b0;
+	--gray-700: #c8c8c8;
 	--gray-900: #ffffff;
 	
 	/* 深色模式 - 降低饱和度，更柔和 */
@@ -2884,12 +2918,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		overflow: hidden;
 	}
 	
-	/* 格子内无滚动条滑动的替代提示（2026-10-10，v1.7.9h）：既然不显示滚动条，
-	   就得给个「这里还能滑」的信号——真溢出且已滑到顶（.day-tasks 起点在格子内容
-	   起点，scrollTop>0 即说明上面还有货）时，底部压一条 10px 渐隐。
-	   必须挂在 .day-cell 上：.day-tasks 自身 overflow:hidden，里面的 ::after
-	   会随内容一起被裁走，永远看不见。 */
-	.day-cell.mt-pan-hint:not(.mt-pan-scrolled) {
+	/* 格子内无滚动条滑动的替代提示（2026-10-10 起，v1.7.11 改挂到滚动容器上）：
+	   既然不显示滚动条，就得给个「这里还能滑」的信号——本格内容总高超过可视高
+	   （main.js 用 scrollHeight − clientHeight 判，与滚动位置无关）时压一条 10px 渐隐，
+	   滑起来后由 .mt-pan-scrolled 撤掉。
+	   为什么不再挂 .day-cell：mask-image 是整元素遮罩，挂在日格上会把底部 10px 连
+	   最需要看清的末行文字、格子投影与调休斜纹一起压到 35% 不透明度；挂在 .day-tasks
+	   上只遮任务区自身。（旧注释说「::after 会被 overflow:hidden 裁掉所以只能挂日格」
+	   ——mask 不是子元素，不适用那条理由。） */
+	.day-tasks.mt-pan-hint:not(.mt-pan-scrolled) {
 		-webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 10px), rgba(0, 0, 0, 0.35) 100%);
 		mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 10px), rgba(0, 0, 0, 0.35) 100%);
 	}
