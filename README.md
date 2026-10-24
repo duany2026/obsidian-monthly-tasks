@@ -202,7 +202,7 @@
 
 ## 作者
 
-**duany2026** （[@duany2026](https://github.com/duany2026)）
+**duany** （[@duany2026](https://github.com/duany2026)）
 
 - 仓库：<https://github.com/duany2026/obsidian-monthly-tasks>
 - 反馈问题或建议：<https://github.com/duany2026/obsidian-monthly-tasks/issues>
