@@ -7,6 +7,7 @@ data.json
 
 # 内部审计文档（内部记录，不随插件发布）
 *审计报告*.md
+AUDIT-*.md
 
 # 本地备份与临时产物
 .workbuddy/
