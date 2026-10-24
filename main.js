@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.7.11
+ * 版本：1.7.12
  * 作者：duany2026
  * 许可证：MIT
  *
@@ -305,6 +305,7 @@ var I18N = {
     "notice.oversized": "\u6708\u5386\u4efb\u52a1\uff1a\u8de8\u5929\u4efb\u52a1\u533a\u95f4\u8d85\u8fc7 {limit} \u5929\uff0c\u4ec5\u663e\u793a\u5f00\u59cb\u4e0e\u7ed3\u675f\u65e5\u671f\uff08\u8be6\u60c5\u89c1\u63a7\u5236\u53f0\uff09",
     "notice.settingsLoadFail": "\u8bbe\u7f6e\u52a0\u8f7d\u5931\u8d25\uff0c\u5df2\u56de\u9000\u9ed8\u8ba4\u8bbe\u7f6e",
     "notice.settingsBackup": "\u8bbe\u7f6e\u8bfb\u53d6\u5931\u8d25\uff0c\u5df2\u56de\u9000\u9ed8\u8ba4\u503c\uff1b\u539f\u6587\u4ef6\u5df2\u53e6\u5b58\u4e3a data.corrupt-\u65f6\u95f4\u6233.json\uff0c\u9700\u8981\u65f6\u53ef\u624b\u52a8\u6062\u590d",
+    "notice.settingsBackupFail": "\u65e0\u6cd5\u5907\u4efd\u635f\u574f\u7684\u8bbe\u7f6e\u6587\u4ef6\uff0c\u5df2\u53d6\u6d88\u4fdd\u5b58\u4ee5\u4fdd\u62a4\u539f\u6587\u4ef6\uff1b\u8bf7\u68c0\u67e5\u63d2\u4ef6\u76ee\u5f55\u7684\u6587\u4ef6\u6743\u9650\u4e0e\u78c1\u76d8\u7a7a\u95f4",
     "notice.settingsSaveFail": "\u8bbe\u7f6e\u4fdd\u5b58\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u78c1\u76d8\u7a7a\u95f4\u4e0e\u6587\u4ef6\u6743\u9650",
     "settings.archive.desc": "\u51b3\u5b9a\u65b0\u4efb\u52a1\u5199\u5165\u54ea\u4e2a\u6587\u4ef6\u3002\u5207\u6362\u540e\u4e0d\u5f71\u54cd\u5df2\u6709\u6587\u4ef6\uff0c\u5386\u53f2\u4efb\u52a1\u4ecd\u4f1a\u5168\u90e8\u663e\u793a\u3002",
     "settings.archive.month": "\u6309\u6708\uff082026\u5e7410\u6708\u4efb\u52a1\u5217\u8868.md\uff09",
@@ -604,6 +605,7 @@ var I18N = {
     "notice.oversized": "\u6708\u66c6\u4efb\u52d9\uff1a\u8de8\u5929\u4efb\u52d9\u5340\u9593\u8d85\u904e {limit} \u5929\uff0c\u50c5\u986f\u793a\u958b\u59cb\u8207\u7d50\u675f\u65e5\u671f\uff08\u8a73\u60c5\u898b\u4e3b\u63a7\u53f0\uff09",
     "notice.settingsLoadFail": "\u8a2d\u5b9a\u8f09\u5165\u5931\u6557\uff0c\u5df2\u56de\u9000\u9810\u8a2d\u503c",
     "notice.settingsBackup": "\u8a2d\u5b9a\u8b80\u53d6\u5931\u6557\uff0c\u5df2\u56de\u9000\u9810\u8a2d\u503c\uff1b\u539f\u6a94\u6848\u5df2\u53e6\u5b58\u70ba data.corrupt-\u6642\u9593\u6233.json\uff0c\u9700\u8981\u6642\u53ef\u624b\u52d5\u9084\u539f",
+    "notice.settingsBackupFail": "\u7121\u6cd5\u5099\u4efd\u640d\u6bc0\u7684\u8a2d\u5b9a\u6a94\uff0c\u5df2\u53d6\u6d88\u5132\u5b58\u4ee5\u4fdd\u8b77\u539f\u6a94\uff1b\u8acb\u6aa2\u67e5\u5916\u639b\u76ee\u9304\u7684\u6a94\u6848\u6b0a\u9650\u8207\u78c1\u789f\u7a7a\u9593",
     "notice.settingsSaveFail": "\u8a2d\u5b9a\u5132\u5b58\u5931\u6557\uff0c\u8acb\u6aa2\u67e5\u78c1\u789f\u7a7a\u9593\u8207\u6a94\u6848\u6b0a\u9650",
     "settings.archive.desc": "\u6c7a\u5b9a\u65b0\u4efb\u52d9\u5beb\u5165\u54ea\u500b\u6a94\u6848\u3002\u5207\u63db\u5f8c\u4e0d\u5f71\u97ff\u5df2\u6709\u6a94\u6848\uff0c\u6b77\u53f2\u4efb\u52d9\u4ecd\u6703\u5168\u90e8\u986f\u793a\u3002",
     "settings.archive.month": "\u6309\u6708\uff082026\u5e7410\u6708\u4efb\u52d9\u5217\u8868.md\uff09",
@@ -903,6 +905,7 @@ var I18N = {
     "notice.oversized": "Monthly Tasks: Multi-day range exceeds {limit} days, showing start and end only (see console)",
     "notice.settingsLoadFail": "Settings load failed, reverted to defaults",
     "notice.settingsBackup": "Settings failed to load and reverted to defaults; the original file was preserved as data.corrupt-<timestamp>.json",
+    "notice.settingsBackupFail": "The damaged settings file could not be backed up. Saving was cancelled to protect it; check plugin-folder permissions and disk space",
     "notice.settingsSaveFail": "Settings save failed, please check disk space and file permissions",
     "settings.archive.desc": "Determines which file new tasks are written to. Switching doesn't affect existing files, historical tasks will still all display.",
     "settings.archive.month": "By Month (2026\u5e7410\u6708\u4efb\u52a1\u5217\u8868.md)",
@@ -1183,8 +1186,19 @@ function cleanTaskContent(rawLine) {
   // 后被永久删除（编辑走重建行，预填的是已剥过的 content）。本文件 extractTimeInfo
   // 的注释早已写明只接受 HH:MM，两处接受域至此对齐。收窄只会让 content 更不容易被剥空，
   // 与上面「两侧字符集必须逐字对齐（审计 H3）」不冲突——那条防的是孤儿行，本改动方向更安全。
-  const content = cleanedLine.replace(/^\s*[-*] \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*\d{1,2}:\d{2}(?:\s*~\s*\d{1,2}:\d{2})?/gu, "").replace(/🔴|🟡|🟢/gu, "").replace(/\s+/g, " ").trim();
+  const content = cleanedLine.replace(/^\s*[-*] \[[ x]\]\s*/i, "").replace(/📅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏳\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/🛫\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/➕\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/✅\s*\d{4}-\d{1,2}-\d{1,2}/gu, "").replace(/⏰\s*\d{1,2}:\d{1,2}(?:\s*[~～]\s*\d{1,2}:\d{1,2})?/gu, "").replace(/🔴|🟡|🟢/gu, "").replace(/\s+/g, " ").trim();
   return { content, category };
+}
+
+/* 解析时被剥掉、但本插件不建模的元数据（Tasks 插件等外部格式）：
+   编辑走整行重建，不带走它们就等于改一次标题丢一次字段（已复现）。
+   只列 cleanTaskContent 剥离集合里的未建模项：🟢 低优先级、⏳ 计划、➕ 创建、✅ 完成；
+   🔴🟡📅🛫⏰ 已建模，由 _createTaskImpl 自己写回，重复保留才会出两份。 */
+function extractPreservedMarkers(rawLine) {
+  const markers = [];
+  const re = /(?:⏳|➕|✅)\s*\d{4}-\d{1,2}-\d{1,2}|🟢/gu;
+  for (const m of String(rawLine || "").matchAll(re)) markers.push(m[0]);
+  return markers.join(" ");
 }
 
 /**
@@ -1220,17 +1234,9 @@ function extractStartDate(rawLine) {
  * @returns 时间字符串或 undefined
  */
 function extractTime(rawLine) {
-  // 支持两种时间格式：
-  //   ⏰ 09:00~12:00  （无空格，本插件生成格式）
-  //   ⏰ 09:00 ~ 12:00（带空格，用户手写或外部粘贴格式）
-  // 遇到 📅/🛫/🔴/🟡/✅ 等其它 emoji 标记时停止；未补零时间归一化为 HH:MM
-  const match = rawLine.match(/⏰\s*([^\s📅🛫🔴🟡✅🟢➕]+(?:\s*~\s*[^\s📅🛫🔴🟡✅🟢➕]+)?)/u);
+  const match = rawLine.match(/⏰\s*(\d{1,2}:\d{1,2}(?:\s*[~～]\s*\d{1,2}:\d{1,2})?)/u);
   if (!match) return void 0;
-  // 全角 ～ 归一为 ~ 并去掉 ~ 两侧空格
-  const compact = match[1].replace(/～/g, "~").replace(/\s*~\s*/g, "~").trim();
-  // 仅接受 HH:MM 或 HH:MM~HH:MM：time 参与同日排序键，垃圾值（⏰ 明天、日期串、
-  // 中文区间等）会插进 HH:MM 序列中间，让「按时间排序」失去意义，直接丢弃
-  if (!/^\d{1,2}:\d{1,2}(~\d{1,2}:\d{1,2})?$/.test(compact)) return void 0;
+  const compact = match[1].replace(/～/g, "~").replace(/\s*~\s*/g, "~");
   return normalizeTimeStr(compact);
 }
 
@@ -1272,27 +1278,14 @@ function noteTextToLines(text) {
   return parts;
 }
 /**
- * 定位任务行（批次三：备注写回的唯一寻址入口）。
- * 缓存的 lineNumber 在文件被别处加过行之后就会集体错位，所以判定顺序与
- * _deleteTaskByRawLineImpl 同口径：先试缓存行号（必须是任务行且与 rawLine 去尾空白
- * 相等），不中则全文件找同文任务行、取离缓存行号最近的一条；都找不到返回 -1。
+ * 备注写回只接受缓存坐标与原文同时命中。坐标失效后即使全文件只剩一条同文任务，
+ * 也无法证明它就是原任务（原任务可能刚被外部改题），因此直接失败，不猜测身份。
  */
 function findTaskLineIdx(lines, task) {
   const norm = (s) => s.replace(/\s+$/, "");
   const want = norm(task.rawLine == null ? "" : task.rawLine);
   const n = task.lineNumber;
-  if (n >= 0 && n < lines.length && isTaskLine(lines[n]) && norm(lines[n]) === want) return n;
-  let idx = -1;
-  let best = Infinity;
-  for (let i = 0; i < lines.length; i++) {
-    if (!isTaskLine(lines[i]) || norm(lines[i]) !== want) continue;
-    const dist = n >= 0 ? Math.abs(i - n) : 0;
-    if (idx === -1 || dist < best) {
-      idx = i;
-      best = dist;
-    }
-  }
-  return idx;
+  return n >= 0 && n < lines.length && isTaskLine(lines[n]) && norm(lines[n]) === want ? n : -1;
 }
 /**
  * 把某任务行下方**自己那段**备注块整体替换为新内容（原地增删行，不重建文件）。
@@ -1602,15 +1595,19 @@ var TaskParser = class {
     } else {
       // metadataCache 未就绪（新建文件首次解析）或无 listItems 时，回退逐行扫描，
       // 避免任务创建后短时间内月历不显示
-      // 维护代码块边界标志，跳过 ``` 围栏内的伪任务行，避免误收/误改代码块内容
-      let inFence = false;
+      let fence = null;
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        if (/^\s*```/.test(line)) {
-          inFence = !inFence;
+        if (fence) {
+          const close = new RegExp(`^\\s{0,3}${fence.char}{${fence.length},}[ \\t]*\\r?$`);
+          if (close.test(line)) fence = null;
           continue;
         }
-        if (inFence) continue;
+        const open = line.match(/^\s{0,3}(`{3,}|~{3,})/);
+        if (open) {
+          fence = { char: open[1][0], length: open[1].length };
+          continue;
+        }
         if (!isTaskLine(line)) continue;
         const task = this.parseTaskLine(line, file.path, i);
         if (task) {
@@ -1670,8 +1667,9 @@ var TaskParser = class {
   /**
    * 切换任务完成状态
    */
-  async toggleTask(task) {
-    // 串行化：避免与 createTask/deleteTask 并发读写同一文件导致后写覆盖先写
+  toggleTask(task) {
+    // 直接返回队列 Promise：弹窗提交与勾选处理器等待同一个 Promise 时，
+    // 先注册的勾选状态回写也先执行，不会被 async 额外包一层后颠倒顺序。
     const run = () => this._toggleTaskImpl(task);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
@@ -1810,13 +1808,12 @@ var TaskParser = class {
   /**
    * 批次三：编辑「先建后删」的旧行删除入口。
    * 新行插入后旧行 lineNumber 常发生偏移（同文件新行可能排在旧行之前），
-   * 直接 deleteTask(task) 会被行号身份校验判为失效。策略：读一次文件 →
-   * 先试 preferredLineNumber（命中即用）；否则全文件找与 rawLine（去尾空白）
-   * 相等且为任务行的行——多处相同取离 preferredLineNumber 最近的一条。
-   * 找不到返回 false。排 writeQueue 串行，与勾选/删除/创建互斥。
+   * 用本次创建实际增加的行数补偿旧坐标，再同时核对任务类型与完整原文。
+   * 坐标失效后不做同文搜索：唯一同文也不能证明身份。找不到返回 false。
+   * 排 writeQueue 串行，与勾选/删除/创建互斥。
    */
-  // 批次三：options.created 传入本次链路刚写入的新行坐标；它与 rawLine 逐字节相同时
-  // 也不得删除——那正是用户刚保存的结果
+  // 批次三：options.created 传入本次链路刚写入的新行坐标；无论它长什么样都不得删除
+  // ——那正是用户刚保存的结果
   async deleteTaskByRawLine(filePath, rawLine, preferredLineNumber, options) {
     const run = () => this._deleteTaskByRawLineImpl(filePath, rawLine, preferredLineNumber, options);
     this.writeQueue = this.writeQueue.then(run, run);
@@ -1826,12 +1823,9 @@ var TaskParser = class {
     try {
       const norm = (s) => s.replace(/\s+$/, "");
       const want = norm(rawLine);
-      // 批次三：先建的新行可能与旧 rawLine 逐字节相同（只改了其他字段时），不排除会
-      // 误删刚落盘的新行导致编辑静默失效（9a 探针实锤）。令牌是「本次链路那一条新行」
-      // 的坐标，所以按 filePath + text + index 三重匹配，只排除这一条，别的同名行照删
       const createdToken = options && options.created ? options.created : null;
-      const tokenApplies = !!(createdToken && createdToken.filePath === filePath && createdToken.text === want);
-      const isNewRow = (n) => tokenApplies && createdToken.index === n;
+      const createdInFile = !!(createdToken && createdToken.filePath === filePath);
+      const isNewRow = (n) => !!(createdInFile && createdToken.index === n);
       const file = this.app.vault.getAbstractFileByPath(filePath);
       if (!(file instanceof import_obsidian.TFile)) {
         console.error(tr("error.fileNotFound2", { path: filePath }));
@@ -1839,45 +1833,17 @@ var TaskParser = class {
       }
       const wrote = await this._mutateFile(file, (content) => {  // v1.7.11
       const linesArr = content.split("\n");
-      let idx = -1;
-      if (preferredLineNumber >= 0 && preferredLineNumber < linesArr.length &&
-          isTaskLine(linesArr[preferredLineNumber]) && norm(linesArr[preferredLineNumber]) === want &&
-          !isNewRow(preferredLineNumber)) {
-        idx = preferredLineNumber;
-      } else {
-        // 全文件兜底：同名任务多行时，取离 preferredLineNumber 最近的一条，
-        // 而不是固定取首条——固定取首条会让用户删/改 B、实际删掉更靠前的 A（内容相同，
-        // 用户难以察觉）。preferred 无效（-1）时退化为原来的「取首条」
-        let bestDist = Infinity;
-        for (let n = 0; n < linesArr.length; n++) {
-          if (!isTaskLine(linesArr[n]) || norm(linesArr[n]) !== want || isNewRow(n)) continue;
-          const dist = preferredLineNumber >= 0 ? Math.abs(n - preferredLineNumber) : 0;
-          if (idx === -1 || dist < bestDist) {
-            idx = n;
-            bestDist = dist;
-          }
-        }
+      if (createdInFile && (createdToken.index < 0 || createdToken.index >= linesArr.length || norm(linesArr[createdToken.index]) !== norm(createdToken.text))) {
+        console.error(tr("error.rawLineNotFound", { path: filePath }));
+        return false;
       }
-      if (idx === -1) {
-        // 1.7.11：原文逐字（去尾空白）匹配不到时，再按「任务身份」（正文＋截止日）兜一次。
-        // 用户在编辑器里手改过该行（换缩进、把 - 改成 *、补了空格）或同步盘做过自动格式化
-        // 时，旧写法直接放弃 → 编辑是「先建新行再删旧行」，于是文件里留下两条重复任务，
-        // 月历凭空多一项、勾选只作用其一，且无自动去重。
-        // 铁律：只在**全文件唯一命中**时才动手；身份相同的仍有多行就照原样放弃，绝不猜。
-        const wantDue = extractDueDate(rawLine);
-        const wantContent = cleanTaskContent(want).content;
-        if (wantContent) {
-          let only = -1;
-          let hits = 0;
-          for (let n = 0; n < linesArr.length; n++) {
-            if (!isTaskLine(linesArr[n]) || isNewRow(n)) continue;
-            if (cleanTaskContent(linesArr[n]).content !== wantContent) continue;
-            if (extractDueDate(linesArr[n]) !== wantDue) continue;
-            hits++;
-            only = n;
-          }
-          if (hits === 1) idx = only;
-        }
+      const insertedBeforeOld = createdInFile && createdToken.index <= preferredLineNumber;
+      const expectedLineNumber = preferredLineNumber + (insertedBeforeOld ? createdToken.lineDelta : 0);
+      let idx = -1;
+      if (expectedLineNumber >= 0 && expectedLineNumber < linesArr.length &&
+          isTaskLine(linesArr[expectedLineNumber]) && norm(linesArr[expectedLineNumber]) === want &&
+          !isNewRow(expectedLineNumber)) {
+        idx = expectedLineNumber;
       }
       if (idx === -1) {
         console.error(tr("error.rawLineNotFound", { path: filePath }));
@@ -1980,13 +1946,13 @@ var TaskParser = class {
   /**
    * 在指定文件中创建新任务
    */
-  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note) {
+  async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note, preserveFromRawLine) {
     // 串行化：避免与其他写操作并发导致后写覆盖先写丢失任务
-    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note);
+    const run = () => this._createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note, preserveFromRawLine);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note) {
+  async _createTaskImpl(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note, preserveFromRawLine) {
     try {
       const file = this.app.vault.getAbstractFileByPath(filePath);
       if (!(file instanceof import_obsidian.TFile)) {
@@ -2000,7 +1966,9 @@ var TaskParser = class {
       // 吞成 return false，表现为「文件已写入、界面却说创建失败」
       let createdIndex = -1;
       let createdLine = "";
+      let createdLineDelta = 0;
       const wrote = await this._mutateFile(file, (fileContent) => {  // v1.7.11
+      const originalLineCount = fileContent.split("\n").length;
       // 归一化入参日期（防外部调用传不补零格式），保证排序比较与月份标题匹配正确
       const normDate = (s) => /^\d{4}-\d{1,2}-\d{1,2}$/.test(s) ? normalizeDateStr(s) : s;
       dueDate = normDate(dueDate);
@@ -2013,11 +1981,15 @@ var TaskParser = class {
       let timeMarker = time && !isAllDay ? `\u23F0 ${time} ` : "";
       // dueDate 缺失时不写 📅 标记（防御：当前调用链恒传有效日期，但本方法是公共入队入口）
       const dueMarker = dueDate ? `\u{1F4C5} ${dueDate}` : "";
+      // 编辑=整行重建，而 cleanTaskContent 会把 🟢/⏳/➕/✅ 从正文里剥掉：
+      // 不额外带走的话，改一次标题，Tasks 插件的计划/创建/完成日期就静默消失（已复现）。
+      const preservedMarker = preserveFromRawLine ? extractPreservedMarkers(preserveFromRawLine) : "";
+      const preservedSuffix = preservedMarker ? ` ${preservedMarker}` : "";
       // 标记顺序约定：内容 → 优先级emoji → 🛫 → ⏰ → 📅 → #标签（与解析层行尾取标签互为逆操作）
       const categoryMarker = category ? ` #${category}` : "";
       // 批次三：编辑=删除+重建，重建必须保留勾选态——已完成任务写 `- [x]`；
       // 新建链路 completed 为 undefined（falsy），行为与旧版逐字节一致
-      let taskLine = createdLine = `- [${completed ? "x" : " "}] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${categoryMarker}`.trimEnd();
+      let taskLine = createdLine = `- [${completed ? "x" : " "}] ${content} ${priorityMarker}${dateMarker}${timeMarker}${dueMarker}${preservedSuffix}${categoryMarker}`.trimEnd();
       // v1.6.0 批次三：编辑=删除+重建时备注必须跟着新行走（否则改一次日期备注就没了）。
       // 这里只把备注渲染成待写回的原文行数组，具体插入位置由各分支按 CRLF 补 \r。
       const noteBody = noteTextToLines(note);
@@ -2074,15 +2046,11 @@ var TaskParser = class {
           createdIndex = (fileContent.slice(0, insertPos + newSection.indexOf(taskLine)).match(/\n/g) || []).length;
         } else {
           // 月份section已存在，按日期时间排序插入
-          const afterSection = fileContent.slice(sectionIdx);
-          // 月份分界用行首 "---" 匹配（兼容 LF/CRLF）：CRLF 换行的文件里 indexOf("\n---\n") 永远失配，
-          // section 会一直延伸到文件尾，导致任务被插进后面的月份 section
-          // 1.7.11：分隔线按 Markdown 规则认三种（--- / *** / ___，三个及以上），旧写法只认
-          // 字面 "---"：用户手改成 **** 或删掉分隔线时 sectionEnd 一路取到文件尾，新任务
-          // 被物理插进下个月（甚至最后一个月）的标题之下，归档文件的月分组与任务日期
-          // 长期不一致——月历按日期标记分组所以界面看不出，手翻文件才觉得「数据乱了」
-          const sepMatch = afterSection.match(/^(?:-{3,}|\*{3,}|_{3,})[ \t]*\r?$/m);
-          const sectionEnd = sepMatch && sepMatch.index > 1 ? sectionIdx + sepMatch.index - 1 : fileContent.length;
+          const sectionBodyStart = sectionIdx + sectionMatch[0].length;
+          const afterSection = fileContent.slice(sectionBodyStart);
+          // 从当前标题之后找边界，避免把当前标题自己当成下一月。
+          const boundaryMatch = afterSection.match(/^(?:##[ \t]+.*|(?:-{3,}|\*{3,}|_{3,})[ \t]*)\r?$/m);
+          const sectionEnd = boundaryMatch ? sectionBodyStart + boundaryMatch.index : fileContent.length;
           const sectionContent = fileContent.slice(sectionIdx, sectionEnd);
           const newTime = time && !isAllDay ? time.split("~")[0] : null;
           // 在section内找到第一个日期大于新日期的行，在其前面插入
@@ -2150,11 +2118,12 @@ var TaskParser = class {
         createdIndex = (fileContent.match(/\n/g) || []).length + (needEol ? 1 : 0);
         fileContent = fileContent + (needEol ? eol : "") + taskLine + eol;
       }
+      createdLineDelta = fileContent.split("\n").length - originalLineCount;
       return fileContent;
       });
       if (!wrote) return false;
       // 一次性交接给紧随其后的编辑删除步骤（调用方取走后经 options.created 显式传回）
-      this.lastCreatedInfo = createdIndex >= 0 ? { filePath, index: createdIndex, text: createdLine } : null;
+      this.lastCreatedInfo = createdIndex >= 0 ? { filePath, index: createdIndex, text: createdLine, lineDelta: createdLineDelta } : null;
       this.invalidateCache();
       return true;
     } catch (error) {
@@ -2165,14 +2134,14 @@ var TaskParser = class {
   /**
    * 在指定日期创建任务（自动选择或创建按年月归类的文件）
    */
-  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath, category, completed, note) {
+  async createTaskForDate(date, content, isAllDay = true, time, priority, endDate, customFolderPath, category, completed, note, preserveFromRawLine) {
     // 串行化整个流程（含年度任务文件创建）：并发创建同一文件时 vault.create 会竞态抛"已存在"，
     // 并入 writeQueue 后第二个请求必能在 findTaskFile 命中首个创建结果
-    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed, note);
+    const run = () => this._createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed, note, preserveFromRawLine);
     this.writeQueue = this.writeQueue.then(run, run);
     return this.writeQueue;
   }
-  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed, note) {
+  async _createTaskForDateImpl(date, content, isAllDay, time, priority, endDate, customFolderPath, category, completed, note, preserveFromRawLine) {
     const dateStr = this.formatDate(date);
     const endDateStr = endDate ? this.formatDate(endDate) : dateStr;
     // 一律写入归档任务列表（年度或月度，由设置决定），跳过日记查找：保证任务统一归集
@@ -2182,7 +2151,7 @@ var TaskParser = class {
       // 直接调用 _createTaskImpl 而非 createTask：本方法已在 writeQueue 链中执行，
       // 若再经 createTask 二次入队会形成 Q2 等待 Q1、Q1 等待 Q2 的死锁，
       // 导致任务永不写入文件、弹窗按钮永久禁用。
-      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr, category, completed, note);
+      return this._createTaskImpl(defaultFile, content, endDateStr, isAllDay, time, priority, dateStr, category, completed, note, preserveFromRawLine);
     }
     return false;
   }
@@ -3027,6 +2996,12 @@ function isSpecialLunarDay(date) {
 
 // 内置节假日兜底数据已外置为插件目录下的 holidays.json（2007 年起的历史年份由网络数据源覆盖），由 loadSettings 中的 loadBuiltinHolidays 读取
 
+function isUsableHolidayData(holidays, year) {
+  if (!Array.isArray(holidays) || holidays.length === 0) return false;
+  const valid = holidays.every((h) => h && typeof h.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(h.date) && isValidDateStr(h.date) && typeof h.name === "string" && h.name.trim().length > 0 && typeof h.isOff === "boolean" && (h.type === "legal" || h.type === "workday"));
+  return valid && holidays.some((h) => h.date.startsWith(`${year}-`));
+}
+
 /**
  * ============================================================
  * HolidayManager - 节假日管理器
@@ -3090,7 +3065,7 @@ var HolidayManager = class {
     const p = (async () => {
       try {
         const apiData = await this.fetchYearFromSources(year);
-        if (apiData && apiData.length > 0) {
+        if (isUsableHolidayData(apiData, year)) {
           this.cache.set(year, apiData);
           this.failureCache.delete(year);
           return true;
@@ -3166,6 +3141,8 @@ var HolidayManager = class {
     }
     if (holidays.length === 0) {
       console.warn(tr("error.holidayApiEmpty", { year: year }), json);
+    } else if (!isUsableHolidayData(holidays, year)) {
+      throw new Error(tr("error.holidayApiFormat"));
     }
     return holidays.sort((a, b) => a.date.localeCompare(b.date));
   }
@@ -3266,6 +3243,9 @@ var HolidayManager = class {
       } else if (d.isOffDay === false) {
         holidays.push({ date: d.date, name: "班", type: "workday" /* WORKDAY */, isOff: false });
       }
+    }
+    if (holidays.length > 0 && !isUsableHolidayData(holidays, year)) {
+      throw new Error(tr("error.holidayCNFormat"));
     }
     return holidays.sort((a, b) => a.date.localeCompare(b.date));
   }
@@ -3678,7 +3658,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       }
       this.lastFirstDayOfWeek = this.plugin.settings.firstDayOfWeek;
     }
-    await this.renderCalendarGridSafe("render"); // 1.7.11：兜底统一走 safe 包装
+    return this.renderCalendarGridSafe("render");
   }
   /**
    * 渲染头部导航
@@ -3764,7 +3744,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
       this.currentMonth = month;
       this.convergeSelectedDate();
       if (this.isWeekFamily()) this.ensureWeekAnchor();
-      await this.renderCalendarGridSafe("openDatePicker"); // 1.7.11：兜底统一走 safe 包装
+      const rendered = await this.renderCalendarGridSafe("openDatePicker");
+      if (!rendered) throw new Error("calendar render failed");
     });
     modal.open();
   }
@@ -3773,12 +3754,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
    * @param force 是否强制重新渲染整个视图
    */
   async refresh(force = false) {
-    if (force) {
-      this.taskParser.invalidateCache();
-      await this.render();
-    } else {
-      await this.renderCalendarGridSafe("refresh"); // 1.7.11：兜底统一走 safe 包装
-    }
+    if (force) this.taskParser.invalidateCache();
+    const rendered = force ? await this.render() : await this.renderCalendarGridSafe("refresh");
+    if (!rendered) throw new Error("calendar refresh failed");
   }
   /**
    * 渲染星期标题
@@ -3920,6 +3898,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       // 渲染后延迟复量，不依赖观察器报信（老 WebView 上信号靠不住）
       this._mtScheduleRetrim();
     }
+    return true;
   }
   /**
    * 审计 L5：不阻塞调用方地重画网格，并把 reject 收敛成一条 console.error。
@@ -3936,8 +3915,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 调用它的事件监听又是无人接收的 async 回调，结果就是 unhandled rejection
     // ＋头部已重建、网格停在半画状态。返回后 await 它既保住「画完再继续」的时序，
     // 又拿到同一份兜底日志。
-    return this.renderCalendarGrid().catch((err) => {
+    return this.renderCalendarGrid().then(() => true).catch((err) => {
       console.error(tr("error.renderGrid"), reason || "", err);
+      return false;
     });
   }
   async _renderCalendarGridCore() {
@@ -4407,14 +4387,24 @@ var MonthlyView = class extends import_obsidian.ItemView {
       if (!m.panning) {
         if (Math.abs(dy) < 4) return;
         if (Math.abs(dx) > Math.abs(dy)) { m.armed = false; return; } // 横向：本序列彻底交还
-        m.panning = true;
       }
+      const nextWant = m.top0 + dy;
+      if (nextWant < 0 || nextWant > m.max) {
+        if (m.panning) {
+          m.want = Math.max(0, Math.min(m.max, nextWant));
+          commit();
+        }
+        stopAll();
+        if (view._mtPanStop === stopAll) view._mtPanStop = null;
+        return;
+      }
+      m.panning = true;
       const now = t.timeStamp || Date.now();
       const dt = now - lastT;
       if (dt > 0) v = (lastY - t.clientY) / dt;
       lastY = t.clientY;
       lastT = now;
-      m.want = m.top0 + dy;
+      m.want = nextWant;
       if (Math.abs(dy) > 6) el._mtPanMoved = true; // 交给 capture click 监听判定误触
       if (raf == null) raf = requestAnimationFrame(commit); // 合帧写入：一帧最多一次
       e.preventDefault(); // 必须在同步路径：事件到 rAF 回调时已不可取消
@@ -4636,6 +4626,11 @@ var MonthlyView = class extends import_obsidian.ItemView {
    */
   openCreateTaskModal(date, existingTasks = [], editTask = null) {
     const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category, editOld, noteText) => {
+      // 弹窗列表里的「勾选完成」是异步入队的，写完文件才回写 editOld.completed/rawLine。
+      // 不等它落定就提交，会拿旧 completed 重建新行，把刚勾的完成盖回未完成（已复现）。
+      // 等队列即可：勾选处理器注册在前，它的状态回写先于本次继续执行。
+      // 上一轮异常已由原入口报告；不能让它卡住之后的每一次提交，本次操作仍按自身结果反馈。
+      await this.taskParser.writeQueue.catch(() => {});
       const customFolderPath = this.plugin.settings.customTaskFolder || void 0;
       // v1.6.0 手机端反馈版：备注改在弹窗里写（noteText 恒为字符串，收起时是空串）。
       // 编辑态逐项比对「任务行本身」有没有变——只有备注变就走 updateTaskNote 原地
@@ -4666,7 +4661,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
           return;
         }
       }
-      const success = await this.taskParser.createTaskForDate(modal.date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0, noteText || void 0);
+      const success = await this.taskParser.createTaskForDate(modal.date, content, isAllDay, time, priority, endDate, customFolderPath, category, editOld ? editOld.completed : void 0, noteText || void 0, editOld ? editOld.rawLine : void 0);
       if (success) {
         // 批次三：编辑=先建新行、再删旧行（3.4 定稿）。删除只认 rawLine：新行插入后
         // 旧行行号常发生偏移；删不到不判失败——新行已在，重复行可见、可手动删除
@@ -4849,7 +4844,11 @@ var MonthlyView = class extends import_obsidian.ItemView {
    */
   async navigateWeek(direction) {
     const cur = dateFromStr(this.weekAnchor());
-    const next = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + direction * 7);
+    let next = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + direction * 7);
+    const min = new Date(1900, 0, 1);
+    const max = new Date(2100, 11, 31);
+    if (next < min) next = min;
+    else if (next > max) next = max;
     this.selectedDate = formatDate(next);
     this.weekStart = weekStartFrom(next, this.plugin.settings.firstDayOfWeek);
     this.currentYear = next.getFullYear();
@@ -5246,6 +5245,7 @@ var DatePickerModal = class extends import_obsidian.Modal {
     
     const yearDecBtn = yearInputWrapper.createEl("button", { text: "\u2212" });
     yearDecBtn.style.width = "40px";
+    yearDecBtn.style.flexShrink = "0";
     yearDecBtn.style.height = "40px";
     yearDecBtn.style.fontSize = "18px";
     yearDecBtn.style.fontWeight = "600";
@@ -5270,6 +5270,8 @@ var DatePickerModal = class extends import_obsidian.Modal {
       }
     });
     yearInput.style.width = "120px";
+    yearInput.style.minWidth = "0";
+    yearInput.style.flex = "1 1 90px";
     yearInput.style.height = "40px";
     yearInput.style.padding = "0 14px";
     yearInput.style.fontSize = "20px";
@@ -5285,6 +5287,7 @@ var DatePickerModal = class extends import_obsidian.Modal {
     
     const yearIncBtn = yearInputWrapper.createEl("button", { text: "+" });
     yearIncBtn.style.width = "40px";
+    yearIncBtn.style.flexShrink = "0";
     yearIncBtn.style.height = "40px";
     yearIncBtn.style.fontSize = "18px";
     yearIncBtn.style.fontWeight = "600";
@@ -5357,7 +5360,7 @@ var DatePickerModal = class extends import_obsidian.Modal {
     
     const monthGrid = monthSection.createDiv("month-grid");
     monthGrid.style.display = "grid";
-    monthGrid.style.gridTemplateColumns = "repeat(4, 1fr)";
+    monthGrid.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
     monthGrid.style.gap = "12px";
     
     const monthLabels = monthNames();
@@ -5392,7 +5395,10 @@ var DatePickerModal = class extends import_obsidian.Modal {
 
     for (let m = 0; m < 12; m++) {
       const monthBtn = monthGrid.createEl("button", { text: monthLabels[m] });
-      monthBtn.style.padding = "16px 8px";
+      monthBtn.style.minWidth = "0";
+      monthBtn.style.overflowWrap = "anywhere";
+      monthBtn.style.lineHeight = "1.2";
+      monthBtn.style.padding = "12px 4px";
       monthBtn.style.fontSize = "14px";
       monthBtn.style.fontWeight = "600";
       monthBtn.style.borderRadius = "12px";
@@ -5563,6 +5569,37 @@ function CF_KICK(anim) {
   return anim;
 }
 
+function watchPopupPosition(owner, reposition) {
+  unwatchPopupPosition(owner);
+  owner._popupRepositionHandler = reposition;
+  window.addEventListener("resize", reposition);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", reposition);
+    window.visualViewport.addEventListener("scroll", reposition);
+  }
+}
+
+function unwatchPopupPosition(owner) {
+  const reposition = owner._popupRepositionHandler;
+  if (!reposition) return;
+  window.removeEventListener("resize", reposition);
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener("resize", reposition);
+    window.visualViewport.removeEventListener("scroll", reposition);
+  }
+  owner._popupRepositionHandler = null;
+}
+
+function closeInlineDatePicker(owner) {
+  unwatchPopupPosition(owner);
+  if (owner.datePickerCloseHandler) {
+    document.removeEventListener("click", owner.datePickerCloseHandler);
+    owner.datePickerCloseHandler = null;
+  }
+  const popup = document.body.querySelector(":scope > .date-picker-popup");
+  if (popup) popup.remove();
+}
+
 var CategoryFilterModal = class extends import_obsidian.Modal {
   constructor(app, view, anchorEl) {
     super(app);
@@ -5588,6 +5625,7 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
     // 现在按行数预估尺寸，同帧完成定位，行渲染不再改变盒尺寸位置。
     this.renderRows();
     this.positionAt(modalEl, true);
+    watchPopupPosition(this, () => this.positionAt(modalEl));
 
     // v1.5.3：进/出场动画改用 Web Animations API（el.animate），而不是「加类 + CSS 过渡」。
     // 实测后者在本弹窗上不可靠：同一 JS 任务里改类再读计算样式，浏览器把两个状态
@@ -5778,6 +5816,7 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
     super.close();
   }
   onClose() {
+    unwatchPopupPosition(this);
     this.contentEl.empty();
     if (CategoryFilterModal.activeInstances && CategoryFilterModal.activeInstances.has(this)) {
       CategoryFilterModal.activeInstances.delete(this);
@@ -5819,6 +5858,7 @@ var ViewMenuModal = class extends import_obsidian.Modal {
     setTimeout(sweepChrome, 100);
     this.renderRows();
     this.positionAt(modalEl, true);
+    watchPopupPosition(this, () => this.positionAt(modalEl));
     this.playEnter(modalEl);
   }
   positionAt(modalEl, prefill = false) {
@@ -5933,6 +5973,7 @@ var ViewMenuModal = class extends import_obsidian.Modal {
     }
   }
   onClose() {
+    unwatchPopupPosition(this);
     this.contentEl.empty();
     if (ViewMenuModal.activeInstances && ViewMenuModal.activeInstances.has(this)) {
       ViewMenuModal.activeInstances.delete(this);
@@ -6491,12 +6532,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
           endDateTrigger.textContent = formatDisplayDate(pickerYear, pickerMonth, d);
           // 审计 L16：这里原先还会 setAttribute("data-value", `${pickerYear}-${m}-${dd}`)
           // （连带两个只为它存在的 m/dd 局部变量），全文无人读取，一并删掉。
-          popup.remove();
-          // 真正移除全局 click 监听器，避免选中日期后监听器残留泄漏
-          if (self.datePickerCloseHandler) {
-            document.removeEventListener("click", self.datePickerCloseHandler);
-          }
-          self.datePickerCloseHandler = null;
+          closeInlineDatePicker(self);
         });
       }
     }
@@ -6529,17 +6565,21 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // 挂在 modal 内时「居中」相对 modal 而非视口，且会被 modal 的 overflow:hidden 裁掉
       const popup = document.body.createDiv("date-picker-popup");
       popup.style.display = "block";
-      // 按触发器定位：出现在触发按钮下方，底部放不下时翻到上方；左右夹在视口内
-      const rect = endDateTrigger.getBoundingClientRect();
-      const estW = 320;
-      const estH = 340;
-      let left = Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - estW - 8));
-      let top = rect.bottom + 6;
-      if (top + estH > window.innerHeight) {
-        top = Math.max(8, rect.top - estH - 6);
-      }
-      popup.style.left = `${left}px`;
-      popup.style.top = `${top}px`;
+      const reposition = () => {
+        if (!popup.isConnected) return;
+        const rect = endDateTrigger.getBoundingClientRect();
+        const w = popup.offsetWidth || 320;
+        const h = popup.offsetHeight || 340;
+        let left = Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - w - 8));
+        let top = rect.bottom + 6;
+        if (top + h > window.innerHeight - 8) {
+          top = Math.max(8, rect.top - h - 6);
+        }
+        popup.style.left = `${left}px`;
+        popup.style.top = `${top}px`;
+      };
+      reposition();
+      watchPopupPosition(self, reposition);
       // 年月导航
       const navRow = popup.createDiv("date-picker-nav");
       const prevBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "\u25C0" });
@@ -6598,10 +6638,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // （没有被新弹层取代），② 弹层还在文档里。任一不成立就不装。
       const closeHandler = (e) => {
         if (!popup.contains(e.target) && !endDateTrigger.contains(e.target)) {
-          popup.remove();
-          document.removeEventListener("click", closeHandler);
-          // 只在自己仍是登记值时清字段，否则会抹掉后来那个弹层的 handler
-          if (self.datePickerCloseHandler === closeHandler) self.datePickerCloseHandler = null;
+          closeInlineDatePicker(self);
         }
       };
       self.datePickerCloseHandler = closeHandler;
@@ -6615,9 +6652,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     function renderDatePicker() {
       const existing = document.body.querySelector(":scope > .date-picker-popup");
       if (existing) {
-        if (self.datePickerCloseHandler) document.removeEventListener("click", self.datePickerCloseHandler);
-        existing.remove();
-        self.datePickerCloseHandler = null;
+        closeInlineDatePicker(self);
         return;
       }
       buildPopup();
@@ -6656,13 +6691,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       }
       if (!isMultiDay) {
         endDate = void 0;
-        const popup = document.body.querySelector(":scope > .date-picker-popup");
-        if (popup) popup.remove();
-        // 同步清理 this.datePickerCloseHandler，避免遗留全局监听器
-        if (this.datePickerCloseHandler) {
-          document.removeEventListener("click", this.datePickerCloseHandler);
-          this.datePickerCloseHandler = null;
-        }
+        closeInlineDatePicker(this);
       }
     });
     const priorityContainer = this.modalEl.createDiv("modal-priority");
@@ -6800,7 +6829,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         // 剥离"emoji + 日期/时间"组合（含范围），字符类含优先级 emoji 以覆盖"🔴 2026-04-21"场景
         // 添加 /u 标志：emoji 为代理对字符，不加 /u 会被当作两个独立的代理项，可能误匹配其他字符
         .replace(/[📅🛫⏰⏳🔴🟡🟢✅➕]\s*\d{4}-\d{1,2}-\d{1,2}(?:\s*~\s*\d{4}-\d{1,2}-\d{1,2})?/gu, "")
-        .replace(/[📅🛫⏰⏳🔴🟡🟢✅➕]\s*\d{1,2}:\d{2}(?:\s*~\s*\d{1,2}:\d{2})?/gu, "")
+        .replace(/[📅🛫⏰⏳🔴🟡🟢✅➕]\s*\d{1,2}:\d{1,2}(?:\s*[~～]\s*\d{1,2}:\d{1,2})?/gu, "")
         // 兜底剥离孤立的元数据 emoji（无后续日期/时间的"📅 复盘"），避免与插件自动拼接的元数据冲突
         .replace(/[📅🛫⏰⏳🔴🟡🟢✅➕]/gu, "")
         .replace(/\s+/g, " ")
@@ -6903,12 +6932,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
    * 挂载也不会误删内容节点（activeInstances 是 Set，重复 add 无副作用）。
    */
   switchToTask(task, anchorStr) {
-    if (this.datePickerCloseHandler) {
-      document.removeEventListener("click", this.datePickerCloseHandler);
-      this.datePickerCloseHandler = null;
-    }
-    const strayPopup = document.body.querySelector(":scope > .date-picker-popup");
-    if (strayPopup) strayPopup.remove();
+    closeInlineDatePicker(this);
     this.editingTask = task;
     // anchorStr 为空 = 退回新建态，日期保持当前（不跳走）
     if (anchorStr) this.date = dateFromStr(anchorStr);
@@ -6917,14 +6941,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
   }
 
   onClose() {
-    // 清理日期选择器的全局 click 监听器，避免泄漏
-    if (this.datePickerCloseHandler) {
-      document.removeEventListener("click", this.datePickerCloseHandler);
-      this.datePickerCloseHandler = null;
-    }
-    // 浮层挂在 document.body 上，关闭弹窗时显式移除，避免残留可交互的孤儿浮层
-    const strayPopup = document.body.querySelector(":scope > .date-picker-popup");
-    if (strayPopup) strayPopup.remove();
+    closeInlineDatePicker(this);
     // modalEl 由 Modal 基类负责移除
     // 从静态活动实例表中摘除
     if (CreateTaskModal.activeInstances && CreateTaskModal.activeInstances.has(this)) {
@@ -7481,8 +7498,14 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     // Notice 已足够告知用户持久化失败，调用方继续执行 refreshView 基于内存新值渲染（可接受，下次重启会回滚）。
     try {
       if (this.settingsLoadFailed) {
+        // 备份成功才清标志、才允许覆盖：备份读不出来时中止本次保存，
+        // 标志留着，下次保存还会再试——绝不在没有副本的情况下盖掉唯一那份设置。
+        const preserved = await this._preserveUnreadableDataFile();
+        if (!preserved) {
+          new import_obsidian.Notice(tr("notice.settingsBackupFail"), 8e3);
+          return;
+        }
         this.settingsLoadFailed = false;
-        await this._preserveUnreadableDataFile();
       }
       await this.saveData(this.settings);
     } catch (e) {
@@ -7497,14 +7520,27 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
    * 时间戳的副本并明确告知，把不可逆变成可恢复。
    */
   async _preserveUnreadableDataFile() {
+    // Plugin 上没有 this.adapter（旧写法因此必抛、备份从未生效），必须走 vault.adapter；
+    // 路径也要带插件目录——saveData 写的是 manifest.dir 下的 data.json，不是库根那份。
+    const adapter = this.app.vault.adapter;
+    const dir = this.manifest.dir || `.obsidian/plugins/${this.manifest.id}`;
+    const dataPath = `${dir}/data.json`;
     try {
-      const raw = await this.adapter.read("data.json");
+      const raw = await adapter.read(dataPath);
       const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-      await this.adapter.write(`data.corrupt-${stamp}.json`, raw);
+      await adapter.write(`${dir}/data.corrupt-${stamp}.json`, raw);
       new import_obsidian.Notice(tr("notice.settingsBackup"), 8e3);
+      return true;
     } catch (e) {
-      // 连原始文件都读不出来（多半是真的不存在）：无档可留，照常写新数据即可
+      // 文件确实不存在时没有什么可留的，放行（新建设置）；
+      // 存在却读/写不动时返回 false，由调用方中止覆盖。
+      try {
+        if (!(await adapter.exists(dataPath))) return true;
+      } catch (e2) {
+        // exists 也失败：按"不能确认"处理，不放行
+      }
       console.error(tr("error.settingsLoad"), e);
+      return false;
     }
   }
   /**
