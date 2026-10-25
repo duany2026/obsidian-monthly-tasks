@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.7.12
+ * 版本：1.8.0
  * 作者：duany
  * 许可证：MIT
  *
@@ -114,7 +114,7 @@ var I18N = {
   "zh-CN": {
     "cmd.open": "\u6253\u5f00\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
     "cmd.refresh": "\u5237\u65b0\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
-    "cmd.toggle": "\u5faa\u73af\u5207\u6362\u6708\u5386\u89c6\u56fe\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u5468 / \u5c0f\u5468\uff09",
+    "cmd.toggle": "\u5faa\u73af\u5207\u6362\u6708\u5386\u89c6\u56fe\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u5468 / \u5c0f\u5468 / \u4e09\u5929\u89c6\u56fe\uff09",
     "error.badDateConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u8bc6\u522b\u7684\u65e5\u671f\u4efb\u52a1\u884c ({path}:{line}): {text}",
     "error.builtinHoliday": "\u6708\u5386\u4efb\u52a1\uff1a\u5185\u7f6e\u8282\u5047\u65e5\u6570\u636e\u8bfb\u53d6\u5931\u8d25\uff08holidays.json \u7f3a\u5931\u6216\u635f\u574f\uff09\uff0c\u5bf9\u5e94\u5e74\u4efd\u5c06\u4f9d\u8d56\u7f51\u7edc\u6570\u636e\u6e90",
     "error.createFail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25:",
@@ -366,9 +366,11 @@ var I18N = {
     "view.cell.loadError": "\u4efb\u52a1\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u67e5\u770b\u63a7\u5236\u53f0",
     "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
     "view.header.nextMonth": "\u4e0b\u6708",
+    "view.header.nextThreeDay": "\u4e0b\u4e09\u5929",
     "view.header.nextWeek": "\u4e0b\u4e00\u5468",
     "view.header.pickView": "\u5207\u6362\u89c6\u56fe",
     "view.header.prevMonth": "\u4e0a\u6708",
+    "view.header.prevThreeDay": "\u4e0a\u4e09\u5929",
     "view.header.prevWeek": "\u4e0a\u4e00\u5468",
     "view.header.thisWeek": "\u56de\u5230\u672c\u5468",
     "view.header.title": "\u6708\u5386\u4efb\u52a1",
@@ -380,8 +382,10 @@ var I18N = {
     "view.mode.desc.agenda": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
     "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
     "view.mode.desc.list": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
+    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u65f6\u94fa\u5f00\uff0c\u70b9\u7a7a\u767d\u62c9\u65f6\u95f4\u6bb5\uff0c\u70b9 \uff0b \u65b0\u5efa\u4efb\u52a1",
     "view.mode.desc.week": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
     "view.mode.list": "\u5927\u6708\u89c6\u56fe",
+    "view.mode.timeGrid": "\u4e09\u5929\u89c6\u56fe",
     "view.mode.week": "\u5c0f\u5468\u89c6\u56fe",
     "view.month.1": "1\u6708",
     "view.month.10": "10\u6708",
@@ -403,6 +407,11 @@ var I18N = {
     "view.week.relative.prev": "\u4e0a\u5468",
     "view.week.relative.this": "\u672c\u5468",
     "view.week.title": "{a} \u2013 {b}",
+    "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52a1",
+    
+    "view.timegrid.alldayLabel": "\u5168\u5929",
+    "view.timegrid.today": "\u4eca\u5929",
+    "view.timegrid.updateFail": "\u65f6\u95f4\u6ca1\u80fd\u5199\u5165\uff0c\u8bf7\u91cd\u8bd5",
     "view.weekday.fri": "\u4e94",
     "view.weekday.mon": "\u4e00",
     "view.weekday.sat": "\u516d",
@@ -414,7 +423,7 @@ var I18N = {
   "zh-TW": {
     "cmd.open": "\u958b\u555f\u6708\u66c6\u4efb\u52d9\u8996\u5716",
     "cmd.refresh": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u4efb\u52d9\u8996\u5716",
-    "cmd.toggle": "\u8ff4\u5708\u5207\u63db\u6708\u66c6\u6aa2\u8996\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u9031 / \u5c0f\u9031\uff09",
+    "cmd.toggle": "\u8ff4\u5708\u5207\u63db\u6708\u66c6\u6aa2\u8996\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u9031 / \u5c0f\u9031 / \u4e09\u5929\u6aa2\u8996\uff09",
     "error.badDateConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u8b58\u5225\u7684\u65e5\u671f\u4efb\u52d9\u884c ({path}:{line}): {text}",
     "error.builtinHoliday": "\u6708\u66c6\u4efb\u52d9\uff1a\u5167\u5efa\u7bc0\u5047\u65e5\u6578\u64da\u8b80\u53d6\u5931\u6557\uff08holidays.json \u7f3a\u5931\u6216\u640d\u58de\uff09\uff0c\u5c0d\u61c9\u5e74\u4efd\u5c07\u4f9d\u8cf4\u7db2\u8def\u6578\u64da\u6e90",
     "error.createFail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff1a",
@@ -666,9 +675,11 @@ var I18N = {
     "view.cell.loadError": "\u4efb\u52d9\u8f09\u5165\u5931\u6557\uff0c\u8acb\u67e5\u770b\u4e3b\u63a7\u53f0",
     "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
     "view.header.nextMonth": "\u4e0b\u6708",
+    "view.header.nextThreeDay": "\u4e0b\u4e09\u5929",
     "view.header.nextWeek": "\u4e0b\u4e00\u9031",
     "view.header.pickView": "\u5207\u63db\u6aa2\u8996",
     "view.header.prevMonth": "\u4e0a\u6708",
+    "view.header.prevThreeDay": "\u4e0a\u4e09\u5929",
     "view.header.prevWeek": "\u4e0a\u4e00\u9031",
     "view.header.thisWeek": "\u56de\u5230\u672c\u9031",
     "view.header.title": "\u6708\u66c6\u4efb\u52d9",
@@ -680,8 +691,10 @@ var I18N = {
     "view.mode.desc.agenda": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
     "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
     "view.mode.desc.list": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
+    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u6642\u92ea\u958b\uff0c\u9ede\u7a7a\u767d\u62c9\u6642\u9593\u6bb5\uff0c\u9ede \uff0b \u65b0\u5efa\u4efb\u52d9",
     "view.mode.desc.week": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
     "view.mode.list": "\u5927\u6708\u6aa2\u8996",
+    "view.mode.timeGrid": "\u4e09\u5929\u6aa2\u8996",
     "view.mode.week": "\u5c0f\u9031\u6aa2\u8996",
     "view.month.1": "1\u6708",
     "view.month.10": "10\u6708",
@@ -703,6 +716,11 @@ var I18N = {
     "view.week.relative.prev": "\u4e0a\u9031",
     "view.week.relative.this": "\u672c\u9031",
     "view.week.title": "{a} \u2013 {b}",
+    "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52d9",
+    
+    "view.timegrid.alldayLabel": "\u5168\u5929",
+    "view.timegrid.today": "\u4eca\u5929",
+    "view.timegrid.updateFail": "\u6642\u9593\u6c92\u80fd\u5beb\u5165\uff0c\u8acb\u91cd\u8a66",
     "view.weekday.fri": "\u4e94",
     "view.weekday.mon": "\u4e00",
     "view.weekday.sat": "\u516d",
@@ -714,7 +732,7 @@ var I18N = {
   "en": {
     "cmd.open": "Open Monthly Tasks View",
     "cmd.refresh": "Refresh Monthly Tasks View",
-    "cmd.toggle": "Cycle monthly view (Month Cells / Month Agenda / Week Cells / Week Agenda)",
+    "cmd.toggle": "Cycle monthly view (Month Cells / Month Agenda / Week Cells / Week Agenda / 3-Day Timeline)",
     "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {text}",
     "error.builtinHoliday": "Monthly Tasks: Built-in holiday data read failed (holidays.json missing or corrupted), corresponding year will rely on network data source",
     "error.createFail": "Create task failed:",
@@ -966,9 +984,11 @@ var I18N = {
     "view.cell.loadError": "Failed to load tasks, check console",
     "view.cell.timeDuration": "{time} \xb7 {days}d",
     "view.header.nextMonth": "Next Month",
+    "view.header.nextThreeDay": "Next 3 days",
     "view.header.nextWeek": "Next week",
     "view.header.pickView": "Switch view",
     "view.header.prevMonth": "Prev Month",
+    "view.header.prevThreeDay": "Previous 3 days",
     "view.header.prevWeek": "Prev week",
     "view.header.thisWeek": "This week",
     "view.header.title": "Monthly Tasks",
@@ -980,8 +1000,10 @@ var I18N = {
     "view.mode.desc.agenda": "Whole month, tasks in the list below",
     "view.mode.desc.bigWeek": "One week only, tasks written in the cells",
     "view.mode.desc.list": "Whole month, tasks written in the cells",
+    "view.mode.desc.timeGrid": "Three days by hour; drag an empty slot to pick a range, tap + to add",
     "view.mode.desc.week": "One week only, tasks in the list below",
     "view.mode.list": "Month \u00b7 Cells",
+    "view.mode.timeGrid": "3-Day Timeline",
     "view.mode.week": "Week \u00b7 Agenda",
     "view.month.1": "Jan",
     "view.month.10": "Oct",
@@ -1003,6 +1025,11 @@ var I18N = {
     "view.week.relative.prev": "Last week",
     "view.week.relative.this": "This week",
     "view.week.title": "{a} \u2013 {b}",
+    "view.timegrid.addTask": "New task",
+    
+    "view.timegrid.alldayLabel": "all-day",
+    "view.timegrid.today": "Today",
+    "view.timegrid.updateFail": "Couldn't save the new time. Please try again.",
     "view.weekday.fri": "Fri",
     "view.weekday.mon": "Mon",
     "view.weekday.sat": "Sat",
@@ -1944,6 +1971,135 @@ var TaskParser = class {
     }
   }
   /**
+   * 三天视图拖拽/拉伸的落盘入口：只改行内 ⏰ 段，不重建任务行。
+   * 重建行会换 createdAt、重排行号，还要连带备注搬一次——拖一下不值得；
+   * 这里按 rawLine 精确定位，改不中就不写，绝不猜。
+   * @param task - 需 filePath / rawLine / lineNumber
+   * @param time - "HH:MM" 或 "HH:MM~HH:MM"；空串表示去掉时间标记
+   */
+  async updateTaskTime(task, time) {
+    const run = () => this._updateTaskTimeImpl(task, time);
+    this.writeQueue = this.writeQueue.then(run, run);
+    return this.writeQueue;
+  }
+  async _updateTaskTimeImpl(task, time) {
+    try {
+      const file = this.app.vault.getAbstractFileByPath(task.filePath);
+      if (!(file instanceof import_obsidian.TFile)) {
+        console.error(tr("error.fileNotFound", { path: task.filePath }));
+        return false;
+      }
+      const value = String(time || "").trim();
+      if (value && !/^\d{1,2}:\d{2}(?:~\d{1,2}:\d{2})?$/.test(value)) return false;
+      const wrote = await this._mutateFile(file, (content) => {
+        const lines = content.split("\n");
+        const idx = findTaskLineIdx(lines, task);
+        if (idx === -1) {
+          console.error(tr("error.rawLineNotFound", { path: task.filePath }));
+          return false;
+        }
+        // CRLF 文件：先把行尾 \r 摘下来，处理完在写回时放回。
+        // 行内清理用的 \s（timeRe 尾部、trimEnd、/\s+$/）都会把 \r 一起吃掉，
+        // 那一行就混成裸 LF 了——旧链路有整文件级的换行保持，这两个新方法没有
+        const rawLine = lines[idx];
+        const cr = rawLine.endsWith("\r") ? "\r" : "";
+        const line = cr ? rawLine.slice(0, -1) : rawLine;
+        const timeRe = /⏰\s*\d{1,2}:\d{1,2}(?:\s*[~～]\s*\d{1,2}:\d{1,2})?\s*/u;
+        let newLine;
+        if (timeRe.test(line)) {
+          newLine = value ? line.replace(timeRe, `⏰ ${value} `) : line.replace(timeRe, "");
+        } else if (value) {
+          // 写在新位置：📅 之前（与 _createTaskImpl 的标记顺序 内容→🛫→⏰→📅 一致）；
+          // 没有 📅 就插在行尾标签串之前；都没有则补在行末
+          if (/📅\s*\d{4}-\d{1,2}-\d{1,2}/u.test(line)) {
+            newLine = line.replace(/(\s*)(📅\s*\d{4}-\d{1,2}-\d{1,2})/u, ` ⏰ ${value} $2`);
+          } else {
+            const tags = line.match(/(?:\s#[^\s#]+)+\s*$/u);
+            newLine = tags
+              ? line.slice(0, tags.index) + ` ⏰ ${value}` + line.slice(tags.index)
+              : `${line.trimEnd()} ⏰ ${value}`;
+          }
+        } else {
+          return false;
+        }
+        lines[idx] = newLine.replace(/\s+$/u, "") + cr;
+        return lines.join("\n");
+      });
+      if (!wrote) return false;
+      this.invalidateCache();
+      return true;
+    } catch (error) {
+      console.error(tr("error.noteSaveFail"), error);
+      return false;
+    }
+  }
+  /**
+   * 跨天拖拽的落盘入口：同一天只改时间走 updateTaskTime，换了日期就得连
+   * 🛫 / 📅 一起改。仍然只动定位到的那一行，不重建任务行。
+   * 单日任务的 🛫 与 📅 指向同一天，两个一起改；只写一个会把任务拉成两天。
+   * @param task - 需 filePath / rawLine / lineNumber
+   * @param dateKey - 新日期 YYYY-MM-DD
+   * @param time - "HH:MM" 或 "HH:MM~HH:MM"
+   */
+  async updateTaskSchedule(task, dateKey, time) {
+    const run = () => this._updateTaskScheduleImpl(task, dateKey, time);
+    this.writeQueue = this.writeQueue.then(run, run);
+    return this.writeQueue;
+  }
+  async _updateTaskScheduleImpl(task, dateKey, time) {
+    try {
+      const file = this.app.vault.getAbstractFileByPath(task.filePath);
+      if (!(file instanceof import_obsidian.TFile)) {
+        console.error(tr("error.fileNotFound", { path: task.filePath }));
+        return false;
+      }
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateKey || ""))) return false;
+      const value = String(time || "").trim();
+      if (value && !/^\d{1,2}:\d{2}(?:~\d{1,2}:\d{2})?$/.test(value)) return false;
+      const wrote = await this._mutateFile(file, (content) => {
+        const lines = content.split("\n");
+        const idx = findTaskLineIdx(lines, task);
+        if (idx === -1) {
+          console.error(tr("error.rawLineNotFound", { path: task.filePath }));
+          return false;
+        }
+        const rawLine = lines[idx];
+        const cr = rawLine.endsWith("\r") ? "\r" : "";
+        let line = cr ? rawLine.slice(0, -1) : rawLine;
+        let touched = false;
+        // 只认开始日与截止日；✅ 完成日、⏳ 计划日不该跟着块走
+        line = line.replace(/(🛫|📅)\s*\d{4}-\d{1,2}-\d{1,2}/gu, (m, mark) => {
+          touched = true;
+          return `${mark} ${dateKey}`;
+        });
+        if (!touched) return false;
+        const timeRe = /⏰\s*\d{1,2}:\d{1,2}(?:\s*[~～]\s*\d{1,2}:\d{1,2})?\s*/u;
+        if (timeRe.test(line)) {
+          line = value ? line.replace(timeRe, `⏰ ${value} `) : line.replace(timeRe, "");
+        } else if (value) {
+          // 与 updateTaskTime 同一套插入阶梯：📅 之前 → 行尾标签串之前 → 行末。
+          // 原先只有 📅 一级：只有 🛫 的任务拖到别天时时间被静默丢掉还返回 true
+          if (/📅\s*\d{4}-\d{1,2}-\d{1,2}/u.test(line)) {
+            line = line.replace(/(\s*)(📅\s*\d{4}-\d{1,2}-\d{1,2})/u, ` ⏰ ${value} $2`);
+          } else {
+            const tags = line.match(/(?:\s#[^\s#]+)+\s*$/u);
+            line = tags
+              ? line.slice(0, tags.index) + ` ⏰ ${value}` + line.slice(tags.index)
+              : `${line.trimEnd()} ⏰ ${value}`;
+          }
+        }
+        lines[idx] = line.replace(/\s+$/u, "") + cr;
+        return lines.join("\n");
+      });
+      if (!wrote) return false;
+      this.invalidateCache();
+      return true;
+    } catch (error) {
+      console.error(tr("error.noteSaveFail"), error);
+      return false;
+    }
+  }
+  /**
    * 在指定文件中创建新任务
    */
   async createTask(filePath, content, dueDate, isAllDay, time, priority, startDate, category, completed, note, preserveFromRawLine) {
@@ -2608,6 +2764,13 @@ function weekEndFrom(startKey) {
 function getWeekTitle(startKey) {
   const s = dateFromStr(startKey);
   const e = weekEndFrom(startKey);
+  const p = (x) => String(x.getMonth() + 1) + "/" + String(x.getDate());
+  return tr("view.week.title", { a: p(s), b: p(e) });
+}
+/** 三天视图标题：起点 + (count-1) 天，与周标题同一种紧凑写法 */
+function getDayRangeTitle(startKey, count) {
+  const s = dateFromStr(startKey);
+  const e = new Date(s.getFullYear(), s.getMonth(), s.getDate() + count - 1);
   const p = (x) => String(x.getMonth() + 1) + "/" + String(x.getDate());
   return tr("view.week.title", { a: p(s), b: p(e) });
 }
@@ -3293,16 +3456,20 @@ var VIEW_TYPE_MONTHLY = "monthly-tasks-view";
    week=小周（只留所在那一行的周格子，明细区不变）。
    v1.7.1：bigWeek=大周（只有一周 8 格：左上「本周」标题块 + 7 个日子格，
    任务写进格子里，整块可上下滚）。
+   v1.8.0：timeGrid=三天视图（三天 3 列 × 24 小时，定时任务画成可拖拽的时间块；
+   模式键沿用 timeGrid，改名会让老 data.json 的 viewMode 失效）。
    数组顺序即菜单顺序与命令循环顺序：先按范围（月 → 周）分组，组内「大」在前，
-   与用户口径「大月 / 小月 / 大周 / 小周」一致。 */
-var VIEW_MODES = ["list", "agenda", "bigWeek", "week"];
+   与用户口径「大月 / 小月 / 大周 / 小周」一致；三天视图挂在周组末尾。 */
+var VIEW_MODES = ["list", "agenda", "bigWeek", "week", "timeGrid"];
 var WEEK_TOGGLE_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="15" x2="8" y2="15.01"></line><line x1="12" y1="15" x2="12" y2="15.01"></line><line x1="16" y1="15" x2="16" y2="15.01"></line></svg>';
 var AGENDA_TOGGLE_ICONS = {
   agenda: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
   list: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>',
   week: WEEK_TOGGLE_ICON,
   // 大周：日历外框 + 一行两列的分栏与内容点（与「小周」那张「一行三点」区分开）
-  bigWeek: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="10" x2="12" y2="22"></line><line x1="7" y1="15" x2="7" y2="15.01"></line><line x1="17" y1="15" x2="17" y2="15.01"></line></svg>'
+  bigWeek: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="10" x2="12" y2="22"></line><line x1="7" y1="15" x2="7" y2="15.01"></line><line x1="17" y1="15" x2="17" y2="15.01"></line></svg>',
+  // 三天视图：钟面 + 时针，一眼区别于三种日历格
+  timeGrid: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15.5 14"></polyline></svg>'
 };
 
 /**
@@ -3449,8 +3616,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 两者都必须在首次 render 之前就位，否则第一帧会按条视图渲染再翻牌（闪一下）
     this.applyViewModeClass();
     this.convergeSelectedDate();
-    // 小周是冷启动默认值也可能命中的视图，锚点必须在首帧前就位
-    if (this.isWeekFamily()) this.ensureWeekAnchor();
+    // 周/三天视图可能是冷启动默认值，锚点必须在首帧前就位
+    this.ensurePeriodAnchor();
     await this.render();
   }
   /**
@@ -3460,6 +3627,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 审计 L12：先立标志，再作废在途渲染——两者顺序很重要：下面的定时器/弹窗清理里
     // 任何一处间接触发渲染，都该立刻被 viewClosed 挡回去。
     this.viewClosed = true;
+    this._tgClearDraft();
     // 递增 renderRequestId 使进行中的渲染 await 后判定失效（myRequestId !== this.renderRequestId），
     // 避免向已分离 DOM 继续添加节点
     this.renderRequestId = (this.renderRequestId || 0) + 1;
@@ -3668,7 +3836,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
     const leftGroup = this.headerEl.createDiv("header-btn-group");
     const prevBtn = leftGroup.createDiv("nav-btn prev-btn");
     prevBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
-    prevBtn.setAttribute("aria-label", this.isWeekFamily() ? tr("view.header.prevWeek") : tr("view.header.prevMonth"));
+    prevBtn.setAttribute("aria-label", this.isWeekFamily()
+      ? tr("view.header.prevWeek")
+      : this.isTimeGrid() ? tr("view.header.prevThreeDay") : tr("view.header.prevMonth"));
     prevBtn.addEventListener("click", () => this.navigatePeriod(-1));
     const titleEl = this.headerEl.createDiv("month-title");
     titleEl.textContent = this.headerTitleText();
@@ -3678,14 +3848,20 @@ var MonthlyView = class extends import_obsidian.ItemView {
     const rightGroup = this.headerEl.createDiv("header-btn-group");
     const nextBtn = rightGroup.createDiv("nav-btn next-btn");
     nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
-    nextBtn.setAttribute("aria-label", this.isWeekFamily() ? tr("view.header.nextWeek") : tr("view.header.nextMonth"));
+    nextBtn.setAttribute("aria-label", this.isWeekFamily()
+      ? tr("view.header.nextWeek")
+      : this.isTimeGrid() ? tr("view.header.nextThreeDay") : tr("view.header.nextMonth"));
     nextBtn.addEventListener("click", () => this.navigatePeriod(1));
     const todayBtn = rightGroup.createDiv("today-btn");
     // 真机反馈回退：图标化并未省下标题区（.month-title flex:1 吃掉余量），四字文案
     // 可读性更好，恢复 v1.4.2 文本按钮
-    // v1.7.0：周视图下同一颗按钮语义变成「回到本周」（四字，宽度不跳），文案分开
-    todayBtn.textContent = this.isWeekFamily() ? tr("view.header.thisWeek") : tr("view.header.today");
-    todayBtn.setAttribute("title", this.isWeekFamily() ? tr("view.header.thisWeek") : tr("view.header.today"));
+    // v1.7.0：周视图下同一颗按钮语义变成「回到本周」（四字，宽度不跳），文案分开；
+    // 三天视图只跳回今天，不重置成某个固定的三天窗口，用「今天」两字
+    const todayLabel = this.isWeekFamily()
+      ? tr("view.header.thisWeek")
+      : this.isTimeGrid() ? tr("view.timegrid.today") : tr("view.header.today");
+    todayBtn.textContent = todayLabel;
+    todayBtn.setAttribute("title", todayLabel);
     todayBtn.addEventListener("click", () => this.goToToday());
     // 漏斗筛选按钮（批次二⑤）：当前解析结果里出现 ≥1 个类别才渲染——纯无标签工作流
     // 永远看不到它；渲染与去留由 updateFilterButton 在每次网格渲染前统一收敛
@@ -3715,14 +3891,18 @@ var MonthlyView = class extends import_obsidian.ItemView {
       this.renderViewMenuPopup(viewBtn);
     });
   }
-  /** 顶栏标题文案：月视图=「2026年 10月」，周视图=「10/5 – 10/11」 */
+  /** 顶栏标题文案：月视图=「2026年 10月」，周视图=「10/5 – 10/11」，三日=「10/25 – 10/27」 */
   headerTitleText() {
-    return this.isWeekFamily() ? getWeekTitle(this.weekAnchor()) : getMonthTitle(this.currentYear, this.currentMonth);
+    if (this.isWeekFamily()) return getWeekTitle(this.weekAnchor());
+    if (this.isTimeGrid()) return getDayRangeTitle(this.threeDayAnchor(), 3);
+    return getMonthTitle(this.currentYear, this.currentMonth);
   }
-  /** 左右箭头统一入口：月视图按月走，周视图按周走（±7 天） */
+  /** 左右箭头统一入口：月视图按月走，周视图按周走（±7 天），三天视图按 3 天走 */
   async navigatePeriod(direction) {
     if (this.isWeekFamily()) {
       await this.navigateWeek(direction);
+    } else if (this.isTimeGrid()) {
+      await this.navigateThreeDay(direction);
     } else {
       await this.navigateMonth(direction);
     }
@@ -3743,7 +3923,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       this.currentYear = year;
       this.currentMonth = month;
       this.convergeSelectedDate();
-      if (this.isWeekFamily()) this.ensureWeekAnchor();
+      this.ensurePeriodAnchor();
       const rendered = await this.renderCalendarGridSafe("openDatePicker");
       if (!rendered) throw new Error("calendar render failed");
     });
@@ -3770,7 +3950,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
     if (!this.rootEl || this.viewClosed) return;
     // 大周视图没有列头：格子是 2 列（手机）/ 4 列（桌面）排布，列与星期不再
     // 一一对应，星期写在每格抬头（见 renderDayCell 的 bigWeek 分支）。
-    if (this.isBigWeek()) return;
+    // 三天视图自带「星期 + 日期」列头（要跟小时轴同宽对齐），也不用这条公共表头。
+    if (this.isBigWeek() || this.isTimeGrid()) return;
     const weekdayEl = document.createElement("div");
     weekdayEl.className = "weekday-header";
     const firstDayOfWeek = this.plugin.settings.firstDayOfWeek;
@@ -3822,7 +4003,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       // 条视图的格子（.day-cell .task-item）与日程视图的明细行（.agenda-item）
       // 都在 rootEl 下：明细区也走同一条删除线开关（v1.6.0 批次二），
       // 已完成 = 变暗 + 按开关决定是否划线，与条视图口径一致
-      apply(this.rootEl.querySelectorAll(".day-cell .task-item.completed, .agenda-item.completed"));
+      apply(this.rootEl.querySelectorAll(".day-cell .task-item.completed, .agenda-item.completed, .tg-block.completed, .tg-allday-item.completed"));
     }
     if (wantModal) {
       // 「该日已有 N 个任务」列表，挂在 body 上的弹窗里，只能全局扫
@@ -3838,30 +4019,33 @@ var MonthlyView = class extends import_obsidian.ItemView {
    * 同一天必然一模一样，不会出现「月视图有节日名、周视图没有」这类分叉。
    */
   visibleDays(calendar) {
+    if (this.isTimeGrid()) return this._synthDays(this.threeDayAnchor(), 3);
     if (!this.isWeekFamily()) return calendar.days;
     const start = this.weekAnchor();
     const at = calendar.days.findIndex((d) => formatDate(d.date) === start);
-    if (at < 0) {
-      // 锚点不在本月网格内（跨月周：如锚点 10/26 而当前显示 11 月）——
-      // 按锚点自身造 7 天，字段与 generateMonthCalendar 完全同构
-      const days = [];
-      const base = dateFromStr(start);
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
-        days.push({
-          date,
-          day: date.getDate(),
-          month: date.getMonth(),
-          year: date.getFullYear(),
-          isCurrentMonth: date.getMonth() === this.currentMonth,
-          isToday: isToday(date),
-          isWeekend: isWeekend(date),
-          dayOfWeek: date.getDay()
-        });
-      }
-      return days;
-    }
+    // 锚点不在本月网格内（跨月周：如锚点 10/26 而当前显示 11 月）——
+    // 按锚点自身造 7 天，字段与 generateMonthCalendar 完全同构
+    if (at < 0) return this._synthDays(start, 7);
     return calendar.days.slice(at, at + 7);
+  }
+  /** 从起点键连续造 count 天，字段与 generateMonthCalendar 同构 */
+  _synthDays(startKey, count) {
+    const base = dateFromStr(startKey);
+    const days = [];
+    for (let i = 0; i < count; i++) {
+      const date = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+      days.push({
+        date,
+        day: date.getDate(),
+        month: date.getMonth(),
+        year: date.getFullYear(),
+        isCurrentMonth: date.getMonth() === this.currentMonth,
+        isToday: isToday(date),
+        isWeekend: isWeekend(date),
+        dayOfWeek: date.getDay()
+      });
+    }
+    return days;
   }
   /**
    * header 序列的唯一重建入口（v1.7.0 从 updateFilterButton 里抽出）。
@@ -3875,6 +4059,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 判空只挡「onOpen 之前」，关闭之后靠 viewClosed。提前返回后 gridEl 保持 null，
     // 下游 _renderCalendarGridCore 的 `if (!this.gridEl) return false;` 能安全接住。
     if (!this.rootEl || this.viewClosed) return;
+    // 草稿条挂在 rootEl 里，empty() 会带走节点；document 上的丢弃监听要一起摘
+    this._tgClearDraft();
     this.rootEl.empty();
     this.gridEl = null;
     this.detailEl = null;
@@ -3996,6 +4182,14 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 从 empty() 到最后一格画完之间没有任何 await，用户看不到空白帧。
     if (!this.gridEl) return false;
     this.gridEl.empty();
+    // 三天视图是一条独立的渲染路径：3 列 × 24 小时的网格没有「格子」，与下面
+    // renderDayCell 的月/周格子语义都不同，提前分流，不去复用那套 DOM。
+    if (this.isTimeGrid()) {
+      this.renderTimeGrid(calendar, taskMap);
+      this.removeAgendaDetail();
+      this.updateFilterButton();
+      return true;
+    }
     // 大周视图要统计「这一周共几项、完成几项」：跨天任务在起止区间内每天都挂一次，
     // 所以按任务对象去重（同一个 task 引用只数一遍），口径与格子里铺出来的条数无关。
     // 审计 L3：这里**故意不按 showCompletedTasks 过滤**，而格子那一侧会过滤
@@ -4183,6 +4377,597 @@ var MonthlyView = class extends import_obsidian.ItemView {
       }
       this.openCreateTaskModal(day.date, displayTasksList);
     });
+  }
+  /**
+   * 三天视图（v1.8.0）：3 列 × 24 小时。
+   *
+   * 布局：列头吸顶，小时网格自己滚；首次进入把「现在」放在可视区上方约
+   * 三分之一处（窗口不含今天时停在 08:00），同一窗口内刷新保持原滚动位置。
+   * 任务分流：定时、时间可解析且不跨天 → 时间块；其余（无时间、时间非法、
+   * 跨天）→ 列头下方的吸顶全天条按日逐条列出，有才出现、限高内滚。
+   */
+  renderTimeGrid(calendar, taskMap) {
+    const gridEl = this.gridEl;
+    if (!gridEl) return;
+    // 重画即作废上一轮草稿：草稿节点随 gridEl.empty() 一起没了，document 上的
+    // 丢弃监听必须同步摘掉，否则下一轮会被一个看不见的草稿吞掉一次点击
+    this._tgClearDraft();
+    gridEl.addClass("time-grid");
+    const days = this.visibleDays(calendar);
+    const anchorKey = this.threeDayAnchor();
+    const restoreScroll = this._tgLastAnchor === anchorKey ? this._tgLastScrollTop : null;
+    this._tgLastAnchor = anchorKey;
+    const catFilter = this.activeCategories;
+    const dayTasks = days.map((day) => {
+      const key = formatDate(day.date);
+      let tasks = taskMap.taskMap.get(key) || [];
+      if (catFilter && catFilter.size > 0) tasks = tasks.filter((t) => catFilter.has(t.category));
+      if (!this.plugin.settings.showCompletedTasks) tasks = tasks.filter((t) => !t.completed);
+      return { day, key, tasks };
+    });
+    // 草稿拖到别的列时，要按那一列取回自己的 day/tasks（弹窗与全天条都用它）
+    this._tgDayTasks = dayTasks;
+
+    const scrollEl = gridEl.createDiv("tg-scroll");
+    const headEl = scrollEl.createDiv("tg-head");
+    const headRow = headEl.createDiv("tg-head-row");
+    headRow.createDiv("tg-gutter-head");
+    const headCols = headRow.createDiv("tg-head-cols");
+    for (const { day, tasks } of dayTasks) {
+      const head = headCols.createDiv("tg-day-head");
+      if (day.isToday) head.addClass("is-today");
+      if (day.isWeekend) head.addClass("is-weekend");
+      // 星期与日期并排：三列本来就不宽，两行堆叠只会把列头撑高
+      head.createDiv("tg-head-weekday").textContent = weekdayFullNames()[day.date.getDay()];
+      head.createDiv("tg-head-date").textContent = `${day.date.getMonth() + 1}/${day.date.getDate()}`;
+      // 点日期 = 当天的任务入口（弹窗里带着当天已有任务列表），不额外占高度
+      head.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.openCreateTaskModal(day.date, tasks, null);
+      });
+    }
+    // 全天任务按日逐条排出来：当天有几条就列几条，不折成计数、不截断成 +N。
+    // 条带随列头一起吸顶，滚动时间轴时仍在；整条限高、内部可滚，
+    // 这样某天堆了七八条也不会把时间轴压没，有/没有全天任务时列头高度都稳定
+    const allDayCols = dayTasks.map(({ day, tasks }) => ({
+      day,
+      tasks,
+      items: tasks.filter((t) => this._tgIsAllDayTask(t))
+    }));
+    if (allDayCols.some((d) => d.items.length > 0)) {
+      const band = headEl.createDiv("tg-allday-band");
+      band.createDiv("tg-allday-gutter").textContent = tr("view.timegrid.alldayLabel");
+      const bandCols = band.createDiv("tg-allday-cols");
+      for (const { day, tasks, items } of allDayCols) {
+        const cell = bandCols.createDiv("tg-allday-cell");
+        for (const task of items) {
+          const row = cell.createDiv("tg-allday-item");
+          this._tgPaintTaskColor(row, task);
+          if (task.completed) {
+            row.addClass("completed");
+            row.toggleClass("completed-strike", !this.plugin.settings.showCompletedStrike);
+          }
+          row.createSpan({ cls: "tg-allday-title", text: task.content });
+          row.setAttribute("title", task.category ? `${task.content} \u00b7 #${task.category}` : task.content);
+          row.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.openCreateTaskModal(this._tgTaskAnchor(task, day.date), tasks, task);
+          });
+        }
+        // 条带空白处也开当天的任务入口，和点日期同一个落点
+        cell.addEventListener("click", (e) => {
+          if (e.target.closest(".tg-allday-item")) return;
+          this.openCreateTaskModal(day.date, tasks, null);
+        });
+      }
+    }
+
+    const canvasEl = scrollEl.createDiv("tg-canvas");
+    const gutter = canvasEl.createDiv("tg-gutter");
+    for (let h = 0; h < 24; h++) {
+      const label = gutter.createDiv("tg-hour-label");
+      label.style.top = `${(h / 24) * 100}%`;
+      label.textContent = `${String(h).padStart(2, "0")}:00`;
+    }
+    const daysEl = canvasEl.createDiv("tg-days");
+    dayTasks.forEach(({ day, key, tasks }) => {
+      const col = daysEl.createDiv("tg-day-col");
+      col.dataset.date = key;
+      if (day.isToday) col.addClass("is-today");
+      if (day.isWeekend) col.addClass("is-weekend");
+      if (day.isToday) {
+        const now = new Date();
+        const nowEl = col.createDiv("tg-now");
+        nowEl.style.top = `${((now.getHours() * 60 + now.getMinutes()) / 1440) * 100}%`;
+      }
+      const timed = [];
+      for (const task of tasks) {
+        if (!task.time || this._tgIsMultiDayTask(task)) continue;
+        const range = this._tgParseRange(task.time);
+        if (range) timed.push({ task, ...range });
+      }
+      this._tgLayoutOverlaps(timed);
+      for (const item of timed) this._tgRenderBlock(col, item, day, tasks);
+      col.addEventListener("click", (e) => {
+        if (e.target.closest(".tg-block")) return;
+        const rect = col.getBoundingClientRect();
+        if (rect.height <= 0) return;
+        const minutes = Math.max(0, Math.min(1439, ((e.clientY - rect.top) / rect.height) * 1440));
+        // 起点最多 23:30：再往下点（23:31+）不该退回到 23:00 开始，给个 30 分钟的口子
+        let start = Math.min(23 * 60 + 30, Math.floor(minutes / 30) * 30);
+        const end = Math.min(start + 60, 23 * 60 + 59);
+        // 先出草稿条，不写盘；点下一格会把它挪过去，点别处直接丢弃
+        this._tgCreateDraft(col, day, tasks, start, end);
+      });
+    });
+
+    // 列头留在滚动容器里吸顶，宽度天然与小时网格一致；
+    // 只有首帧要按窗口决定停在哪一小时，之后刷新沿用用户当前的滚动位置
+    requestAnimationFrame(() => {
+      // 以滚动容器自己是否还在文档里为准：同一帧内若又画了一轮，旧容器的
+      // scrollTop 写回去只会覆盖新一轮的首屏定位
+      if (!scrollEl.isConnected) return;
+      const hourPx = canvasEl.getBoundingClientRect().height / 24;
+      if (restoreScroll != null) {
+        scrollEl.scrollTop = restoreScroll;
+      } else if (dayTasks.some(({ day }) => day.isToday)) {
+        const now = new Date();
+        const nowPx = ((now.getHours() * 60 + now.getMinutes()) / 1440) * hourPx * 24;
+        const viewH = Math.max(0, scrollEl.clientHeight - headEl.offsetHeight);
+        // 「现在」压在顶边等于一屏只看得见往后，往前提约三分之一屏，前面的时段也留得住。
+        // 列头（含全天条）是吸顶的：canvas 在视口里的起点已经是 headH，
+        // 这里只按「列头以下的可视高度」倒推滚动量，否则全天条一高，
+        // 「现在」会被推进列头底下
+        scrollEl.scrollTop = Math.max(0, nowPx - viewH * 0.35);
+      } else {
+        // 同理：让 08:00 落在列头下沿 8px 处，而不是再往下藏一个列头的高度
+        scrollEl.scrollTop = Math.max(0, 8 * hourPx - 8);
+      }
+      this._tgLastScrollTop = scrollEl.scrollTop;
+    });
+    scrollEl.addEventListener("scroll", () => {
+      this._tgLastScrollTop = scrollEl.scrollTop;
+    });
+  }
+  /** 清掉草稿条与 document 上的丢弃监听（重画、切视图、关视图都要走） */
+  _tgClearDraft() {
+    if (this._tgDraftDismiss) {
+      document.removeEventListener("click", this._tgDraftDismiss, true);
+      this._tgDraftDismiss = null;
+    }
+    if (this._tgDraftEl) {
+      this._tgDraftEl.remove();
+      this._tgDraftEl = null;
+    }
+  }
+  /**
+   * 空白格草稿条：只在 DOM 里放一根临时块，不写文件。
+   * 上/下边框拖动改起止（15 分钟吸附），条体拖动整体平移；条内 ＋ 才把
+   * 当前区间交给创建弹窗。点别处由 document 的 capture 监听丢弃。
+   */
+  _tgCreateDraft(col, day, tasks, start, end) {
+    this._tgClearDraft();
+    const el = col.createDiv("tg-block tg-draft");
+    this._tgDraftEl = el;
+    let curStart = start;
+    let curEnd = end;
+    // 草稿也能横向拖到别的日子：拖过去之后 ＋ 开的是那一日的弹窗
+    let curDay = day;
+    let curTasks = tasks;
+    el.createDiv("tg-block-time tg-draft-time");
+    const add = el.createEl("button", {
+      cls: "tg-draft-add",
+      attr: { type: "button", "aria-label": tr("view.timegrid.addTask"), title: tr("view.timegrid.addTask") }
+    });
+    add.innerHTML = AGENDA_ADD_ICON;
+    el.createDiv("tg-resize tg-resize-top").setAttribute("aria-hidden", "true");
+    el.createDiv("tg-resize tg-resize-bottom").setAttribute("aria-hidden", "true");
+    const paint = () => {
+      el.style.top = `${(curStart / 1440) * 100}%`;
+      el.style.height = `${((curEnd - curStart) / 1440) * 100}%`;
+      el.toggleClass("is-short", curEnd - curStart < 45);
+      el.querySelector(".tg-draft-time").textContent =
+        `${this._tgFmtMinutes(curStart)}\u2013${this._tgFmtMinutes(curEnd)}`;
+    };
+    const snap = (m) => Math.round(m / 15) * 15;
+    const hourPx = () => {
+      const canvas = el.closest(".tg-canvas");
+      const h = canvas ? canvas.getBoundingClientRect().height : 0;
+      return h > 0 ? h / 24 : 52;
+    };
+    let mode = "move";
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    let baseStart = curStart;
+    let baseEnd = curEnd;
+    let active = false;
+    let colSpans = [];
+    const pickCol = (x) => {
+      for (const s of colSpans) if (x >= s.left && x < s.right) return s.col;
+      return null;
+    };
+    const cleanup = () => {
+      el.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onUp);
+      el.removeClass("is-dragging");
+      if (pointerId != null) {
+        try { el.releasePointerCapture(pointerId); } catch (e) {}
+        pointerId = null;
+      }
+      active = false;
+    };
+    const onMove = (ev) => {
+      if (pointerId != null && ev.pointerId != null && ev.pointerId !== pointerId) return;
+      if (!active) {
+        if (Math.hypot(ev.clientX - startX, ev.clientY - startY) <= 2) return;
+        active = true;
+        el.addClass("is-dragging");
+      }
+      const delta = snap(((ev.clientY - startY) / hourPx()) * 60);
+      if (mode === "start") {
+        curStart = Math.max(0, Math.min(baseEnd - 15, baseStart + delta));
+        curEnd = baseEnd;
+      } else if (mode === "end") {
+        curStart = baseStart;
+        curEnd = Math.max(baseStart + 15, Math.min(1439, baseEnd + delta));
+      } else {
+        const span = baseEnd - baseStart;
+        curStart = Math.max(0, Math.min(1439 - span, baseStart + delta));
+        curEnd = curStart + span;
+        const hit = pickCol(ev.clientX);
+        if (hit && hit.col !== el.parentElement) {
+          hit.col.appendChild(el);
+          const target = (this._tgDayTasks || []).find((d) => d.key === hit.col.dataset.date);
+          if (target) {
+            curDay = target.day;
+            curTasks = target.tasks;
+          }
+        }
+      }
+      paint();
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+    const onUp = (ev) => {
+      if (pointerId != null && ev && ev.pointerId != null && ev.pointerId !== pointerId) return;
+      cleanup();
+    };
+    el.addEventListener("pointerdown", (ev) => {
+      if (ev.button != null && ev.button !== 0) return;
+      // ＋ 是唯一出口：按在它上面不进入拖拽，交给 click
+      if (ev.target.closest(".tg-draft-add")) return;
+      mode = ev.target.closest(".tg-resize-top") ? "start"
+        : ev.target.closest(".tg-resize-bottom") ? "end" : "move";
+      pointerId = ev.pointerId;
+      startX = ev.clientX;
+      startY = ev.clientY;
+      baseStart = curStart;
+      baseEnd = curEnd;
+      active = false;
+      const wrap = el.parentElement && el.parentElement.parentElement;
+      colSpans = wrap ? Array.from(wrap.children).map((c) => {
+        const r = c.getBoundingClientRect();
+        return { col: c, left: r.left, right: r.right };
+      }) : [];
+      try { el.setPointerCapture(pointerId); } catch (e) {}
+      el.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
+      ev.preventDefault();
+    });
+    add.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const time = `${this._tgFmtMinutes(curStart)}~${this._tgFmtMinutes(curEnd)}`;
+      this._tgClearDraft();
+      this.openCreateTaskModal(curDay.date, curTasks, null, { time });
+    });
+    paint();
+    // 建草稿的这一下点击还会继续冒泡到列上；监听器挪到下一帧再挂，
+    // 免得刚建出来的草稿被自己这一下丢掉
+    requestAnimationFrame(() => {
+      if (this._tgDraftEl !== el) return;
+      this._tgDraftDismiss = (e) => {
+        if (!this._tgDraftEl) return;
+        if (e.target && e.target.closest && e.target.closest(".tg-draft")) return;
+        this._tgClearDraft();
+      };
+      document.addEventListener("click", this._tgDraftDismiss, true);
+    });
+  }
+  /** 编辑弹窗的锚点：跨天任务用开始日，单日任务用截止日 */
+  _tgTaskAnchor(task, fallbackDate) {
+    const s = task.startDate || task.dueDate;
+    return s ? dateFromStr(s) : fallbackDate;
+  }
+  _tgIsMultiDayTask(task) {
+    return !!(task.startDate && task.dueDate && task.startDate !== task.dueDate);
+  }
+  _tgIsAllDayTask(task) {
+    // 时间写坏（手改出 25:99 之类）时 _tgParseRange 返回 null，时间块与全天条
+    // 都会跳过它——整条任务在三天视图里凭空消失。归到全天条至少看得见、点得开
+    return !task.time || !this._tgParseRange(task.time) || this._tgIsMultiDayTask(task);
+  }
+  /** 「09:00」/「09:00~11:30」→ 分钟区间；单时间点按 1 小时画（不写回结束时间） */
+  _tgParseRange(time) {
+    // 手改文件可能写全角「～」（updateTaskTime 的匹配式两种都认），这里一并拆开
+    const parts = String(time || "").split(/[~～]/);
+    const toMin = (s) => {
+      const m = /^(\d{1,2}):(\d{1,2})$/.exec(String(s).trim());
+      if (!m) return null;
+      const h = Number(m[1]);
+      const min = Number(m[2]);
+      return h >= 0 && h <= 23 && min >= 0 && min <= 59 ? h * 60 + min : null;
+    };
+    const start = toMin(parts[0]);
+    if (start == null) return null;
+    let end = parts[1] ? toMin(parts[1]) : null;
+    const single = end == null;
+    if (single) end = Math.min(start + 60, 1439);
+    if (end <= start) end = Math.min(start + 15, 1439);
+    return { start, end, single };
+  }
+  /**
+   * 重叠任务分道：按开始时间切簇，簇内贪心放进最早空出来的道。
+   * 每簇统一用「簇内最大道数」算宽度，同簇的块左右边界才对得齐。
+   */
+  _tgLayoutOverlaps(items) {
+    const sorted = items.slice().sort((a, b) => a.start - b.start || b.end - a.end);
+    const clusters = [];
+    let cur = null;
+    for (const item of sorted) {
+      if (!cur || item.start >= cur.end) {
+        cur = { items: [], end: item.end };
+        clusters.push(cur);
+      }
+      cur.items.push(item);
+      if (item.end > cur.end) cur.end = item.end;
+    }
+    for (const cluster of clusters) {
+      const laneEnds = [];
+      for (const item of cluster.items) {
+        let lane = 0;
+        while (lane < laneEnds.length && laneEnds[lane] > item.start) lane++;
+        if (lane === laneEnds.length) laneEnds.push(item.end);
+        else laneEnds[lane] = item.end;
+        item.lane = lane;
+      }
+      for (const item of cluster.items) item.lanes = laneEnds.length;
+    }
+  }
+  _tgFmtMinutes(m) {
+    const mm = Math.max(0, Math.min(1439, Math.round(m)));
+    return `${String(Math.floor(mm / 60)).padStart(2, "0")}:${String(mm % 60).padStart(2, "0")}`;
+  }
+  _tgPaintTaskColor(el, task) {
+    // 无类别不套默认蓝：默认蓝恰好就是「生活」的色，看着像被误分了类。
+    // 交给 CSS 的中性灰，和草稿条的虚线蓝也能区分开
+    if (!task.category) {
+      el.addClass("is-uncategorized");
+      return;
+    }
+    const color = resolveCategoryColor(task.category, this.plugin.settings.categories);
+    el.style.setProperty("--tg-color", color);
+    el.style.setProperty("--tg-tint", hexToRgba(color, 0.14));
+    el.style.setProperty("--tg-tint-dark", hexToRgba(color, 0.26));
+  }
+  _tgRenderBlock(col, item, day, dayTasks) {
+    const task = item.task;
+    const el = col.createDiv("tg-block");
+    this._tgPaintTaskColor(el, task);
+    if (task.completed) {
+      el.addClass("completed");
+      el.toggleClass("completed-strike", !this.plugin.settings.showCompletedStrike);
+    }
+    // 45 分钟以下的块放不下「时间 + 标题」两行：让出时间行只留标题，
+    // 位置本身已经说明了时间（小时线 + 半小时虚线）
+    if (item.end - item.start < 45) el.addClass("is-short");
+    el.style.top = `${(item.start / 1440) * 100}%`;
+    el.style.height = `${((item.end - item.start) / 1440) * 100}%`;
+    const lanes = item.lanes || 1;
+    el.style.left = `calc(${(item.lane / lanes) * 100}% + 2px)`;
+    el.style.width = `calc(${100 / lanes}% - 4px)`;
+    el.createDiv("tg-block-time").textContent = item.single
+      ? this._tgFmtMinutes(item.start)
+      : `${this._tgFmtMinutes(item.start)}\u2013${this._tgFmtMinutes(item.end)}`;
+    el.createDiv("tg-block-title").textContent = task.content;
+    el.setAttribute("title", task.category ? `${task.content} \u00b7 #${task.category}` : task.content);
+    // 上下两条边框都能拉：补上原来缺的顶边，时间可以往前延
+    el.createDiv("tg-resize tg-resize-top").setAttribute("aria-hidden", "true");
+    el.createDiv("tg-resize tg-resize-bottom").setAttribute("aria-hidden", "true");
+    el.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (el._tgSuppressClick) {
+        el._tgSuppressClick = false;
+        return;
+      }
+      this.openCreateTaskModal(this._tgTaskAnchor(task, day.date), dayTasks, task);
+    });
+    this._tgAttachBlockDrag(el, item, task);
+  }
+  /**
+   * 时间块拖拽：块体上下移动、上/下边把手拉改起止，15 分钟吸附。
+   * 触屏 220ms 长按才进入拖拽——手指一落就抢事件会跟纵向滚动打架；
+   * 长按前位移超过 8px 视为滚动，直接放弃本次拖拽。鼠标移动超过 3px 才进入。
+   * 松手后只改行内 ⏰ 段（updateTaskTime），不重建任务行、不动行号。
+   */
+  _tgAttachBlockDrag(el, item, task) {
+    const view = this;
+    let mode = null;
+    let active = false;
+    let pointerId = null;
+    let startX = 0;
+    let startY = 0;
+    const baseStart = item.start;
+    const baseEnd = item.end;
+    let previewStart = baseStart;
+    let previewEnd = baseEnd;
+    let longPress = null;
+    // 横向换天：按下时把三列的左右边界记下来，拖动中按 clientX 判断指针落在哪一列，
+    // 落在别的列就把块整个搬过去（各列等高，top/height 的百分比原样有效）
+    let originCol = null;
+    let colSpans = [];
+    const pickCol = (x) => {
+      for (const s of colSpans) if (x >= s.left && x < s.right) return s.col;
+      return null;
+    };
+    const snap = (m) => Math.round(m / 15) * 15;
+    const hourPx = () => {
+      const canvas = el.closest(".tg-canvas");
+      const h = canvas ? canvas.getBoundingClientRect().height : 0;
+      return h > 0 ? h / 24 : 52;
+    };
+    const paint = () => {
+      el.style.top = `${(previewStart / 1440) * 100}%`;
+      el.style.height = `${((previewEnd - previewStart) / 1440) * 100}%`;
+      el.toggleClass("is-short", previewEnd - previewStart < 45);
+      const t = el.querySelector(".tg-block-time");
+      if (t) {
+        t.textContent = item.single && mode === "move"
+          ? view._tgFmtMinutes(previewStart)
+          : `${view._tgFmtMinutes(previewStart)}\u2013${view._tgFmtMinutes(previewEnd)}`;
+      }
+    };
+    const cancelLongPress = () => {
+      if (longPress != null) {
+        clearTimeout(longPress);
+        longPress = null;
+      }
+    };
+    const onTouchMove = (ev) => {
+      if (active) ev.preventDefault();
+    };
+    const activate = () => {
+      if (active) return;
+      active = true;
+      el.addClass("is-dragging");
+      // 长按期间手机可能判定成纵向滚动；进入拖拽后先关掉本元素的 touch-action，
+      // 再用非 passive 的 document touchmove 兜底（后者对已开始的滚动才拦得住）
+      el.style.touchAction = "none";
+      document.addEventListener("touchmove", onTouchMove, { passive: false });
+    };
+    const cleanup = () => {
+      cancelLongPress();
+      el.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
+      document.removeEventListener("touchmove", onTouchMove);
+      el.removeClass("is-dragging");
+      el.style.touchAction = "";
+      if (pointerId != null) {
+        try { el.releasePointerCapture(pointerId); } catch (e) {}
+        pointerId = null;
+      }
+      active = false;
+    };
+    const onMove = (ev) => {
+      if (pointerId != null && ev.pointerId != null && ev.pointerId !== pointerId) return;
+      if (!active) {
+        // 横向也算位移：跨天拖动一开始只有横移，只看 dy 会永远进不了拖拽态
+        const dist = Math.hypot(ev.clientX - startX, ev.clientY - startY);
+        // 鼠标不按下即拖：动过 3px 才算拖拽，单纯点一下不该闪一下拖拽态
+        if (ev.pointerType !== "touch" && dist > 3) activate();
+        else if (dist > 8) cancelLongPress();
+        return;
+      }
+      const delta = snap(((ev.clientY - startY) / hourPx()) * 60);
+      if (mode === "move") {
+        const hit = pickCol(ev.clientX);
+        if (hit && hit.col !== el.parentElement) hit.col.appendChild(el);
+      }
+      if (mode === "resizeStart") {
+        previewStart = Math.max(0, Math.min(baseEnd - 15, baseStart + delta));
+        previewEnd = baseEnd;
+      } else if (mode === "resizeEnd") {
+        previewStart = baseStart;
+        previewEnd = Math.max(baseStart + 15, Math.min(1439, baseEnd + delta));
+      } else {
+        const span = baseEnd - baseStart;
+        previewStart = Math.max(0, Math.min(1439 - span, baseStart + delta));
+        previewEnd = previewStart + span;
+      }
+      paint();
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+    const onCancel = (ev) => {
+      if (pointerId != null && ev && ev.pointerId != null && ev.pointerId !== pointerId) return;
+      cleanup();
+      if (originCol && el.parentElement !== originCol) originCol.appendChild(el);
+      previewStart = baseStart;
+      previewEnd = baseEnd;
+      paint();
+    };
+    const onUp = async (ev) => {
+      // 多点触控时别让第二根手指的抬起结束第一根手指的拖拽
+      if (pointerId != null && ev && ev.pointerId != null && ev.pointerId !== pointerId) return;
+      const wasActive = active;
+      cleanup();
+      if (!wasActive) return;
+      const targetCol = el.parentElement;
+      const newDateKey = targetCol && targetCol.dataset ? targetCol.dataset.date : "";
+      const dayChanged = !!newDateKey && !!originCol
+        && originCol.dataset && newDateKey !== originCol.dataset.date;
+      if (!dayChanged && previewStart === baseStart && previewEnd === baseEnd) return;
+      el._tgSuppressClick = true;
+      // 拉过任意一条边就写区间：只有「整体平移 + 原本只有一个时间点」才维持单点写法
+      const newTime = mode === "move" && item.single
+        ? view._tgFmtMinutes(previewStart)
+        : `${view._tgFmtMinutes(previewStart)}~${view._tgFmtMinutes(previewEnd)}`;
+      try {
+        if (dayChanged) {
+          const ok = await view.taskParser.updateTaskSchedule(task, newDateKey, newTime);
+          if (!ok) throw new Error("updateTaskSchedule returned false");
+          // 🛫 与 📅 在单日任务里是同一天，内存里一起改，避免刷新前的下一帧又画回旧日子
+          if (task.dueDate) task.dueDate = newDateKey;
+          if (task.startDate) task.startDate = newDateKey;
+        } else {
+          const ok = await view.taskParser.updateTaskTime(task, newTime);
+          if (!ok) throw new Error("updateTaskTime returned false");
+        }
+        task.time = newTime;
+        await view.refresh(true);
+      } catch (err) {
+        console.error(err);
+        // 拖拽失败没有 refresh，元素还留在屏幕上：把点按拦截解掉，把块送回原来那一列，
+        // 否则用户下一次点这块任务会被这次失败吞掉一次，块也会停在一个没写进文件的日期上
+        el._tgSuppressClick = false;
+        if (originCol && el.parentElement !== originCol) originCol.appendChild(el);
+        previewStart = baseStart;
+        previewEnd = baseEnd;
+        paint();
+        new import_obsidian.Notice(tr("view.timegrid.updateFail"), 4e3);
+      }
+    };
+    el.addEventListener("pointerdown", (ev) => {
+      if (ev.button != null && ev.button !== 0) return;
+      mode = ev.target.closest(".tg-resize-top") ? "resizeStart"
+        : ev.target.closest(".tg-resize-bottom") ? "resizeEnd" : "move";
+      pointerId = ev.pointerId;
+      startX = ev.clientX;
+      startY = ev.clientY;
+      previewStart = baseStart;
+      previewEnd = baseEnd;
+      originCol = el.parentElement;
+      const wrap = originCol && originCol.parentElement;
+      colSpans = wrap ? Array.from(wrap.children).map((c) => {
+        const r = c.getBoundingClientRect();
+        return { col: c, left: r.left, right: r.right };
+      }) : [];
+      try { el.setPointerCapture(pointerId); } catch (e) {}
+      el.addEventListener("pointermove", onMove);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onCancel);
+      if (ev.pointerType === "touch") {
+        longPress = setTimeout(() => {
+          longPress = null;
+          activate();
+        }, 220);
+      }
+      // 鼠标/触控笔不在这里激活：等指针真的移动 3px 再由 onMove 进入拖拽
+    });
+    el.addEventListener("dblclick", (e) => e.stopPropagation());
   }
   /**
    * 手机端等高截断的网格观察（2026-10-10，v1.7.8）：ResizeObserver 只盯 rootEl 不够——
@@ -4624,7 +5409,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
   /**
    * 打开创建任务弹窗
    */
-  openCreateTaskModal(date, existingTasks = [], editTask = null) {
+  openCreateTaskModal(date, existingTasks = [], editTask = null, prefill = null) {
     const modal = new CreateTaskModal(this.app, date, async (content, isAllDay, time, priority, endDate, category, editOld, noteText) => {
       // 弹窗列表里的「勾选完成」是异步入队的，写完文件才回写 editOld.completed/rawLine。
       // 不等它落定就提交，会拿旧 completed 重建新行，把刚勾的完成盖回未完成（已复现）。
@@ -4687,7 +5472,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
         // 抛错让 CreateTaskModal 的 .catch 分支接管：保留弹窗、回滚 submitted/disabled 状态，允许用户重试
         throw new Error("createTaskForDate returned false");
       }
-    }, this.plugin, existingTasks, editTask);
+    }, this.plugin, existingTasks, editTask, prefill);
     modal.open();
   }
   /**
@@ -4714,9 +5499,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
     }
     // 日程视图：选中日跟着月份走，否则会出现「网格已翻月、明细还在上一月某天」
     this.convergeSelectedDate();
-    // 周视图：月都换了，锚点没有留在旧周的道理（convergeSelectedDate 已把选中日
-    // 拉进新月，这里据它重算锚点，标题与网格自然对齐）
-    if (this.isWeekFamily()) this.ensureWeekAnchor();
+    // 周/三天视图：月都换了，锚点没有留在旧周期里的道理（convergeSelectedDate 已把
+    // 选中日拉进新月，这里据它重算锚点，标题与网格自然对齐）
+    this.ensurePeriodAnchor();
     await this.renderCalendarGridSafe("navigateMonth"); // 1.7.11：兜底统一走 safe 包装
   }
   /**
@@ -4729,6 +5514,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.convergeSelectedDate();
     // 「回到本周」：周视图下锚点强制回到含今天那一周（ensureWeekAnchor 走 selectedDate=今天）
     if (this.isWeekFamily()) this.weekStart = weekStartFrom(new Date(), this.plugin.settings.firstDayOfWeek);
+    // 三天视图：窗口起点=今天，今天永远在第一列
+    else if (this.isTimeGrid()) this.threeDayStart = formatDate(new Date());
     await this.renderCalendarGridSafe("goToToday"); // 1.7.11：兜底统一走 safe 包装
   }
   /**
@@ -4756,9 +5543,17 @@ var MonthlyView = class extends import_obsidian.ItemView {
     return this.plugin.settings.viewMode === "bigWeek";
   }
   /**
+   * 三天视图（v1.8.0）：三天 × 24 小时的网格，定时任务画成可拖动的块。
+   * 故意沿用 timeGrid 这个模式键：改名会让老 data.json 里的 viewMode 失效。
+   */
+  isTimeGrid() {
+    return this.plugin.settings.viewMode === "timeGrid";
+  }
+  /**
    * 「按周过」的判定：顶栏标题=周区间、箭头按周翻页、锚点维护、visibleDays
    * 只取 7 天——小周与大周这些行为完全一致，故共用一个谓词，避免每处写两遍。
    * 注意：格子里画不画圆点、要不要明细区是 isCompactCell() 的事，两者正交。
+   * 三天视图不在此列：它按 3 天翻页、锚点起点就是选中日，与周起点无关。
    */
   isWeekFamily() {
     const m = this.plugin.settings.viewMode;
@@ -4803,8 +5598,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
     await this.plugin.saveSettings();
     // 进紧凑格子类视图时若从未选中过日子，先把选中日收敛到当前月内（否则明细区空白）
     if (this.isCompactCell() && !this.selectedDate) this.convergeSelectedDate();
-    // 进周视图：锚点若无或不属当前月，收到当前月（切出周视图不动锚点，回来还在同一周）
-    if (this.isWeekFamily()) this.ensureWeekAnchor();
+    // 进周/三天视图：锚点若无或不属当前月，收到当前月（切出去不动锚点，回来还在原位）
+    this.ensurePeriodAnchor();
     this.closeActivePopup();
     this.rebuildHeader();
     this.applyViewModeClass();
@@ -4820,8 +5615,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.appliedViewMode = this.plugin.settings.viewMode;
     this.rootEl.toggleClass("view-agenda", this.isCompactCell());
     this.rootEl.toggleClass("view-week", this.isWeek());
-
     this.rootEl.toggleClass("view-bigweek", this.isBigWeek());
+    this.rootEl.toggleClass("view-timegrid", this.isTimeGrid());
+    if (this.gridEl) this.gridEl.toggleClass("time-grid", this.isTimeGrid());
   }
   /** 周锚点（YYYY-MM-DD，视图内存态）：小周视图显示哪一周由它决定 */
   weekAnchor() {
@@ -4837,6 +5633,43 @@ var MonthlyView = class extends import_obsidian.ItemView {
   ensureWeekAnchor() {
     if (!this.selectedDate) this.convergeSelectedDate();
     this.weekStart = weekStartFrom(dateFromStr(this.selectedDate), this.plugin.settings.firstDayOfWeek);
+  }
+  /** 三日锚点（YYYY-MM-DD，视图内存态）：窗口的第一天 */
+  threeDayAnchor() {
+    return this.threeDayStart || this.selectedDate || formatDate(new Date());
+  }
+  /**
+   * 进三天视图：窗口从选中日开始。currentYear/Month 跟着窗口走——
+   * 否则从 10 月切进来、窗口跨到 11 月时，日期选择器还停在 10 月。
+   */
+  ensureThreeDayAnchor() {
+    if (!this.selectedDate) this.convergeSelectedDate();
+    this.threeDayStart = this.selectedDate;
+    const d = dateFromStr(this.threeDayStart);
+    this.currentYear = d.getFullYear();
+    this.currentMonth = d.getMonth();
+  }
+  /** 周期锚点的统一维护：周视图收周起点，三天视图收窗口起点，其余不碰 */
+  ensurePeriodAnchor() {
+    if (this.isWeekFamily()) this.ensureWeekAnchor();
+    else if (this.isTimeGrid()) this.ensureThreeDayAnchor();
+  }
+  /**
+   * 三日翻页：起点 ±3 天，currentYear/Month 跟到起点所在月。
+   * 选中日同步到新起点：再切回小周/小月时，明细区落在眼前这一屏上。
+   */
+  async navigateThreeDay(direction) {
+    const cur = dateFromStr(this.threeDayAnchor());
+    let next = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + direction * 3);
+    const min = new Date(1900, 0, 1);
+    const max = new Date(2100, 11, 31);
+    if (next < min) next = min;
+    else if (next > max) next = max;
+    this.threeDayStart = formatDate(next);
+    this.selectedDate = this.threeDayStart;
+    this.currentYear = next.getFullYear();
+    this.currentMonth = next.getMonth();
+    await this.renderCalendarGridSafe("navigateThreeDay"); // 1.7.11：兜底统一走 safe 包装
   }
   /**
    * 按周导航：锚点 ±7 天，再把 currentYear/Month 跟到锚点所在月——
@@ -5982,7 +6815,7 @@ var ViewMenuModal = class extends import_obsidian.Modal {
 };
 
 var CreateTaskModal = class extends import_obsidian.Modal {
-  constructor(app, date, onSubmit, plugin, existingTasks = [], editTask = null) {
+  constructor(app, date, onSubmit, plugin, existingTasks = [], editTask = null, prefill = null) {
     super(app);
     this.app = app;
     this.date = date;
@@ -5991,6 +6824,9 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     this.onSubmit = onSubmit;
     this.plugin = plugin;
     this.existingTasks = existingTasks;
+    // 三天视图草稿条带进来的预填时间（HH:MM~HH:MM）。
+    // 只在创建态生效；编辑态一律以任务自身的时间为准
+    this.prefillTime = prefill && typeof prefill.time === "string" ? prefill.time : "";
     // 批次三：编辑目标任务（null=创建态）。同弹窗类内分支，不新增第二个弹窗类；
     // 预填全部在 onOpen 构建期完成（打开方式=以任务锚点日期重建本弹窗）
     this.editingTask = editTask;
@@ -6328,7 +7164,16 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     applyNoteOpen();
     let startTimeEl = null;
     let endTimeEl = null;
-    let isAllDay = this.editingTask ? !this.editingTask.time : this.plugin.settings.defaultAllDayTask;
+    // 三天视图里拉草稿带进来的时间：此时用户选的是一个具体时段，不该再按
+    // 「默认全天」把时间区收起来（否则点 09:00 得到一条全天任务）
+    const prefillTime = !this.editingTask && /^\d{1,2}:\d{2}(?:~\d{1,2}:\d{2})?$/.test(this.prefillTime || "")
+      ? this.prefillTime.split("~").map((s) => {
+          const [h, m] = s.split(":");
+          return `${h.padStart(2, "0")}:${m.padStart(2, "0")}`;
+        }).join("~")
+      : "";
+    const prefillParts = prefillTime ? prefillTime.split("~") : [];
+    let isAllDay = this.editingTask ? !this.editingTask.time : (prefillTime ? false : this.plugin.settings.defaultAllDayTask);
     let allDayCheckbox = null;
     // setTimeOpen 定义在时间区渲染块内，但编辑态同步块也要调它——提到函数级声明
     let setTimeOpen = null;
@@ -6341,7 +7186,9 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     //   默认全天时整段时间区（含那行折叠的勾选）就不该出现，弹窗太长占地方；编辑态
     //   只在任务本身带时间时渲染。想建/改定时任务，先到设置里关掉「默认全天」。
     //   M7 指出的入口缺失属作者认可的取舍，后续审计勿再把这里改成恒渲染。
-    const renderTimeSection = !this.plugin.settings.defaultAllDayTask || this.editingTask && this.editingTask.time;
+    // v1.8.0 唯一例外：三天视图的草稿条已明确指定了时间（prefillTime），
+    // 那就要把时间区摊开、按钮上显示这段时间。
+    const renderTimeSection = !!prefillTime || !this.plugin.settings.defaultAllDayTask || this.editingTask && this.editingTask.time;
     if (renderTimeSection) {
       // 计算默认时间：系统时间取整到下一小时，结束时间+4小时（结束跨午夜截断到 23:59，
       // 避免 "22:00~02:00" 被结束时间校验拒绝）；23 点后开始时间不再 %24 回绕——
@@ -6359,11 +7206,11 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       const timeWrapper = timeContainer.createDiv("time-input-wrapper");
       // 原生时间输入框
       startTimeEl = timeWrapper.createEl("input", { type: "time", cls: "time-native-input" });
-      const defaultStartTime = `${defaultStartHourStr}:00`;
+      const defaultStartTime = prefillParts[0] || `${defaultStartHourStr}:00`;
       startTimeEl.value = defaultStartTime;
       timeWrapper.createEl("span", { cls: "time-separator", text: tr("modal.create.to") });
       endTimeEl = timeWrapper.createEl("input", { type: "time", cls: "time-native-input" });
-      const defaultEndTime = `${defaultEndHourStr}:${defaultEndMinuteStr}`;
+      const defaultEndTime = prefillParts[1] || `${defaultEndHourStr}:${defaultEndMinuteStr}`;
       endTimeEl.value = defaultEndTime;
       const allDayToggle = timeContainer.createDiv("all-day-toggle");
       allDayCheckbox = allDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": tr("modal.create.allDay") } });
@@ -6997,12 +7844,23 @@ function resolveCategoryColor(name, categories) {
   }
   return CATEGORY_PALETTE[h % CATEGORY_PALETTE.length];
 }
+/** #3b82f6 → rgba(59,130,246,α)：时间块的浅底色按类别色现算，深色模式用更高的 α */
+function hexToRgba(hex, alpha) {
+  const raw = String(hex || "").replace("#", "");
+  const full = raw.length === 3 ? raw.split("").map((c) => c + c).join("") : raw;
+  if (!/^[0-9a-f]{6}$/i.test(full)) return `rgba(59, 130, 246, ${alpha})`;
+  const r = parseInt(full.slice(0, 2), 16);
+  const g = parseInt(full.slice(2, 4), 16);
+  const b = parseInt(full.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 var DEFAULT_SETTINGS = {
   // 视图模式："list"（大月：格子里铺任务行）| "agenda"（小月：格子只出一枚圆点，
   // 文字在下方明细区）| "bigWeek"（大周：一周 8 格，左上「本周」块 + 7 个铺任务的
-  // 日子格）| "week"（小周：上半屏只留所在那一行的周格子）。
-  // v1.6.0 新增、v1.7.0 扩到三值、v1.7.1 扩到四值；老 data.json 缺该键时由
-  // Object.assign({}, DEFAULT_SETTINGS, loadedData) 取此默认值，不需额外兜底。
+  // 日子格）| "week"（小周：上半屏只留所在那一行的周格子）| "timeGrid"（三天视图：
+  // 三天 × 24 小时，定时任务画成可拖拽的块）。
+  // v1.6.0 新增、v1.7.0 扩到三值、v1.7.1 扩到四值、v1.8.0 扩到五值；老 data.json 缺
+  // 该键时由 Object.assign({}, DEFAULT_SETTINGS, loadedData) 取此默认值，不需额外兜底。
   viewMode: "list",
   // 界面语言：v1.7.2 起恒为 "auto"（跟随 Obsidian 界面语言），设置页不再提供选项；
 

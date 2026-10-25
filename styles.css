@@ -3,7 +3,7 @@
  * 月历任务插件样式 (Monthly Tasks Plugin)
  * ============================================================
  *
- * 版本：1.7.12
+ * 版本：1.8.0
  * 作者：duany
  *
  * 样式架构：
@@ -2734,22 +2734,30 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		padding: 0 16px 14px;
 	}
 
+	/* 两个时间框定宽居中，不再各占一半撑满整栏：
+	   右侧原生拾取器的图标原先是紧贴屏幕右边的 */
 	.time-input-wrapper {
-		gap: 6px;
-		flex-wrap: wrap;
+		gap: 10px;
+		flex-wrap: nowrap;
+		justify-content: center;
+		padding: 0 2px;
 	}
 	.time-native-input {
 		box-sizing: border-box;
-		flex: 1 1 100px;
-		width: 0;
+		flex: 0 1 108px;
+		width: 108px;
 		min-width: 0;
-		max-width: 160px;
-		padding: 10px 6px;
+		max-width: 108px;
+		padding: 9px 8px;
 		font-size: 16px;
+	}
+	.time-native-input::-webkit-calendar-picker-indicator {
+		margin-left: 4px;
 	}
 	.time-separator {
 		flex: 0 0 auto;
-		margin: 0 2px;
+		margin: 0;
+		font-size: 13px;
 	}
 	.theme-dark .time-native-input {
 		font-size: 16px;
@@ -3187,11 +3195,37 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* 「今天」与「选中日」必须分开：今天是整格描边（格子级），选中日只给日号包一枚
    实心蓝药丸（元素级）。两者若都用描边，用户分不清哪个是「今天」哪个是「正在看的那天」。 */
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number {
-	background: var(--primary-500);
+	position: relative;
+	z-index: 0;
 	color: #fff;
-	border-radius: 999px;
-	padding: 0 5px;
 	font-weight: 700;
+}
+
+/* 圆形取 1.4em，比日号行高略大：数字四周留出呼吸，单数字时左右各探出约 6px，
+   探进格子内边距和网格间隙，不会压到旁边的格子 */
+.monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 1.4em;
+	height: 1.4em;
+	transform: translate(-50%, -50%);
+	border-radius: 50%;
+	background: var(--primary-500);
+	z-index: -1;
+}
+
+/* 圆形会比日号本身宽，单数字时左边会探出格子内边距；agenda 格子里
+   只有日期和底部圆点，放开裁切才不会切掉圆的左缘 */
+.monthly-tasks-container.view-agenda .day-cell {
+	overflow: visible;
+}
+
+/* 放开裁切后农历不能再撑宽行：窄格子里让它自己省略，否则会溢到隔壁格子 */
+.monthly-tasks-container.view-agenda .lunar-info {
+	flex-shrink: 1;
+	min-width: 0;
 }
 
 /* 选中格自身不加边框，只给一层极淡底色帮助定位（描边留给「今天」） */
@@ -4028,4 +4062,650 @@ body:not(.is-mobile) .modal-container .modal-bg {
 
 .theme-dark .monthly-tasks-container.view-bigweek .week-summary-bar {
 	background: rgba(148, 163, 184, 0.24);
+}
+
+/* ============================================================
+   v1.8.0 三天视图（.view-timegrid）
+   ------------------------------------------------------------
+   三天 3 列 × 24 小时：列头吸顶，小时网格自己滚（root 不滚）。
+   小时高度、左侧时间轴宽度、列头高度三个量统一由 CSS 变量给，
+   块的 top/height 用百分比表达（JS 不量像素，只有拖拽时才量小时高度）。
+   ============================================================ */
+.monthly-tasks-container.view-timegrid {
+	--tg-hour: 52px;
+	--tg-gutter: 42px;
+	--tg-head-h: 40px;
+	--tg-line: var(--gray-200);
+	--tg-half-line: rgba(148, 163, 184, 0.18);
+	overflow: hidden;
+	/* 根容器在三天视图下永不滚动，取消基础样式为月网格预留的滚动条槽位，
+	   否则右缘会多出一条空白 */
+	scrollbar-gutter: auto;
+}
+
+.monthly-tasks-container.view-timegrid .calendar-grid.time-grid {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	gap: 0;
+}
+
+.tg-scroll {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-gutter: stable;
+	background: var(--bg-primary);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-sm);
+}
+
+/* ---------- 列头 ---------- */
+.tg-head {
+	position: sticky;
+	top: 0;
+	z-index: 6;
+	display: flex;
+	flex-direction: column;
+	background: var(--bg-primary);
+	border-bottom: 1px solid var(--tg-line);
+}
+
+/* 日期行只放星期与日期，固定高度；全天任务另起一条附在下面，
+   不往这一行里塞东西，三列的日期就永远在同一条中线上 */
+.tg-head-row {
+	display: flex;
+	min-height: var(--tg-head-h);
+	box-sizing: border-box;
+}
+
+.tg-gutter-head {
+	width: var(--tg-gutter);
+	flex: 0 0 auto;
+}
+
+.tg-head-cols {
+	flex: 1 1 auto;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	min-width: 0;
+}
+
+.tg-day-head {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	min-width: 0;
+	padding: 0 4px;
+	font-variant-numeric: tabular-nums;
+	cursor: pointer;
+}
+
+.tg-head-weekday {
+	font-size: 11px;
+	line-height: 1.1;
+	color: var(--gray-600);
+	white-space: nowrap;
+}
+
+.tg-head-date {
+	font-size: 16px;
+	line-height: 1.2;
+	font-weight: 600;
+	color: var(--gray-900);
+	white-space: nowrap;
+}
+
+.tg-day-head.is-weekend .tg-head-weekday {
+	color: var(--danger);
+}
+
+.tg-day-head.is-today .tg-head-date {
+	padding: 1px 7px;
+	border-radius: 999px;
+	color: #fff;
+	background: var(--primary-500);
+}
+
+/* ---------- 全天条 ----------
+   列头下方一条浅底带，当天的全天任务一条一行排出来，有几条列几条：
+   计数丸说明不了「是哪几件事」，所以不折、不截成 +N。
+   整条限高、内部可滚，某天堆多了也不会把时间轴压没；没有全天任务就不出现，
+   有/没有时日期行都是固定高度，列头不会因为多了几条任务忽然变挤 */
+.tg-allday-band {
+	display: flex;
+	/* 不拉伸成容器高：内容多时由条自己滚，列高按最长的一列算 */
+	align-items: flex-start;
+	box-sizing: border-box;
+	max-height: 90px;
+	overflow-y: auto;
+	padding: 3px 0 4px;
+	background: var(--bg-secondary);
+	border-top: 1px solid var(--tg-line);
+	scrollbar-width: none;
+}
+
+.tg-allday-band::-webkit-scrollbar {
+	width: 0;
+	height: 0;
+}
+
+.tg-allday-gutter {
+	position: sticky;
+	top: 0;
+	align-self: flex-start;
+	width: var(--tg-gutter);
+	flex: 0 0 auto;
+	box-sizing: border-box;
+	padding: 3px 5px 0 0;
+	text-align: right;
+	font-size: 10px;
+	line-height: 1.35;
+	color: var(--gray-500);
+	user-select: none;
+}
+
+.tg-allday-cols {
+	flex: 1 1 auto;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	min-width: 0;
+}
+
+.tg-allday-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	padding: 0 4px;
+	cursor: pointer;
+	border-left: 1px solid var(--tg-line);
+}
+
+.tg-allday-item {
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
+	min-height: 19px;
+	padding: 2px 5px;
+	border-left: 3px solid var(--tg-color, var(--primary-500));
+	border-radius: 4px;
+	background: var(--tg-tint, rgba(59, 130, 246, 0.14));
+	color: var(--gray-900);
+	font-size: 11px;
+	line-height: 1.35;
+	overflow: hidden;
+	cursor: pointer;
+	user-select: none;
+}
+
+.tg-allday-title {
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.tg-allday-item.completed {
+	opacity: 0.55;
+}
+
+.tg-allday-item.completed.completed-strike .tg-allday-title {
+	text-decoration: line-through;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.tg-allday-item:hover {
+		box-shadow: var(--shadow-sm);
+	}
+}
+
+/* ---------- 小时网格 ---------- */
+.tg-canvas {
+	position: relative;
+	display: flex;
+	height: calc(var(--tg-hour) * 24);
+}
+
+.tg-gutter {
+	position: relative;
+	width: var(--tg-gutter);
+	flex: 0 0 auto;
+}
+
+.tg-hour-label {
+	position: absolute;
+	right: 5px;
+	transform: translateY(-50%);
+	font-size: 10px;
+	line-height: 1;
+	color: var(--gray-500);
+	font-variant-numeric: tabular-nums;
+	pointer-events: none;
+}
+
+.tg-hour-label:first-child {
+	transform: none;
+}
+
+.tg-days {
+	flex: 1 1 auto;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	min-width: 0;
+}
+
+.tg-day-col {
+	position: relative;
+	min-width: 0;
+	cursor: pointer;
+	border-left: 1px solid var(--tg-line);
+	background-color: var(--bg-primary);
+	background-image:
+		linear-gradient(to bottom, var(--tg-half-line) 1px, transparent 1px),
+		linear-gradient(to bottom, var(--tg-line) 1px, transparent 1px);
+	background-size: 100% calc(var(--tg-hour) / 2), 100% var(--tg-hour);
+	background-repeat: repeat-y;
+}
+
+.tg-day-col.is-weekend {
+	background-color: rgba(148, 163, 184, 0.06);
+}
+
+.tg-day-col.is-today {
+	background-color: rgba(59, 130, 246, 0.05);
+}
+
+.tg-now {
+	position: absolute;
+	left: 0;
+	right: 0;
+	z-index: 3;
+	border-top: 1.5px solid var(--danger);
+	pointer-events: none;
+}
+
+.tg-now::before {
+	content: "";
+	position: absolute;
+	left: -3px;
+	top: -3.5px;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--danger);
+}
+
+/* ---------- 时间块 ---------- */
+.tg-block {
+	position: absolute;
+	z-index: 2;
+	box-sizing: border-box;
+	min-height: 14px;
+	/* 左内边距要减去 3px 的类别色竖条，正文才在块内真正居中 */
+	padding: 2px 8px 2px 5px;
+	/* 内容整块居中：靠左上角会正好压在顶部拉伸手柄下面，
+	   用户想拖整块时抓到的永远是「改开始时间」 */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1px;
+	text-align: center;
+	border-left: 3px solid var(--tg-color, var(--primary-500));
+	border-radius: 5px;
+	background: var(--tg-tint, rgba(59, 130, 246, 0.14));
+	color: var(--gray-900);
+	overflow: hidden;
+	cursor: grab;
+	touch-action: pan-y;
+	user-select: none;
+}
+
+/* 没类别就没有类别色：默认蓝恰好是「生活」的色，会看着像被误分类。
+   灰色中性条既说明「未分类」，也和草稿的虚线蓝区分得开 */
+.tg-block.is-uncategorized,
+.tg-allday-item.is-uncategorized {
+	--tg-color: #94a3b8;
+	--tg-tint: rgba(148, 163, 184, 0.18);
+	--tg-tint-dark: rgba(148, 163, 184, 0.3);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.tg-block:hover {
+		box-shadow: var(--shadow-sm);
+	}
+}
+
+.tg-block.is-dragging {
+	z-index: 6;
+	cursor: grabbing;
+	box-shadow: var(--shadow-md);
+	opacity: 0.92;
+}
+
+.tg-block.completed {
+	opacity: 0.55;
+}
+
+.tg-block.completed.completed-strike .tg-block-title {
+	text-decoration: line-through;
+}
+
+.tg-block-time {
+	max-width: 100%;
+	/* 空间不够时只压标题，时间行必须整行可读 */
+	flex-shrink: 0;
+	font-size: 10px;
+	line-height: 1.25;
+	color: var(--gray-600);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.tg-block-title {
+	max-width: 100%;
+	/* 居中布局下内容超高时两边一起裁，会把上面那行时间切掉；
+	   允许标题这个 item 自己压缩，时间行就始终留在块里 */
+	min-height: 0;
+	font-size: 12px;
+	line-height: 1.3;
+	font-weight: 500;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 4;
+	-webkit-box-orient: vertical;
+}
+
+.tg-block.is-short {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.tg-block.is-short .tg-block-time {
+	display: none;
+}
+
+.tg-block.is-short .tg-block-title {
+	font-size: 11px;
+	-webkit-line-clamp: 1;
+}
+
+/* 短块只剩一行标题，35% 高的上下热区会把它整个夹住：
+   手指按在字上永远落在「改时间」，整块挪不动。短块热区收窄到边上 */
+.tg-block.is-short .tg-resize {
+	height: clamp(4px, 22%, 8px);
+}
+
+/* 上下两条边都能拉：热区按块高伸缩（短块不至于两边打架），横线只在悬停/拖拽时提示 */
+.tg-resize {
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: clamp(5px, 35%, 14px);
+	cursor: ns-resize;
+	touch-action: none;
+}
+
+.tg-resize-top {
+	top: 0;
+}
+
+.tg-resize-bottom {
+	bottom: 0;
+}
+
+.tg-resize::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	width: 14px;
+	height: 2px;
+	border-radius: 1px;
+	background: var(--tg-color, var(--primary-500));
+	opacity: 0;
+	transform: translateX(-50%);
+	transition: opacity 0.12s ease;
+}
+
+/* 常态不露线：满屏都是块时几十根短横纯属噪点 */
+@media (hover: hover) and (pointer: fine) {
+	.tg-block:hover .tg-resize::after {
+		opacity: 0.45;
+	}
+}
+
+/* 触屏没有悬停，按住开始拖时再把两条边显出来，说明抓的是哪一头 */
+.tg-block.is-dragging .tg-resize::after {
+	opacity: 0.45;
+}
+
+.tg-resize-top::after {
+	top: 2px;
+}
+
+.tg-resize-bottom::after {
+	bottom: 2px;
+}
+
+/* ---------- 草稿条：点空白格先出一根，不写盘 ---------- */
+.tg-draft {
+	left: 2px;
+	right: 2px;
+	z-index: 4;
+	/* 时段和 ＋ 整组居中，不再把 ＋ 钉死在右边缘；
+	   普通块改成纵向居中后，草稿这里要显式回到横排 */
+	flex-direction: row;
+	text-align: left;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	/* 草稿还没类别，固定用主题蓝，和四周任何类别色的块都区分得开 */
+	border: 1px dashed var(--primary-500);
+	border-left-width: 3px;
+	border-radius: 6px;
+	background: rgba(59, 130, 246, 0.12);
+	padding: 2px 8px;
+	min-height: 26px;
+	/* 触屏上拖草稿不能顺带滚时间轴 */
+	touch-action: none;
+}
+
+/* 草稿的上下边就是主操作，热区比普通块大方些；两条边加起来也不吃掉中间的 ＋ */
+.tg-draft .tg-resize {
+	height: clamp(6px, 28%, 14px);
+}
+
+.tg-draft .tg-resize::after {
+	opacity: 0.7;
+	width: 20px;
+	background: var(--primary-500);
+}
+
+/* 草稿的时间是唯一反馈，再矮也不能像普通短块那样省掉 */
+.tg-draft.is-short .tg-block-time {
+	display: block;
+}
+
+.tg-draft.is-short {
+	min-height: 24px;
+	padding: 1px 6px;
+	gap: 4px;
+}
+
+/* 压到十几分钟时条里只剩一行字：横线会压在文字上，干脆收掉（虚线边框本身就说明可拉） */
+.tg-block.is-short .tg-resize-top::after,
+.tg-block.is-short .tg-resize-bottom::after {
+	opacity: 0;
+}
+
+.tg-draft-time {
+	min-width: 0;
+	/* 草稿里时间是横排长文，窄了要能省略号收尾 */
+	flex-shrink: 1;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.2;
+	color: var(--primary-600);
+}
+
+.tg-draft-add {
+	position: relative;
+	z-index: 2;
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background: var(--primary-500);
+	color: #fff;
+	cursor: pointer;
+	box-shadow: var(--shadow-sm);
+}
+
+.tg-draft-add svg {
+	pointer-events: none;
+}
+
+/* ---------- 深色：线降一档、块底色提亮 ---------- */
+.theme-dark .monthly-tasks-container.view-timegrid {
+	--tg-line: rgba(255, 255, 255, 0.12);
+	--tg-half-line: rgba(255, 255, 255, 0.06);
+}
+
+.theme-dark .tg-block {
+	background: var(--tg-tint-dark, rgba(59, 130, 246, 0.26));
+}
+
+.theme-dark .tg-allday-item {
+	background: var(--tg-tint-dark, rgba(59, 130, 246, 0.26));
+}
+
+.theme-dark .tg-draft {
+	background: rgba(59, 130, 246, 0.2);
+}
+
+.theme-dark .tg-hour-label {
+	color: var(--gray-600);
+}
+
+.theme-dark .tg-allday-gutter {
+	color: var(--gray-600);
+}
+
+.theme-dark .tg-draft-time {
+	color: #93c5fd;
+}
+
+.theme-dark .tg-day-head.is-weekend .tg-head-weekday {
+	color: #f87171;
+}
+
+.theme-dark .tg-day-col.is-weekend {
+	background-color: rgba(148, 163, 184, 0.09);
+}
+
+.theme-dark .tg-day-col.is-today {
+	background-color: rgba(59, 130, 246, 0.09);
+}
+
+.theme-dark .tg-scroll {
+	background: var(--bg-primary);
+}
+
+/* ---------- 手机：时间轴收窄、字再小一档 ---------- */
+@media (max-width: 480px) {
+	.monthly-tasks-container.view-timegrid {
+		--tg-hour: 56px;
+		--tg-gutter: 30px;
+		--tg-head-h: 36px;
+	}
+
+	.tg-hour-label {
+		right: 3px;
+		font-size: 9px;
+	}
+
+	.tg-head-weekday {
+		font-size: 10px;
+	}
+
+	.tg-head-date {
+		font-size: 14px;
+	}
+
+	.tg-day-head.is-today .tg-head-date {
+		padding: 0 6px;
+	}
+
+	.tg-allday-band {
+		max-height: 90px;
+		padding: 3px 0 4px;
+	}
+
+	.tg-allday-gutter {
+		padding-top: 3px;
+		font-size: 9px;
+	}
+
+	.tg-allday-cell {
+		gap: 2px;
+		padding: 0 3px;
+	}
+
+	.tg-allday-item {
+		padding: 2px 4px;
+		font-size: 11px;
+	}
+
+	.tg-block {
+		/* 同上：2px 的竖条已经占了左边 */
+		padding: 1px 6px 1px 4px;
+		border-left-width: 2px;
+	}
+
+	/* 三列时单列只有百来像素，「11:00–12:00」加上草稿的 ＋ 就撑满了 */
+	.tg-block-time {
+		font-size: 10px;
+	}
+
+	.tg-block-title {
+		font-size: 13px;
+	}
+
+	.tg-block.is-short .tg-block-title {
+		font-size: 12px;
+	}
+
+	.tg-draft {
+		/* 三列一窄，草稿条往两边各再让 1px 出来，时段才不会被 ＋ 挤成省略号 */
+		left: 1px;
+		right: 1px;
+		gap: 2px;
+		padding: 1px 3px;
+	}
+
+	.tg-draft-time {
+		font-size: 10px;
+	}
+
+	.tg-draft-add {
+		width: 16px;
+		height: 16px;
+	}
+
+	.tg-draft-add svg {
+		width: 10px;
+		height: 10px;
+	}
 }
