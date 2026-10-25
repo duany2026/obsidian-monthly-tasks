@@ -1,9 +1,9 @@
 {
 	"id": "monthly-tasks",
 	"name": "月历任务",
-	"version": "1.8.1",
+	"version": "1.8.2",
 	"minAppVersion": "0.15.0",
-	"description": "滴答清单风格的月视图任务管理插件，支持农历、节假日和调休显示",
+	"description": "滴答清单风格的任务管理插件：月/周/三天时间轴视图，支持农历、节假日和调休显示",
 	"author": "duany",
 	"authorUrl": "https://github.com/duany2026",
 	"isDesktopOnly": false

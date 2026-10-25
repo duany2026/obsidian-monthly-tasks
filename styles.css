@@ -3,7 +3,7 @@
  * 月历任务插件样式 (Monthly Tasks Plugin)
  * ============================================================
  *
- * 版本：1.8.1
+ * 版本：1.8.2
  * 作者：duany
  *
  * 样式架构：
@@ -1124,6 +1124,24 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	border-color: var(--interactive-accent);
 	background-color: var(--interactive-accent);
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4.5 10.5 8.2 14 15.5 5.8' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Obsidian 主题的对勾画在 :checked::before（mask 着色）上：appearance:none
+   管不到它，不单独中和就会和上面自绘的 background-image 对勾叠成两个。
+   连 :after 一起压掉，content/display/background/mask 四路全断 */
+.all-day-toggle input[type="checkbox"]::before,
+.all-day-toggle input[type="checkbox"]::after,
+.all-day-toggle input[type="checkbox"]:checked::before,
+.all-day-toggle input[type="checkbox"]:checked::after,
+.multi-day-toggle input[type="checkbox"]::before,
+.multi-day-toggle input[type="checkbox"]::after,
+.multi-day-toggle input[type="checkbox"]:checked::before,
+.multi-day-toggle input[type="checkbox"]:checked::after {
+	content: none;
+	display: none;
+	background: none;
+	-webkit-mask-image: none;
+	mask-image: none;
 }
 
 .all-day-toggle input[type="checkbox"]:not(:checked):hover,
@@ -5014,4 +5032,51 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		width: 10px;
 		height: 10px;
 	}
+}
+/* 删除后的撤销浮层：Notice 放不了按钮，自绘一枚 6 秒小条（新删除顶掉旧的，只保最新一笔） */
+.mt-undo-toast {
+	position: fixed;
+	left: 50%;
+	bottom: 32px;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 10px 8px 16px;
+	border-radius: 10px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+	z-index: 1000;
+}
+.mt-undo-toast-text {
+	font-size: 13px;
+	color: var(--text-normal);
+}
+.mt-undo-toast-btn {
+	appearance: none;
+	border: none;
+	cursor: pointer;
+	padding: 6px 12px;
+	border-radius: 7px;
+	font-size: 13px;
+	font-weight: 600;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+.mt-undo-toast-btn:disabled {
+	opacity: 0.5;
+}
+.theme-dark .mt-undo-toast {
+	background: var(--background-secondary);
+}
+@media (max-width: 600px) {
+	.mt-undo-toast {
+		bottom: 24px;
+	}
+}
+/* 三天视图：结束不晚于开始的时间段压成 15 分钟示意并加红色虚线描边，提示去改 */
+.tg-block.is-badtime {
+	outline: 1.5px dashed var(--danger);
+	outline-offset: -1.5px;
 }

@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.8.1
+ * 版本：1.8.2
  * 作者：duany
  * 许可证：MIT
  *
@@ -241,6 +241,9 @@ var I18N = {
     "modal.create.collapse": "\u6536\u8d77",
     "modal.create.dateLine": "{m}\u6708{day}\u65e5 \xb7 {weekday}",
     "modal.create.delete": "\u5220\u9664\u4efb\u52a1",
+    "task.deletedToast": "\u5df2\u5220\u9664",
+    "task.undo": "\u64a4\u9500",
+    "task.undoFail": "\u64a4\u9500\u5931\u8d25\uff0c\u8bf7\u624b\u52a8\u8865\u56de",
     "modal.create.deleteFail": "\u5220\u9664\u5931\u8d25\uff0c\u8be5\u4efb\u52a1\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c06\u5237\u65b0\u5217\u8868",
     "modal.create.displayDate": "{y}/{m}/{d}",
     "modal.create.edit": "\u7f16\u8f91\u4efb\u52a1",
@@ -382,7 +385,7 @@ var I18N = {
     "view.mode.desc.agenda": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
     "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
     "view.mode.desc.list": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
-    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u65f6\u94fa\u5f00\uff0c\u70b9\u7a7a\u767d\u62c9\u65f6\u95f4\u6bb5\uff0c\u70b9 \uff0b \u65b0\u5efa\u4efb\u52a1",
+    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u65f6\u94fa\u5f00\uff0c\u62d6\u52a8\u6392\u4efb\u52a1",
     "view.mode.desc.week": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
     "view.mode.list": "\u5927\u6708\u89c6\u56fe",
     "view.mode.timeGrid": "\u4e09\u5929\u89c6\u56fe",
@@ -408,6 +411,7 @@ var I18N = {
     "view.week.relative.this": "\u672c\u5468",
     "view.week.title": "{a} \u2013 {b}",
     "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52a1",
+    "view.timegrid.badTime": "\u65f6\u95f4\u6bb5\u65e0\u6548\uff1a\u7ed3\u675f\u4e0d\u665a\u4e8e\u5f00\u59cb",
     
     "view.timegrid.alldayLabel": "\u5168\u5929",
     "view.timegrid.alldayCollapse": "\u6536\u8d77\u5168\u5929\u4efb\u52a1",
@@ -553,6 +557,9 @@ var I18N = {
     "modal.create.collapse": "\u6536\u8d77",
     "modal.create.dateLine": "{m}\u6708{day}\u65e5 \xb7 {weekday}",
     "modal.create.delete": "\u522a\u9664\u4efb\u52d9",
+    "task.deletedToast": "\u5df2\u522a\u9664",
+    "task.undo": "\u64a4\u92b7",
+    "task.undoFail": "\u64a4\u92b7\u5931\u6557\uff0c\u8acb\u624b\u52d5\u88dc\u56de",
     "modal.create.deleteFail": "\u522a\u9664\u5931\u6557\uff0c\u8a72\u4efb\u52d9\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c07\u91cd\u65b0\u6574\u7406\u5217\u8868",
     "modal.create.displayDate": "{y}/{m}/{d}",
     "modal.create.edit": "\u7de8\u8f2f\u4efb\u52d9",
@@ -694,7 +701,7 @@ var I18N = {
     "view.mode.desc.agenda": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
     "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
     "view.mode.desc.list": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
-    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u6642\u92ea\u958b\uff0c\u9ede\u7a7a\u767d\u62c9\u6642\u9593\u6bb5\uff0c\u9ede \uff0b \u65b0\u5efa\u4efb\u52d9",
+    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u6642\u92ea\u958b\uff0c\u62d6\u52d5\u6392\u4efb\u52d9",
     "view.mode.desc.week": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
     "view.mode.list": "\u5927\u6708\u6aa2\u8996",
     "view.mode.timeGrid": "\u4e09\u5929\u6aa2\u8996",
@@ -720,6 +727,7 @@ var I18N = {
     "view.week.relative.this": "\u672c\u9031",
     "view.week.title": "{a} \u2013 {b}",
     "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52d9",
+    "view.timegrid.badTime": "\u6642\u9593\u6bb5\u7121\u6548\uff1a\u7d50\u675f\u4e0d\u665a\u65bc\u958b\u59cb",
     
     "view.timegrid.alldayLabel": "\u5168\u5929",
     "view.timegrid.alldayCollapse": "\u6536\u5408\u5168\u5929\u4efb\u52d9",
@@ -865,6 +873,9 @@ var I18N = {
     "modal.create.collapse": "Collapse",
     "modal.create.dateLine": "{m}/{day} \xb7 {weekday}",
     "modal.create.delete": "Delete Task",
+    "task.deletedToast": "Deleted",
+    "task.undo": "Undo",
+    "task.undoFail": "Undo failed; please re-add manually",
     "modal.create.deleteFail": "Delete failed, the task may have been modified; refreshing the list",
     "modal.create.displayDate": "{m}/{d}/{y}",
     "modal.create.edit": "Edit Task",
@@ -1006,7 +1017,7 @@ var I18N = {
     "view.mode.desc.agenda": "Whole month, tasks in the list below",
     "view.mode.desc.bigWeek": "One week only, tasks written in the cells",
     "view.mode.desc.list": "Whole month, tasks written in the cells",
-    "view.mode.desc.timeGrid": "Three days by hour; drag an empty slot to pick a range, tap + to add",
+    "view.mode.desc.timeGrid": "Three days by hour, drag to schedule",
     "view.mode.desc.week": "One week only, tasks in the list below",
     "view.mode.list": "Month \u00b7 Cells",
     "view.mode.timeGrid": "3-Day Timeline",
@@ -1032,6 +1043,7 @@ var I18N = {
     "view.week.relative.this": "This week",
     "view.week.title": "{a} \u2013 {b}",
     "view.timegrid.addTask": "New task",
+    "view.timegrid.badTime": "Invalid time range: end is not after start",
     
     "view.timegrid.alldayLabel": "all-day",
     "view.timegrid.alldayCollapse": "Hide all-day tasks",
@@ -1552,7 +1564,10 @@ var TaskParser = class {
     if (this.parsingPromise && !forceRefresh) {
       return this.parsingPromise;
     }
-    const mine = (async () => {
+    // 先声明再赋值：IIFE 在第一个 await 之前若同步抛错，finally 里的 mine 还没初始化，
+    // TDZ 错误会顶掉真实异常（空任务列表/前置步骤抛错时可复现）。hoist 后真错误能冒出来
+    let mine;
+    mine = (async () => {
       // 并发序号守卫：forceRefresh 允许另起在途解析后，先启动的（内容较旧的）
       // 解析可能更晚完成；写缓存前校验「自己仍是最后启动的那次」，旧快照不得覆盖新结果
       const mySeq = (this.parseSeq = (this.parseSeq || 0) + 1);
@@ -4743,8 +4758,11 @@ var MonthlyView = class extends import_obsidian.ItemView {
     let end = parts[1] ? toMin(parts[1]) : null;
     const single = end == null;
     if (single) end = Math.min(start + 60, 1439);
-    if (end <= start) end = Math.min(start + 15, 1439);
-    return { start, end, single };
+    // 结束不晚于开始（手滑/跨午夜写反）：防崩压成 15 分钟示意，并打 invalid 标记——
+    // 渲染时给红色虚线描边与提示，而不是让人对着一条莫名其妙的细条猜
+    const invalid = end <= start;
+    if (invalid) end = Math.min(start + 15, 1439);
+    return { start, end, single, invalid };
   }
   /**
    * 重叠任务分道：按开始时间切簇，簇内贪心放进最早空出来的道。
@@ -4811,6 +4829,10 @@ var MonthlyView = class extends import_obsidian.ItemView {
       : `${this._tgFmtMinutes(item.start)}\u2013${this._tgFmtMinutes(item.end)}`;
     el.createDiv("tg-block-title").textContent = task.content;
     el.setAttribute("title", task.category ? `${task.content} \u00b7 #${task.category}` : task.content);
+    if (item.invalid) {
+      el.addClass("is-badtime");
+      el.setAttribute("title", `${el.getAttribute("title")} — ${tr("view.timegrid.badTime")}`);
+    }
     // 上下两条边框都能拉：补上原来缺的顶边，时间可以往前延
     el.createDiv("tg-resize tg-resize-top").setAttribute("aria-hidden", "true");
     el.createDiv("tg-resize tg-resize-bottom").setAttribute("aria-hidden", "true");
@@ -7129,6 +7151,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
                 const titleEl2 = titleRow.querySelector(".existing-tasks-title");
                 if (titleEl2) titleEl2.textContent = tr("modal.create.existingCount", { n: this.existingTasks.length });
                 renderTasks();
+                this.plugin.showDeleteUndo(task);
               } else {
                 // 审计 M5：删除失败不能一声不响。旧实现只把按钮恢复可点，用户看到的
                 // 就是「点了删除、什么都没发生、也没提示」。与勾选失败（toggleFail）
@@ -7294,6 +7317,14 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       const allDayToggle = timeContainer.createDiv("all-day-toggle");
       allDayCheckbox = allDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": tr("modal.create.allDay") } });
       allDayToggle.createEl("span", { text: tr("modal.create.allDay") });
+      // 整行就是开关：行做成了药丸按钮的样子，只有小方框可点会像坏了。
+      // 点框本体交给浏览器切换（change 监听自会同步），点「+ 设置时间」不抢
+      allDayToggle.addEventListener("click", (e) => {
+        if (e.target === allDayCheckbox || allDayCheckbox.contains(e.target)) return;
+        if (e.target.closest(".time-show-btn")) return;
+        allDayCheckbox.checked = !allDayCheckbox.checked;
+        allDayCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+      });
       // 「+ 设置时间」：全天态下唯一的加时间入口，坐在勾选行右侧；
       // 时间框组默认折叠（display:none = 不进布局，手机上不再"跳出时间选择器"）
       const showTimeBtn = allDayToggle.createEl("button", { cls: "time-show-btn", type: "button", text: tr("modal.create.setTime") });
@@ -7363,6 +7394,13 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     const multiDayToggle = endDateWrapper.createDiv("multi-day-toggle");
     const multiDayCheckbox = multiDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": tr("modal.create.multiDay") } });
     multiDayToggle.createEl("span", { text: tr("modal.create.multiDay") });
+    // 同全天行：整行可点，框本体与行内日期触发器除外
+    multiDayToggle.addEventListener("click", (e) => {
+      if (e.target === multiDayCheckbox || multiDayCheckbox.contains(e.target)) return;
+      if (e.target.closest(".end-date-trigger")) return;
+      multiDayCheckbox.checked = !multiDayCheckbox.checked;
+      multiDayCheckbox.dispatchEvent(new Event("change", { bubbles: true }));
+    });
     // 自定义日期选择器触发按钮
     // v1.6.2 真机反馈：结束日期原先勾上「跨天任务」才长出来，第一眼像"没居中"、
     // 甚至以为没有这个控件。改成常驻——未勾选时置灰不可点，勾上即点亮，
@@ -7999,6 +8037,31 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
   /**
    * 插件加载
    */
+  /** 删除后的 6 秒撤销窗口：原文与备注还在内存里，点「撤销」按原标记写回。
+   *  复用加固过的 createTask（preserveFromRawLine 保住 createdAt/优先级等低频标记，
+   *  按排序位插回正确的月份节）；写盘后经 vault modify 事件自动刷新视图。 */
+  showDeleteUndo(task) {
+    const old = document.querySelector(".mt-undo-toast");
+    if (old) old.remove();
+    if (this._undoToastTimer) { clearTimeout(this._undoToastTimer); this._undoToastTimer = null; }
+    const toast = document.body.createDiv({ cls: "mt-undo-toast" });
+    toast.createSpan({ cls: "mt-undo-toast-text", text: tr("task.deletedToast") });
+    const btn = toast.createEl("button", { cls: "mt-undo-toast-btn", attr: { type: "button" } });
+    btn.textContent = tr("task.undo");
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      const ok = await this.taskParser.createTask(
+        task.filePath, task.content, task.dueDate, !task.time, task.time,
+        task.priority || 0, task.startDate || null, task.category || "", !!task.completed,
+        task.note || "", task.rawLine
+      );
+      toast.remove();
+      if (this._undoToastTimer) { clearTimeout(this._undoToastTimer); this._undoToastTimer = null; }
+      if (!ok) new import_obsidian.Notice(tr("task.undoFail"));
+    });
+    this._undoToastTimer = setTimeout(() => { toast.remove(); this._undoToastTimer = null; }, 6000);
+  }
+
   async onload() {
     // 初始化节假日管理器（每个插件实例独立）
     this.holidayManager = new HolidayManager();
