@@ -3,7 +3,7 @@
  * 月历任务插件样式 (Monthly Tasks Plugin)
  * ============================================================
  *
- * 版本：1.8.0
+ * 版本：1.8.1
  * 作者：duany
  *
  * 样式架构：
@@ -1067,6 +1067,18 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 .time-native-input:disabled::-webkit-calendar-picker-indicator {
 	cursor: not-allowed;
+}
+
+/* 时间框外壳：桌面端不产生盒子，原生输入照旧自己显示时间与拾取器箭头；
+   触屏端才变成自绘框（见下方 @media (pointer: coarse)），值和箭头由插件画，
+   不再受系统 WebView 给原生时间框定多宽的摆布 */
+.time-field {
+	display: contents;
+}
+
+.time-field-value,
+.time-field-chevron {
+	display: none;
 }
 
 .all-day-toggle {
@@ -2826,6 +2838,85 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	}
 }
 
+/* 触屏：时间框自绘。原生 <input type=time> 在手机上由系统 WebView 决定宽度，
+   时间码和拾取器箭头之间会空出一大截；这里把「时间 + 箭头」交给插件画，
+   原生输入透明铺满整个框，点哪都还是弹出系统时间选择器 */
+@media (pointer: coarse) {
+	.time-field {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		box-sizing: border-box;
+		min-height: 40px;
+		padding: 9px 10px;
+		border: 1px solid #d1d5db;
+		border-radius: 8px;
+		background: var(--background-primary);
+		cursor: pointer;
+	}
+
+	.time-field-value {
+		display: block;
+		font-size: 16px;
+		font-weight: 500;
+		line-height: 1.2;
+		color: #1f2937;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+
+	.time-field-chevron {
+		display: block;
+		flex: 0 0 auto;
+		width: 7px;
+		height: 7px;
+		border-right: 1.5px solid #64748b;
+		border-bottom: 1.5px solid #64748b;
+		transform: translateY(-2px) rotate(45deg);
+	}
+
+	.time-field .time-native-input {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		box-sizing: border-box;
+		width: 100%;
+		height: 100%;
+		min-width: 0;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		opacity: 0;
+		/* 小于 16px 时 iOS 聚焦会放大整页 */
+		font-size: 16px;
+		cursor: pointer;
+	}
+
+	.time-field:focus-within {
+		border-color: #3b82f6;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+	}
+
+	.time-field:has(.time-native-input:disabled) {
+		opacity: 0.4;
+	}
+
+	.theme-dark .time-field {
+		background: #1e293b;
+		border-color: #475569;
+	}
+
+	.theme-dark .time-field-value {
+		color: #e2e8f0;
+	}
+
+	.theme-dark .time-field-chevron {
+		border-color: #94a3b8;
+	}
+}
+
 /* 极窄屏（iPhone SE / 小屏安卓，≤380px）：卡片内容宽只剩 220px，两框加间距仍差一点
    → 再挤一档（内边距与间距同步收）。实测 100 + 6 + 105 = 211 ≤ 220 → 一行放得下，
    宁可紧凑也不让这行拆成两行 */
@@ -4209,6 +4300,131 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	user-select: none;
 }
 
+/* 「全天」本身就是折叠开关：别让它长成 Obsidian 的默认按钮样，
+   外观和旁边的小时标签一致，右侧加一个小箭头指示收/展 */
+.tg-allday-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 2px;
+	appearance: none;
+	height: auto;
+	min-height: 0;
+	margin: 0;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+	font-family: inherit;
+	font-weight: inherit;
+	font-size: 10px;
+	line-height: 1.35;
+	color: var(--gray-500);
+	cursor: pointer;
+}
+
+/* 主题里的 button:hover / :active 背景和阴影特异性比裸类名高，
+   这里一并压掉，不然鼠标悬停时「全天」会突然长出一块按钮底色 */
+.tg-allday-toggle:hover,
+.tg-allday-toggle:active,
+.tg-allday-toggle:focus {
+	background: transparent;
+	box-shadow: none;
+	border: 0;
+	color: var(--gray-700);
+}
+
+.tg-allday-toggle:focus-visible {
+	outline: 2px solid var(--interactive-accent, var(--primary-500));
+	outline-offset: -2px;
+}
+
+.tg-allday-toggle-label {
+	white-space: nowrap;
+}
+
+.tg-allday-chevron {
+	flex: 0 0 auto;
+	box-sizing: border-box;
+	width: 6px;
+	height: 6px;
+	border-right: 1.5px solid currentColor;
+	border-bottom: 1.5px solid currentColor;
+	transform: translateY(-1px) rotate(45deg);
+	transition: transform 0.15s ease;
+}
+
+.tg-allday-toggle[aria-expanded="true"] .tg-allday-chevron {
+	transform: translateY(2px) rotate(225deg);
+}
+
+/* 收起态只显示每日条数；展开态整组隐藏，回到逐条列表 */
+.tg-allday-counts {
+	display: none;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+}
+
+.tg-allday-count {
+	display: inline-flex;
+	align-items: center;
+	box-sizing: border-box;
+	min-height: 18px;
+	padding: 1px 7px;
+	border-radius: 999px;
+	background: var(--gray-100);
+	color: var(--gray-600);
+	font-size: 11px;
+	line-height: 1.3;
+	white-space: nowrap;
+}
+
+.tg-allday-band.is-collapsed {
+	align-items: stretch;
+	max-height: none;
+	overflow: hidden;
+	padding: 0;
+	cursor: pointer;
+}
+
+.tg-allday-band.is-collapsed .tg-allday-item {
+	display: none;
+}
+
+.tg-allday-band.is-collapsed .tg-allday-counts {
+	display: flex;
+}
+
+.tg-allday-band.is-collapsed .tg-allday-cell {
+	flex-direction: row;
+	align-items: center;
+	gap: 4px;
+	min-height: 24px;
+	padding: 2px 4px;
+}
+
+/* 收起态条带只有一行，标签随行居中，不再按多行列表的顶端对齐 */
+.tg-allday-band.is-collapsed .tg-allday-gutter {
+	align-self: center;
+	padding-top: 0;
+}
+
+/* 手指点「全天」收回去时，别只让 30×17 的字面接住：上下各借 6px，
+   左右不外扩，免得抢走第一列条带的点击 */
+@media (pointer: coarse) {
+	.tg-allday-toggle {
+		position: relative;
+	}
+
+	.tg-allday-toggle::after {
+		content: "";
+		position: absolute;
+		inset: -6px 0;
+	}
+}
+
 .tg-allday-cols {
 	flex: 1 1 auto;
 	display: grid;
@@ -4633,6 +4849,10 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	color: var(--gray-600);
 }
 
+.theme-dark .tg-allday-toggle:hover {
+	color: var(--gray-700);
+}
+
 .theme-dark .tg-draft-time {
 	color: #93c5fd;
 }
@@ -4696,6 +4916,28 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	.tg-allday-item {
 		padding: 2px 4px;
 		font-size: 11px;
+	}
+
+	.tg-allday-band.is-collapsed .tg-allday-cell {
+		gap: 3px;
+		min-height: 22px;
+		padding: 2px 3px;
+	}
+
+	.tg-allday-toggle {
+		gap: 1px;
+		padding-right: 4px;
+	}
+
+	.tg-allday-chevron {
+		width: 5px;
+		height: 5px;
+	}
+
+	.tg-allday-count {
+		min-height: 17px;
+		padding: 0 5px;
+		font-size: 10px;
 	}
 
 	.tg-block {

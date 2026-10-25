@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.8.0
+ * 版本：1.8.1
  * 作者：duany
  * 许可证：MIT
  *
@@ -410,6 +410,9 @@ var I18N = {
     "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52a1",
     
     "view.timegrid.alldayLabel": "\u5168\u5929",
+    "view.timegrid.alldayCollapse": "\u6536\u8d77\u5168\u5929\u4efb\u52a1",
+    "view.timegrid.alldayCount": "{n} \u9879",
+    "view.timegrid.alldayExpand": "\u5c55\u5f00\u5168\u5929\u4efb\u52a1",
     "view.timegrid.today": "\u4eca\u5929",
     "view.timegrid.updateFail": "\u65f6\u95f4\u6ca1\u80fd\u5199\u5165\uff0c\u8bf7\u91cd\u8bd5",
     "view.weekday.fri": "\u4e94",
@@ -719,6 +722,9 @@ var I18N = {
     "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52d9",
     
     "view.timegrid.alldayLabel": "\u5168\u5929",
+    "view.timegrid.alldayCollapse": "\u6536\u5408\u5168\u5929\u4efb\u52d9",
+    "view.timegrid.alldayCount": "{n} \u9805",
+    "view.timegrid.alldayExpand": "\u5c55\u958b\u5168\u5929\u4efb\u52d9",
     "view.timegrid.today": "\u4eca\u5929",
     "view.timegrid.updateFail": "\u6642\u9593\u6c92\u80fd\u5beb\u5165\uff0c\u8acb\u91cd\u8a66",
     "view.weekday.fri": "\u4e94",
@@ -1028,6 +1034,9 @@ var I18N = {
     "view.timegrid.addTask": "New task",
     
     "view.timegrid.alldayLabel": "all-day",
+    "view.timegrid.alldayCollapse": "Hide all-day tasks",
+    "view.timegrid.alldayCount": "{n} items",
+    "view.timegrid.alldayExpand": "Show all-day tasks",
     "view.timegrid.today": "Today",
     "view.timegrid.updateFail": "Couldn't save the new time. Please try again.",
     "view.weekday.fri": "Fri",
@@ -4426,9 +4435,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
         this.openCreateTaskModal(day.date, tasks, null);
       });
     }
-    // 全天任务按日逐条排出来：当天有几条就列几条，不折成计数、不截断成 +N。
-    // 条带随列头一起吸顶，滚动时间轴时仍在；整条限高、内部可滚，
-    // 这样某天堆了七八条也不会把时间轴压没，有/没有全天任务时列头高度都稳定
+    // 全天任务默认收成一行「全天」＋每日条数：某天堆了七八条时不再把时间轴挤到看不见。
+    // 点条带或左边的「全天」展开，展开后仍按日逐条列出（当天有几条列几条，不截成 +N），
+    // 整条限高、内部可滚。展开状态只存在视图字段里，刷新/翻日期不丢，也不写进 data.json
     const allDayCols = dayTasks.map(({ day, tasks }) => ({
       day,
       tasks,
@@ -4436,10 +4445,37 @@ var MonthlyView = class extends import_obsidian.ItemView {
     }));
     if (allDayCols.some((d) => d.items.length > 0)) {
       const band = headEl.createDiv("tg-allday-band");
-      band.createDiv("tg-allday-gutter").textContent = tr("view.timegrid.alldayLabel");
+      const toggle = band.createEl("button", { cls: "tg-allday-gutter tg-allday-toggle" });
+      toggle.setAttribute("type", "button");
+      toggle.createSpan({ cls: "tg-allday-toggle-label", text: tr("view.timegrid.alldayLabel") });
+      toggle.createSpan({ cls: "tg-allday-chevron" });
+      const applyAllDayExpanded = (expanded) => {
+        this._tgAllDayExpanded = expanded;
+        band.toggleClass("is-collapsed", !expanded);
+        toggle.setAttribute("aria-expanded", expanded ? "true" : "false");
+        const tip = tr(expanded ? "view.timegrid.alldayCollapse" : "view.timegrid.alldayExpand");
+        toggle.setAttribute("aria-label", tip);
+        toggle.setAttribute("title", tip);
+      };
+      applyAllDayExpanded(this._tgAllDayExpanded === true);
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        applyAllDayExpanded(!this._tgAllDayExpanded);
+      });
+      // 收起时点条带任何位置都算「我要看」：展开，而不是误开当天的新建弹窗
+      band.addEventListener("click", (e) => {
+        if (this._tgAllDayExpanded) return;
+        if (e.target.closest(".tg-allday-toggle")) return;
+        applyAllDayExpanded(true);
+      });
       const bandCols = band.createDiv("tg-allday-cols");
       for (const { day, tasks, items } of allDayCols) {
         const cell = bandCols.createDiv("tg-allday-cell");
+        const counts = cell.createDiv("tg-allday-counts");
+        if (items.length > 0) {
+          const pill = counts.createDiv("tg-allday-count");
+          pill.textContent = tr("view.timegrid.alldayCount", { n: items.length });
+        }
         for (const task of items) {
           const row = cell.createDiv("tg-allday-item");
           this._tgPaintTaskColor(row, task);
@@ -4454,9 +4490,11 @@ var MonthlyView = class extends import_obsidian.ItemView {
             this.openCreateTaskModal(this._tgTaskAnchor(task, day.date), tasks, task);
           });
         }
-        // 条带空白处也开当天的任务入口，和点日期同一个落点
+        // 展开后条带空白处也开当天的任务入口，和点日期同一个落点；
+        // 收起时这一下交给条带自己的展开处理，别顺手弹出新建窗
         cell.addEventListener("click", (e) => {
           if (e.target.closest(".tg-allday-item")) return;
+          if (!this._tgAllDayExpanded) return;
           this.openCreateTaskModal(day.date, tasks, null);
         });
       }
@@ -7178,6 +7216,9 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     applyNoteOpen();
     let startTimeEl = null;
     let endTimeEl = null;
+    // 自绘时间值的刷新回调（手机端用；桌面端原生输入自己显示，回调只是空转）
+    let syncStartTime = null;
+    let syncEndTime = null;
     // 三天视图里拉草稿带进来的时间：此时用户选的是一个具体时段，不该再按
     // 「默认全天」把时间区收起来（否则点 09:00 得到一条全天任务）
     const prefillTime = !this.editingTask && /^\d{1,2}:\d{2}(?:~\d{1,2}:\d{2})?$/.test(this.prefillTime || "")
@@ -7218,14 +7259,38 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       const timeContainer = this.modalEl.createDiv("modal-time-container");
       const timeLabelEl = timeContainer.createEl("span", { cls: "time-label", text: tr("modal.create.time") });
       const timeWrapper = timeContainer.createDiv("time-input-wrapper");
-      // 原生时间输入框
-      startTimeEl = timeWrapper.createEl("input", { type: "time", cls: "time-native-input" });
-      const defaultStartTime = prefillParts[0] || `${defaultStartHourStr}:00`;
-      startTimeEl.value = defaultStartTime;
+      // 手机端的时间框：原生 <input type=time> 的宽度和拾取器箭头位置由系统 WebView
+      // 决定，插件只改外框宽度压不进去（真机实测箭头仍被顶到框的最右边）。所以值的
+      // 文字和箭头改由插件画，原生输入透明地铺满整个框、只负责点开系统选择器；
+      // 桌面端 .time-field 是 display:contents，原生输入与以前完全一样
+      const fmtTimeValue = (v) => {
+        if (!v) return "--:--";
+        const [h, m] = String(v).split(":");
+        const t = new Date();
+        t.setHours(Number(h) || 0, Number(m) || 0, 0, 0);
+        return t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      };
+      const makeTimeField = (wrapper, initial) => {
+        const field = wrapper.createDiv("time-field");
+        const input = field.createEl("input", { type: "time", cls: "time-native-input" });
+        input.value = initial;
+        const valueEl = field.createSpan({ cls: "time-field-value" });
+        field.createSpan({ cls: "time-field-chevron" });
+        const sync = () => {
+          valueEl.textContent = fmtTimeValue(input.value);
+        };
+        sync();
+        input.addEventListener("input", sync);
+        input.addEventListener("change", sync);
+        return { input, sync };
+      };
+      const startField = makeTimeField(timeWrapper, prefillParts[0] || `${defaultStartHourStr}:00`);
+      startTimeEl = startField.input;
+      syncStartTime = startField.sync;
       timeWrapper.createEl("span", { cls: "time-separator", text: tr("modal.create.to") });
-      endTimeEl = timeWrapper.createEl("input", { type: "time", cls: "time-native-input" });
-      const defaultEndTime = prefillParts[1] || `${defaultEndHourStr}:${defaultEndMinuteStr}`;
-      endTimeEl.value = defaultEndTime;
+      const endField = makeTimeField(timeWrapper, prefillParts[1] || `${defaultEndHourStr}:${defaultEndMinuteStr}`);
+      endTimeEl = endField.input;
+      syncEndTime = endField.sync;
       const allDayToggle = timeContainer.createDiv("all-day-toggle");
       allDayCheckbox = allDayToggle.createEl("input", { attr: { type: "checkbox", "aria-label": tr("modal.create.allDay") } });
       allDayToggle.createEl("span", { text: tr("modal.create.allDay") });
@@ -7264,6 +7329,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // 设置下编辑全天任务会出现复选框未勾但提交按全天的观感不一致
       const tp0 = this.editingTask.time ? String(this.editingTask.time).split("~") : [];
       startTimeEl.value = tp0[0] || startTimeEl.value;
+      if (syncStartTime) syncStartTime();
       // 单时间点任务没有 tp0[1]：extractTime 接受裸 HH:MM，所以 task.time === "09:00"
       // 是文件里的合法形态。此前这里写 `|| endTimeEl.value`，于是结束框沿用「按当前
       // 时刻算出的 defaultStartHour+4」默认值（见上面 renderTimeSection 里算默认时间
@@ -7273,6 +7339,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // 改成清空，让界面显示真实状态；提交侧对「原本就是单时间点」的任务放行只填
       // 开始时间，原样写回 ⏰ 09:00（见 submitTask 的 origSinglePoint 分支）。
       endTimeEl.value = tp0[1] || "";
+      if (syncEndTime) syncEndTime();
       // 审计 M9：`<input type=time>` 会做值净化——赋 "25:99" 得到 ""（extractTime 归一化时
       // 只查数字形状、不查时钟范围，所以手改文件能造出这种值）。原任务带 ⏰ 而两个
       // 框都空 ⇒ 值被净化掉了，照旧提交会让 ⏰ 标记连同时间一起消失且无任何提示。
