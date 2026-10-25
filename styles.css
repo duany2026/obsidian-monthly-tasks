@@ -2734,25 +2734,25 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		padding: 0 16px 14px;
 	}
 
-	/* 两个时间框定宽居中，不再各占一半撑满整栏：
-	   右侧原生拾取器的图标原先是紧贴屏幕右边的 */
+	/* 两个时间框按内容取固有宽度，不再各占一半撑满整栏：
+	   定宽 108px 时时间码后面留一大截空白，原生拾取器的向下箭头被顶到框的
+	   最右边，看着离时间很远；取固有宽度后箭头就紧跟在时间码后面 */
 	.time-input-wrapper {
 		gap: 10px;
 		flex-wrap: nowrap;
 		justify-content: center;
 		padding: 0 2px;
 	}
-	.time-native-input {
+	.time-input-wrapper .time-native-input {
 		box-sizing: border-box;
-		flex: 0 1 108px;
-		width: 108px;
+		flex: 0 0 auto;
+		width: auto;
 		min-width: 0;
-		max-width: 108px;
 		padding: 9px 8px;
 		font-size: 16px;
 	}
-	.time-native-input::-webkit-calendar-picker-indicator {
-		margin-left: 4px;
+	.time-input-wrapper .time-native-input::-webkit-calendar-picker-indicator {
+		margin-left: 0;
 	}
 	.time-separator {
 		flex: 0 0 auto;
@@ -4543,6 +4543,36 @@ body:not(.is-mobile) .modal-container .modal-bg {
 .tg-block.is-short .tg-resize-top::after,
 .tg-block.is-short .tg-resize-bottom::after {
 	opacity: 0;
+}
+
+/* 触屏没有悬停：两条边的抓手常显，否则看不出能拉、也看不出拉的是哪一头；
+   命中区比桌面厚一档——手指不是 1px 的光标，抓手再细一按就滑出去 */
+@media (pointer: coarse) {
+	.tg-block:not(.tg-draft) .tg-resize {
+		height: clamp(8px, 32%, 20px);
+	}
+
+	.tg-block:not(.tg-draft) .tg-resize::after {
+		opacity: 0.4;
+		width: 24px;
+		height: 3px;
+		border-radius: 2px;
+	}
+
+	/* 十几到半小时的块本来就矮：抓手再厚就没地方按正文了 */
+	.tg-block.is-short:not(.tg-draft) .tg-resize {
+		height: clamp(5px, 24%, 9px);
+	}
+
+	.tg-block.is-short:not(.tg-draft) .tg-resize::after {
+		opacity: 0.25;
+		width: 18px;
+		height: 2px;
+	}
+
+	.tg-block.is-dragging:not(.tg-draft) .tg-resize::after {
+		opacity: 0.75;
+	}
 }
 
 .tg-draft-time {

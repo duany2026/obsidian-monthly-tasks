@@ -4584,7 +4584,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     let active = false;
     let colSpans = [];
     const pickCol = (x) => {
-      for (const s of colSpans) if (x >= s.left && x < s.right) return s.col;
+      for (const s of colSpans) if (x >= s.left && x < s.right) return s;
       return null;
     };
     const cleanup = () => {
@@ -4809,7 +4809,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     let originCol = null;
     let colSpans = [];
     const pickCol = (x) => {
-      for (const s of colSpans) if (x >= s.left && x < s.right) return s.col;
+      for (const s of colSpans) if (x >= s.left && x < s.right) return s;
       return null;
     };
     const snap = (m) => Math.round(m / 15) * 15;
@@ -4863,15 +4863,29 @@ var MonthlyView = class extends import_obsidian.ItemView {
     };
     const onMove = (ev) => {
       if (pointerId != null && ev.pointerId != null && ev.pointerId !== pointerId) return;
+      const dx = ev.clientX - startX;
+      const dy = ev.clientY - startY;
       if (!active) {
-        // 横向也算位移：跨天拖动一开始只有横移，只看 dy 会永远进不了拖拽态
-        const dist = Math.hypot(ev.clientX - startX, ev.clientY - startY);
-        // 鼠标不按下即拖：动过 3px 才算拖拽，单纯点一下不该闪一下拖拽态
-        if (ev.pointerType !== "touch" && dist > 3) activate();
-        else if (dist > 8) cancelLongPress();
-        return;
+        const dist = Math.hypot(dx, dy);
+        if (ev.pointerType === "touch") {
+          // 上下两条边自己 touch-action:none，滚动不会从这儿开始 —— 不用等长按，
+          // 压上去就能跟手；整块移动里横向为主的手势同样不会触发纵向滚动，跨天也直接跟手
+          const edge = mode !== "move";
+          const horizontal = Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(dy);
+          if (!edge && !horizontal) {
+            // 竖向整块移动会和滚动抢手势：只等长按；浏览器先接管成滚动时会发 pointercancel
+            if (dist > 8) cancelLongPress();
+            return;
+          }
+          if (dist <= 2) return;
+          cancelLongPress();
+        } else if (dist <= 3) {
+          // 鼠标不按下即拖：动过 3px 才算拖拽，单纯点一下不该闪一下拖拽态
+          return;
+        }
+        activate();
       }
-      const delta = snap(((ev.clientY - startY) / hourPx()) * 60);
+      const delta = snap((dy / hourPx()) * 60);
       if (mode === "move") {
         const hit = pickCol(ev.clientX);
         if (hit && hit.col !== el.parentElement) hit.col.appendChild(el);
@@ -4959,7 +4973,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       el.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
       window.addEventListener("pointercancel", onCancel);
-      if (ev.pointerType === "touch") {
+      if (ev.pointerType === "touch" && mode === "move") {
         longPress = setTimeout(() => {
           longPress = null;
           activate();
