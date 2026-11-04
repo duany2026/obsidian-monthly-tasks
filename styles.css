@@ -3291,9 +3291,10 @@ body:not(.is-mobile) .modal-container .modal-bg {
    必须在下面单独补一条带 .workspace-split 的规则，不能只靠这条。 */
 .monthly-tasks-container.view-agenda .day-cell {
 	min-height: 52px;
-	/* 左内边距比上/下大 7px：日号行盒中心距左边框要等于距上边框，圆才能在
-	   四边留出同样的空隙（数字宽度只有字高的一半，横向天然吃亏） */
-	padding: 5px 4px 5px 12px;
+	/* 上内边距 9px：数字字形的墨迹中心比行盒中心高 2.15px（19px 字号实测），
+	   上边多留 4px 才能让字形落在格子里的圆正中；左 12px 比上 9px 大 3px，
+	   正好补上数字宽度只有字高一半、横向墨迹中心偏右的差额 */
+	padding: 9px 4px 5px 12px;
 	gap: 0;
 }
 
@@ -3347,13 +3348,13 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 圆形取 1.4em：格子左内边距已放宽到 12px，圆直径 26.6px 仍完整落在格内。
-   圆心往下偏 0.079em，因为数字字形的视觉中心比行盒中心高约这么多（19px
-   字号实测 1.5px），补偿后数字落在圆内正中。圆不参与布局（绝对定位），
-   日号位置与其它日期完全一致 */
+   圆心取数字字形的墨迹中心，比行盒中心低 0.113em（数字字形天然偏上，
+   19px 字号实测 2.15px），这样数字正好落在圆内正中。圆不参与布局
+   （绝对定位），日号位置与其它日期完全一致 */
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
 	content: "";
 	position: absolute;
-	top: calc(50% + 0.079em);
+	top: calc(50% - 0.113em);
 	left: 50%;
 	width: 1.4em;
 	height: 1.4em;
@@ -3392,7 +3393,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 .workspace-split.mod-right-split .monthly-tasks-container.view-agenda .day-cell,
 .workspace-split.mod-left-split .monthly-tasks-container.view-agenda .day-cell {
 	min-height: 52px;
-	padding: 5px 4px 5px 12px;
+	padding: 9px 4px 5px 12px;
 }
 
 /* ---------- 深色模式：底色跟随主题变量，点色不变 ---------- */
