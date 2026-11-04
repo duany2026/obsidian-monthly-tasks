@@ -4015,6 +4015,25 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	}
 }
 
+/* 手机端压制 Obsidian 的底部弹层：is-phone 下 Obsidian 强制 modal 贴底、
+   全宽并播放从底部滑入的动画，规则带 !important，JS 内联 top/left 打不赢。
+   这里用更高特异性 + !important 把位置交还给 JS 写入的 --vm-top/--vm-left，
+   并关掉系统滑入动画；插件自己的 WAAPI 进出场（playEnter/playLeave）走
+   合成器动画层，不受 CSS animation/transition 禁用影响。 */
+body.is-phone .modal-container .modal.view-menu-modal {
+	position: fixed !important;
+	top: var(--vm-top) !important;
+	left: var(--vm-left) !important;
+	bottom: auto !important;
+	right: auto !important;
+	width: auto !important;
+	max-width: 92vw !important;
+	margin: 0 !important;
+	border-radius: 16px !important;
+	animation: none !important;
+	transition: none !important;
+}
+
 /* ============================================================
    v1.7.1 大周视图（.view-bigweek）
    ------------------------------------------------------------

@@ -6798,6 +6798,10 @@ var ViewMenuModal = class extends import_obsidian.Modal {
       }
       modalEl.style.left = `${left}px`;
       modalEl.style.top = `${top}px`;
+      // 手机端 Obsidian 的底部弹层规则带 !important，内联 top/left 打不赢，
+      // 位置经变量交给 styles.css 的 is-phone 覆盖规则
+      modalEl.style.setProperty("--vm-left", `${left}px`);
+      modalEl.style.setProperty("--vm-top", `${top}px`);
       modalEl.classList.toggle("cf-flip-up", flipped);
       modalEl.style.minHeight = "";
     };
