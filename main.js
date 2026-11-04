@@ -7614,7 +7614,11 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         const rect = endDateTrigger.getBoundingClientRect();
         const w = popup.offsetWidth || 320;
         const h = popup.offsetHeight || 340;
-        let left = Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - w - 8));
+        // 手机端屏幕窄：触发器（结束日期按钮）本身偏右，锚它左缘会把整个浮层
+        // 顶到右半边；改为相对屏幕水平居中。桌面端保持锚定触发器，不换上下文。
+        let left = import_obsidian.Platform.isPhone
+          ? Math.max(8, (window.innerWidth - w) / 2)
+          : Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - w - 8));
         let top = rect.bottom + 6;
         if (top + h > window.innerHeight - 8) {
           top = Math.max(8, rect.top - h - 6);
