@@ -3347,7 +3347,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-weight: 700;
 }
 
-/* 圆紧贴数字再均匀放大：直径 = 字形墨迹高度 + 0.4em，圆心对准字形中心。
+/* 圆紧贴数字再均匀放大：直径 = 字形墨迹高度 + 0.55em，圆心对准字形中心。
    两个值都由插件启动时用 canvas measureText 实测当前字体得出（--mt-badge-ink /
    --mt-badge-dy），不同字体下圆都均匀包住数字、数字自然居中。圆不参与布局
    （绝对定位），日号位置与其它日期完全一致 */
@@ -3356,8 +3356,8 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	position: absolute;
 	top: calc(50% - var(--mt-badge-dy, 0.113em));
 	left: 50%;
-	width: calc(var(--mt-badge-ink, 0.72em) + 0.4em);
-	height: calc(var(--mt-badge-ink, 0.72em) + 0.4em);
+	width: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
+	height: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
 	transform: translate(-50%, -50%);
 	border-radius: 50%;
 	background: var(--primary-500);
