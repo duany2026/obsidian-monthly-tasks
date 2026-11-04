@@ -8063,6 +8063,43 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
   }
 
   async onload() {
+    // 选中圆标的字形偏移校准：不同字体里数字字形在行盒中的垂直位置不同，
+    // 写死的 em 补偿只在特定字体下成立。这里用 canvas measureText 实测当前
+    // 字体里数字墨迹中心相对行盒中心的偏移（em 单位），写入 --mt-badge-dy，
+    // styles.css 的选中圆 ::before 用它把圆心对准字形中心，任何字体下数字
+    // 都落在圆内正中。测量失败时 styles.css 有兜底值，不影响功能。
+    try {
+      const probe = document.createElement("span");
+      probe.className = "day-number";
+      probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-weight:700;";
+      probe.textContent = "0";
+      document.body.appendChild(probe);
+      const cs = getComputedStyle(probe);
+      const fontSize = parseFloat(cs.fontSize);
+      const family = cs.fontFamily;
+      // 基线探针：空 inline-block 的底边正好坐在文本基线上。Chromium 的 CSS
+      // 行盒度量与 canvas fontBoundingBoxAscent 用的是两套字体度量，基线
+      // 位置必须在真实 DOM 里量，不能靠 canvas。
+      const bl = document.createElement("span");
+      bl.style.cssText = "display:inline-block;width:0;height:0;";
+      probe.appendChild(bl);
+      const pr = probe.getBoundingClientRect();
+      const br = bl.getBoundingClientRect();
+      const baselineFromTop = br.bottom - pr.top;
+      const lineBoxH = pr.height;
+      probe.remove();
+      const ctx = document.createElement("canvas").getContext("2d");
+      if (ctx) {
+        ctx.font = `700 ${fontSize}px ${family}`;
+        const m = ctx.measureText("0");
+        // 字形墨迹中心在基线上方的距离（px）
+        const inkCenter = (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+        // dy = 字形墨迹中心相对行盒中心的偏移（向上为正）
+        const dyPx = lineBoxH / 2 - baselineFromTop + inkCenter;
+        document.documentElement.style.setProperty("--mt-badge-dy", (dyPx / fontSize).toFixed(4) + "em");
+      }
+    } catch (e) { /* 兜底值在 styles.css */ }
+
     // 初始化节假日管理器（每个插件实例独立）
     this.holidayManager = new HolidayManager();
     
