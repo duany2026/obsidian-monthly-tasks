@@ -3337,17 +3337,6 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* ---------- 选中日：只动日号 ---------- */
 /* 「今天」与「选中日」必须分开：今天是整格描边（格子级），选中日只给日号包一枚
    实心蓝药丸（元素级）。两者若都用描边，用户分不清哪个是「今天」哪个是「正在看的那天」。 */
-/* 桌面/平板断点（≥768px）日号 17px 时 1.4em 的圆直径约 24px，左侧探出超过格子内边距 8px，
-   圆缘会压到左边框（手机 13px 探出量小，故不明显）。给选中日的日号行补一点左内边距，
-   圆随日号整体右移、与数字仍同心；取值按「左边缝隙 ≈ 上边缝隙」推算：
-   上边 6px 内边距 + 行高与圆的半径差 ≈ 4.3px，故左补 0.2em（17px 字号下约 3.4px）。
-   手机上不加，保持原样 */
-@media (min-width: 768px) {
-	.monthly-tasks-container.view-agenda .day-cell.sel .day-header-row {
-		padding-left: 0.2em;
-	}
-}
-
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number {
 	position: relative;
 	z-index: 0;
@@ -3368,6 +3357,32 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	border-radius: 50%;
 	background: var(--primary-500);
 	z-index: -1;
+}
+
+/* 桌面/平板断点（≥768px）：日号 17px、格子内边距 6px 8px、行高 1.2（20.4px）。
+   原实现以行盒中心为圆心，而数字的视觉中心比行盒中心高约 1.7px，看起来不在圆内正中；
+   圆缘也会压到格子左边框。这里把日号本身做成 1.4em 的圆形 flex 容器，数字用 flex
+   居中，圆心即盒子中心；再用负外边距把圆顶/圆左推到与内边距相同的位置：
+   上 6px + (-1.4px) = 左 8px + (-3.4px) = 4.6px，左右上下缝隙一致；
+   负外边距同时吃掉圆比行高多出的 3.4px，行高与原布局一致，农历不会下移。
+   手机断点字号 13px，探出量小，保持原伪元素方案 */
+@media (min-width: 768px) {
+	.monthly-tasks-container.view-agenda .day-cell.sel .day-number {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		width: 1.4em;
+		height: 1.4em;
+		margin: -1.4px 0 -2px -3.4px;
+		border-radius: 50%;
+		background: var(--primary-500);
+		line-height: 1;
+	}
+
+	.monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
+		content: none;
+	}
 }
 
 /* 圆形会比日号本身宽，单数字时左边会探出格子内边距；agenda 格子里
