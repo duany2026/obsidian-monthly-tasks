@@ -6505,6 +6505,10 @@ function closeInlineDatePicker(owner) {
   }
   const popup = document.body.querySelector(":scope > .date-picker-popup");
   if (popup) popup.remove();
+  // 恢复弹窗输入框的软键盘能力（浮层打开时禁用过）
+  try {
+    if (owner.modalEl) owner.modalEl.querySelectorAll('[inputmode="none"]').forEach((el) => el.removeAttribute("inputmode"));
+  } catch (e) {}
 }
 
 var CategoryFilterModal = class extends import_obsidian.Modal {
@@ -7581,6 +7585,9 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // 挂在 modal 内时「居中」相对 modal 而非视口，且会被 modal 的 overflow:hidden 裁掉
       const popup = document.body.createDiv("date-picker-popup");
       popup.style.display = "block";
+      // 手机端：浮层存续期间禁止弹窗输入框唤起软键盘（inputmode=none 保留焦点
+      // 能力但不弹键盘），根治翻月/改年月时"键盘闪一下"；关闭浮层时统一恢复
+      [inputEl, noteText].forEach((el) => { if (el) el.setAttribute("inputmode", "none"); });
       const reposition = () => {
         if (!popup.isConnected) return;
         const rect = endDateTrigger.getBoundingClientRect();
