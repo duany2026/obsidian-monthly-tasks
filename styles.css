@@ -3347,18 +3347,17 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-weight: 700;
 }
 
-/* 圆形取 1.4em：格子左内边距已放宽到 12px，圆直径 26.6px 仍完整落在格内。
-   圆心用 --mt-badge-dy 对准数字字形的墨迹中心：该值由插件启动时用 canvas
-   measureText 实测当前字体得出（不同字体里字形在行盒中的垂直偏移不同，
-   写死 em 值只在特定字体下成立），JS 测量失败时用 0.113em 兜底。
-   圆不参与布局（绝对定位），日号位置与其它日期完全一致 */
+/* 圆紧贴数字：直径 = 字形墨迹高度 + 0.18em 裕量，圆心对准字形中心。
+   两个值都由插件启动时用 canvas measureText 实测当前字体得出（--mt-badge-ink /
+   --mt-badge-dy），不同字体下圆都正好包住数字、数字自然居中。圆不参与布局
+   （绝对定位），日号位置与其它日期完全一致 */
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
 	content: "";
 	position: absolute;
 	top: calc(50% - var(--mt-badge-dy, 0.113em));
 	left: 50%;
-	width: 1.4em;
-	height: 1.4em;
+	width: calc(var(--mt-badge-ink, 0.72em) + 0.18em);
+	height: calc(var(--mt-badge-ink, 0.72em) + 0.18em);
 	transform: translate(-50%, -50%);
 	border-radius: 50%;
 	background: var(--primary-500);

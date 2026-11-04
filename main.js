@@ -8097,6 +8097,9 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
         // dy = 字形墨迹中心相对行盒中心的偏移（向上为正）
         const dyPx = lineBoxH / 2 - baselineFromTop + inkCenter;
         document.documentElement.style.setProperty("--mt-badge-dy", (dyPx / fontSize).toFixed(4) + "em");
+        // 字形墨迹高度（em）：选中圆直径以此为基准，让圆紧贴数字
+        const ink = (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) / fontSize;
+        document.documentElement.style.setProperty("--mt-badge-ink", ink.toFixed(4) + "em");
       }
     } catch (e) { /* 兜底值在 styles.css */ }
 
