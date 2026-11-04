@@ -3359,22 +3359,25 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	z-index: -1;
 }
 
-/* 桌面/平板断点（≥768px）：日号 17px、格子内边距 6px 8px、行高 1.2（20.4px）。
-   原实现以行盒中心为圆心，而数字的视觉中心比行盒中心高约 1.7px，看起来不在圆内正中；
-   圆缘也会压到格子左边框。这里把日号本身做成 1.4em 的圆形 flex 容器，数字用 flex
-   居中，圆心即盒子中心；再用负外边距把圆顶/圆左推到与内边距相同的位置：
-   上 6px + (-1.4px) = 左 8px + (-3.4px) = 4.6px，左右上下缝隙一致；
-   负外边距同时吃掉圆比行高多出的 3.4px，行高与原布局一致，农历不会下移。
-   手机断点字号 13px，探出量小，保持原伪元素方案 */
+/* 桌面/平板断点（≥768px）：日程视图格子内边距是 3px 4px，日号 17px（≥1024 为 19px）、
+   行高 1.2（20.4px）。原实现以行盒中心为圆心，而数字的视觉中心比行盒中心高约 1.7px，
+   看起来不在圆内正中。这里把日号本身做成 1.4em 的圆形 flex 容器，数字用 flex 居中，
+   圆心即盒子中心；再用外边距把圆推到距格子左边框、上边框都是 5px：
+   左 4px 内边距 + 1px，上 3px 内边距 + 2px；底部负外边距抵掉圆比行高多出的 0.2em
+   和那 2px，使整行占位仍等于原行高，农历位置不变。手机断点字号 13px，保持原方案 */
 @media (min-width: 768px) {
 	.monthly-tasks-container.view-agenda .day-cell.sel .day-number {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		flex-shrink: 0;
+		box-sizing: border-box;
 		width: 1.4em;
 		height: 1.4em;
-		margin: -1.4px 0 -2px -3.4px;
+		margin: 2px 0 calc(-0.2em - 2px) 1px;
+		/* 数字字形的视觉中心比行盒中心高约 0.08em（实测 19px 字号下 1.5px），
+		   补 0.158em 顶部内边距把行盒在圆内下移 0.079em，使字形真正居中 */
+		padding-top: 0.158em;
 		border-radius: 50%;
 		background: var(--primary-500);
 		line-height: 1;
