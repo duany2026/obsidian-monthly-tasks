@@ -6766,7 +6766,36 @@ var ViewMenuModal = class extends import_obsidian.Modal {
     this.renderRows();
     this.positionAt(modalEl, true);
     watchPopupPosition(this, () => this.positionAt(modalEl));
-    this.playEnter(modalEl);
+    this._enterAnim = this.playEnter(modalEl);
+    // 手机端：Obsidian 底部弹层的滑入动画可能是 CSS transition 也可能是 WAAPI，
+    // styles.css 的 animation/transition 禁用管不到 WAAPI，这里再把 modal 与
+    // 容器上非本人创建的动画全部 cancel（覆盖 CSS 动画/transition/WAAPI 三种来源）
+    if (import_obsidian.Platform.isPhone) {
+      const sweep = () => {
+        try {
+          [this.containerEl, modalEl].forEach((el) => {
+            if (!el) return;
+            el.getAnimations().forEach((a) => {
+              if (a !== this._enterAnim) {
+                try { a.cancel(); } catch (e) {}
+              }
+            });
+          });
+        } catch (e) {}
+      };
+      requestAnimationFrame(sweep);
+      setTimeout(sweep, 80);
+      setTimeout(sweep, 260);
+      // beta 诊断：真机回读实际生效的样式值（正式版移除）
+      setTimeout(() => {
+        try {
+          const cs = getComputedStyle(modalEl);
+          const diag = this.contentEl.createDiv();
+          diag.style.cssText = "font-size:10px;color:#94a3b8;padding:4px 10px;border-top:1px solid #eef2f7;word-break:break-all;";
+          diag.textContent = `diag pos=${cs.position} top=${cs.top} bottom=${cs.bottom} anim=${cs.animationName} trans=${cs.transitionProperty}`;
+        } catch (e) {}
+      }, 300);
+    }
   }
   positionAt(modalEl, prefill = false) {
     modalEl.style.position = "fixed";
@@ -6798,6 +6827,10 @@ var ViewMenuModal = class extends import_obsidian.Modal {
       }
       modalEl.style.left = `${left}px`;
       modalEl.style.top = `${top}px`;
+      // 手机端 Obsidian 的底部弹层规则带 !important，内联 top/left 打不赢，
+      // 位置经变量交给 styles.css 的 is-phone 覆盖规则
+      modalEl.style.setProperty("--vm-left", `${left}px`);
+      modalEl.style.setProperty("--vm-top", `${top}px`);
       modalEl.classList.toggle("cf-flip-up", flipped);
       modalEl.style.minHeight = "";
     };
@@ -6839,13 +6872,14 @@ var ViewMenuModal = class extends import_obsidian.Modal {
   }
   playEnter(modalEl) {
     if (CF_MOTION_OFF())
-      return;
+      return null;
     try {
-      CF_KICK(modalEl.animate([
+      return CF_KICK(modalEl.animate([
         { opacity: 0, transform: "translateY(-6px) scale(0.96)" },
         { opacity: 1, transform: "none" },
       ], { duration: 160, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)" }));
     } catch (e) {
+      return null;
     }
   }
   playLeave(modalEl, container) {
