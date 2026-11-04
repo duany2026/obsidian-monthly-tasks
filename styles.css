@@ -892,7 +892,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 0-4-0：压过上面统一组的 border 简写（0-3-0），聚焦描边才能真的出现 */
-.modal-container .modal.create-task-modal .task-input:focus {
+.modal-container .modal.create-task-modal .task-input:focus:not(.mt-no-focus-fx) {
 	border-color: #3b82f6;
 	background: var(--background-primary);
 	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
@@ -2648,7 +2648,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	color: #e2e8f0;
 }
 
-.theme-dark .modal-container .modal.create-task-modal .task-input:focus {
+.theme-dark .modal-container .modal.create-task-modal .task-input:focus:not(.mt-no-focus-fx) {
 	background: rgba(30, 41, 59, 1);
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
@@ -2995,15 +2995,6 @@ body:not(.is-mobile) .modal-container .modal-bg {
 .theme-dark .btn-cancel:hover {
 	background: rgba(71, 85, 105, 0.6);
 	color: #e2e8f0;
-}
-
-/* 手机端：输入框焦点高亮只认键盘导航（:focus-visible），程序性聚焦不再亮框。
-   日期浮层打开时焦点会被系统焦点管理拉回输入框，:focus 下会闪一下高亮 */
-body.is-phone input:not([type="checkbox"]):not([type="time"]):not([type="date"]):not(:focus-visible):focus,
-body.is-phone textarea:not(:focus-visible):focus {
-	outline: none !important;
-	box-shadow: none !important;
-	border-color: var(--border) !important;
 }
 
 /* ========== 移动端优化 ========== */
@@ -3817,7 +3808,7 @@ body.is-phone textarea:not(:focus-visible):focus {
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.modal-container .modal.create-task-modal .note-textarea:focus {
+.modal-container .modal.create-task-modal .note-textarea:focus:not(.mt-no-focus-fx) {
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
@@ -3835,7 +3826,7 @@ body.is-phone textarea:not(:focus-visible):focus {
 	border-color: rgba(71, 85, 105, 0.5);
 }
 
-.theme-dark .modal-container .modal.create-task-modal .note-textarea:focus {
+.theme-dark .modal-container .modal.create-task-modal .note-textarea:focus:not(.mt-no-focus-fx) {
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
