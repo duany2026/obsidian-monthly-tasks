@@ -3337,6 +3337,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* ---------- 选中日：只动日号 ---------- */
 /* 「今天」与「选中日」必须分开：今天是整格描边（格子级），选中日只给日号包一枚
    实心蓝药丸（元素级）。两者若都用描边，用户分不清哪个是「今天」哪个是「正在看的那天」。 */
+/* 桌面/平板断点（≥768px）日号 17px 时 1.4em 的圆直径约 24px，左侧探出超过格子内边距 8px，
+   圆缘会压到左边框（手机 13px 探出量小，故不明显）。给选中日的日号行补一点左内边距，
+   圆随日号整体右移、与数字仍同心，且不影响其他格子的日号对齐；手机上不加，保持原样 */
+@media (min-width: 768px) {
+	.monthly-tasks-container.view-agenda .day-cell.sel .day-header-row {
+		padding-left: 0.35em;
+	}
+}
+
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number {
 	position: relative;
 	z-index: 0;
