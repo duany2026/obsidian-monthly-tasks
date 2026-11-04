@@ -6558,15 +6558,6 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
       requestAnimationFrame(sweep);
       setTimeout(sweep, 80);
       setTimeout(sweep, 260);
-      // beta 诊断：真机回读实际生效的样式值（正式版移除）
-      setTimeout(() => {
-        try {
-          const cs = getComputedStyle(modalEl);
-          const diag = this.contentEl.createDiv();
-          diag.style.cssText = "font-size:10px;color:#94a3b8;padding:4px 10px;border-top:1px solid #eef2f7;word-break:break-all;";
-          diag.textContent = `diag pos=${cs.position} top=${cs.top} bottom=${cs.bottom} anim=${cs.animationName} trans=${cs.transitionProperty}`;
-        } catch (e) {}
-      }, 300);
     }
   }
   /** 锚定到漏斗按钮正下方；越界翻到上方 / 收进屏内 */
@@ -6820,15 +6811,6 @@ var ViewMenuModal = class extends import_obsidian.Modal {
       requestAnimationFrame(sweep);
       setTimeout(sweep, 80);
       setTimeout(sweep, 260);
-      // beta 诊断：真机回读实际生效的样式值（正式版移除）
-      setTimeout(() => {
-        try {
-          const cs = getComputedStyle(modalEl);
-          const diag = this.contentEl.createDiv();
-          diag.style.cssText = "font-size:10px;color:#94a3b8;padding:4px 10px;border-top:1px solid #eef2f7;word-break:break-all;";
-          diag.textContent = `diag pos=${cs.position} top=${cs.top} bottom=${cs.bottom} anim=${cs.animationName} trans=${cs.transitionProperty}`;
-        } catch (e) {}
-      }, 300);
     }
   }
   positionAt(modalEl, prefill = false) {
@@ -6976,16 +6958,6 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     this.deleteChain = Promise.resolve();
   }
   onOpen() {
-    // beta4 诊断：打开耗时 + 动画窗口内的最长长任务（正式版移除）
-    const __t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : 0;
-    let __maxTask = 0;
-    let __po = null;
-    try {
-      __po = new PerformanceObserver((list) => {
-        for (const e of list.getEntries()) __maxTask = Math.max(__maxTask, e.duration);
-      });
-      __po.observe({ entryTypes: ["longtask"] });
-    } catch (e) {}
     // 登记到静态活动实例表——必须是 onOpen 的第一条语句（审计 M11）。
     // 本方法约 370 行，此前登记写在最后一句，而另外三个弹窗都在第一句登记。
     // 中间任何一处抛错（getHolidayInfo / setIcon / resolveCategoryColor）都会留下一个
@@ -7628,6 +7600,14 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       };
       reposition();
       watchPopupPosition(self, reposition);
+      // 手机端：翻月/改年月的原生 select 系统选择器关闭后，焦点会被 Obsidian
+      // 焦点管理拉回弹窗的任务输入框，软键盘跟着弹出；交互后主动摘掉输入焦点
+      const killSoftKb = () => {
+        try {
+          const ae = document.activeElement;
+          if (ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA")) ae.blur();
+        } catch (e) {}
+      };
       // 年月导航
       const navRow = popup.createDiv("date-picker-nav");
       const prevBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "\u25C0" });
@@ -7651,6 +7631,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         clampPicker();
         syncSelects(popup);
         updateGrid(popup);
+        killSoftKb(); setTimeout(killSoftKb, 80);
       });
       nextBtn.addEventListener("click", () => {
         pickerMonth++;
@@ -7658,6 +7639,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         clampPicker();
         syncSelects(popup);
         updateGrid(popup);
+        killSoftKb(); setTimeout(killSoftKb, 80);
       });
       yearSelect.addEventListener("change", () => {
         pickerYear = parseInt(yearSelect.value, 10);
@@ -7665,8 +7647,9 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         // 钳制若真发生了，下拉框显示的还是刚选的越界年份，必须回写一次才与网格一致
         syncSelects(popup);
         updateGrid(popup);
+        killSoftKb(); setTimeout(killSoftKb, 80);
       });
-      monthSelect.addEventListener("change", () => { pickerMonth = parseInt(monthSelect.value, 10); updateGrid(popup); });
+      monthSelect.addEventListener("change", () => { pickerMonth = parseInt(monthSelect.value, 10); updateGrid(popup); killSoftKb(); setTimeout(killSoftKb, 80); });
       // 星期标题（跟随设置「每周第一天」轮转，与主月历一致）
       const weekRow = popup.createDiv("date-picker-week");
       const fdowHeader = self.plugin.settings.firstDayOfWeek || 0;
@@ -7676,6 +7659,8 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       });
       // 日期网格（首次渲染）
       updateGrid(popup);
+      // 内容构建完毕后宽度才稳定，重算一次定位（手机端居中依赖准确宽度）
+      reposition();
       // 点击外部关闭（popup 已挂 document.body，需显式排除 popup 与触发按钮自身）
       // 审计 L13：原来是 `self.datePickerCloseHandler = (e) => {...}` 再
       // `setTimeout(() => document.addEventListener("click", self.datePickerCloseHandler), 0)`。
@@ -7970,18 +7955,6 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // Escape 关闭由 Modal 基类统一处理，避免双重 close
     });
     // activeInstances 的登记已上移到 onOpen 首句（审计 M11），此处不再重复
-    // beta4 诊断：700ms 窗口覆盖系统滑入动画，回读构建耗时与最长长任务
-    const __openMs = __t0 ? performance.now() - __t0 : -1;
-    if (import_obsidian.Platform.isPhone) {
-      setTimeout(() => {
-        try { __po && __po.disconnect(); } catch (e) {}
-        try {
-          const diag = this.modalEl.createDiv();
-          diag.style.cssText = "font-size:10px;color:#94a3b8;padding:2px 10px;text-align:center;";
-          diag.textContent = `diag open=${__openMs.toFixed(0)}ms maxTask=${__maxTask.toFixed(0)}ms tasks=${this.existingTasks.length}`;
-        } catch (e) {}
-      }, 700);
-    }
   }
 
   /**
