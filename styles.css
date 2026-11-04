@@ -3344,15 +3344,18 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-weight: 700;
 }
 
-/* 圆形取 1.4em，比日号行高略大：数字四周留出呼吸，单数字时左右各探出约 6px，
-   探进格子内边距和网格间隙，不会压到旁边的格子 */
+/* 圆形取 1.3em：比日号行高略大，数字四周留出呼吸；圆心往下偏 0.079em，
+   因为数字字形的视觉中心比行盒中心高约这么多（19px 字号实测 1.5px），
+   补偿后数字正好落在圆内正中。圆不参与布局，日号位置与其它日期完全一致。
+   格子左内边距只有 4px，单数字时圆左缘会略叠出格子约 2px，这是该布局下
+   保证「数字不动 + 数字居中」的必然结果 */
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
 	content: "";
 	position: absolute;
-	top: 50%;
+	top: calc(50% + 0.079em);
 	left: 50%;
-	width: 1.4em;
-	height: 1.4em;
+	width: 1.3em;
+	height: 1.3em;
 	transform: translate(-50%, -50%);
 	border-radius: 50%;
 	background: var(--primary-500);
