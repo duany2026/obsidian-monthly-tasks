@@ -3291,11 +3291,19 @@ body:not(.is-mobile) .modal-container .modal-bg {
    必须在下面单独补一条带 .workspace-split 的规则，不能只靠这条。 */
 .monthly-tasks-container.view-agenda .day-cell {
 	min-height: 52px;
-	/* 上内边距 9px：数字字形的墨迹中心比行盒中心高 2.15px（19px 字号实测），
-	   上边多留 4px 才能让字形落在格子里的圆正中；左 12px 比上 9px 大 3px，
-	   正好补上数字宽度只有字高一半、横向墨迹中心偏右的差额 */
-	padding: 9px 4px 5px 12px;
+	/* 手机端布局与 1.8.2 完全一致；桌面端选中圆标的修正收在下面 min-width:768px 断点里 */
+	padding: 3px 4px;
 	gap: 0;
+}
+
+/* ---------- 桌面端：选中圆标修正 ---------- */
+@media (min-width: 768px) {
+	.monthly-tasks-container.view-agenda .day-cell {
+		/* 上内边距 9px：数字字形的墨迹中心比行盒中心高 2.15px（19px 字号实测），
+		   上边多留 4px 才能让字形落在格子里的圆正中；左 12px 比上 9px 大 3px，
+		   正好补上数字宽度只有字高一半、横向墨迹中心偏右的差额 */
+		padding: 9px 4px 5px 12px;
+	}
 }
 
 /* ---------- 格子底色：三类统一去掉 ---------- */
@@ -3347,22 +3355,31 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-weight: 700;
 }
 
-/* 圆紧贴数字再均匀放大：直径 = 字形墨迹高度 + 0.55em，圆心对准字形中心。
-   两个值都由插件启动时用 canvas measureText 实测当前字体得出（--mt-badge-ink /
-   --mt-badge-dy），任何字体、任何断点下圆都均匀包住数字、数字自然居中，
-   且圆直径自适应字号，不会像固定 1.4em 那样在小字号格子里压到左边框。
-   圆不参与布局（绝对定位），日号位置与其它日期完全一致 */
+/* 手机端：布局不动（数字位置与 1.8.2 一致），只把圆缩小到不顶边框——
+   直径 = 字形墨迹高度 + 0.15em（15px 字号下约 14px，半径 7px，
+   数字中心距左边框 8px，左缘留约 1px 缝）。圆心用 --mt-badge-dy
+   对准字形中心，圆缩小后数字仍在正中 */
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
 	content: "";
 	position: absolute;
 	top: calc(50% - var(--mt-badge-dy, 0.113em));
 	left: 50%;
-	width: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
-	height: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
+	width: calc(var(--mt-badge-ink, 0.75em) + 0.15em);
+	height: calc(var(--mt-badge-ink, 0.75em) + 0.15em);
 	transform: translate(-50%, -50%);
 	border-radius: 50%;
 	background: var(--primary-500);
 	z-index: -1;
+}
+
+/* 桌面端：圆再放大些——直径 = 字形墨迹高度 + 0.55em，配合上面放宽的
+   格子内边距，圆距左/上边框各约 6.5/7.5px。圆不参与布局（绝对定位），
+   日号位置与其它日期完全一致 */
+@media (min-width: 768px) {
+	.monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
+		width: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
+		height: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
+	}
 }
 
 /* 圆形会比日号本身宽，单数字时左边会探出格子内边距；agenda 格子里
