@@ -8100,6 +8100,10 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
         // 字形墨迹高度（em）：选中圆直径以此为基准，让圆紧贴数字
         const ink = (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) / fontSize;
         document.documentElement.style.setProperty("--mt-badge-ink", ink.toFixed(4) + "em");
+        // 双位数字形宽度（em）：选中圆直径取它与墨迹高度的较大者，
+        // 否则圆按字高取直径时「10」–「31」这些双位数会露到圆外
+        const w2 = ctx.measureText("00").width / fontSize;
+        document.documentElement.style.setProperty("--mt-badge-w2", w2.toFixed(4) + "em");
       }
     } catch (e) { /* 兜底值在 styles.css */ }
 

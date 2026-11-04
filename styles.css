@@ -3355,30 +3355,38 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-weight: 700;
 }
 
-/* 手机端：布局不动（数字位置与 1.8.2 一致），只把圆缩小到不顶边框——
-   直径 = 字形墨迹高度 + 0.15em（15px 字号下约 14px，半径 7px，
-   数字中心距左边框 8px，左缘留约 1px 缝）。圆心用 --mt-badge-dy
-   对准字形中心，圆缩小后数字仍在正中 */
+/* 日号等宽：盒宽统一为双位数字形宽度（--mt-badge-w2，插件启动时用 canvas
+   实测当前字体），数字在盒内居中。这样单双数的圆心位置一致，圆才能
+   对所有日期都居中覆盖；所有日期的数字一起对齐，不会出现选中日偏移 */
+.monthly-tasks-container.view-agenda .day-cell .day-number {
+	display: inline-block;
+	min-width: var(--mt-badge-w2, 1.15em);
+	text-align: center;
+}
+
+/* 手机端：布局不动（数字位置只随等宽统一对齐），圆缩小到不顶边框——
+   直径 = max(字形墨迹高度, 双数字形宽度) + 0.15em，单双数都正好包住。
+   圆心用 --mt-badge-dy 对准字形中心 */
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
 	content: "";
 	position: absolute;
 	top: calc(50% - var(--mt-badge-dy, 0.113em));
 	left: 50%;
-	width: calc(var(--mt-badge-ink, 0.75em) + 0.15em);
-	height: calc(var(--mt-badge-ink, 0.75em) + 0.15em);
+	width: calc(max(var(--mt-badge-ink, 0.75em), var(--mt-badge-w2, 1.15em)) + 0.15em);
+	height: calc(max(var(--mt-badge-ink, 0.75em), var(--mt-badge-w2, 1.15em)) + 0.15em);
 	transform: translate(-50%, -50%);
 	border-radius: 50%;
 	background: var(--primary-500);
 	z-index: -1;
 }
 
-/* 桌面端：圆再放大些——直径 = 字形墨迹高度 + 0.55em，配合上面放宽的
+/* 桌面端：圆再放大些——直径 = max(字高, 双数宽) + 0.55em，配合上面放宽的
    格子内边距，圆距左/上边框各约 6.5/7.5px。圆不参与布局（绝对定位），
    日号位置与其它日期完全一致 */
 @media (min-width: 768px) {
 	.monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
-		width: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
-		height: calc(var(--mt-badge-ink, 0.72em) + 0.55em);
+		width: calc(max(var(--mt-badge-ink, 0.72em), var(--mt-badge-w2, 1.1em)) + 0.55em);
+		height: calc(max(var(--mt-badge-ink, 0.72em), var(--mt-badge-w2, 1.1em)) + 0.55em);
 	}
 }
 
