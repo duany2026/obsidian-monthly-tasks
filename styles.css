@@ -2997,6 +2997,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	color: #e2e8f0;
 }
 
+/* 手机端：输入框焦点高亮只认键盘导航（:focus-visible），程序性聚焦不再亮框。
+   日期浮层打开时焦点会被系统焦点管理拉回输入框，:focus 下会闪一下高亮 */
+body.is-phone input:not([type="checkbox"]):not([type="time"]):not([type="date"]):not(:focus-visible):focus,
+body.is-phone textarea:not(:focus-visible):focus {
+	outline: none !important;
+	box-shadow: none !important;
+	border-color: var(--border) !important;
+}
+
 /* ========== 移动端优化 ========== */
 @media (max-width: 480px) {
 	/* 批次四①：容器内边距 8→4（左右共 8px 由 7 列分摊，实测 +1.14px/格） */
