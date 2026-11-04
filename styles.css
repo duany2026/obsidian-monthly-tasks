@@ -4018,8 +4018,9 @@ body:not(.is-mobile) .modal-container .modal-bg {
    全宽并播放从底部滑入的动画，规则带 !important，JS 内联 top/left 打不赢。
    这里用更高特异性 + !important 把位置交还给 JS 写入的 --vm-top/--vm-left，
    并关掉系统滑入动画；插件自己的 WAAPI 进出场（playEnter/playLeave）走
-   合成器动画层，不受 CSS animation/transition 禁用影响。 */
-body.is-phone .modal-container .modal.view-menu-modal {
+   合成器动画层，不受 CSS animation/transition 禁用影响。
+   作用于 .category-filter-modal 一族：类别筛选面板与视图菜单（它也带这个类）。 */
+body.is-phone .modal-container .modal.category-filter-modal {
 	position: fixed !important;
 	top: var(--vm-top) !important;
 	left: var(--vm-left) !important;
