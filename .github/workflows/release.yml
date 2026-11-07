@@ -1,13 +1,19 @@
 name: Release
 
-# 推送 v* 标签时自动打包插件并创建 Release
+# 官方上架要求：Release 的 tag 必须与 manifest.json 里的 version 逐字相同，
+# 不带 v 前缀（Obsidian 是按「tag == manifest.version」去找发行版再下载资产的）。
+# 所以这里触发所有 tag，并在下一步把不合格式的 tag 直接拦下来，而不是让它
+# 产出一个目录永远认不到的发行版。
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
 
 permissions:
   contents: write
+  # actions/attest 要用 OIDC 令牌签名，并把证明文件写进仓库的证明存储
+  id-token: write
+  attestations: write
 
 jobs:
   release:
@@ -16,11 +22,49 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 打包插件
+      - name: 校验 tag 与 manifest 版本一致
         run: |
           set -euo pipefail
           TAG="${GITHUB_REF_NAME}"
-          VER="${TAG#v}"
+          VER="$(node -p "require('./manifest.json').version")"
+          if [ "$TAG" != "$VER" ]; then
+            echo "::error::tag「${TAG}」与 manifest.json 的 version「${VER}」不一致。官方要求两者逐字相同且不带 v 前缀，请改用 git tag -a ${VER} -m ${VER}"
+            exit 1
+          fi
+          # 版本号必须是 x.y.z：目录只认这一种格式
+          if ! printf '%s' "$VER" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::version「${VER}」不是 x.y.z 三段式，社区目录只支持这一种格式"
+            exit 1
+          fi
+          # versions.json 必须登记当前版本，否则老版本 Obsidian 装不到匹配的 minAppVersion
+          node -e "
+            const v = require('./manifest.json').version;
+            const map = require('./versions.json');
+            if (!Object.prototype.hasOwnProperty.call(map, v)) {
+              console.error('::error::versions.json 里没有 ' + v + ' 这一条');
+              process.exit(1);
+            }
+          "
+          echo "tag / manifest / versions.json 三者一致：${VER}"
+
+      - name: 校验 main.js 语法与内置节假日数据未漂移
+        run: |
+          set -euo pipefail
+          node --check main.js
+          node scripts/check-holidays-sync.mjs
+
+      - name: 生成资产证明（官方上架流程要求的可验证构建来源）
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+            styles.css
+
+      - name: 打包手动安装用的 ZIP
+        run: |
+          set -euo pipefail
+          VER="${GITHUB_REF_NAME}"
           rm -rf dist
           mkdir -p dist/monthly-tasks
           cp main.js manifest.json styles.css holidays.json versions.json README.md LICENSE dist/monthly-tasks/
@@ -31,7 +75,7 @@ jobs:
       - name: 从 CHANGELOG 提取发行说明
         run: |
           set -euo pipefail
-          VER="${GITHUB_REF_NAME#v}"
+          VER="${GITHUB_REF_NAME}"
           awk -v ver="$VER" '
             $0 ~ "^## \\[" ver "\\]" { f=1; next }
             f && /^## \[/ { exit }
@@ -53,15 +97,18 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           set -uo pipefail
+          # 官方要求 main.js / manifest.json / styles.css 作为三个独立的二进制附件上传：
+          # Obsidian 客户端逐个下载这三份，ZIP 它不认。ZIP 仍然保留，供手动安装与本地备份。
+          ASSETS=(main.js manifest.json styles.css dist/monthly-tasks-*.zip)
           publish() {
             export GH_TOKEN="$1"
             if gh release view "$TAG" >/dev/null 2>&1; then
-              gh release upload "$TAG" dist/monthly-tasks-*.zip --clobber || return 1
+              gh release upload "$TAG" "${ASSETS[@]}" --clobber || return 1
               gh release edit "$TAG" \
                 --title "月历任务 ${TAG}" \
                 --notes-file RELEASE_NOTES.md || return 1
             else
-              gh release create "$TAG" dist/monthly-tasks-*.zip \
+              gh release create "$TAG" "${ASSETS[@]}" \
                 --title "月历任务 ${TAG}" \
                 --notes-file RELEASE_NOTES.md || return 1
             fi

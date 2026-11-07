@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.8.3
+ * 版本：1.8.5
  * 作者：duany
  * 许可证：MIT
  *
@@ -44,7 +44,7 @@
  *    - 工具函数：solarToLunar, getLunarInfo, getLunarDayText
  *
  * 5. HolidayManager
- *    - 节假日管理（数据源链：holiday-cn 社区源 → timor.tech 备份源 → holidays.json 内置兜底）
+ *    - 节假日管理（数据源链：holiday-cn 社区源 → timor.tech 备份源 → 随 main.js 分发的内置兜底）
  *    - 查询：getHolidayInfo, formatDate
  *    - 网络获取：fetchYearFromSources, ensureYearData, updateFromNetwork
  *
@@ -92,6 +92,9 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // ---- 模块导出：Obsidian 通过 module.exports.default 获取插件主类 ----
+// module 是宿主 CommonJS 加载器注入的全局（不是浏览器全局），这里显式声明，
+// 免得自动审核的 no-undef 把它当未定义变量。
+/* global module -- 宿主以 CommonJS 加载 main.js，module 由加载器注入 */
 var main_exports = {};
 __export(main_exports, {
   default: () => MonthlyTasksPlugin
@@ -112,643 +115,643 @@ var import_obsidian = require("obsidian");
  */
 var I18N = {
   "zh-CN": {
-    "cmd.open": "\u6253\u5f00\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
-    "cmd.refresh": "\u5237\u65b0\u6708\u5386\u4efb\u52a1\u89c6\u56fe",
-    "cmd.toggle": "\u5faa\u73af\u5207\u6362\u6708\u5386\u89c6\u56fe\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u5468 / \u5c0f\u5468 / \u4e09\u5929\u89c6\u56fe\uff09",
-    "error.badDateConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u8bc6\u522b\u7684\u65e5\u671f\u4efb\u52a1\u884c ({path}:{line}): {text}",
-    "error.builtinHoliday": "\u6708\u5386\u4efb\u52a1\uff1a\u5185\u7f6e\u8282\u5047\u65e5\u6570\u636e\u8bfb\u53d6\u5931\u8d25\uff08holidays.json \u7f3a\u5931\u6216\u635f\u574f\uff09\uff0c\u5bf9\u5e94\u5e74\u4efd\u5c06\u4f9d\u8d56\u7f51\u7edc\u6570\u636e\u6e90",
-    "error.createFail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25:",
-    "error.delayRefresh": "\u5ef6\u8fdf\u5237\u65b0\u5931\u8d25:",
-    "error.deleteFail": "\u5220\u9664\u4efb\u52a1\u5931\u8d25:",
-    "error.deleteOldFail": "\u5220\u9664\u539f\u4efb\u52a1\u884c\u5931\u8d25:",
-    "error.fileNotFound": "\u6587\u4ef6\u4e0d\u5b58\u5728: {path}",
-    "error.fileNotFound2": "\u6587\u4ef6\u4e0d\u5b58\u5728: {path}",
-    "error.folderCreate": "\u5728\u6587\u4ef6\u5939\u300c{folder}\u300d\u521b\u5efa\u4efb\u52a1\u6587\u4ef6\u5931\u8d25:",
-    "error.holidayApi": "\u8282\u5047\u65e5\u6570\u636e\uff1a{year} \u5e74 API \u8c03\u7528\u5931\u8d25",
-    "error.holidayApiEmpty": "\u8282\u5047\u65e5\u6570\u636e\uff1a{year} \u5e74 API \u8fd4\u56de\u4e86 holiday \u5b57\u6bb5\u4f46\u672a\u89e3\u6790\u51fa\u4efb\u4f55\u6709\u6548\u6761\u76ee\uff0c\u54cd\u5e94\u7ed3\u6784\u53ef\u80fd\u5df2\u53d8\u5316",
-    "error.holidayApiFormat": "API\u683c\u5f0f\u9519\u8bef",
-    "error.holidayCN": "\u6708\u5386\u4efb\u52a1\uff1aholiday-cn \u6570\u636e\u6e90\u83b7\u53d6 {year} \u5e74\u5931\u8d25\uff0c\u5c1d\u8bd5 timor.tech",
-    "error.holidayCNFormat": "holiday-cn \u6570\u636e\u683c\u5f0f\u9519\u8bef",
-    "error.holidayTimeout1": "\u8bf7\u6c42\u8d85\u65f6\uff088s\uff09\uff1a{year}\u5e74\u8282\u5047\u65e5\u6570\u636e",
-    "error.holidayTimeout2": "\u8bf7\u6c42\u8d85\u65f6\uff088s\uff09\uff1a{year}\u5e74 holiday-cn \u6570\u636e",
-    "error.holidaysDataFormat": "\u6708\u5386\u4efb\u52a1\uff1aholidaysData \u4e2d {year} \u5e74\u7684\u6570\u636e\u683c\u5f0f\u975e\u6cd5\uff0c\u5df2\u5ffd\u7565",
-    "error.holidaysDataKey": "\u6708\u5386\u4efb\u52a1\uff1aholidaysData \u4e2d\u952e\u300c{year}\u300d\u4e0d\u662f\u5408\u6cd5\u5e74\u4efd\uff0c\u5df2\u5ffd\u7565",
-    "error.holidaysJsonFormat": "\u6708\u5386\u4efb\u52a1\uff1aholidays.json \u4e2d {year} \u5e74\u7684\u6570\u636e\u683c\u5f0f\u975e\u6cd5\uff0c\u5df2\u5ffd\u7565",
-    "error.lineInvalid1": "\u884c\u53f7\u5df2\u5931\u6548\uff0c\u8be5\u884c\u4e0d\u662f\u4efb\u52a1\uff1a{line}",
-    "error.lineInvalid2": "\u884c\u53f7\u5df2\u5931\u6548\uff0c\u8be5\u884c\u4e0d\u662f\u76ee\u6807\u4efb\u52a1\uff1a{line}",
-    "error.lineInvalidDel1": "\u884c\u53f7\u5df2\u5931\u6548\uff0c\u8be5\u884c\u4e0d\u662f\u4efb\u52a1\uff0c\u62d2\u7edd\u5220\u9664\uff1a{line}",
-    "error.lineInvalidDel2": "\u884c\u53f7\u5df2\u5931\u6548\uff0c\u8be5\u884c\u4e0d\u662f\u76ee\u6807\u4efb\u52a1\uff0c\u62d2\u7edd\u5220\u9664\uff1a{line}",
-    "error.lineRange": "\u884c\u53f7\u8d85\u51fa\u8303\u56f4: {line}",
-    "error.loadTasks": "\u52a0\u8f7d\u4efb\u52a1\u5931\u8d25:",
-    "error.noteSaveFail": "\u5907\u6CE8\u4FDD\u5B58\u5931\u8D25:",
-    "error.oversizedConsole": "\u6708\u5386\u4efb\u52a1\uff1a\u8de8\u5929\u4efb\u52a1\u533a\u95f4 {start} ~ {due} \u8d85\u8fc7 {limit} \u5929\uff0c\u4ec5\u6302\u8f7d\u9996\u5c3e\u4e24\u65e5 ({path}:{line}): {content}",
-    "error.parseFile": "\u89e3\u6790\u6587\u4ef6\u5931\u8d25: {path}",
-    "error.postCreateRefresh": "\u521b\u5efa\u540e\u5237\u65b0\u89c6\u56fe\u5931\u8d25:",
-    "error.rawLineNotFound": "\u6309 rawLine \u672a\u627e\u5230\u4efb\u52a1\u884c: {path}",
-    "error.refreshHoliday": "\u5237\u65b0\u8282\u5047\u65e5\u6570\u636e\u5931\u8d25:",
-    "error.refreshView": "\u5237\u65b0\u6708\u5386\u89c6\u56fe\u5931\u8d25:",
-    "error.renderGrid": "\u91cd\u7ed8\u65e5\u5386\u7f51\u683c\u5931\u8d25:",
-    "error.settingsLoad": "\u8bbe\u7f6e\u52a0\u8f7d\u5931\u8d25\uff0c\u4f7f\u7528\u9ed8\u8ba4\u8bbe\u7f6e:",
-    "error.settingsSave": "\u8bbe\u7f6e\u4fdd\u5b58\u5931\u8d25:",
-    "error.toggleFail": "\u5207\u6362\u4efb\u52a1\u72b6\u6001\u5931\u8d25:",
-    "file.autoCreated": "\u7531\u300c\u6708\u5386\u4efb\u52a1\u300d\u63d2\u4ef6\u81ea\u52a8\u521b\u5efa\u3002",
-    "holiday.workday": "\u73ed",
-    "lunar.branch.1": "\u5b50",
-    "lunar.branch.10": "\u9149",
-    "lunar.branch.11": "\u620c",
-    "lunar.branch.12": "\u4ea5",
-    "lunar.branch.2": "\u4e11",
-    "lunar.branch.3": "\u5bc5",
-    "lunar.branch.4": "\u536f",
-    "lunar.branch.5": "\u8fb0",
-    "lunar.branch.6": "\u5df3",
-    "lunar.branch.7": "\u5348",
-    "lunar.branch.8": "\u672a",
-    "lunar.branch.9": "\u7533",
-    "lunar.day.1": "\u521d\u4e00",
-    "lunar.day.10": "\u521d\u5341",
-    "lunar.day.11": "\u5341\u4e00",
-    "lunar.day.12": "\u5341\u4e8c",
-    "lunar.day.13": "\u5341\u4e09",
-    "lunar.day.14": "\u5341\u56db",
-    "lunar.day.15": "\u5341\u4e94",
-    "lunar.day.16": "\u5341\u516d",
-    "lunar.day.17": "\u5341\u4e03",
-    "lunar.day.18": "\u5341\u516b",
-    "lunar.day.19": "\u5341\u4e5d",
-    "lunar.day.2": "\u521d\u4e8c",
-    "lunar.day.20": "\u4e8c\u5341",
-    "lunar.day.21": "\u5eff\u4e00",
-    "lunar.day.22": "\u5eff\u4e8c",
-    "lunar.day.23": "\u5eff\u4e09",
-    "lunar.day.24": "\u5eff\u56db",
-    "lunar.day.25": "\u5eff\u4e94",
-    "lunar.day.26": "\u5eff\u516d",
-    "lunar.day.27": "\u5eff\u4e03",
-    "lunar.day.28": "\u5eff\u516b",
-    "lunar.day.29": "\u5eff\u4e5d",
-    "lunar.day.3": "\u521d\u4e09",
-    "lunar.day.30": "\u4e09\u5341",
-    "lunar.day.4": "\u521d\u56db",
-    "lunar.day.5": "\u521d\u4e94",
-    "lunar.day.6": "\u521d\u516d",
-    "lunar.day.7": "\u521d\u4e03",
-    "lunar.day.8": "\u521d\u516b",
-    "lunar.day.9": "\u521d\u4e5d",
-    "lunar.leap": "\u95f0{monthName}\u6708",
-    "lunar.month.1": "\u6b63",
-    "lunar.month.10": "\u5341",
-    "lunar.month.11": "\u51ac",
-    "lunar.month.12": "\u814a",
-    "lunar.month.2": "\u4e8c",
-    "lunar.month.3": "\u4e09",
-    "lunar.month.4": "\u56db",
-    "lunar.month.5": "\u4e94",
-    "lunar.month.6": "\u516d",
-    "lunar.month.7": "\u4e03",
-    "lunar.month.8": "\u516b",
-    "lunar.month.9": "\u4e5d",
-    "lunar.monthSuffix": "{monthName}\u6708",
-    "lunar.rangeError": "\u5e74\u4efd\u8d85\u51fa\u652f\u6301\u8303\u56f4\uff081900-2100\uff09",
-    "lunar.stem.1": "\u7532",
-    "lunar.stem.10": "\u7678",
-    "lunar.stem.2": "\u4e59",
-    "lunar.stem.3": "\u4e19",
-    "lunar.stem.4": "\u4e01",
-    "lunar.stem.5": "\u620a",
-    "lunar.stem.6": "\u5df1",
-    "lunar.stem.7": "\u5e9a",
-    "lunar.stem.8": "\u8f9b",
-    "lunar.stem.9": "\u58ec",
-    "lunar.zodiac.1": "\u9f20",
-    "lunar.zodiac.10": "\u9e21",
-    "lunar.zodiac.11": "\u72d7",
-    "lunar.zodiac.12": "\u732a",
-    "lunar.zodiac.2": "\u725b",
-    "lunar.zodiac.3": "\u864e",
-    "lunar.zodiac.4": "\u5154",
-    "lunar.zodiac.5": "\u9f99",
-    "lunar.zodiac.6": "\u86c7",
-    "lunar.zodiac.7": "\u9a6c",
-    "lunar.zodiac.8": "\u7f8a",
-    "lunar.zodiac.9": "\u7334",
-    "modal.create.add": "\u6dfb\u52a0\u4efb\u52a1",
-    "modal.create.allDay": "\u5168\u5929",
-    "modal.create.cancel": "\u53d6\u6d88",
-    "modal.create.catMore": "\u66f4\u591a",
-    "modal.create.category": "\u7c7b\u522b",
-    "modal.create.categoryAria": "\u7c7b\u522b {label}",
-    "modal.create.collapse": "\u6536\u8d77",
-    "modal.create.dateLine": "{m}\u6708{day}\u65e5 \xb7 {weekday}",
-    "modal.create.delete": "\u5220\u9664\u4efb\u52a1",
-    "task.deletedToast": "\u5df2\u5220\u9664",
-    "task.undo": "\u64a4\u9500",
-    "task.undoFail": "\u64a4\u9500\u5931\u8d25\uff0c\u8bf7\u624b\u52a8\u8865\u56de",
-    "modal.create.deleteFail": "\u5220\u9664\u5931\u8d25\uff0c\u8be5\u4efb\u52a1\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c06\u5237\u65b0\u5217\u8868",
+    "cmd.open": "打开月历任务视图",
+    "cmd.refresh": "刷新月历任务视图",
+    "cmd.toggle": "循环切换月历视图（大月 / 小月 / 大周 / 小周 / 三天视图）",
+    "error.badDateConsole": "月历任务：无法识别的日期任务行 ({path}:{line}): {text}",
+    "error.builtinHoliday": "月历任务：插件目录下的 holidays.json 解析失败，已改用随包内置的节假日数据",
+    "error.createFail": "创建任务失败:",
+    "error.delayRefresh": "延迟刷新失败:",
+    "error.deleteFail": "删除任务失败:",
+    "error.deleteOldFail": "删除原任务行失败:",
+    "error.fileNotFound": "文件不存在: {path}",
+    "error.fileNotFound2": "文件不存在: {path}",
+    "error.folderCreate": "在文件夹「{folder}」创建任务文件失败:",
+    "error.holidayApi": "节假日数据：{year} 年 API 调用失败",
+    "error.holidayApiEmpty": "节假日数据：{year} 年 API 返回了 holiday 字段但未解析出任何有效条目，响应结构可能已变化",
+    "error.holidayApiFormat": "API格式错误",
+    "error.holidayCN": "月历任务：holiday-cn 数据源获取 {year} 年失败，尝试 timor.tech",
+    "error.holidayCNFormat": "holiday-cn 数据格式错误",
+    "error.holidayTimeout1": "请求超时（8s）：{year}年节假日数据",
+    "error.holidayTimeout2": "请求超时（8s）：{year}年 holiday-cn 数据",
+    "error.holidaysDataFormat": "月历任务：holidaysData 中 {year} 年的数据格式非法，已忽略",
+    "error.holidaysDataKey": "月历任务：holidaysData 中键「{year}」不是合法年份，已忽略",
+    "error.holidaysJsonFormat": "月历任务：holidays.json 中 {year} 年的数据格式非法，已忽略",
+    "error.lineInvalid1": "行号已失效，该行不是任务：{line}",
+    "error.lineInvalid2": "行号已失效，该行不是目标任务：{line}",
+    "error.lineInvalidDel1": "行号已失效，该行不是任务，拒绝删除：{line}",
+    "error.lineInvalidDel2": "行号已失效，该行不是目标任务，拒绝删除：{line}",
+    "error.lineRange": "行号超出范围: {line}",
+    "error.loadTasks": "加载任务失败:",
+    "error.noteSaveFail": "备注保存失败:",
+    "error.oversizedConsole": "月历任务：跨天任务区间 {start} ~ {due} 超过 {limit} 天，仅挂载首尾两日 ({path}:{line}): {content}",
+    "error.parseFile": "解析文件失败: {path}",
+    "error.postCreateRefresh": "创建后刷新视图失败:",
+    "error.rawLineNotFound": "按 rawLine 未找到任务行: {path}",
+    "error.refreshHoliday": "刷新节假日数据失败:",
+    "error.refreshView": "刷新月历视图失败:",
+    "error.renderGrid": "重绘日历网格失败:",
+    "error.settingsLoad": "设置加载失败，使用默认设置:",
+    "error.settingsSave": "设置保存失败:",
+    "error.toggleFail": "切换任务状态失败:",
+    "file.autoCreated": "由「月历任务」插件自动创建。",
+    "holiday.workday": "班",
+    "lunar.branch.1": "子",
+    "lunar.branch.10": "酉",
+    "lunar.branch.11": "戌",
+    "lunar.branch.12": "亥",
+    "lunar.branch.2": "丑",
+    "lunar.branch.3": "寅",
+    "lunar.branch.4": "卯",
+    "lunar.branch.5": "辰",
+    "lunar.branch.6": "巳",
+    "lunar.branch.7": "午",
+    "lunar.branch.8": "未",
+    "lunar.branch.9": "申",
+    "lunar.day.1": "初一",
+    "lunar.day.10": "初十",
+    "lunar.day.11": "十一",
+    "lunar.day.12": "十二",
+    "lunar.day.13": "十三",
+    "lunar.day.14": "十四",
+    "lunar.day.15": "十五",
+    "lunar.day.16": "十六",
+    "lunar.day.17": "十七",
+    "lunar.day.18": "十八",
+    "lunar.day.19": "十九",
+    "lunar.day.2": "初二",
+    "lunar.day.20": "二十",
+    "lunar.day.21": "廿一",
+    "lunar.day.22": "廿二",
+    "lunar.day.23": "廿三",
+    "lunar.day.24": "廿四",
+    "lunar.day.25": "廿五",
+    "lunar.day.26": "廿六",
+    "lunar.day.27": "廿七",
+    "lunar.day.28": "廿八",
+    "lunar.day.29": "廿九",
+    "lunar.day.3": "初三",
+    "lunar.day.30": "三十",
+    "lunar.day.4": "初四",
+    "lunar.day.5": "初五",
+    "lunar.day.6": "初六",
+    "lunar.day.7": "初七",
+    "lunar.day.8": "初八",
+    "lunar.day.9": "初九",
+    "lunar.leap": "闰{monthName}月",
+    "lunar.month.1": "正",
+    "lunar.month.10": "十",
+    "lunar.month.11": "冬",
+    "lunar.month.12": "腊",
+    "lunar.month.2": "二",
+    "lunar.month.3": "三",
+    "lunar.month.4": "四",
+    "lunar.month.5": "五",
+    "lunar.month.6": "六",
+    "lunar.month.7": "七",
+    "lunar.month.8": "八",
+    "lunar.month.9": "九",
+    "lunar.monthSuffix": "{monthName}月",
+    "lunar.rangeError": "年份超出支持范围（1900-2100）",
+    "lunar.stem.1": "甲",
+    "lunar.stem.10": "癸",
+    "lunar.stem.2": "乙",
+    "lunar.stem.3": "丙",
+    "lunar.stem.4": "丁",
+    "lunar.stem.5": "戊",
+    "lunar.stem.6": "己",
+    "lunar.stem.7": "庚",
+    "lunar.stem.8": "辛",
+    "lunar.stem.9": "壬",
+    "lunar.zodiac.1": "鼠",
+    "lunar.zodiac.10": "鸡",
+    "lunar.zodiac.11": "狗",
+    "lunar.zodiac.12": "猪",
+    "lunar.zodiac.2": "牛",
+    "lunar.zodiac.3": "虎",
+    "lunar.zodiac.4": "兔",
+    "lunar.zodiac.5": "龙",
+    "lunar.zodiac.6": "蛇",
+    "lunar.zodiac.7": "马",
+    "lunar.zodiac.8": "羊",
+    "lunar.zodiac.9": "猴",
+    "modal.create.add": "添加任务",
+    "modal.create.allDay": "全天",
+    "modal.create.cancel": "取消",
+    "modal.create.catMore": "更多",
+    "modal.create.category": "类别",
+    "modal.create.categoryAria": "类别 {label}",
+    "modal.create.collapse": "收起",
+    "modal.create.dateLine": "{m}月{day}日 · {weekday}",
+    "modal.create.delete": "删除任务",
+    "task.deletedToast": "已删除",
+    "task.undo": "撤销",
+    "task.undoFail": "撤销失败，请手动补回",
+    "modal.create.deleteFail": "删除失败，该任务可能已被修改，将刷新列表",
     "modal.create.displayDate": "{y}/{m}/{d}",
-    "modal.create.edit": "\u7f16\u8f91\u4efb\u52a1",
-    "modal.create.empty": "\u4efb\u52a1\u5185\u5bb9\u4e0d\u80fd\u4e3a\u7a7a\uff08\u5143\u6570\u636e\u6807\u8bb0\u5df2\u88ab\u81ea\u52a8\u5265\u79bb\uff09",
-    "modal.create.endBeforeStart": "\u7ed3\u675f\u65e5\u671f\u4e0d\u80fd\u65e9\u4e8e\u5f00\u59cb\u65e5\u671f",
-    "modal.create.endBeforeStartTime": "\u7ed3\u675f\u65f6\u95f4\u987b\u665a\u4e8e\u5f00\u59cb\u65f6\u95f4",
-    "modal.create.endNeedToggle": "\u5148\u52fe\u9009\u8de8\u5929",
-    "modal.create.existingCount": "\u8be5\u65e5\u5df2\u6709 {n} \u4e2a\u4efb\u52a1",
-    "modal.create.expand": "\u5c55\u5f00",
-    "modal.create.fail": "\u521b\u5efa\u4efb\u52a1\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5",
-    "modal.create.fillBoth": "\u8bf7\u540c\u65f6\u586b\u5199\u5f00\u59cb\u4e0e\u7ed3\u675f\u65f6\u95f4",
-    "modal.create.goto": "\u8df3\u8f6c\u5230\u6587\u6863",
-    "modal.create.high": "\u9ad8",
-    "modal.create.medium": "\u4e2d",
-    "modal.create.multiDay": "\u8de8\u5929\u4efb\u52a1",
-    "modal.create.noDateMark": "\u8be5\u4efb\u52a1\u6ca1\u6709\u65e5\u671f\u6807\u8bb0\uff0c\u65e0\u6cd5\u5b9a\u4f4d\u7f16\u8f91",
-    "modal.create.none": "\u666e\u901a",
-    "modal.create.note": "\u5907\u6CE8",
-    "modal.create.noteAdd": "\uFF0B\u6DFB\u52A0\u5907\u6CE8",
-    "modal.create.noteAria": "\u4E3A\u8FD9\u6761\u4EFB\u52A1\u5199\u5907\u6CE8",
-    "modal.create.notePlaceholder": "\u8F93\u5165\u5907\u6CE8\uff0c\u53EF\u591A\u884C...",
-    "modal.create.placeholder": "\u8f93\u5165\u4efb\u52a1\u5185\u5bb9...",
-    "modal.create.pleaseSelect": "\u8bf7\u9009\u62e9\u65e5\u671f",
-    "modal.create.priority": "\u4f18\u5148\u7ea7",
-    "modal.create.save": "\u4fdd\u5b58",
-    "modal.create.setTime": "+ \u8bbe\u7f6e\u65f6\u95f4",
-    "modal.create.time": "\u65f6\u95f4",
-    "modal.create.timeInvalidKept": "\u4efb\u52a1\u91cc\u7684\u65f6\u95f4\u503c {time} \u4e0d\u662f\u6709\u6548\u7684\u65f6\u949f\u65f6\u95f4\uff0c\u5df2\u539f\u6837\u4fdd\u7559\uff1b\u5982\u9700\u4fee\u6539\u8bf7\u76f4\u63a5\u7f16\u8f91\u7b14\u8bb0\u4e2d\u8be5\u884c",
-    "modal.create.to": "\u81f3",
-    "modal.create.toggleComplete": "\u5207\u6362\u5b8c\u6210\u72b6\u6001",
-    "modal.create.toggleFail": "\u64cd\u4f5c\u5931\u8d25\uff0c\u8be5\u4efb\u52a1\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c06\u5237\u65b0\u5217\u8868",
-    "modal.create.viewAll": "\u67e5\u770b\u5168\u90e8 {n} \u4e2a\u4efb\u52a1 \u25be",
-    "modal.create.weekday.fri": "\u5468\u4e94",
-    "modal.create.weekday.mon": "\u5468\u4e00",
-    "modal.create.weekday.sat": "\u5468\u516d",
-    "modal.create.weekday.sun": "\u5468\u65e5",
-    "modal.create.weekday.thu": "\u5468\u56db",
-    "modal.create.weekday.tue": "\u5468\u4e8c",
-    "modal.create.weekday.wed": "\u5468\u4e09",
-    "modal.date.confirm": "\u786e\u5b9a",
-    "modal.date.currentYear": "\u5f53\u524d\u5e74\u4efd: {year}",
-    "modal.date.month": "\u6708\u4efd",
-    "modal.date.monthSuffix": "{m}\u6708",
-    "modal.date.title": "\u9009\u62e9\u65e5\u671f",
-    "modal.date.year": "\u5e74\u4efd",
-    "modal.date.yearSuffix": "{y}\u5e74",
-    "modal.filter.all": "\u5168\u90e8",
-    "modal.filter.selected": "\u5df2\u9009 {n}",
-    "modal.filter.title": "\u6309\u7c7b\u522b\u7b5b\u9009",
-    "modal.filter.untagged": "\u65e0\u6807\u7b7e",
-    "notice.badDate": "\u6708\u5386\u4efb\u52a1\uff1a\u53d1\u73b0 \uD83D\uDCC5/\uD83D\uDEEB \u540e\u65e5\u671f\u65e0\u6cd5\u8bc6\u522b\uff08\u542b\u975e\u6cd5\u65e5\u671f\u5982 2026-02-30\uff09\u7684\u4efb\u52a1\u884c\uff0c\u5df2\u5ffd\u7565\uff08\u8be6\u60c5\u89c1\u63a7\u5236\u53f0\uff09",
-    "notice.cantOpenView": "\u6708\u5386\u4efb\u52a1\uff1a\u65e0\u6cd5\u6253\u5f00\u89c6\u56fe\uff0c\u8bf7\u91cd\u542f Obsidian \u540e\u91cd\u8bd5",
-    "notice.catExists": "\u7c7b\u522b\u300c{name}\u300d\u5df2\u5b58\u5728",
-    "notice.catInvalid": "\u7c7b\u522b\u540d\u4e0d\u5408\u6cd5\uff1a\u4e0d\u80fd\u4e3a\u7a7a\u3001\u4e0d\u80fd\u542b\u7a7a\u683c\u6216 #\u3001\u4e0d\u80fd\u662f\u7eaf\u6570\u5b57",
-    "notice.createdRefreshFail": "\u4efb\u52a1\u5df2\u521b\u5efa\uff0c\u5237\u65b0\u5931\u8d25\u8bf7\u624b\u52a8\u5207\u6362\u6708\u4efd",
-    "notice.editSavedBut": "\u7f16\u8f91\u5df2\u4fdd\u5b58\uff0c\u4f46\u539f\u4efb\u52a1\u884c\u672a\u80fd\u81ea\u52a8\u5220\u9664\uff0c\u8bf7\u68c0\u67e5\u662f\u5426\u91cd\u590d",
-    "notice.holidayPartial": "\u8282\u5047\u65e5\u6570\u636e\u5df2\u5237\u65b0\uff08{ok}/{total} \u5e74\u6210\u529f\uff09",
-    "notice.holidayNoData": "\u8282\u5047\u65e5\u6570\u636e\u5df2\u66f4\u65b0\uff1b{years} \u5b98\u65b9\u5c1a\u672a\u516c\u544a\uff0c\u5df2\u8df3\u8fc7",
-    "notice.holidayRefreshFail": "\u5237\u65b0\u8282\u5047\u65e5\u6570\u636e\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc",
-    "notice.holidayRefreshed": "\u8282\u5047\u65e5\u6570\u636e\u5df2\u5237\u65b0\uff01",
-    "notice.opFail": "\u64cd\u4f5c\u5931\u8d25\uff0c\u8bf7\u91cd\u8bd5",
-    "notice.oversized": "\u6708\u5386\u4efb\u52a1\uff1a\u8de8\u5929\u4efb\u52a1\u533a\u95f4\u8d85\u8fc7 {limit} \u5929\uff0c\u4ec5\u663e\u793a\u5f00\u59cb\u4e0e\u7ed3\u675f\u65e5\u671f\uff08\u8be6\u60c5\u89c1\u63a7\u5236\u53f0\uff09",
-    "notice.settingsLoadFail": "\u8bbe\u7f6e\u52a0\u8f7d\u5931\u8d25\uff0c\u5df2\u56de\u9000\u9ed8\u8ba4\u8bbe\u7f6e",
-    "notice.settingsBackup": "\u8bbe\u7f6e\u8bfb\u53d6\u5931\u8d25\uff0c\u5df2\u56de\u9000\u9ed8\u8ba4\u503c\uff1b\u539f\u6587\u4ef6\u5df2\u53e6\u5b58\u4e3a data.corrupt-\u65f6\u95f4\u6233.json\uff0c\u9700\u8981\u65f6\u53ef\u624b\u52a8\u6062\u590d",
-    "notice.settingsBackupFail": "\u65e0\u6cd5\u5907\u4efd\u635f\u574f\u7684\u8bbe\u7f6e\u6587\u4ef6\uff0c\u5df2\u53d6\u6d88\u4fdd\u5b58\u4ee5\u4fdd\u62a4\u539f\u6587\u4ef6\uff1b\u8bf7\u68c0\u67e5\u63d2\u4ef6\u76ee\u5f55\u7684\u6587\u4ef6\u6743\u9650\u4e0e\u78c1\u76d8\u7a7a\u95f4",
-    "notice.settingsSaveFail": "\u8bbe\u7f6e\u4fdd\u5b58\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u78c1\u76d8\u7a7a\u95f4\u4e0e\u6587\u4ef6\u6743\u9650",
-    "settings.archive.desc": "\u51b3\u5b9a\u65b0\u4efb\u52a1\u5199\u5165\u54ea\u4e2a\u6587\u4ef6\u3002\u5207\u6362\u540e\u4e0d\u5f71\u54cd\u5df2\u6709\u6587\u4ef6\uff0c\u5386\u53f2\u4efb\u52a1\u4ecd\u4f1a\u5168\u90e8\u663e\u793a\u3002",
-    "settings.archive.month": "\u6309\u6708\uff082026\u5e7410\u6708\u4efb\u52a1\u5217\u8868.md\uff09",
-    "settings.archive.year": "\u6309\u5e74\uff082026\u5e74\u4efb\u52a1\u5217\u8868.md\uff09",
-    "settings.autoHoliday.desc": "\u542f\u52a8\u65f6\u9884\u53d6\u4eca\u5e74\u524d\u540e\u4e09\u5e74\u7684\u8282\u5047\u65e5\u6570\u636e\uff08\u6570\u636e\u6e90\uff1aholiday-cn \u2192 timor.tech\uff09\uff0c\u4e0d\u5f39\u63d0\u793a\uff1b\u6d4f\u89c8\u5176\u4ed6\u5e74\u4efd\u65f6\u4e5f\u4f1a\u6309\u9700\u83b7\u53d6\u7f3a\u5931\u5e74\u4efd\u7684\u6570\u636e",
-    "settings.autoHoliday.name": "\u542f\u52a8\u65f6\u81ea\u52a8\u5237\u65b0\u8282\u5047\u65e5",
-    "settings.catAdd": "\u6dfb\u52a0",
-    "settings.catColor": "\u989c\u8272 {name}",
-    "settings.catDelete": "\u5220\u9664",
-    "settings.catDeleteAria": "\u5220\u9664\u7c7b\u522b {name}",
-    "settings.catDown": "\u4e0b\u79fb {name}",
-    "settings.catEmpty": "\u6682\u65e0\u5df2\u77e5\u7c7b\u522b\uff0c\u7528\u4e0b\u65b9\u8f93\u5165\u6846\u6dfb\u52a0",
-    "settings.catKnown.desc": "\u7ef4\u62a4\u521b\u5efa\u5f39\u7a97\u4e0e\u6f0f\u6597\u9762\u677f\u7684\u987a\u5e8f\u548c\u989c\u8272\u3002\u7c7b\u522b\u672c\u8eab\u662f\u4efb\u52a1\u884c\u5c3e\u7684 #\u6807\u7b7e\uff0c\u5728\u8fd9\u91cc\u589e\u5220\u4e0d\u4f1a\u4fee\u6539\u4efb\u4f55\u7b14\u8bb0\u3002",
-    "settings.catKnown.name": "\u5df2\u77e5\u7c7b\u522b",
-    "settings.catPlaceholder": "\u65b0\u7c7b\u522b\u540d\u79f0\uff0c\u5982\uff1a\u5065\u8eab",
-    "settings.catSwatch": "\u8272\u53f7 {n}",
-    "settings.catUp": "\u4e0a\u79fb {name}",
-    "settings.defaultAllDay.desc": "\u65b0\u5efa\u4efb\u52a1\u65f6\u9ed8\u8ba4\u4e3a\u5168\u5929\u4efb\u52a1\uff08\u4e0d\u5e26\u5177\u4f53\u65f6\u95f4\uff09",
-    "settings.defaultAllDay.name": "\u9ed8\u8ba4\u5168\u5929\u4efb\u52a1",
-    "settings.firstDow.desc": "\u8bbe\u7f6e\u65e5\u5386\u6bcf\u5468\u7684\u8d77\u59cb\u65e5",
-    "settings.firstDow.name": "\u6bcf\u5468\u7b2c\u4e00\u5929",
-    "settings.folder.dead": "{folder}\uff08\u5df2\u5931\u6548\uff09",
-    "settings.folder.default": "\u9ed8\u8ba4\uff08\u4efb\u52a1\uff09",
-    "settings.folder.desc": "\u9009\u62e9\u4efb\u52a1\u6587\u4ef6\u7684\u5b58\u50a8\u4f4d\u7f6e\u3002\u5982\u679c\u5df2\u6709\u5e74\u5ea6\u4efb\u52a1\u6587\u4ef6\uff0c\u63d2\u4ef6\u4f1a\u4f18\u5148\u4f7f\u7528\u5b83\u3002",
-    "settings.hideStrike.desc": "\u6253\u5f00\u540e\u5df2\u5b8c\u6210\u4efb\u52a1\u9690\u85cf\u5220\u9664\u7ebf\uff08\u540c\u65f6\u9690\u85cf\u8fc7\u671f\u4efb\u52a1\u7684\u7ea2\u8272\u7ad6\u7ebf\uff1b\u5b8c\u6210\u6001\u672c\u8eab\u4ecd\u6709\u53cd\u9988\uff1a\u624b\u673a\u7aef\u5de6\u7f18\u7070\u7ad6\u6761 + \u53d8\u6697\uff09",
-    "settings.hideStrike.name": "\u5df2\u5b8c\u6210\u9690\u85cf\u5220\u9664\u7ebf",
+    "modal.create.edit": "编辑任务",
+    "modal.create.empty": "任务内容不能为空（元数据标记已被自动剥离）",
+    "modal.create.endBeforeStart": "结束日期不能早于开始日期",
+    "modal.create.endBeforeStartTime": "结束时间须晚于开始时间",
+    "modal.create.endNeedToggle": "先勾选跨天",
+    "modal.create.existingCount": "该日已有 {n} 个任务",
+    "modal.create.expand": "展开",
+    "modal.create.fail": "创建任务失败，请重试",
+    "modal.create.fillBoth": "请同时填写开始与结束时间",
+    "modal.create.goto": "跳转到文档",
+    "modal.create.high": "高",
+    "modal.create.medium": "中",
+    "modal.create.multiDay": "跨天任务",
+    "modal.create.noDateMark": "该任务没有日期标记，无法定位编辑",
+    "modal.create.none": "普通",
+    "modal.create.note": "备注",
+    "modal.create.noteAdd": "＋添加备注",
+    "modal.create.noteAria": "为这条任务写备注",
+    "modal.create.notePlaceholder": "输入备注，可多行...",
+    "modal.create.placeholder": "输入任务内容...",
+    "modal.create.pleaseSelect": "请选择日期",
+    "modal.create.priority": "优先级",
+    "modal.create.save": "保存",
+    "modal.create.setTime": "+ 设置时间",
+    "modal.create.time": "时间",
+    "modal.create.timeInvalidKept": "任务里的时间值 {time} 不是有效的时钟时间，已原样保留；如需修改请直接编辑笔记中该行",
+    "modal.create.to": "至",
+    "modal.create.toggleComplete": "切换完成状态",
+    "modal.create.toggleFail": "操作失败，该任务可能已被修改，将刷新列表",
+    "modal.create.viewAll": "查看全部 {n} 个任务 ▾",
+    "modal.create.weekday.fri": "周五",
+    "modal.create.weekday.mon": "周一",
+    "modal.create.weekday.sat": "周六",
+    "modal.create.weekday.sun": "周日",
+    "modal.create.weekday.thu": "周四",
+    "modal.create.weekday.tue": "周二",
+    "modal.create.weekday.wed": "周三",
+    "modal.date.confirm": "确定",
+    "modal.date.currentYear": "当前年份: {year}",
+    "modal.date.month": "月份",
+    "modal.date.monthSuffix": "{m}月",
+    "modal.date.title": "选择日期",
+    "modal.date.year": "年份",
+    "modal.date.yearSuffix": "{y}年",
+    "modal.filter.all": "全部",
+    "modal.filter.selected": "已选 {n}",
+    "modal.filter.title": "按类别筛选",
+    "modal.filter.untagged": "无标签",
+    "notice.badDate": "月历任务：发现 📅/🛫 后日期无法识别（含非法日期如 2026-02-30）的任务行，已忽略（详情见控制台）",
+    "notice.cantOpenView": "月历任务：无法打开视图，请重启 Obsidian 后重试",
+    "notice.catExists": "类别「{name}」已存在",
+    "notice.catInvalid": "类别名不合法：不能为空、不能含空格或 #、不能是纯数字",
+    "notice.createdRefreshFail": "任务已创建，刷新失败请手动切换月份",
+    "notice.editSavedBut": "编辑已保存，但原任务行未能自动删除，请检查是否重复",
+    "notice.holidayPartial": "节假日数据已刷新（{ok}/{total} 年成功）",
+    "notice.holidayNoData": "节假日数据已更新；{years} 官方尚未公告，已跳过",
+    "notice.holidayRefreshFail": "刷新节假日数据失败，请检查网络",
+    "notice.holidayRefreshed": "节假日数据已刷新！",
+    "notice.opFail": "操作失败，请重试",
+    "notice.oversized": "月历任务：跨天任务区间超过 {limit} 天，仅显示开始与结束日期（详情见控制台）",
+    "notice.settingsLoadFail": "设置加载失败，已回退默认设置",
+    "notice.settingsBackup": "设置读取失败，已回退默认值；原文件已另存为 data.corrupt-时间戳.json，需要时可手动恢复",
+    "notice.settingsBackupFail": "无法备份损坏的设置文件，已取消保存以保护原文件；请检查插件目录的文件权限与磁盘空间",
+    "notice.settingsSaveFail": "设置保存失败，请检查磁盘空间与文件权限",
+    "settings.archive.desc": "决定新任务写入哪个文件。切换后不影响已有文件，历史任务仍会全部显示。",
+    "settings.archive.month": "按月（{file}）",
+    "settings.archive.year": "按年（{file}）",
+    "settings.autoHoliday.desc": "启动时预取今年前后三年的节假日数据（数据源：holiday-cn → timor.tech），不弹提示；浏览其他年份时也会按需获取缺失年份的数据",
+    "settings.autoHoliday.name": "启动时自动刷新节假日",
+    "settings.catAdd": "添加",
+    "settings.catColor": "颜色 {name}",
+    "settings.catColorNames": "蓝,紫,绿,橙,红,青,粉,灰",
+    "settings.catDelete": "删除",
+    "settings.catDeleteAria": "删除类别 {name}",
+    "settings.catDown": "下移 {name}",
+    "settings.catEmpty": "暂无已知类别，用下方输入框添加",
+    "settings.catKnown.desc": "维护创建弹窗与漏斗面板的顺序和颜色。类别本身是任务行尾的 #标签，在这里增删不会修改任何笔记。",
+    "settings.catKnown.name": "已知类别",
+    "settings.catPlaceholder": "新类别名称，如：健身",
+    "settings.catUp": "上移 {name}",
+    "settings.defaultAllDay.desc": "新建任务时默认为全天任务（不带具体时间）",
+    "settings.defaultAllDay.name": "默认全天任务",
+    "settings.firstDow.desc": "设置日历每周的起始日",
+    "settings.firstDow.name": "每周第一天",
+    "settings.folder.dead": "{folder}（已失效）",
+    "settings.folder.default": "默认（任务）",
+    "settings.folder.desc": "选择任务文件的存储位置。如果已有年度任务文件，插件会优先使用它。",
+    "settings.hideStrike.desc": "打开后已完成任务隐藏删除线（同时隐藏过期任务的红色竖线；完成态本身仍有反馈：手机端左缘灰竖条 + 变暗）",
+    "settings.hideStrike.name": "已完成隐藏删除线",
     // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
     // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.loading": "\u52a0\u8f7d\u4e2d...",
-    "settings.refreshBtn": "\u5237\u65b0",
-    "settings.refreshHoliday.desc": "\u4ece holiday-cn / timor.tech \u6570\u636e\u6e90\u83b7\u53d6\u6700\u65b0\u8282\u5047\u65e5\u6570\u636e",
-    "settings.refreshHoliday.name": "\u5237\u65b0\u8282\u5047\u65e5\u6570\u636e",
-    "settings.section.archive": "\u4efb\u52a1\u5f52\u6863\u5468\u671f",
-    "settings.section.category": "\u7c7b\u522b\u7ba1\u7406",
-    "settings.section.display": "\u663e\u793a",
-    "settings.section.folder": "\u4efb\u52a1\u6587\u4ef6\u5939",
-    "settings.section.holiday": "\u8282\u5047\u65e5\u6570\u636e",
-    "settings.section.storage": "\u4efb\u52a1\u4e0e\u5b58\u50a8",
-    "settings.showCompleted.desc": "\u5728\u6708\u5386\u4e2d\u663e\u793a\u5df2\u5b8c\u6210\u7684\u4efb\u52a1",
-    "settings.showCompleted.name": "\u663e\u793a\u5df2\u5b8c\u6210\u4efb\u52a1",
-    "settings.showHoliday.desc": "\u6807\u6ce8\u6cd5\u5b9a\u8282\u5047\u65e5\u548c\u8c03\u4f11\u4fe1\u606f",
-    "settings.showHoliday.name": "\u663e\u793a\u8282\u5047\u65e5",
-    "settings.showLunar.desc": "\u5728\u65e5\u671f\u4e0b\u65b9\u663e\u793a\u519c\u5386\u65e5\u671f\u548c\u8282\u6c14",
-    "settings.showLunar.name": "\u663e\u793a\u519c\u5386",
-    "settings.tasksLimit.desc": "\u6bcf\u4e2a\u65e5\u671f\u683c\u5b50\u6700\u591a\u663e\u793a\u7684\u4efb\u52a1\u6570\u91cf\uff1b\u5f53\u5929\u9762\u677f\u7684\u4efb\u52a1\u5217\u8868\u8d85\u8fc7\u8fd9\u4e2a\u6570\u5c31\u9ed8\u8ba4\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u6309\u5b83\u51fa\u73b0",
-    "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52a1\u663e\u793a\u6570\u91cf",
-    "settings.view.desc": "\u6253\u5f00\u6708\u5386\u65f6\u9ed8\u8ba4\u4f7f\u7528\u54ea\u4e00\u6863\u89c6\u56fe\u3002\u9876\u680f\u5207\u6362\u89c6\u56fe\u540e\u8fd9\u91cc\u4f1a\u8ddf\u7740\u53d8\u6210\u4f60\u6700\u540e\u7528\u7684\u90a3\u4e00\u6863\uff0c\u4e0b\u6b21\u6253\u5f00\u5c31\u505c\u5728\u90a3\u513f\u3002",
-    "settings.view.name": "\u9ed8\u8ba4\u89c6\u56fe",
-    "view.agenda.addOne": "\u6dfb\u52a0",
-    "view.agenda.clearFilterAria": "\u6E05\u9664\u5F53\u524D\u7C7B\u522B\u7B5B\u9009",
-    "view.agenda.emptyDay": "\u8fd9\u5929\u6ca1\u5b89\u6392",
-    "view.agenda.emptyFiltered": "\u5F53\u524D\u7B5B\u9009\u4E0B\u8FD9\u5929\u6CA1\u6709\u4EFB\u52A1",
-    "view.agenda.hasTaskDot": "\u8fd9\u5929\u6709\u5b89\u6392",
-    "view.agenda.manageDay": "\u7ba1\u7406",
-    "view.agenda.overdueDot": "\u8fd9\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
-    "view.cell.category": "\u7c7b\u522b\uff1a{category}",
-    "view.cell.duration": "{days}\u5929",
-    "view.cell.loadError": "\u4efb\u52a1\u52a0\u8f7d\u5931\u8d25\uff0c\u8bf7\u67e5\u770b\u63a7\u5236\u53f0",
-    "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
-    "view.header.nextMonth": "\u4e0b\u6708",
-    "view.header.nextThreeDay": "\u4e0b\u4e09\u5929",
-    "view.header.nextWeek": "\u4e0b\u4e00\u5468",
-    "view.header.pickView": "\u5207\u6362\u89c6\u56fe",
-    "view.header.prevMonth": "\u4e0a\u6708",
-    "view.header.prevThreeDay": "\u4e0a\u4e09\u5929",
-    "view.header.prevWeek": "\u4e0a\u4e00\u5468",
-    "view.header.thisWeek": "\u56de\u5230\u672c\u5468",
-    "view.header.title": "\u6708\u5386\u4efb\u52a1",
-    "view.header.titleTip": "\u70b9\u51fb\u5feb\u901f\u5207\u6362\u65e5\u671f",
-    "view.header.today": "\u56de\u5230\u672c\u6708",
-    "view.menu.title": "\u89c6\u56fe",
-    "view.mode.agenda": "\u5c0f\u6708\u89c6\u56fe",
-    "view.mode.bigWeek": "\u5927\u5468\u89c6\u56fe",
-    "view.mode.desc.agenda": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
-    "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
-    "view.mode.desc.list": "\u6574\u6708\u94fa\u6ee1\u5c4f\u5e55\uff0c\u4efb\u52a1\u5199\u5728\u683c\u5b50\u91cc",
-    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u65f6\u94fa\u5f00\uff0c\u62d6\u52a8\u6392\u4efb\u52a1",
-    "view.mode.desc.week": "\u53ea\u770b\u4e00\u5468\uff0c\u4efb\u52a1\u5728\u4e0b\u65b9\u660e\u7ec6\u533a",
-    "view.mode.list": "\u5927\u6708\u89c6\u56fe",
-    "view.mode.timeGrid": "\u4e09\u5929\u89c6\u56fe",
-    "view.mode.week": "\u5c0f\u5468\u89c6\u56fe",
-    "view.month.1": "1\u6708",
-    "view.month.10": "10\u6708",
-    "view.month.11": "11\u6708",
-    "view.month.12": "12\u6708",
-    "view.month.2": "2\u6708",
-    "view.month.3": "3\u6708",
-    "view.month.4": "4\u6708",
-    "view.month.5": "5\u6708",
-    "view.month.6": "6\u6708",
-    "view.month.7": "7\u6708",
-    "view.month.8": "8\u6708",
-    "view.month.9": "9\u6708",
-    "view.month.title": "{year}\u5e74 {monthName}",
-    "view.week.load": "\u5171 {n} \u9879 \u00b7 \u5b8c\u6210 {m}",
-    "view.week.loadHiddenHint": "\u5176\u4e2d {m} \u9879\u5df2\u5b8c\u6210\uff0c\u6309\u5f53\u524d\u8bbe\u7f6e\u672a\u5728\u683c\u5b50\u4e2d\u663e\u793a",
-    "view.week.number": "\u7b2c {n} \u5468",
-    "view.week.relative.next": "\u4e0b\u5468",
-    "view.week.relative.prev": "\u4e0a\u5468",
-    "view.week.relative.this": "\u672c\u5468",
-    "view.week.title": "{a} \u2013 {b}",
-    "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52a1",
-    "view.timegrid.badTime": "\u65f6\u95f4\u6bb5\u65e0\u6548\uff1a\u7ed3\u675f\u4e0d\u665a\u4e8e\u5f00\u59cb",
+    "settings.loading": "加载中...",
+    "settings.refreshBtn": "刷新",
+    "settings.refreshHoliday.desc": "从 holiday-cn / timor.tech 数据源获取最新节假日数据",
+    "settings.refreshHoliday.name": "刷新节假日数据",
+    "settings.section.archive": "归档周期",
+    "settings.section.category": "类别管理",
+    "settings.section.display": "显示",
+    "settings.section.folder": "记录位置",
+    "settings.section.holiday": "节假日数据",
+    "settings.section.storage": "任务",
+    "settings.showCompleted.desc": "在月历中显示已完成的任务",
+    "settings.showCompleted.name": "显示已完成任务",
+    "settings.showHoliday.desc": "标注法定节假日和调休信息",
+    "settings.showHoliday.name": "显示节假日",
+    "settings.showLunar.desc": "在日期下方显示农历日期和节气",
+    "settings.showLunar.name": "显示农历",
+    "settings.tasksLimit.desc": "每个日期格子最多显示的任务数量；当天面板的任务列表超过这个数就默认收起，「查看全部」也按它出现",
+    "settings.tasksLimit.name": "每日任务显示数量",
+    "settings.view.desc": "打开月历时默认使用哪一档视图。顶栏切换视图后这里会跟着变成你最后用的那一档，下次打开就停在那儿。",
+    "settings.view.name": "默认视图",
+    "view.agenda.addOne": "添加",
+    "view.agenda.clearFilterAria": "清除当前类别筛选",
+    "view.agenda.emptyDay": "这天没安排",
+    "view.agenda.emptyFiltered": "当前筛选下这天没有任务",
+    "view.agenda.hasTaskDot": "这天有安排",
+    "view.agenda.manageDay": "管理",
+    "view.agenda.overdueDot": "这天有逾期未完成",
+    "view.cell.category": "类别：{category}",
+    "view.cell.duration": "{days}天",
+    "view.cell.loadError": "任务加载失败，请查看控制台",
+    "view.cell.timeDuration": "{time} · {days}天",
+    "view.header.nextMonth": "下月",
+    "view.header.nextThreeDay": "下三天",
+    "view.header.nextWeek": "下一周",
+    "view.header.pickView": "切换视图",
+    "view.header.prevMonth": "上月",
+    "view.header.prevThreeDay": "上三天",
+    "view.header.prevWeek": "上一周",
+    "view.header.thisWeek": "回到本周",
+    "view.header.title": "月历任务",
+    "view.header.titleTip": "点击快速切换日期",
+    "view.header.today": "回到本月",
+    "view.menu.title": "视图",
+    "view.mode.agenda": "小月视图",
+    "view.mode.bigWeek": "大周视图",
+    "view.mode.desc.agenda": "整月铺满屏幕，任务在下方明细区",
+    "view.mode.desc.bigWeek": "只看一周，任务写在格子里",
+    "view.mode.desc.list": "整月铺满屏幕，任务写在格子里",
+    "view.mode.desc.timeGrid": "三天按小时铺开，拖动排任务",
+    "view.mode.desc.week": "只看一周，任务在下方明细区",
+    "view.mode.list": "大月视图",
+    "view.mode.timeGrid": "三天视图",
+    "view.mode.week": "小周视图",
+    "view.month.1": "1月",
+    "view.month.10": "10月",
+    "view.month.11": "11月",
+    "view.month.12": "12月",
+    "view.month.2": "2月",
+    "view.month.3": "3月",
+    "view.month.4": "4月",
+    "view.month.5": "5月",
+    "view.month.6": "6月",
+    "view.month.7": "7月",
+    "view.month.8": "8月",
+    "view.month.9": "9月",
+    "view.month.title": "{year}年 {monthName}",
+    "view.week.load": "共 {n} 项 · 完成 {m}",
+    "view.week.loadHiddenHint": "其中 {m} 项已完成，按当前设置未在格子中显示",
+    "view.week.number": "第 {n} 周",
+    "view.week.relative.next": "下周",
+    "view.week.relative.prev": "上周",
+    "view.week.relative.this": "本周",
+    "view.week.title": "{a} – {b}",
+    "view.timegrid.addTask": "新建任务",
+    "view.timegrid.badTime": "时间段无效：结束不晚于开始",
     
-    "view.timegrid.alldayLabel": "\u5168\u5929",
-    "view.timegrid.alldayCollapse": "\u6536\u8d77\u5168\u5929\u4efb\u52a1",
-    "view.timegrid.alldayCount": "{n} \u9879",
-    "view.timegrid.alldayExpand": "\u5c55\u5f00\u5168\u5929\u4efb\u52a1",
-    "view.timegrid.today": "\u4eca\u5929",
-    "view.timegrid.updateFail": "\u65f6\u95f4\u6ca1\u80fd\u5199\u5165\uff0c\u8bf7\u91cd\u8bd5",
-    "view.weekday.fri": "\u4e94",
-    "view.weekday.mon": "\u4e00",
-    "view.weekday.sat": "\u516d",
-    "view.weekday.sun": "\u65e5",
-    "view.weekday.thu": "\u56db",
-    "view.weekday.tue": "\u4e8c",
-    "view.weekday.wed": "\u4e09"
+    "view.timegrid.alldayLabel": "全天",
+    "view.timegrid.alldayCollapse": "收起全天任务",
+    "view.timegrid.alldayCount": "{n} 项",
+    "view.timegrid.alldayExpand": "展开全天任务",
+    "view.timegrid.today": "今天",
+    "view.timegrid.updateFail": "时间没能写入，请重试",
+    "view.weekday.fri": "五",
+    "view.weekday.mon": "一",
+    "view.weekday.sat": "六",
+    "view.weekday.sun": "日",
+    "view.weekday.thu": "四",
+    "view.weekday.tue": "二",
+    "view.weekday.wed": "三"
   },
   "zh-TW": {
-    "cmd.open": "\u958b\u555f\u6708\u66c6\u4efb\u52d9\u8996\u5716",
-    "cmd.refresh": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u4efb\u52d9\u8996\u5716",
-    "cmd.toggle": "\u8ff4\u5708\u5207\u63db\u6708\u66c6\u6aa2\u8996\uff08\u5927\u6708 / \u5c0f\u6708 / \u5927\u9031 / \u5c0f\u9031 / \u4e09\u5929\u6aa2\u8996\uff09",
-    "error.badDateConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u8b58\u5225\u7684\u65e5\u671f\u4efb\u52d9\u884c ({path}:{line}): {text}",
-    "error.builtinHoliday": "\u6708\u66c6\u4efb\u52d9\uff1a\u5167\u5efa\u7bc0\u5047\u65e5\u6578\u64da\u8b80\u53d6\u5931\u6557\uff08holidays.json \u7f3a\u5931\u6216\u640d\u58de\uff09\uff0c\u5c0d\u61c9\u5e74\u4efd\u5c07\u4f9d\u8cf4\u7db2\u8def\u6578\u64da\u6e90",
-    "error.createFail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff1a",
-    "error.delayRefresh": "\u5ef6\u9072\u91cd\u65b0\u6574\u7406\u5931\u6557\uff1a",
-    "error.deleteFail": "\u522a\u9664\u4efb\u52d9\u5931\u6557\uff1a",
-    "error.deleteOldFail": "\u522a\u9664\u539f\u4efb\u52d9\u884c\u5931\u6557\uff1a",
-    "error.fileNotFound": "\u6a94\u6848\u4e0d\u5b58\u5728\uff1a{path}",
-    "error.fileNotFound2": "\u6a94\u6848\u4e0d\u5b58\u5728\uff1a{path}",
-    "error.folderCreate": "\u5728\u8cc7\u6599\u593e\u300c{folder}\u300d\u5efa\u7acb\u4efb\u52d9\u6a94\u6848\u5931\u6557\uff1a",
-    "error.holidayApi": "\u7bc0\u5047\u65e5\u6578\u64da\uff1a{year} \u5e74 API \u547c\u53eb\u5931\u6557",
-    "error.holidayApiEmpty": "\u7bc0\u5047\u65e5\u6578\u64da\uff1a{year} \u5e74 API \u50b3\u56de\u4e86 holiday \u6b04\u4f4d\u4f46\u672a\u89e3\u6790\u51fa\u4efb\u4f55\u6709\u6548\u689d\u76ee\uff0c\u56de\u61c9\u7d50\u69cb\u53ef\u80fd\u5df2\u8b8a\u5316",
-    "error.holidayApiFormat": "API \u683c\u5f0f\u932f\u8aa4",
-    "error.holidayCN": "\u6708\u66c6\u4efb\u52d9\uff1aholiday-cn \u6578\u64da\u6e90\u53d6\u5f97 {year} \u5e74\u5931\u6557\uff0c\u5617\u8a66 timor.tech",
-    "error.holidayCNFormat": "holiday-cn \u6578\u64da\u683c\u5f0f\u932f\u8aa4",
-    "error.holidayTimeout1": "\u8acb\u6c42\u903e\u6642\uff088s\uff09\uff1a{year}\u5e74\u7bc0\u5047\u65e5\u6578\u64da",
-    "error.holidayTimeout2": "\u8acb\u6c42\u903e\u6642\uff088s\uff09\uff1a{year}\u5e74 holiday-cn \u6578\u64da",
-    "error.holidaysDataFormat": "\u6708\u66c6\u4efb\u52d9\uff1aholidaysData \u4e2d {year} \u5e74\u7684\u6578\u64da\u683c\u5f0f\u975e\u6cd5\uff0c\u5df2\u5ffd\u7565",
-    "error.holidaysDataKey": "\u6708\u66c6\u4efb\u52d9\uff1aholidaysData \u4e2d\u9375\u300c{year}\u300d\u4e0d\u662f\u5408\u6cd5\u5e74\u4efd\uff0c\u5df2\u5ffd\u7565",
-    "error.holidaysJsonFormat": "\u6708\u66c6\u4efb\u52d9\uff1aholidays.json \u4e2d {year} \u5e74\u7684\u6578\u64da\u683c\u5f0f\u975e\u6cd5\uff0c\u5df2\u5ffd\u7565",
-    "error.lineInvalid1": "\u884c\u865f\u5df2\u5931\u6548\uff0c\u8a72\u884c\u4e0d\u662f\u4efb\u52d9\uff1a{line}",
-    "error.lineInvalid2": "\u884c\u865f\u5df2\u5931\u6548\uff0c\u8a72\u884c\u4e0d\u662f\u76ee\u6a19\u4efb\u52d9\uff1a{line}",
-    "error.lineInvalidDel1": "\u884c\u865f\u5df2\u5931\u6548\uff0c\u8a72\u884c\u4e0d\u662f\u4efb\u52d9\uff0c\u62d2\u7d55\u522a\u9664\uff1a{line}",
-    "error.lineInvalidDel2": "\u884c\u865f\u5df2\u5931\u6548\uff0c\u8a72\u884c\u4e0d\u662f\u76ee\u6a19\u4efb\u52d9\uff0c\u62d2\u7d55\u522a\u9664\uff1a{line}",
-    "error.lineRange": "\u884c\u865f\u8d85\u51fa\u7bc4\u570d\uff1a{line}",
-    "error.loadTasks": "\u8f09\u5165\u4efb\u52d9\u5931\u6557\uff1a",
-    "error.noteSaveFail": "\u5099\u8A3B\u5132\u5B58\u5931\u6557\uFF1A",
-    "error.oversizedConsole": "\u6708\u66c6\u4efb\u52d9\uff1a\u8de8\u5929\u4efb\u52d9\u5340\u9593 {start} ~ {due} \u8d85\u904e {limit} \u5929\uff0c\u50c5\u639b\u8f09\u9996\u5c3e\u5169\u65e5 ({path}:{line}): {content}",
-    "error.parseFile": "\u89e3\u6790\u6a94\u6848\u5931\u6557\uff1a{path}",
-    "error.postCreateRefresh": "\u5efa\u7acb\u5f8c\u91cd\u65b0\u6574\u7406\u8996\u5716\u5931\u6557\uff1a",
-    "error.rawLineNotFound": "\u6309 rawLine \u672a\u627e\u5230\u4efb\u52d9\u884c\uff1a{path}",
-    "error.refreshHoliday": "\u91cd\u65b0\u6574\u7406\u7bc0\u5047\u65e5\u6578\u64da\u5931\u6557\uff1a",
-    "error.refreshView": "\u91cd\u65b0\u6574\u7406\u6708\u66c6\u6aa2\u8996\u5931\u6557\uff1a",
-    "error.renderGrid": "\u91cd\u7e6a\u6708\u66c6\u7db2\u683c\u5931\u6557\uff1a",
-    "error.settingsLoad": "\u8a2d\u5b9a\u8f09\u5165\u5931\u6557\uff0c\u4f7f\u7528\u9810\u8a2d\u503c\uff1a",
-    "error.settingsSave": "\u8a2d\u5b9a\u5132\u5b58\u5931\u6557\uff1a",
-    "error.toggleFail": "\u5207\u63db\u4efb\u52d9\u72c0\u614b\u5931\u6557\uff1a",
-    "file.autoCreated": "\u7531\u300c\u6708\u66c6\u4efb\u52d9\u300d\u63d2\u4ef6\u81ea\u52d5\u5275\u5efa\u3002",
-    "holiday.workday": "\u73ed",
-    "lunar.branch.1": "\u5b50",
-    "lunar.branch.10": "\u9149",
-    "lunar.branch.11": "\u620c",
-    "lunar.branch.12": "\u4ea5",
-    "lunar.branch.2": "\u4e11",
-    "lunar.branch.3": "\u5bc5",
-    "lunar.branch.4": "\u536f",
-    "lunar.branch.5": "\u8fb0",
-    "lunar.branch.6": "\u5df3",
-    "lunar.branch.7": "\u5348",
-    "lunar.branch.8": "\u672a",
-    "lunar.branch.9": "\u7533",
-    "lunar.day.1": "\u521d\u4e00",
-    "lunar.day.10": "\u521d\u5341",
-    "lunar.day.11": "\u5341\u4e00",
-    "lunar.day.12": "\u5341\u4e8c",
-    "lunar.day.13": "\u5341\u4e09",
-    "lunar.day.14": "\u5341\u56db",
-    "lunar.day.15": "\u5341\u4e94",
-    "lunar.day.16": "\u5341\u516d",
-    "lunar.day.17": "\u5341\u4e03",
-    "lunar.day.18": "\u5341\u516b",
-    "lunar.day.19": "\u5341\u4e5d",
-    "lunar.day.2": "\u521d\u4e8c",
-    "lunar.day.20": "\u4e8c\u5341",
-    "lunar.day.21": "\u5eff\u4e00",
-    "lunar.day.22": "\u5eff\u4e8c",
-    "lunar.day.23": "\u5eff\u4e09",
-    "lunar.day.24": "\u5eff\u56db",
-    "lunar.day.25": "\u5eff\u4e94",
-    "lunar.day.26": "\u5eff\u516d",
-    "lunar.day.27": "\u5eff\u4e03",
-    "lunar.day.28": "\u5eff\u516b",
-    "lunar.day.29": "\u5eff\u4e5d",
-    "lunar.day.3": "\u521d\u4e09",
-    "lunar.day.30": "\u4e09\u5341",
-    "lunar.day.4": "\u521d\u56db",
-    "lunar.day.5": "\u521d\u4e94",
-    "lunar.day.6": "\u521d\u516d",
-    "lunar.day.7": "\u521d\u4e03",
-    "lunar.day.8": "\u521d\u516b",
-    "lunar.day.9": "\u521d\u4e5d",
-    "lunar.leap": "\u958f{monthName}\u6708",
-    "lunar.month.1": "\u6b63",
-    "lunar.month.10": "\u5341",
-    "lunar.month.11": "\u51ac",
-    "lunar.month.12": "\u81d8",
-    "lunar.month.2": "\u4e8c",
-    "lunar.month.3": "\u4e09",
-    "lunar.month.4": "\u56db",
-    "lunar.month.5": "\u4e94",
-    "lunar.month.6": "\u516d",
-    "lunar.month.7": "\u4e03",
-    "lunar.month.8": "\u516b",
-    "lunar.month.9": "\u4e5d",
-    "lunar.monthSuffix": "{monthName}\u6708",
-    "lunar.rangeError": "\u5e74\u4efd\u8d85\u51fa\u652f\u63f4\u7bc4\u570d\uff081900-2100\uff09",
-    "lunar.stem.1": "\u7532",
-    "lunar.stem.10": "\u7678",
-    "lunar.stem.2": "\u4e59",
-    "lunar.stem.3": "\u4e19",
-    "lunar.stem.4": "\u4e01",
-    "lunar.stem.5": "\u620a",
-    "lunar.stem.6": "\u5df1",
-    "lunar.stem.7": "\u5e9a",
-    "lunar.stem.8": "\u8f9b",
-    "lunar.stem.9": "\u58ec",
-    "lunar.zodiac.1": "\u9f20",
-    "lunar.zodiac.10": "\u96de",
-    "lunar.zodiac.11": "\u72d7",
-    "lunar.zodiac.12": "\u8c6c",
-    "lunar.zodiac.2": "\u725b",
-    "lunar.zodiac.3": "\u864e",
-    "lunar.zodiac.4": "\u5154",
-    "lunar.zodiac.5": "\u9f8d",
-    "lunar.zodiac.6": "\u86c7",
-    "lunar.zodiac.7": "\u99ac",
-    "lunar.zodiac.8": "\u7f8a",
-    "lunar.zodiac.9": "\u7334",
-    "modal.create.add": "\u65b0\u589e\u4efb\u52d9",
-    "modal.create.allDay": "\u5168\u5929",
-    "modal.create.cancel": "\u53d6\u6d88",
-    "modal.create.catMore": "\u66f4\u591a",
-    "modal.create.category": "\u985e\u5225",
-    "modal.create.categoryAria": "\u985e\u5225 {label}",
-    "modal.create.collapse": "\u6536\u8d77",
-    "modal.create.dateLine": "{m}\u6708{day}\u65e5 \xb7 {weekday}",
-    "modal.create.delete": "\u522a\u9664\u4efb\u52d9",
-    "task.deletedToast": "\u5df2\u522a\u9664",
-    "task.undo": "\u64a4\u92b7",
-    "task.undoFail": "\u64a4\u92b7\u5931\u6557\uff0c\u8acb\u624b\u52d5\u88dc\u56de",
-    "modal.create.deleteFail": "\u522a\u9664\u5931\u6557\uff0c\u8a72\u4efb\u52d9\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c07\u91cd\u65b0\u6574\u7406\u5217\u8868",
+    "cmd.open": "開啟月曆任務視圖",
+    "cmd.refresh": "重新整理月曆任務視圖",
+    "cmd.toggle": "迴圈切換月曆檢視（大月 / 小月 / 大週 / 小週 / 三天檢視）",
+    "error.badDateConsole": "月曆任務：無法識別的日期任務行 ({path}:{line}): {text}",
+    "error.builtinHoliday": "月曆任務：插件目錄下的 holidays.json 解析失敗，已改用隨包內建的節假日資料",
+    "error.createFail": "建立任務失敗：",
+    "error.delayRefresh": "延遲重新整理失敗：",
+    "error.deleteFail": "刪除任務失敗：",
+    "error.deleteOldFail": "刪除原任務行失敗：",
+    "error.fileNotFound": "檔案不存在：{path}",
+    "error.fileNotFound2": "檔案不存在：{path}",
+    "error.folderCreate": "在資料夾「{folder}」建立任務檔案失敗：",
+    "error.holidayApi": "節假日數據：{year} 年 API 呼叫失敗",
+    "error.holidayApiEmpty": "節假日數據：{year} 年 API 傳回了 holiday 欄位但未解析出任何有效條目，回應結構可能已變化",
+    "error.holidayApiFormat": "API 格式錯誤",
+    "error.holidayCN": "月曆任務：holiday-cn 數據源取得 {year} 年失敗，嘗試 timor.tech",
+    "error.holidayCNFormat": "holiday-cn 數據格式錯誤",
+    "error.holidayTimeout1": "請求逾時（8s）：{year}年節假日數據",
+    "error.holidayTimeout2": "請求逾時（8s）：{year}年 holiday-cn 數據",
+    "error.holidaysDataFormat": "月曆任務：holidaysData 中 {year} 年的數據格式非法，已忽略",
+    "error.holidaysDataKey": "月曆任務：holidaysData 中鍵「{year}」不是合法年份，已忽略",
+    "error.holidaysJsonFormat": "月曆任務：holidays.json 中 {year} 年的數據格式非法，已忽略",
+    "error.lineInvalid1": "行號已失效，該行不是任務：{line}",
+    "error.lineInvalid2": "行號已失效，該行不是目標任務：{line}",
+    "error.lineInvalidDel1": "行號已失效，該行不是任務，拒絕刪除：{line}",
+    "error.lineInvalidDel2": "行號已失效，該行不是目標任務，拒絕刪除：{line}",
+    "error.lineRange": "行號超出範圍：{line}",
+    "error.loadTasks": "載入任務失敗：",
+    "error.noteSaveFail": "備註儲存失敗：",
+    "error.oversizedConsole": "月曆任務：跨天任務區間 {start} ~ {due} 超過 {limit} 天，僅掛載首尾兩日 ({path}:{line}): {content}",
+    "error.parseFile": "解析檔案失敗：{path}",
+    "error.postCreateRefresh": "建立後重新整理視圖失敗：",
+    "error.rawLineNotFound": "按 rawLine 未找到任務行：{path}",
+    "error.refreshHoliday": "重新整理節假日數據失敗：",
+    "error.refreshView": "重新整理月曆檢視失敗：",
+    "error.renderGrid": "重繪月曆網格失敗：",
+    "error.settingsLoad": "設定載入失敗，使用預設值：",
+    "error.settingsSave": "設定儲存失敗：",
+    "error.toggleFail": "切換任務狀態失敗：",
+    "file.autoCreated": "由「月曆任務」插件自動創建。",
+    "holiday.workday": "班",
+    "lunar.branch.1": "子",
+    "lunar.branch.10": "酉",
+    "lunar.branch.11": "戌",
+    "lunar.branch.12": "亥",
+    "lunar.branch.2": "丑",
+    "lunar.branch.3": "寅",
+    "lunar.branch.4": "卯",
+    "lunar.branch.5": "辰",
+    "lunar.branch.6": "巳",
+    "lunar.branch.7": "午",
+    "lunar.branch.8": "未",
+    "lunar.branch.9": "申",
+    "lunar.day.1": "初一",
+    "lunar.day.10": "初十",
+    "lunar.day.11": "十一",
+    "lunar.day.12": "十二",
+    "lunar.day.13": "十三",
+    "lunar.day.14": "十四",
+    "lunar.day.15": "十五",
+    "lunar.day.16": "十六",
+    "lunar.day.17": "十七",
+    "lunar.day.18": "十八",
+    "lunar.day.19": "十九",
+    "lunar.day.2": "初二",
+    "lunar.day.20": "二十",
+    "lunar.day.21": "廿一",
+    "lunar.day.22": "廿二",
+    "lunar.day.23": "廿三",
+    "lunar.day.24": "廿四",
+    "lunar.day.25": "廿五",
+    "lunar.day.26": "廿六",
+    "lunar.day.27": "廿七",
+    "lunar.day.28": "廿八",
+    "lunar.day.29": "廿九",
+    "lunar.day.3": "初三",
+    "lunar.day.30": "三十",
+    "lunar.day.4": "初四",
+    "lunar.day.5": "初五",
+    "lunar.day.6": "初六",
+    "lunar.day.7": "初七",
+    "lunar.day.8": "初八",
+    "lunar.day.9": "初九",
+    "lunar.leap": "閏{monthName}月",
+    "lunar.month.1": "正",
+    "lunar.month.10": "十",
+    "lunar.month.11": "冬",
+    "lunar.month.12": "臘",
+    "lunar.month.2": "二",
+    "lunar.month.3": "三",
+    "lunar.month.4": "四",
+    "lunar.month.5": "五",
+    "lunar.month.6": "六",
+    "lunar.month.7": "七",
+    "lunar.month.8": "八",
+    "lunar.month.9": "九",
+    "lunar.monthSuffix": "{monthName}月",
+    "lunar.rangeError": "年份超出支援範圍（1900-2100）",
+    "lunar.stem.1": "甲",
+    "lunar.stem.10": "癸",
+    "lunar.stem.2": "乙",
+    "lunar.stem.3": "丙",
+    "lunar.stem.4": "丁",
+    "lunar.stem.5": "戊",
+    "lunar.stem.6": "己",
+    "lunar.stem.7": "庚",
+    "lunar.stem.8": "辛",
+    "lunar.stem.9": "壬",
+    "lunar.zodiac.1": "鼠",
+    "lunar.zodiac.10": "雞",
+    "lunar.zodiac.11": "狗",
+    "lunar.zodiac.12": "豬",
+    "lunar.zodiac.2": "牛",
+    "lunar.zodiac.3": "虎",
+    "lunar.zodiac.4": "兔",
+    "lunar.zodiac.5": "龍",
+    "lunar.zodiac.6": "蛇",
+    "lunar.zodiac.7": "馬",
+    "lunar.zodiac.8": "羊",
+    "lunar.zodiac.9": "猴",
+    "modal.create.add": "新增任務",
+    "modal.create.allDay": "全天",
+    "modal.create.cancel": "取消",
+    "modal.create.catMore": "更多",
+    "modal.create.category": "類別",
+    "modal.create.categoryAria": "類別 {label}",
+    "modal.create.collapse": "收起",
+    "modal.create.dateLine": "{m}月{day}日 · {weekday}",
+    "modal.create.delete": "刪除任務",
+    "task.deletedToast": "已刪除",
+    "task.undo": "撤銷",
+    "task.undoFail": "撤銷失敗，請手動補回",
+    "modal.create.deleteFail": "刪除失敗，該任務可能已被修改，將重新整理列表",
     "modal.create.displayDate": "{y}/{m}/{d}",
-    "modal.create.edit": "\u7de8\u8f2f\u4efb\u52d9",
-    "modal.create.empty": "\u4efb\u52d9\u5167\u5bb9\u4e0d\u80fd\u70ba\u7a7a\uff08\u5143\u6578\u64da\u6a19\u8a18\u5df2\u88ab\u81ea\u52d5\u525d\u96e2\uff09",
-    "modal.create.endBeforeStart": "\u7d50\u675f\u65e5\u671f\u4e0d\u80fd\u65e9\u65bc\u958b\u59cb\u65e5\u671f",
-    "modal.create.endBeforeStartTime": "\u7d50\u675f\u6642\u9593\u9808\u665a\u65bc\u958b\u59cb\u6642\u9593",
-    "modal.create.endNeedToggle": "\u5148\u52fe\u9078\u8de8\u5929",
-    "modal.create.existingCount": "\u8a72\u65e5\u5df2\u6709 {n} \u500b\u4efb\u52d9",
-    "modal.create.expand": "\u5c55\u958b",
-    "modal.create.fail": "\u5efa\u7acb\u4efb\u52d9\u5931\u6557\uff0c\u8acb\u91cd\u8a66",
-    "modal.create.fillBoth": "\u8acb\u540c\u6642\u586b\u5beb\u958b\u59cb\u8207\u7d50\u675f\u6642\u9593",
-    "modal.create.goto": "\u8df3\u8f49\u5230\u6587\u6a94",
-    "modal.create.high": "\u9ad8",
-    "modal.create.medium": "\u4e2d",
-    "modal.create.multiDay": "\u8de8\u5929\u4efb\u52d9",
-    "modal.create.noDateMark": "\u8a72\u4efb\u52d9\u6c92\u6709\u65e5\u671f\u6a19\u8a18\uff0c\u7121\u6cd5\u5b9a\u4f4d\u7de8\u8f2f",
-    "modal.create.none": "\u666e\u901a",
-    "modal.create.note": "\u5099\u8A3B",
-    "modal.create.noteAdd": "\uFF0B\u65B0\u589E\u5099\u8A3B",
-    "modal.create.noteAria": "\u70BA\u9019\u689D\u4EFB\u52D9\u5BEB\u5099\u8A3B",
-    "modal.create.notePlaceholder": "\u8F38\u5165\u5099\u8A3B\uFF0C\u53EF\u591A\u884C...",
-    "modal.create.placeholder": "\u8f38\u5165\u4efb\u52d9\u5167\u5bb9\u2026",
-    "modal.create.pleaseSelect": "\u8acb\u9078\u64c7\u65e5\u671f",
-    "modal.create.priority": "\u512a\u5148\u7d1a",
-    "modal.create.save": "\u5132\u5b58",
-    "modal.create.setTime": "+ \u8a2d\u5b9a\u6642\u9593",
-    "modal.create.time": "\u6642\u9593",
-    "modal.create.timeInvalidKept": "\u4efb\u52d9\u88e1\u7684\u6642\u9593\u503c {time} \u4e0d\u662f\u6709\u6548\u7684\u6642\u9418\u6642\u9593\uff0c\u5df2\u539f\u6a23\u4fdd\u7559\uff1b\u5982\u9700\u4fee\u6539\u8acb\u76f4\u63a5\u7de8\u8f2f\u7b46\u8a18\u4e2d\u8a72\u884c",
-    "modal.create.to": "\u81f3",
-    "modal.create.toggleComplete": "\u5207\u63db\u5b8c\u6210\u72c0\u614b",
-    "modal.create.toggleFail": "\u64cd\u4f5c\u5931\u6557\uff0c\u8a72\u4efb\u52d9\u53ef\u80fd\u5df2\u88ab\u4fee\u6539\uff0c\u5c07\u91cd\u65b0\u6574\u7406\u5217\u8868",
-    "modal.create.viewAll": "\u6aa2\u8996\u5168\u90e8 {n} \u500b\u4efb\u52d9 \u25be",
-    "modal.create.weekday.fri": "\u9031\u4e94",
-    "modal.create.weekday.mon": "\u9031\u4e00",
-    "modal.create.weekday.sat": "\u9031\u516d",
-    "modal.create.weekday.sun": "\u9031\u65e5",
-    "modal.create.weekday.thu": "\u9031\u56db",
-    "modal.create.weekday.tue": "\u9031\u4e8c",
-    "modal.create.weekday.wed": "\u9031\u4e09",
-    "modal.date.confirm": "\u78ba\u5b9a",
-    "modal.date.currentYear": "\u76ee\u524d\u5e74\u4efd\uff1a{year}",
-    "modal.date.month": "\u6708\u4efd",
-    "modal.date.monthSuffix": "{m}\u6708",
-    "modal.date.title": "\u9078\u64c7\u65e5\u671f",
-    "modal.date.year": "\u5e74\u4efd",
-    "modal.date.yearSuffix": "{y}\u5e74",
-    "modal.filter.all": "\u5168\u90e8",
-    "modal.filter.selected": "\u5df2\u9078 {n}",
-    "modal.filter.title": "\u6309\u985e\u5225\u7be9\u9078",
-    "modal.filter.untagged": "\u7121\u6a19\u7c64",
-    "notice.badDate": "\u6708\u66c6\u4efb\u52d9\uff1a\u767c\u73fe \uD83D\uDCC5/\uD83D\uDEEB \u5f8c\u65e5\u671f\u7121\u6cd5\u8b58\u5225\uff08\u542b\u975e\u6cd5\u65e5\u671f\u5982 2026-02-30\uff09\u7684\u4efb\u52d9\u884c\uff0c\u5df2\u5ffd\u7565\uff08\u8a73\u60c5\u898b\u4e3b\u63a7\u53f0\uff09",
-    "notice.cantOpenView": "\u6708\u66c6\u4efb\u52d9\uff1a\u7121\u6cd5\u958b\u555f\u8996\u5716\uff0c\u8acb\u91cd\u555f Obsidian \u5f8c\u91cd\u8a66",
-    "notice.catExists": "\u985e\u5225\u300c{name}\u300d\u5df2\u5b58\u5728",
-    "notice.catInvalid": "\u985e\u5225\u540d\u4e0d\u5408\u6cd5\uff1a\u4e0d\u80fd\u70ba\u7a7a\u3001\u4e0d\u80fd\u542b\u7a7a\u683c\u6216 #\u3001\u4e0d\u80fd\u662f\u7d14\u6578\u5b57",
-    "notice.createdRefreshFail": "\u4efb\u52d9\u5df2\u5efa\u7acb\uff0c\u91cd\u65b0\u6574\u7406\u5931\u6557\u8acb\u624b\u52d5\u5207\u63db\u6708\u4efd",
-    "notice.editSavedBut": "\u7de8\u8f2f\u5df2\u5132\u5b58\uff0c\u4f46\u539f\u4efb\u52d9\u884c\u672a\u80fd\u81ea\u52d5\u522a\u9664\uff0c\u8acb\u6aa2\u67e5\u662f\u5426\u91cd\u8907",
-    "notice.holidayPartial": "\u7bc0\u5047\u65e5\u6578\u64da\u5df2\u91cd\u65b0\u6574\u7406\uff08{ok}/{total} \u5e74\u6210\u529f\uff09",
-    "notice.holidayNoData": "\u7bc0\u5047\u65e5\u8cc7\u6599\u5df2\u66f4\u65b0\uff1b{years} \u5b98\u65b9\u5c1a\u672a\u516c\u544a\uff0c\u5df2\u7565\u904e",
-    "notice.holidayRefreshFail": "\u91cd\u65b0\u6574\u7406\u7bc0\u5047\u65e5\u6578\u64da\u5931\u6557\uff0c\u8acb\u6aa2\u67e5\u7db2\u8def",
-    "notice.holidayRefreshed": "\u7bc0\u5047\u65e5\u6578\u64da\u5df2\u91cd\u65b0\u6574\u7406\uff01",
-    "notice.opFail": "\u64cd\u4f5c\u5931\u6557\uff0c\u8acb\u91cd\u8a66",
-    "notice.oversized": "\u6708\u66c6\u4efb\u52d9\uff1a\u8de8\u5929\u4efb\u52d9\u5340\u9593\u8d85\u904e {limit} \u5929\uff0c\u50c5\u986f\u793a\u958b\u59cb\u8207\u7d50\u675f\u65e5\u671f\uff08\u8a73\u60c5\u898b\u4e3b\u63a7\u53f0\uff09",
-    "notice.settingsLoadFail": "\u8a2d\u5b9a\u8f09\u5165\u5931\u6557\uff0c\u5df2\u56de\u9000\u9810\u8a2d\u503c",
-    "notice.settingsBackup": "\u8a2d\u5b9a\u8b80\u53d6\u5931\u6557\uff0c\u5df2\u56de\u9000\u9810\u8a2d\u503c\uff1b\u539f\u6a94\u6848\u5df2\u53e6\u5b58\u70ba data.corrupt-\u6642\u9593\u6233.json\uff0c\u9700\u8981\u6642\u53ef\u624b\u52d5\u9084\u539f",
-    "notice.settingsBackupFail": "\u7121\u6cd5\u5099\u4efd\u640d\u6bc0\u7684\u8a2d\u5b9a\u6a94\uff0c\u5df2\u53d6\u6d88\u5132\u5b58\u4ee5\u4fdd\u8b77\u539f\u6a94\uff1b\u8acb\u6aa2\u67e5\u5916\u639b\u76ee\u9304\u7684\u6a94\u6848\u6b0a\u9650\u8207\u78c1\u789f\u7a7a\u9593",
-    "notice.settingsSaveFail": "\u8a2d\u5b9a\u5132\u5b58\u5931\u6557\uff0c\u8acb\u6aa2\u67e5\u78c1\u789f\u7a7a\u9593\u8207\u6a94\u6848\u6b0a\u9650",
-    "settings.archive.desc": "\u6c7a\u5b9a\u65b0\u4efb\u52d9\u5beb\u5165\u54ea\u500b\u6a94\u6848\u3002\u5207\u63db\u5f8c\u4e0d\u5f71\u97ff\u5df2\u6709\u6a94\u6848\uff0c\u6b77\u53f2\u4efb\u52d9\u4ecd\u6703\u5168\u90e8\u986f\u793a\u3002",
-    "settings.archive.month": "\u6309\u6708\uff082026\u5e7410\u6708\u4efb\u52d9\u5217\u8868.md\uff09",
-    "settings.archive.year": "\u6309\u5e74\uff082026\u5e74\u4efb\u52d9\u5217\u8868.md\uff09",
-    "settings.autoHoliday.desc": "\u555f\u52d5\u6642\u9810\u53d6\u4eca\u5e74\u524d\u5f8c\u4e09\u5e74\u7684\u7bc0\u5047\u65e5\u6578\u64da\uff08\u6578\u64da\u6e90\uff1aholiday-cn \u2192 timor.tech\uff09\uff0c\u4e0d\u5f48\u63d0\u793a\uff1b\u700f\u89bd\u5176\u4ed6\u5e74\u4efd\u6642\u4e5f\u6703\u6309\u9700\u53d6\u5f97\u7f3a\u5931\u5e74\u4efd\u7684\u6578\u64da",
-    "settings.autoHoliday.name": "\u555f\u52d5\u6642\u81ea\u52d5\u91cd\u65b0\u6574\u7406\u7bc0\u5047\u65e5",
-    "settings.catAdd": "\u65b0\u589e",
-    "settings.catColor": "\u984f\u8272 {name}",
-    "settings.catDelete": "\u522a\u9664",
-    "settings.catDeleteAria": "\u522a\u9664\u985e\u5225 {name}",
-    "settings.catDown": "\u4e0b\u79fb {name}",
-    "settings.catEmpty": "\u66ab\u7121\u5df2\u77e5\u985e\u5225\uff0c\u7528\u4e0b\u65b9\u8f38\u5165\u6846\u65b0\u589e",
-    "settings.catKnown.desc": "\u7dad\u8b77\u5efa\u7acb\u5f48\u7a97\u8207\u6f0f\u6597\u9762\u677f\u7684\u9806\u5e8f\u548c\u984f\u8272\u3002\u985e\u5225\u672c\u8eab\u662f\u4efb\u52d9\u884c\u5c3e\u7684 #\u6a19\u7c64\uff0c\u5728\u9019\u88e1\u589e\u522a\u4e0d\u6703\u4fee\u6539\u4efb\u4f55\u7b46\u8a18\u3002",
-    "settings.catKnown.name": "\u5df2\u77e5\u985e\u5225",
-    "settings.catPlaceholder": "\u65b0\u985e\u5225\u540d\u7a31\uff0c\u5982\uff1a\u5065\u8eab",
-    "settings.catSwatch": "\u8272\u865f {n}",
-    "settings.catUp": "\u4e0a\u79fb {name}",
-    "settings.defaultAllDay.desc": "\u65b0\u5efa\u4efb\u52d9\u6642\u9810\u8a2d\u70ba\u5168\u5929\u4efb\u52d9\uff08\u4e0d\u5e36\u5177\u9ad4\u6642\u9593\uff09",
-    "settings.defaultAllDay.name": "\u9810\u8a2d\u5168\u5929\u4efb\u52d9",
-    "settings.firstDow.desc": "\u8a2d\u5b9a\u65e5\u66c6\u6bcf\u9031\u7684\u8d77\u59cb\u65e5",
-    "settings.firstDow.name": "\u6bcf\u9031\u7b2c\u4e00\u5929",
-    "settings.folder.dead": "{folder}\uff08\u5df2\u5931\u6548\uff09",
-    "settings.folder.default": "\u9810\u8a2d\uff08\u4efb\u52d9\uff09",
-    "settings.folder.desc": "\u9078\u64c7\u4efb\u52d9\u6a94\u6848\u7684\u5132\u5b58\u4f4d\u7f6e\u3002\u5982\u679c\u5df2\u6709\u5e74\u5ea6\u4efb\u52d9\u6a94\u6848\uff0c\u5916\u639b\u6703\u512a\u5148\u4f7f\u7528\u5b83\u3002",
-    "settings.hideStrike.desc": "\u958b\u555f\u5f8c\u5df2\u5b8c\u6210\u4efb\u52d9\u96b1\u85cf\u522a\u9664\u7dda\uff08\u540c\u6642\u96b1\u85cf\u904e\u671f\u4efb\u52d9\u7684\u7d05\u8272\u8c4e\u7dda\uff1b\u5b8c\u6210\u614b\u672c\u8eab\u4ecd\u6709\u56de\u994b\uff1a\u624b\u6a5f\u7aef\u5de6\u7de3\u7070\u8c4e\u689d + \u8b8a\u6697\uff09",
-    "settings.hideStrike.name": "\u5df2\u5b8c\u6210\u96b1\u85cf\u522a\u9664\u7dda",
+    "modal.create.edit": "編輯任務",
+    "modal.create.empty": "任務內容不能為空（元數據標記已被自動剝離）",
+    "modal.create.endBeforeStart": "結束日期不能早於開始日期",
+    "modal.create.endBeforeStartTime": "結束時間須晚於開始時間",
+    "modal.create.endNeedToggle": "先勾選跨天",
+    "modal.create.existingCount": "該日已有 {n} 個任務",
+    "modal.create.expand": "展開",
+    "modal.create.fail": "建立任務失敗，請重試",
+    "modal.create.fillBoth": "請同時填寫開始與結束時間",
+    "modal.create.goto": "跳轉到文檔",
+    "modal.create.high": "高",
+    "modal.create.medium": "中",
+    "modal.create.multiDay": "跨天任務",
+    "modal.create.noDateMark": "該任務沒有日期標記，無法定位編輯",
+    "modal.create.none": "普通",
+    "modal.create.note": "備註",
+    "modal.create.noteAdd": "＋新增備註",
+    "modal.create.noteAria": "為這條任務寫備註",
+    "modal.create.notePlaceholder": "輸入備註，可多行...",
+    "modal.create.placeholder": "輸入任務內容…",
+    "modal.create.pleaseSelect": "請選擇日期",
+    "modal.create.priority": "優先級",
+    "modal.create.save": "儲存",
+    "modal.create.setTime": "+ 設定時間",
+    "modal.create.time": "時間",
+    "modal.create.timeInvalidKept": "任務裡的時間值 {time} 不是有效的時鐘時間，已原樣保留；如需修改請直接編輯筆記中該行",
+    "modal.create.to": "至",
+    "modal.create.toggleComplete": "切換完成狀態",
+    "modal.create.toggleFail": "操作失敗，該任務可能已被修改，將重新整理列表",
+    "modal.create.viewAll": "檢視全部 {n} 個任務 ▾",
+    "modal.create.weekday.fri": "週五",
+    "modal.create.weekday.mon": "週一",
+    "modal.create.weekday.sat": "週六",
+    "modal.create.weekday.sun": "週日",
+    "modal.create.weekday.thu": "週四",
+    "modal.create.weekday.tue": "週二",
+    "modal.create.weekday.wed": "週三",
+    "modal.date.confirm": "確定",
+    "modal.date.currentYear": "目前年份：{year}",
+    "modal.date.month": "月份",
+    "modal.date.monthSuffix": "{m}月",
+    "modal.date.title": "選擇日期",
+    "modal.date.year": "年份",
+    "modal.date.yearSuffix": "{y}年",
+    "modal.filter.all": "全部",
+    "modal.filter.selected": "已選 {n}",
+    "modal.filter.title": "按類別篩選",
+    "modal.filter.untagged": "無標籤",
+    "notice.badDate": "月曆任務：發現 📅/🛫 後日期無法識別（含非法日期如 2026-02-30）的任務行，已忽略（詳情見主控台）",
+    "notice.cantOpenView": "月曆任務：無法開啟視圖，請重啟 Obsidian 後重試",
+    "notice.catExists": "類別「{name}」已存在",
+    "notice.catInvalid": "類別名不合法：不能為空、不能含空格或 #、不能是純數字",
+    "notice.createdRefreshFail": "任務已建立，重新整理失敗請手動切換月份",
+    "notice.editSavedBut": "編輯已儲存，但原任務行未能自動刪除，請檢查是否重複",
+    "notice.holidayPartial": "節假日數據已重新整理（{ok}/{total} 年成功）",
+    "notice.holidayNoData": "節假日資料已更新；{years} 官方尚未公告，已略過",
+    "notice.holidayRefreshFail": "重新整理節假日數據失敗，請檢查網路",
+    "notice.holidayRefreshed": "節假日數據已重新整理！",
+    "notice.opFail": "操作失敗，請重試",
+    "notice.oversized": "月曆任務：跨天任務區間超過 {limit} 天，僅顯示開始與結束日期（詳情見主控台）",
+    "notice.settingsLoadFail": "設定載入失敗，已回退預設值",
+    "notice.settingsBackup": "設定讀取失敗，已回退預設值；原檔案已另存為 data.corrupt-時間戳.json，需要時可手動還原",
+    "notice.settingsBackupFail": "無法備份損毀的設定檔，已取消儲存以保護原檔；請檢查外掛目錄的檔案權限與磁碟空間",
+    "notice.settingsSaveFail": "設定儲存失敗，請檢查磁碟空間與檔案權限",
+    "settings.archive.desc": "決定新任務寫入哪個檔案。切換後不影響已有檔案，歷史任務仍會全部顯示。",
+    "settings.archive.month": "按月（{file}）",
+    "settings.archive.year": "按年（{file}）",
+    "settings.autoHoliday.desc": "啟動時預取今年前後三年的節假日數據（數據源：holiday-cn → timor.tech），不彈提示；瀏覽其他年份時也會按需取得缺失年份的數據",
+    "settings.autoHoliday.name": "啟動時自動重新整理節假日",
+    "settings.catAdd": "新增",
+    "settings.catColor": "顏色 {name}",
+    "settings.catColorNames": "藍,紫,綠,橙,紅,青,粉,灰",
+    "settings.catDelete": "刪除",
+    "settings.catDeleteAria": "刪除類別 {name}",
+    "settings.catDown": "下移 {name}",
+    "settings.catEmpty": "暫無已知類別，用下方輸入框新增",
+    "settings.catKnown.desc": "維護建立彈窗與漏斗面板的順序和顏色。類別本身是任務行尾的 #標籤，在這裡增刪不會修改任何筆記。",
+    "settings.catKnown.name": "已知類別",
+    "settings.catPlaceholder": "新類別名稱，如：健身",
+    "settings.catUp": "上移 {name}",
+    "settings.defaultAllDay.desc": "新建任務時預設為全天任務（不帶具體時間）",
+    "settings.defaultAllDay.name": "預設全天任務",
+    "settings.firstDow.desc": "設定日曆每週的起始日",
+    "settings.firstDow.name": "每週第一天",
+    "settings.folder.dead": "{folder}（已失效）",
+    "settings.folder.default": "預設（任務）",
+    "settings.folder.desc": "選擇任務檔案的儲存位置。如果已有年度任務檔案，外掛會優先使用它。",
+    "settings.hideStrike.desc": "開啟後已完成任務隱藏刪除線（同時隱藏過期任務的紅色豎線；完成態本身仍有回饋：手機端左緣灰豎條 + 變暗）",
+    "settings.hideStrike.name": "已完成隱藏刪除線",
     // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
     // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.loading": "\u8f09\u5165\u4e2d\u2026",
-    "settings.refreshBtn": "\u91cd\u65b0\u6574\u7406",
-    "settings.refreshHoliday.desc": "\u5f9e holiday-cn / timor.tech \u6578\u64da\u6e90\u53d6\u5f97\u6700\u65b0\u7bc0\u5047\u65e5\u6578\u64da",
-    "settings.refreshHoliday.name": "\u91cd\u65b0\u6574\u7406\u7bc0\u5047\u65e5\u6578\u64da",
-    "settings.section.archive": "\u4efb\u52d9\u6b78\u6a94\u9031\u671f",
-    "settings.section.category": "\u985e\u5225\u7ba1\u7406",
-    "settings.section.display": "\u986f\u793a",
-    "settings.section.folder": "\u4efb\u52d9\u8cc7\u6599\u593e",
-    "settings.section.holiday": "\u7bc0\u5047\u65e5\u6578\u64da",
-    "settings.section.storage": "\u4efb\u52d9\u8207\u5132\u5b58",
-    "settings.showCompleted.desc": "\u5728\u6708\u66c6\u4e2d\u986f\u793a\u5df2\u5b8c\u6210\u7684\u4efb\u52d9",
-    "settings.showCompleted.name": "\u986f\u793a\u5df2\u5b8c\u6210\u4efb\u52d9",
-    "settings.showHoliday.desc": "\u6a19\u8a3b\u6cd5\u5b9a\u7bc0\u5047\u65e5\u548c\u8abf\u4f11\u8cc7\u8a0a",
-    "settings.showHoliday.name": "\u986f\u793a\u7bc0\u5047\u65e5",
-    "settings.showLunar.desc": "\u5728\u65e5\u671f\u4e0b\u65b9\u986f\u793a\u8fb2\u66c6\u65e5\u671f\u548c\u7bc0\u6c23",
-    "settings.showLunar.name": "\u986f\u793a\u8fb2\u66c6",
-    "settings.tasksLimit.desc": "\u6bcf\u500b\u65e5\u671f\u683c\u4f4d\u6700\u591a\u986f\u793a\u7684\u4efb\u52d9\u6578\u91cf\uff1b\u7576\u5929\u9762\u677f\u7684\u4efb\u52d9\u6e05\u55ae\u8d85\u904e\u9019\u500b\u6578\u5c31\u9810\u8a2d\u6536\u8d77\uff0c\u300c\u67e5\u770b\u5168\u90e8\u300d\u4e5f\u4f9d\u5b83\u51fa\u73fe",
-    "settings.tasksLimit.name": "\u6bcf\u65e5\u4efb\u52d9\u986f\u793a\u6578\u91cf",
-    "settings.view.desc": "\u958b\u555f\u6708\u66c6\u6642\u9810\u8a2d\u4f7f\u7528\u54ea\u4e00\u6a94\u6aa2\u8996\u3002\u9802\u6b04\u5207\u63db\u6aa2\u8996\u5f8c\u9019\u88e1\u6703\u8ddf\u8457\u8b8a\u6210\u4f60\u6700\u5f8c\u4f7f\u7528\u7684\u90a3\u4e00\u6a94\uff0c\u4e0b\u6b21\u958b\u555f\u5c31\u505c\u5728\u90a3\u88e1\u3002",
-    "settings.view.name": "\u9810\u8a2d\u6aa2\u8996",
-    "view.agenda.addOne": "\u6dfb\u52a0",
-    "view.agenda.clearFilterAria": "\u6E05\u9664\u76EE\u524D\u985E\u5225\u7BE9\u9078",
-    "view.agenda.emptyDay": "\u9019\u5929\u6c92\u5b89\u6392",
-    "view.agenda.emptyFiltered": "\u76EE\u524D\u7BE9\u9078\u4E0B\u9019\u5929\u6C92\u6709\u4EFB\u52D9",
-    "view.agenda.hasTaskDot": "\u9019\u5929\u6709\u5b89\u6392",
-    "view.agenda.manageDay": "\u7ba1\u7406",
-    "view.agenda.overdueDot": "\u9019\u5929\u6709\u903e\u671f\u672a\u5b8c\u6210",
-    "view.cell.category": "\u985e\u5225\uff1a{category}",
-    "view.cell.duration": "{days}\u5929",
-    "view.cell.loadError": "\u4efb\u52d9\u8f09\u5165\u5931\u6557\uff0c\u8acb\u67e5\u770b\u4e3b\u63a7\u53f0",
-    "view.cell.timeDuration": "{time} \xb7 {days}\u5929",
-    "view.header.nextMonth": "\u4e0b\u6708",
-    "view.header.nextThreeDay": "\u4e0b\u4e09\u5929",
-    "view.header.nextWeek": "\u4e0b\u4e00\u9031",
-    "view.header.pickView": "\u5207\u63db\u6aa2\u8996",
-    "view.header.prevMonth": "\u4e0a\u6708",
-    "view.header.prevThreeDay": "\u4e0a\u4e09\u5929",
-    "view.header.prevWeek": "\u4e0a\u4e00\u9031",
-    "view.header.thisWeek": "\u56de\u5230\u672c\u9031",
-    "view.header.title": "\u6708\u66c6\u4efb\u52d9",
-    "view.header.titleTip": "\u9ede\u64ca\u5feb\u901f\u5207\u63db\u65e5\u671f",
-    "view.header.today": "\u56de\u5230\u672c\u6708",
-    "view.menu.title": "\u6aa2\u8996",
-    "view.mode.agenda": "\u5c0f\u6708\u6aa2\u8996",
-    "view.mode.bigWeek": "\u5927\u9031\u6aa2\u8996",
-    "view.mode.desc.agenda": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
-    "view.mode.desc.bigWeek": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
-    "view.mode.desc.list": "\u6574\u6708\u92ea\u6eff\u87a2\u5e55\uff0c\u4efb\u52d9\u5beb\u5728\u683c\u5b50\u88e1",
-    "view.mode.desc.timeGrid": "\u4e09\u5929\u6309\u5c0f\u6642\u92ea\u958b\uff0c\u62d6\u52d5\u6392\u4efb\u52d9",
-    "view.mode.desc.week": "\u53ea\u770b\u4e00\u9031\uff0c\u4efb\u52d9\u5728\u4e0b\u65b9\u660e\u7d30\u5340",
-    "view.mode.list": "\u5927\u6708\u6aa2\u8996",
-    "view.mode.timeGrid": "\u4e09\u5929\u6aa2\u8996",
-    "view.mode.week": "\u5c0f\u9031\u6aa2\u8996",
-    "view.month.1": "1\u6708",
-    "view.month.10": "10\u6708",
-    "view.month.11": "11\u6708",
-    "view.month.12": "12\u6708",
-    "view.month.2": "2\u6708",
-    "view.month.3": "3\u6708",
-    "view.month.4": "4\u6708",
-    "view.month.5": "5\u6708",
-    "view.month.6": "6\u6708",
-    "view.month.7": "7\u6708",
-    "view.month.8": "8\u6708",
-    "view.month.9": "9\u6708",
-    "view.month.title": "{year}\u5e74 {monthName}",
-    "view.week.load": "\u5171 {n} \u9805 \u00b7 \u5b8c\u6210 {m}",
-    "view.week.loadHiddenHint": "\u5176\u4e2d {m} \u9805\u5df2\u5b8c\u6210\uff0c\u4f9d\u76ee\u524d\u8a2d\u5b9a\u672a\u5728\u683c\u5b50\u4e2d\u986f\u793a",
-    "view.week.number": "\u7b2c {n} \u9031",
-    "view.week.relative.next": "\u4e0b\u9031",
-    "view.week.relative.prev": "\u4e0a\u9031",
-    "view.week.relative.this": "\u672c\u9031",
-    "view.week.title": "{a} \u2013 {b}",
-    "view.timegrid.addTask": "\u65b0\u5efa\u4efb\u52d9",
-    "view.timegrid.badTime": "\u6642\u9593\u6bb5\u7121\u6548\uff1a\u7d50\u675f\u4e0d\u665a\u65bc\u958b\u59cb",
+    "settings.loading": "載入中…",
+    "settings.refreshBtn": "重新整理",
+    "settings.refreshHoliday.desc": "從 holiday-cn / timor.tech 數據源取得最新節假日數據",
+    "settings.refreshHoliday.name": "重新整理節假日數據",
+    "settings.section.archive": "歸檔週期",
+    "settings.section.category": "類別管理",
+    "settings.section.display": "顯示",
+    "settings.section.folder": "記錄位置",
+    "settings.section.holiday": "節假日數據",
+    "settings.section.storage": "任務",
+    "settings.showCompleted.desc": "在月曆中顯示已完成的任務",
+    "settings.showCompleted.name": "顯示已完成任務",
+    "settings.showHoliday.desc": "標註法定節假日和調休資訊",
+    "settings.showHoliday.name": "顯示節假日",
+    "settings.showLunar.desc": "在日期下方顯示農曆日期和節氣",
+    "settings.showLunar.name": "顯示農曆",
+    "settings.tasksLimit.desc": "每個日期格位最多顯示的任務數量；當天面板的任務清單超過這個數就預設收起，「查看全部」也依它出現",
+    "settings.tasksLimit.name": "每日任務顯示數量",
+    "settings.view.desc": "開啟月曆時預設使用哪一檔檢視。頂欄切換檢視後這裡會跟著變成你最後使用的那一檔，下次開啟就停在那裡。",
+    "settings.view.name": "預設檢視",
+    "view.agenda.addOne": "添加",
+    "view.agenda.clearFilterAria": "清除目前類別篩選",
+    "view.agenda.emptyDay": "這天沒安排",
+    "view.agenda.emptyFiltered": "目前篩選下這天沒有任務",
+    "view.agenda.hasTaskDot": "這天有安排",
+    "view.agenda.manageDay": "管理",
+    "view.agenda.overdueDot": "這天有逾期未完成",
+    "view.cell.category": "類別：{category}",
+    "view.cell.duration": "{days}天",
+    "view.cell.loadError": "任務載入失敗，請查看主控台",
+    "view.cell.timeDuration": "{time} · {days}天",
+    "view.header.nextMonth": "下月",
+    "view.header.nextThreeDay": "下三天",
+    "view.header.nextWeek": "下一週",
+    "view.header.pickView": "切換檢視",
+    "view.header.prevMonth": "上月",
+    "view.header.prevThreeDay": "上三天",
+    "view.header.prevWeek": "上一週",
+    "view.header.thisWeek": "回到本週",
+    "view.header.title": "月曆任務",
+    "view.header.titleTip": "點擊快速切換日期",
+    "view.header.today": "回到本月",
+    "view.menu.title": "檢視",
+    "view.mode.agenda": "小月檢視",
+    "view.mode.bigWeek": "大週檢視",
+    "view.mode.desc.agenda": "整月鋪滿螢幕，任務在下方明細區",
+    "view.mode.desc.bigWeek": "只看一週，任務寫在格子裡",
+    "view.mode.desc.list": "整月鋪滿螢幕，任務寫在格子裡",
+    "view.mode.desc.timeGrid": "三天按小時鋪開，拖動排任務",
+    "view.mode.desc.week": "只看一週，任務在下方明細區",
+    "view.mode.list": "大月檢視",
+    "view.mode.timeGrid": "三天檢視",
+    "view.mode.week": "小週檢視",
+    "view.month.1": "1月",
+    "view.month.10": "10月",
+    "view.month.11": "11月",
+    "view.month.12": "12月",
+    "view.month.2": "2月",
+    "view.month.3": "3月",
+    "view.month.4": "4月",
+    "view.month.5": "5月",
+    "view.month.6": "6月",
+    "view.month.7": "7月",
+    "view.month.8": "8月",
+    "view.month.9": "9月",
+    "view.month.title": "{year}年 {monthName}",
+    "view.week.load": "共 {n} 項 · 完成 {m}",
+    "view.week.loadHiddenHint": "其中 {m} 項已完成，依目前設定未在格子中顯示",
+    "view.week.number": "第 {n} 週",
+    "view.week.relative.next": "下週",
+    "view.week.relative.prev": "上週",
+    "view.week.relative.this": "本週",
+    "view.week.title": "{a} – {b}",
+    "view.timegrid.addTask": "新建任務",
+    "view.timegrid.badTime": "時間段無效：結束不晚於開始",
     
-    "view.timegrid.alldayLabel": "\u5168\u5929",
-    "view.timegrid.alldayCollapse": "\u6536\u5408\u5168\u5929\u4efb\u52d9",
-    "view.timegrid.alldayCount": "{n} \u9805",
-    "view.timegrid.alldayExpand": "\u5c55\u958b\u5168\u5929\u4efb\u52d9",
-    "view.timegrid.today": "\u4eca\u5929",
-    "view.timegrid.updateFail": "\u6642\u9593\u6c92\u80fd\u5beb\u5165\uff0c\u8acb\u91cd\u8a66",
-    "view.weekday.fri": "\u4e94",
-    "view.weekday.mon": "\u4e00",
-    "view.weekday.sat": "\u516d",
-    "view.weekday.sun": "\u65e5",
-    "view.weekday.thu": "\u56db",
-    "view.weekday.tue": "\u4e8c",
-    "view.weekday.wed": "\u4e09"
+    "view.timegrid.alldayLabel": "全天",
+    "view.timegrid.alldayCollapse": "收合全天任務",
+    "view.timegrid.alldayCount": "{n} 項",
+    "view.timegrid.alldayExpand": "展開全天任務",
+    "view.timegrid.today": "今天",
+    "view.timegrid.updateFail": "時間沒能寫入，請重試",
+    "view.weekday.fri": "五",
+    "view.weekday.mon": "一",
+    "view.weekday.sat": "六",
+    "view.weekday.sun": "日",
+    "view.weekday.thu": "四",
+    "view.weekday.tue": "二",
+    "view.weekday.wed": "三"
   },
   "en": {
     "cmd.open": "Open Monthly Tasks View",
     "cmd.refresh": "Refresh Monthly Tasks View",
     "cmd.toggle": "Cycle monthly view (Month Cells / Month Agenda / Week Cells / Week Agenda / 3-Day Timeline)",
     "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {text}",
-    "error.builtinHoliday": "Monthly Tasks: Built-in holiday data read failed (holidays.json missing or corrupted), corresponding year will rely on network data source",
+    "error.builtinHoliday": "Monthly Tasks: Failed to parse holidays.json in the plugin folder; using the built-in holiday data instead.",
     "error.createFail": "Create task failed:",
     "error.delayRefresh": "Delayed refresh failed:",
     "error.deleteFail": "Delete task failed:",
@@ -871,7 +874,7 @@ var I18N = {
     "modal.create.category": "Category",
     "modal.create.categoryAria": "Category {label}",
     "modal.create.collapse": "Collapse",
-    "modal.create.dateLine": "{m}/{day} \xb7 {weekday}",
+    "modal.create.dateLine": "{m}/{day} · {weekday}",
     "modal.create.delete": "Delete Task",
     "task.deletedToast": "Deleted",
     "task.undo": "Undo",
@@ -897,7 +900,7 @@ var I18N = {
     "modal.create.noteAdd": "+ Add note",
     "modal.create.noteAria": "Add a note to this task",
     "modal.create.notePlaceholder": "Write a note, multiple lines allowed...",
-    "modal.create.placeholder": "Enter task content\u2026",
+    "modal.create.placeholder": "Enter task content…",
     "modal.create.pleaseSelect": "Please select date",
     "modal.create.priority": "Priority",
     "modal.create.save": "Save",
@@ -907,7 +910,7 @@ var I18N = {
     "modal.create.to": "to",
     "modal.create.toggleComplete": "Toggle completion status",
     "modal.create.toggleFail": "Operation failed, task may have been modified, refreshing list",
-    "modal.create.viewAll": "View all {n} tasks \u25be",
+    "modal.create.viewAll": "View all {n} tasks ▾",
     "modal.create.weekday.fri": "Friday",
     "modal.create.weekday.mon": "Monday",
     "modal.create.weekday.sat": "Saturday",
@@ -926,7 +929,7 @@ var I18N = {
     "modal.filter.selected": "{n} Selected",
     "modal.filter.title": "Filter by Category",
     "modal.filter.untagged": "No Tag",
-    "notice.badDate": "Monthly Tasks: Found task with unrecognizable \uD83D\uDCC5/\uD83D\uDEEB date (including invalid dates like 2026-02-30), ignored (see console)",
+    "notice.badDate": "Monthly Tasks: Found task with unrecognizable 📅/🛫 date (including invalid dates like 2026-02-30), ignored (see console)",
     "notice.cantOpenView": "Monthly Tasks: Cannot open view, please restart Obsidian and try again",
     "notice.catExists": "Category \"{name}\" already exists",
     "notice.catInvalid": "Invalid category name: cannot be empty, cannot contain spaces or #, cannot be pure numbers",
@@ -943,12 +946,13 @@ var I18N = {
     "notice.settingsBackupFail": "The damaged settings file could not be backed up. Saving was cancelled to protect it; check plugin-folder permissions and disk space",
     "notice.settingsSaveFail": "Settings save failed, please check disk space and file permissions",
     "settings.archive.desc": "Determines which file new tasks are written to. Switching doesn't affect existing files, historical tasks will still all display.",
-    "settings.archive.month": "By Month (2026\u5e7410\u6708\u4efb\u52a1\u5217\u8868.md)",
-    "settings.archive.year": "By Year (2026\u5e74\u4efb\u52a1\u5217\u8868.md)",
-    "settings.autoHoliday.desc": "Prefetch holiday data for three years before and after this year on startup (data source: holiday-cn \u2192 timor.tech), runs silently with no popup; also fetch missing year data on demand when browsing other years",
+    "settings.archive.month": "By Month ({file})",
+    "settings.archive.year": "By Year ({file})",
+    "settings.autoHoliday.desc": "Prefetch holiday data for three years before and after this year on startup (data source: holiday-cn → timor.tech), runs silently with no popup; also fetch missing year data on demand when browsing other years",
     "settings.autoHoliday.name": "Auto-refresh Holidays on Startup",
     "settings.catAdd": "Add",
     "settings.catColor": "Color {name}",
+    "settings.catColorNames": "Blue,Purple,Green,Amber,Red,Cyan,Pink,Gray",
     "settings.catDelete": "Delete",
     "settings.catDeleteAria": "Delete Category {name}",
     "settings.catDown": "Move Down {name}",
@@ -956,7 +960,6 @@ var I18N = {
     "settings.catKnown.desc": "Maintain order and color for create modal and filter panel. Categories themselves are #tags at end of task lines, adding/deleting here won't modify any notes.",
     "settings.catKnown.name": "Known Categories",
     "settings.catPlaceholder": "New category name, e.g.: Fitness",
-    "settings.catSwatch": "Swatch {n}",
     "settings.catUp": "Move Up {name}",
     "settings.defaultAllDay.desc": "New tasks default to all-day (no specific time)",
     "settings.defaultAllDay.name": "Default All Day Task",
@@ -969,16 +972,16 @@ var I18N = {
     "settings.hideStrike.name": "Hide Strikethrough for Completed",
     // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
     // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
-    "settings.loading": "Loading\u2026",
+    "settings.loading": "Loading…",
     "settings.refreshBtn": "Refresh",
     "settings.refreshHoliday.desc": "Get latest holiday data from holiday-cn / timor.tech data source",
     "settings.refreshHoliday.name": "Refresh Holiday Data",
-    "settings.section.archive": "Task Archive Period",
+    "settings.section.archive": "Archive Period",
     "settings.section.category": "Category Management",
     "settings.section.display": "Display",
-    "settings.section.folder": "Task Folder",
+    "settings.section.folder": "Location",
     "settings.section.holiday": "Holiday Data",
-    "settings.section.storage": "Tasks & Storage",
+    "settings.section.storage": "Tasks",
     "settings.showCompleted.desc": "Show completed tasks in calendar",
     "settings.showCompleted.name": "Show Completed Tasks",
     "settings.showHoliday.desc": "Mark legal holidays and make-up workday information",
@@ -999,7 +1002,7 @@ var I18N = {
     "view.cell.category": "Category: {category}",
     "view.cell.duration": "{days}d",
     "view.cell.loadError": "Failed to load tasks, check console",
-    "view.cell.timeDuration": "{time} \xb7 {days}d",
+    "view.cell.timeDuration": "{time} · {days}d",
     "view.header.nextMonth": "Next Month",
     "view.header.nextThreeDay": "Next 3 days",
     "view.header.nextWeek": "Next week",
@@ -1012,16 +1015,16 @@ var I18N = {
     "view.header.titleTip": "Click to jump to date",
     "view.header.today": "Today",
     "view.menu.title": "View",
-    "view.mode.agenda": "Month \u00b7 Agenda",
-    "view.mode.bigWeek": "Week \u00b7 Cells",
+    "view.mode.agenda": "Month · Agenda",
+    "view.mode.bigWeek": "Week · Cells",
     "view.mode.desc.agenda": "Whole month, tasks in the list below",
     "view.mode.desc.bigWeek": "One week only, tasks written in the cells",
     "view.mode.desc.list": "Whole month, tasks written in the cells",
     "view.mode.desc.timeGrid": "Three days by hour, drag to schedule",
     "view.mode.desc.week": "One week only, tasks in the list below",
-    "view.mode.list": "Month \u00b7 Cells",
+    "view.mode.list": "Month · Cells",
     "view.mode.timeGrid": "3-Day Timeline",
-    "view.mode.week": "Week \u00b7 Agenda",
+    "view.mode.week": "Week · Agenda",
     "view.month.1": "Jan",
     "view.month.10": "Oct",
     "view.month.11": "Nov",
@@ -1035,13 +1038,13 @@ var I18N = {
     "view.month.8": "Aug",
     "view.month.9": "Sep",
     "view.month.title": "{monthName} {year}",
-    "view.week.load": "{n} items \u00b7 {m} done",
+    "view.week.load": "{n} items · {m} done",
     "view.week.loadHiddenHint": "{m} of them are done and hidden from the cells under the current setting",
     "view.week.number": "Week {n}",
     "view.week.relative.next": "Next week",
     "view.week.relative.prev": "Last week",
     "view.week.relative.this": "This week",
-    "view.week.title": "{a} \u2013 {b}",
+    "view.week.title": "{a} – {b}",
     "view.timegrid.addTask": "New task",
     "view.timegrid.badTime": "Invalid time range: end is not after start",
     
@@ -1111,7 +1114,7 @@ function applyLanguage(setting) {
   } else {
     try {
       code = typeof import_obsidian.getLanguage === "function" ? import_obsidian.getLanguage() : (navigator.language || "zh-CN");
-    } catch (e) {
+    } catch {
       code = navigator.language || "zh-CN";
     }
   }
@@ -1128,8 +1131,8 @@ function applyLanguage(setting) {
  */
 function applyBadgeLocale() {
   try {
-    document.documentElement.style.setProperty("--mt-badge-work", JSON.stringify(tr("holiday.workday")));
-  } catch (e) {
+    activeDocument.documentElement.style.setProperty("--mt-badge-work", JSON.stringify(tr("holiday.workday")));
+  } catch {
     // 拿不到 document（极端情况）时退回 CSS 里的 '班' 兜底值，不影响其余渲染
   }
 }
@@ -1460,7 +1463,7 @@ function getPeriodId(date, period) {
   const y = String(date.getFullYear());
   if (period === "month") {
     const m = String(date.getMonth() + 1).padStart(2, "0");
-    return `${y}\u5E74${m}\u6708`;
+    return `${y}年${m}月`;
   }
   return y;
 }
@@ -2158,7 +2161,7 @@ var TaskParser = class {
       let dateMarker = startDate && startDate !== dueDate
         ? `\u{1F6EB} ${startDate} `
         : "";
-      let timeMarker = time && !isAllDay ? `\u23F0 ${time} ` : "";
+      let timeMarker = time && !isAllDay ? `⏰ ${time} ` : "";
       // dueDate 缺失时不写 📅 标记（防御：当前调用链恒传有效日期，但本方法是公共入队入口）
       const dueMarker = dueDate ? `\u{1F4C5} ${dueDate}` : "";
       // 编辑=整行重建，而 cleanTaskContent 会把 🟢/⏳/➕/✅ 从正文里剥掉：
@@ -2180,17 +2183,17 @@ var TaskParser = class {
       
       if (sortDate) {
         const [y, m] = sortDate.split("-");
-        const monthSection = `## ${y}\u5E74${m}\u6708`;
+        const monthSection = `## ${y}年${m}月`;
         // 查找月份section位置：兼容用户手动创建的无前导零月份标题（如 "## 2026年4月"），
         // 避免与插件生成的 "## 2026年04月" 重复创建同月 section。
         // 两处模式都必须锚定行尾（[ \t]*\r?$ 兼容 CRLF）：否则用户手写的日期级标题
         // "## 2026年1月1日 元旦计划会" 会被当成 1 月节，新任务被塞进那段纪要下面
-        const sectionMatch = fileContent.match(new RegExp(`^## ${y}\u5E740*${parseInt(m, 10)}\u6708[ \\t]*\\r?$`, "m"));
+        const sectionMatch = fileContent.match(new RegExp(`^## ${y}年0*${parseInt(m, 10)}月[ \\t]*\\r?$`, "m"));
         const sectionIdx = sectionMatch ? sectionMatch.index : -1;
         if (sectionIdx === -1) {
           // 月份section不存在，需要创建
           // 找到所有月份section的位置（锚定行首+行尾，避免误匹配 ### 、行中或日期级标题）
-          const monthRegex = /^## (\d{4})\u5E74(\d{1,2})\u6708[ \t]*\r?$/gm;
+          const monthRegex = /^## (\d{4})年(\d{1,2})月[ \t]*\r?$/gm;
           const months = [];
           let match;
           while ((match = monthRegex.exec(fileContent)) !== null) {
@@ -2345,7 +2348,7 @@ var TaskParser = class {
     const now = date || new Date();
     const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
     const periodId = getPeriodId(now, period);
-    const targetFileName = `${periodId}${period === "month" ? "" : "\u5E74"}\u4EFB\u52A1\u5217\u8868.md`;
+    const targetFileName = `${periodId}${period === "month" ? "" : "年"}任务列表.md`;
 
     // 1. 使用缓存查找已存在的任务文件（传入 customFolderPath 用于消歧）
     const existingPath = this.findTaskFile(periodId, customFolderPath);
@@ -2356,7 +2359,7 @@ var TaskParser = class {
     // 2. 如果没找到，在指定位置或默认位置创建
     // 自定义文件夹可能已被删除或父路径是文件，导致 ensureFolderExists 抛错；
     // 失败时回退到默认「任务」文件夹，保证任务仍可创建。
-    const candidates = customFolderPath ? [customFolderPath, `\u4EFB\u52A1`] : [`\u4EFB\u52A1`];
+    const candidates = customFolderPath ? [customFolderPath, `任务`] : [`任务`];
     for (const folderPath of candidates) {
       const filePath = `${folderPath}/${targetFileName}`;
       try {
@@ -2423,7 +2426,7 @@ var TaskParser = class {
           // 免得一个空模板把票型带偏。
           if (text.includes("\r\n")) crlf++;
           else if (text.includes("\n")) lf++;
-        } catch (e) {
+        } catch {
           // 读不了（已删除/无权限/非文本）就跳过这个样本，不影响其余
         }
       }
@@ -2432,10 +2435,10 @@ var TaskParser = class {
     let all = [];
     try {
       all = this.app.vault.getMarkdownFiles() || [];
-    } catch (e) {
+    } catch {
       return "\n";
     }
-    let [crlf, lf] = await tally(all.filter((f) => f.name.endsWith("\u4EFB\u52A1\u5217\u8868.md")));
+    let [crlf, lf] = await tally(all.filter((f) => f.name.endsWith("任务列表.md")));
     if (crlf + lf === 0 && folderPath) {
       const norm = String(folderPath).replace(/\/+$/, "");
       [crlf, lf] = await tally(all.filter((f) => f.parent && f.parent.path === norm));
@@ -2480,7 +2483,7 @@ var TaskParser = class {
   findTaskFile(periodId, customFolderPath) {
     const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
     const cacheKey = `${period}|${periodId}`;
-    const targetFileName = `${periodId}${period === "month" ? "" : "\u5E74"}\u4EFB\u52A1\u5217\u8868.md`;
+    const targetFileName = `${periodId}${period === "month" ? "" : "年"}任务列表.md`;
     const normalizedCustom = customFolderPath ? customFolderPath.replace(/\/+$/, "") : "";
 
     // 1. 检查缓存
@@ -2669,7 +2672,6 @@ function formatDate(date) {
  */
 function generateMonthCalendar(year, month, firstDayOfWeek = 1) {
   const days = [];
-  const firstDay = new Date(year, month, 1);
   const daysInMonth = getDaysInMonth(year, month);
   const firstDayWeekday = getFirstDayOfMonth(year, month);
 
@@ -2905,18 +2907,18 @@ function zodiacAnimals() {
  * 展示时经 translateHolidayName 转换；切语言不需要重写任何已缓存数据。
  */
 var TRADITIONAL_HOLIDAYS = {
-  "1-1": "\u6625\u8282",
-  "1-15": "\u5143\u5BB5",
-  "2-2": "\u9F99\u62AC\u5934",
-  "5-5": "\u7AEF\u5348",
-  "7-7": "\u4E03\u5915",
-  "7-15": "\u4E2D\u5143",
-  "8-15": "\u4E2D\u79CB",
-  "9-9": "\u91CD\u9633",
-  "10-1": "\u5BD2\u8863",
-  "10-15": "\u4E0B\u5143",
-  "12-8": "\u814A\u516B",
-  "12-23": "\u5C0F\u5E74"
+  "1-1": "春节",
+  "1-15": "元宵",
+  "2-2": "龙抬头",
+  "5-5": "端午",
+  "7-7": "七夕",
+  "7-15": "中元",
+  "8-15": "中秋",
+  "9-9": "重阳",
+  "10-1": "寒衣",
+  "10-15": "下元",
+  "12-8": "腊八",
+  "12-23": "小年"
 };
 var LUNAR_INFO = [
   48424,29984,59984,45733,25776,43440,109156,22176,46480,47778,29984,55894,45648,42160,107701,10960,
@@ -2955,8 +2957,6 @@ function getLunarMonthDays(year, month) {
 }
 function solarToLunar(date) {
   let year = date.getFullYear();
-  let month = date.getMonth() + 1;
-  let day = date.getDate();
   if (year < 1900 || year > 2100) {
     throw new Error(tr("lunar.rangeError"));
   }
@@ -3022,86 +3022,86 @@ function getLunarDayText(lunarDate) {
  * 覆盖不到的名称原样显示：这是第三方数据，宁可留中文也不要编一个错的英文名。
  */
 var HOLIDAY_NAME_EN = {
-  "\u5143\u65E6": "New Year's Day",
-  "\u6625\u8282": "Spring Festival",
-  "\u9664\u5915": "New Year's Eve",
-  "\u5143\u5BB5": "Lantern Festival",
-  "\u5143\u5BB5\u8282": "Lantern Festival",
-  "\u9F99\u62AC\u5934": "Dragon Raises Head",
-  "\u6E05\u660E": "Qingming Festival",
-  "\u6E05\u660E\u8282": "Qingming Festival",
-  "\u52B3\u52A8\u8282": "Labor Day",
-  "\u4E94\u4E00\u52B3\u52A8\u8282": "Labor Day",
-  "\u7AEF\u5348": "Dragon Boat Festival",
-  "\u7AEF\u5348\u8282": "Dragon Boat Festival",
-  "\u4E03\u5915": "Qixi Festival",
-  "\u4E2D\u5143": "Ghost Festival",
-  "\u79CB\u62A5": "Ghost Festival",
-  "\u4E2D\u79CB": "Mid-Autumn Festival",
-  "\u4E2D\u79CB\u8282": "Mid-Autumn Festival",
-  "\u91CD\u9633": "Double Ninth Festival",
-  "\u91CD\u9633\u8282": "Double Ninth Festival",
-  "\u5BD2\u8863": "Winter Clothing Festival",
-  "\u4E0B\u5143": "Lower Yuan Festival",
-  "\u51AC\u81F3": "Winter Solstice",
-  "\u5C0F\u5E74": "Little New Year",
-  "\u5357\u65B9\u5C0F\u5E74": "Little New Year",
-  "\u814A\u516B": "Laba Festival",
-  "\u56FD\u5E86": "National Day",
-  "\u56FD\u5E86\u8282": "National Day",
-  "\u5341\u4E00\u56FD\u5E86\u8282": "National Day",
-  "\u5973\u795E\u8282": "Goddess Festival",
-  "\u5987\u5973\u8282": "Women's Day",
-  "\u513F\u7AE5\u8282": "Children's Day",
-  "\u6559\u5E08\u8282": "Teachers' Day",
-  "\u5EFA\u519B\u8282": "Army Day",
-  "\u60DC\u5149\u8282": "Light-sparing Festival",
-  "\u7231\u7433\u8282": "Ailin Festival",
-  "\u56DE\u9E4B\u8282": "Hui Festival",
-  "\u6653\u516B\u8282": "Xiao and Ba Festival",
-  "\u73AF\u5883\u65E5": "Environment Day",
-  "\u5468\u672B": "Weekend",
-  "\u5047\u65E5": "Holiday",
-  "\u8282\u5047\u65E5": "Public Holiday",
-  "\u73ED": "Work",
-  "\u4F11": "Rest",
-  "\u8C03\u4F11": "Make-up Day"
+  "元旦": "New Year's Day",
+  "春节": "Spring Festival",
+  "除夕": "New Year's Eve",
+  "元宵": "Lantern Festival",
+  "元宵节": "Lantern Festival",
+  "龙抬头": "Dragon Raises Head",
+  "清明": "Qingming Festival",
+  "清明节": "Qingming Festival",
+  "劳动节": "Labor Day",
+  "五一劳动节": "Labor Day",
+  "端午": "Dragon Boat Festival",
+  "端午节": "Dragon Boat Festival",
+  "七夕": "Qixi Festival",
+  "中元": "Ghost Festival",
+  "秋报": "Ghost Festival",
+  "中秋": "Mid-Autumn Festival",
+  "中秋节": "Mid-Autumn Festival",
+  "重阳": "Double Ninth Festival",
+  "重阳节": "Double Ninth Festival",
+  "寒衣": "Winter Clothing Festival",
+  "下元": "Lower Yuan Festival",
+  "冬至": "Winter Solstice",
+  "小年": "Little New Year",
+  "南方小年": "Little New Year",
+  "腊八": "Laba Festival",
+  "国庆": "National Day",
+  "国庆节": "National Day",
+  "十一国庆节": "National Day",
+  "女神节": "Goddess Festival",
+  "妇女节": "Women's Day",
+  "儿童节": "Children's Day",
+  "教师节": "Teachers' Day",
+  "建军节": "Army Day",
+  "惜光节": "Light-sparing Festival",
+  "爱琳节": "Ailin Festival",
+  "回鹋节": "Hui Festival",
+  "晓八节": "Xiao and Ba Festival",
+  "环境日": "Environment Day",
+  "周末": "Weekend",
+  "假日": "Holiday",
+  "节假日": "Public Holiday",
+  "班": "Work",
+  "休": "Rest",
+  "调休": "Make-up Day"
 };
 
 /** 同上，zh-CN → zh-TW 的用词/字形差异（腊八→臘八、国庆→國慶、调休→調休…） */
 var HOLIDAY_NAME_TW = {
-  "\u56FD\u5E86": "\u570B\u6176",
-  "\u56FD\u5E86\u8282": "\u570B\u6176\u7BC0",
-  "\u5341\u4E00\u56FD\u5E86\u8282": "\u5341\u4E00\u570B\u6176\u7BC0",
-  "\u52B3\u52A8\u8282": "\u52DE\u52D5\u7BC0",
-  "\u4E94\u4E00\u52B3\u52A8\u8282": "\u4E94\u4E00\u52DE\u52D5\u7BC0",
-  "\u814A\u516B": "\u81D8\u516B",
-  "\u9F99\u62AC\u5934": "\u9F8D\u62AC\u982D",
-  "\u513F\u7AE5\u8282": "\u5152\u7AE5\u7BC0",
-  "\u6559\u5E08\u8282": "\u6559\u5E2B\u7BC0",
-  "\u5EFA\u519B\u8282": "\u5EFA\u8ECD\u7BC0",
-  "\u5973\u795E\u8282": "\u5973\u795E\u7BC0",
-  "\u5987\u5973\u8282": "\u5A66\u5973\u7BC0",
-  "\u56DE\u9E4B\u8282": "\u56DE\u9D93\u7BC0",
-  "\u6653\u516B\u8282": "\u66C9\u516B\u7BC0",
-  "\u5143\u5BB5\u8282": "\u5143\u5BB5\u7BC0",
-  "\u7AEF\u5348\u8282": "\u7AEF\u5348\u7BC0",
-  "\u4E2D\u79CB\u8282": "\u4E2D\u79CB\u7BC0",
-  "\u91CD\u9633\u8282": "\u91CD\u967D\u7BC0",
-  "\u6E05\u660E\u8282": "\u6E05\u660E\u7BC0",
-  "\u8282\u5047\u65E5": "\u7BC0\u5047\u65E5",
-  "\u5468\u672B": "\u9031\u672B",
-  "\u8C03\u4F11": "\u8ABF\u4F11",
+  "国庆": "國慶",
+  "国庆节": "國慶節",
+  "十一国庆节": "十一國慶節",
+  "劳动节": "勞動節",
+  "五一劳动节": "五一勞動節",
+  "腊八": "臘八",
+  "龙抬头": "龍抬頭",
+  "儿童节": "兒童節",
+  "教师节": "教師節",
+  "建军节": "建軍節",
+  "女神节": "女神節",
+  "妇女节": "婦女節",
+  "回鹋节": "回鶓節",
+  "晓八节": "曉八節",
+  "元宵节": "元宵節",
+  "端午节": "端午節",
+  "中秋节": "中秋節",
+  "重阳节": "重陽節",
+  "清明节": "清明節",
+  "节假日": "節假日",
+  "周末": "週末",
+  "调休": "調休",
   /* v1.7.5 补齐：API 与内置兜底数据会给出这些**基础名**（不带「节」字），
      原先 TW 表一条都没有，繁中界面直接露出简体。这里只收繁简不同形的四条，
      其余繁简同形（元旦/除夕/元宵/清明/端午/七夕/中元/中秋/寒衣/下元/小年/
      南方小年/假日/班/休）靠 translateHolidayName 回退原样输出，不入表。 */
-  "\u6625\u8282": "\u6625\u7BC0",
-  "\u79CB\u62A5": "\u79CB\u5831",
-  "\u91CD\u9633": "\u91CD\u967D",
-  "\u7231\u7433\u8282": "\u611B\u7433\u7BC0",
-  "\u60DC\u5149\u8282": "\u60DC\u5149\u7BC0",
-  "\u73AF\u5883\u65E5": "\u74B0\u5883\u65E5"
+  "春节": "春節",
+  "秋报": "秋報",
+  "重阳": "重陽",
+  "爱琳节": "愛琳節",
+  "惜光节": "惜光節",
+  "环境日": "環境日"
 };
 
 /**
@@ -3123,7 +3123,7 @@ function translateHolidayName(name) {
   // 任一段查不到就整体原样返回：沿用上面单名的既定策略，宁可不翻，也不要输出
   // 「國慶節/Mid-Autumn Festival」这种半截译文。分隔符统一用「/」拼回，
   // 与内置数据的写法一致（格子很窄，不再加空格）。
-  const parts = name.split(/[\/\uFF0F,\uFF0C\u3001]/);
+  const parts = name.split(/[/／,，、]/);
   if (parts.length < 2) return name;
   const out = [];
   for (const part of parts) {
@@ -3143,7 +3143,7 @@ function getTraditionalHoliday(lunarDate) {
   if (lunarDate.month === 12) {
     const daysInMonth = getLunarMonthDays(lunarDate.year, 12);
     if (lunarDate.day === daysInMonth) {
-      return "\u9664\u5915";
+      return "除夕";
     }
   }
   const key = `${lunarDate.month}-${lunarDate.day}`;
@@ -3165,7 +3165,7 @@ function getLunarInfo(date) {
       text: getLunarDayText(lunarDate),
       isFestival: false
     };
-  } catch (e) {
+  } catch {
     return {
       text: "",
       isFestival: false
@@ -3176,12 +3176,214 @@ function isSpecialLunarDay(date) {
   try {
     const lunarDate = solarToLunar(date);
     return lunarDate.day === 1 || lunarDate.day === 15;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
 
-// 内置节假日兜底数据已外置为插件目录下的 holidays.json（2007 年起的历史年份由网络数据源覆盖），由 loadSettings 中的 loadBuiltinHolidays 读取
+// 内置节假日兜底数据：下面的 BUILTIN_HOLIDAYS 块随 main.js 一起分发，是离线兜底的
+// 唯一可靠来源。社区目录安装插件时只下载 main.js / manifest.json / styles.css 三份，
+// 仓库里的 holidays.json 不会进用户的插件目录——只依赖那份外部文件，目录安装的用户
+// 就完全没有内置数据，节假日全押在网络源上（timor.tech 已实测返回 403）。
+// holidays.json 仍是可编辑的数据源：改它 → node scripts/sync-holidays.mjs → 一起提交；
+// 用户也可以往插件目录另放一份 holidays.json，按年覆盖内置副本。
+// 2007 年起的历史年份由网络数据源覆盖。
+
+/* === BUILTIN_HOLIDAYS:BEGIN === */
+/* 由 scripts/sync-holidays.mjs 从 holidays.json 生成，请勿手改本块。
+   改数据请改 holidays.json 再跑同步脚本；CI 会拦住两者漂移。 */
+var BUILTIN_HOLIDAYS = {
+  "2022": [
+    { "date": "2022-01-01", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2022-01-02", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2022-01-03", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2022-01-31", "name": "除夕", "type": "legal", "isOff": true },
+    { "date": "2022-02-01", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2022-02-02", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2022-02-03", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2022-02-04", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2022-02-05", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2022-02-06", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2022-01-29", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2022-01-30", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2022-04-03", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2022-04-04", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2022-04-05", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2022-04-02", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2022-04-30", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2022-05-01", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2022-05-02", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2022-05-03", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2022-05-04", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2022-04-24", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2022-05-07", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2022-06-03", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2022-06-04", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2022-06-05", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2022-09-10", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2022-09-11", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2022-09-12", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2022-10-01", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2022-10-02", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2022-10-03", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2022-10-04", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2022-10-05", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2022-10-06", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2022-10-07", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2022-10-08", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2022-10-09", "name": "班", "type": "workday", "isOff": false }
+  ],
+  "2023": [
+    { "date": "2023-01-01", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2023-01-02", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2023-01-21", "name": "除夕", "type": "legal", "isOff": true },
+    { "date": "2023-01-22", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2023-01-23", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2023-01-24", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2023-01-25", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2023-01-26", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2023-01-27", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2023-01-28", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2023-01-29", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2023-04-05", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2023-04-29", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2023-04-30", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2023-05-01", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2023-05-02", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2023-05-03", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2023-04-23", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2023-05-06", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2023-06-22", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2023-06-23", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2023-06-24", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2023-06-25", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2023-09-29", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2023-09-30", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2023-10-01", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2023-10-02", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2023-10-03", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2023-10-04", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2023-10-05", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2023-10-06", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2023-10-07", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2023-10-08", "name": "班", "type": "workday", "isOff": false }
+  ],
+  "2024": [
+    { "date": "2024-01-01", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2024-02-09", "name": "除夕", "type": "legal", "isOff": true },
+    { "date": "2024-02-10", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-11", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-12", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-13", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-14", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-15", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-16", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-17", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2024-02-04", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2024-02-18", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2024-04-04", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2024-04-05", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2024-04-06", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2024-05-01", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2024-05-02", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2024-05-03", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2024-05-04", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2024-05-05", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2024-04-28", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2024-05-11", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2024-06-10", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2024-09-15", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2024-09-16", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2024-09-17", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2024-09-14", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2024-10-01", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2024-10-02", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2024-10-03", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2024-10-04", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2024-10-05", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2024-10-06", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2024-10-07", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2024-09-29", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2024-10-12", "name": "班", "type": "workday", "isOff": false }
+  ],
+  "2025": [
+    { "date": "2025-01-01", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2025-01-28", "name": "除夕", "type": "legal", "isOff": true },
+    { "date": "2025-01-29", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2025-01-30", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2025-01-31", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2025-02-01", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2025-02-02", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2025-02-03", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2025-02-04", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2025-01-26", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2025-02-08", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2025-04-04", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2025-04-05", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2025-04-06", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2025-05-01", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2025-05-02", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2025-05-03", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2025-05-04", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2025-05-05", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2025-04-27", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2025-05-31", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2025-06-01", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2025-06-02", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2025-10-01", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2025-10-02", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2025-10-03", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2025-10-04", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2025-10-05", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2025-10-06", "name": "国庆节/中秋节", "type": "legal", "isOff": true },
+    { "date": "2025-10-07", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2025-10-08", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2025-09-28", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2025-10-11", "name": "班", "type": "workday", "isOff": false }
+  ],
+  "2026": [
+    { "date": "2026-01-01", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2026-01-02", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2026-01-03", "name": "元旦", "type": "legal", "isOff": true },
+    { "date": "2026-01-04", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2026-02-15", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-16", "name": "除夕", "type": "legal", "isOff": true },
+    { "date": "2026-02-17", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-18", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-19", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-20", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-21", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-22", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-23", "name": "春节", "type": "legal", "isOff": true },
+    { "date": "2026-02-14", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2026-02-28", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2026-04-04", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2026-04-05", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2026-04-06", "name": "清明节", "type": "legal", "isOff": true },
+    { "date": "2026-05-01", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2026-05-02", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2026-05-03", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2026-05-04", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2026-05-05", "name": "劳动节", "type": "legal", "isOff": true },
+    { "date": "2026-05-09", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2026-06-19", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2026-06-20", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2026-06-21", "name": "端午节", "type": "legal", "isOff": true },
+    { "date": "2026-09-25", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2026-09-26", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2026-09-27", "name": "中秋节", "type": "legal", "isOff": true },
+    { "date": "2026-10-01", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2026-10-02", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2026-10-03", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2026-10-04", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2026-10-05", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2026-10-06", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2026-10-07", "name": "国庆节", "type": "legal", "isOff": true },
+    { "date": "2026-09-20", "name": "班", "type": "workday", "isOff": false },
+    { "date": "2026-10-10", "name": "班", "type": "workday", "isOff": false }
+  ]
+};
+/* === BUILTIN_HOLIDAYS:END === */
 
 function isUsableHolidayData(holidays, year) {
   if (!Array.isArray(holidays) || holidays.length === 0) return false;
@@ -3203,7 +3405,8 @@ function isUsableHolidayData(holidays, year) {
  * 数据来源（按优先级，任一源成功即采用）：
  * - 网络源 1：holiday-cn（社区维护，跟随国务院公告及时更新，覆盖 2007 年至今，经 jsDelivr CDN）
  * - 网络源 2：timor.tech API（备份源）
- * - 内置兜底：插件目录 holidays.json（2022-2026 官方数据，与代码分离；官方未发布年份不写预测数据）
+ * - 内置兜底：main.js 里的 BUILTIN_HOLIDAYS 块（2022-2026 官方数据，随包分发；插件目录另放的
+ *   holidays.json 可按年覆盖它。官方未发布年份不写预测数据）
  *
  * 主要功能：
  * - getHolidayInfo(date)：获取指定日期的节假日信息（类型+名称）
@@ -3275,8 +3478,8 @@ var HolidayManager = class {
     // 单次网络抖动时重试 1 次（500ms 后），提升节假日数据获取成功率
     try {
       return await this._doFetchOnce(year);
-    } catch (e1) {
-      await new Promise((r) => setTimeout(r, 500));
+    } catch {
+      await new Promise((r) => window.setTimeout(r, 500));
       return this._doFetchOnce(year);
     }
   }
@@ -3292,13 +3495,13 @@ var HolidayManager = class {
       const res = await Promise.race([
         import_obsidian.requestUrl({ url }),
         new Promise((_, reject) => {
-          timeoutId = setTimeout(() => reject(new Error(timeoutLabel)), timeoutMs);
+          timeoutId = window.setTimeout(() => reject(new Error(timeoutLabel)), timeoutMs);
         })
       ]);
       if (res.status < 200 || res.status >= 300) throw new Error(`HTTP ${res.status}`);
       return res.json;
     } finally {
-      clearTimeout(timeoutId);
+      window.clearTimeout(timeoutId);
     }
   }
   async _doFetchOnce(year) {
@@ -3395,7 +3598,7 @@ var HolidayManager = class {
     if (this.cnHost) {
       try {
         json = await this._fetchJson(this.cnHost + year + ".json", TIMEOUT, label());
-      } catch (e) {
+      } catch {
         this.cnHost = null; // 上次能通现在不通：丢掉快路径，走竞速
       }
     }
@@ -3485,16 +3688,96 @@ var VIEW_TYPE_MONTHLY = "monthly-tasks-view";
    数组顺序即菜单顺序与命令循环顺序：先按范围（月 → 周）分组，组内「大」在前，
    与用户口径「大月 / 小月 / 大周 / 小周」一致；三天视图挂在周组末尾。 */
 var VIEW_MODES = ["list", "agenda", "bigWeek", "week", "timeGrid"];
-var WEEK_TOGGLE_ICON = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="8" y1="15" x2="8" y2="15.01"></line><line x1="12" y1="15" x2="12" y2="15.01"></line><line x1="16" y1="15" x2="16" y2="15.01"></line></svg>';
+/* 图标不再存 HTML 字符串：审核规则禁止写 innerHTML（no-unsanitized，属 error 级），
+   而 setIcon() 与 createSvg() 都是 1.1.0 才有的 API，本插件声明 minAppVersion 0.15.0，
+   不能直接用。于是改成「结构数据 + createElementNS」：spec = { size: 边长, stroke: 线宽,
+   paths: [[标签名, 属性表], ...] }，由 setSvgIcon() 画成真实 SVG 节点。 */
+var SVG_NS = "http://www.w3.org/2000/svg";
+var WEEK_TOGGLE_ICON = {
+  size: 18,
+  stroke: 2,
+  paths: [
+    ["rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }],
+    ["line", { x1: "16", y1: "2", x2: "16", y2: "6" }],
+    ["line", { x1: "8", y1: "2", x2: "8", y2: "6" }],
+    ["line", { x1: "3", y1: "10", x2: "21", y2: "10" }],
+    ["line", { x1: "8", y1: "15", x2: "8", y2: "15.01" }],
+    ["line", { x1: "12", y1: "15", x2: "12", y2: "15.01" }],
+    ["line", { x1: "16", y1: "15", x2: "16", y2: "15.01" }]
+  ]
+};
 var AGENDA_TOGGLE_ICONS = {
-  agenda: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
-  list: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>',
+  agenda: {
+    size: 18,
+    stroke: 2,
+    paths: [
+      ["rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }],
+      ["line", { x1: "16", y1: "2", x2: "16", y2: "6" }],
+      ["line", { x1: "8", y1: "2", x2: "8", y2: "6" }],
+      ["line", { x1: "3", y1: "10", x2: "21", y2: "10" }]
+    ]
+  },
+  list: {
+    size: 18,
+    stroke: 2,
+    paths: [
+      ["line", { x1: "8", y1: "6", x2: "21", y2: "6" }],
+      ["line", { x1: "8", y1: "12", x2: "21", y2: "12" }],
+      ["line", { x1: "8", y1: "18", x2: "21", y2: "18" }],
+      ["line", { x1: "3", y1: "6", x2: "3.01", y2: "6" }],
+      ["line", { x1: "3", y1: "12", x2: "3.01", y2: "12" }],
+      ["line", { x1: "3", y1: "18", x2: "3.01", y2: "18" }]
+    ]
+  },
   week: WEEK_TOGGLE_ICON,
   // 大周：日历外框 + 一行两列的分栏与内容点（与「小周」那张「一行三点」区分开）
-  bigWeek: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><line x1="12" y1="10" x2="12" y2="22"></line><line x1="7" y1="15" x2="7" y2="15.01"></line><line x1="17" y1="15" x2="17" y2="15.01"></line></svg>',
+  bigWeek: {
+    size: 18,
+    stroke: 2,
+    paths: [
+      ["rect", { x: "3", y: "4", width: "18", height: "18", rx: "2", ry: "2" }],
+      ["line", { x1: "16", y1: "2", x2: "16", y2: "6" }],
+      ["line", { x1: "8", y1: "2", x2: "8", y2: "6" }],
+      ["line", { x1: "3", y1: "10", x2: "21", y2: "10" }],
+      ["line", { x1: "12", y1: "10", x2: "12", y2: "22" }],
+      ["line", { x1: "7", y1: "15", x2: "7", y2: "15.01" }],
+      ["line", { x1: "17", y1: "15", x2: "17", y2: "15.01" }]
+    ]
+  },
   // 三天视图：钟面 + 时针，一眼区别于三种日历格
-  timeGrid: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><polyline points="12 7 12 12 15.5 14"></polyline></svg>'
+  timeGrid: {
+    size: 18,
+    stroke: 2,
+    paths: [
+      ["circle", { cx: "12", cy: "12", r: "9" }],
+      ["polyline", { points: "12 7 12 12 15.5 14" }]
+    ]
+  }
 };
+/**
+ * 把 spec 画成 SVG 并放进 el（替换原有内容）。
+ * 文档取 el 自己的 ownerDocument：侧栏/弹窗开在副窗口（popout）里时，
+ * 不能用主窗口的 document 建节点，否则图标会挂到另一个文档上去。
+ */
+function setSvgIcon(el, spec) {
+  const doc = el.ownerDocument;
+  const svg = doc.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("width", String(spec.size));
+  svg.setAttribute("height", String(spec.size));
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", String(spec.stroke));
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  for (const [tag, attrs] of spec.paths) {
+    const child = doc.createElementNS(SVG_NS, tag);
+    for (const [k, v] of Object.entries(attrs)) child.setAttribute(k, v);
+    svg.appendChild(child);
+  }
+  el.empty();
+  el.appendChild(svg);
+}
 
 /**
  * 星期全称（周日/周一…）。v1.7.1 大周视图的格子里没有列头可借，每格自带星期；
@@ -3555,10 +3838,54 @@ function viewModeLabel(mode) {
 }
 
 // 明细区「＋ 添加」按钮的加号图标（lucide plus 路径子集，stroke 规格同上）
-var AGENDA_ADD_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+var AGENDA_ADD_ICON = {
+  size: 14,
+  stroke: 2.4,
+  paths: [
+    ["line", { x1: "12", y1: "5", x2: "12", y2: "19" }],
+    ["line", { x1: "5", y1: "12", x2: "19", y2: "12" }]
+  ]
+};
 // 明细区吸顶行「管理」按钮的列表图标（lucide list 路径子集）：
 // 不用加号——加号只承诺"新建"，而这颗按钮打开的面板里既能改也能删也能跳转。
-var AGENDA_MANAGE_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>';
+var AGENDA_MANAGE_ICON = {
+  size: 14,
+  stroke: 2.2,
+  paths: [
+    ["line", { x1: "8", y1: "6", x2: "21", y2: "6" }],
+    ["line", { x1: "8", y1: "12", x2: "21", y2: "12" }],
+    ["line", { x1: "8", y1: "18", x2: "21", y2: "18" }],
+    ["line", { x1: "3", y1: "6", x2: "3.01", y2: "6" }],
+    ["line", { x1: "3", y1: "12", x2: "3.01", y2: "12" }],
+    ["line", { x1: "3", y1: "18", x2: "3.01", y2: "18" }]
+  ]
+};
+// 头部导航左右箭头、类别漏斗，以及任务行上的编辑/跳转/删除（形状与原先的
+// 内联 SVG 字符串逐点一致，只换了构建方式）
+var ICON_CHEVRON_LEFT = { size: 20, stroke: 2, paths: [["polyline", { points: "15 18 9 12 15 6" }]] };
+var ICON_CHEVRON_RIGHT = { size: 20, stroke: 2, paths: [["polyline", { points: "9 18 15 12 9 6" }]] };
+var ICON_FUNNEL = { size: 20, stroke: 2, paths: [["polygon", { points: "22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" }]] };
+var ICON_EDIT = { size: 13, stroke: 2, paths: [["path", { d: "M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" }]] };
+var ICON_GOTO = {
+  size: 13,
+  stroke: 2,
+  paths: [
+    ["path", { d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" }],
+    ["polyline", { points: "15 3 21 3 21 9" }],
+    ["line", { x1: "10", y1: "14", x2: "21", y2: "3" }]
+  ]
+};
+var ICON_DELETE = {
+  size: 13,
+  stroke: 2,
+  paths: [
+    ["polyline", { points: "3 6 5 6 21 6" }],
+    ["path", { d: "M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" }],
+    ["path", { d: "M10 11v6" }],
+    ["path", { d: "M14 11v6" }],
+    ["path", { d: "M9 6V4h6v2" }]
+  ]
+};
 
 /**
  * ============================================================
@@ -3657,7 +3984,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.renderRequestId = (this.renderRequestId || 0) + 1;
     // 清理 toggleTask 中可能挂起的延迟刷新定时器，避免向已分离 DOM 渲染
     if (this.pendingTimers && this.pendingTimers.size > 0) {
-      for (const t of this.pendingTimers) clearTimeout(t);
+      for (const t of this.pendingTimers) window.clearTimeout(t);
       this.pendingTimers.clear();
     }
     // 手机端等高截断的尺寸观察器（onOpen 里建）：随视图一并拆掉，不留悬挂回调
@@ -3667,8 +3994,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
       this._mtObservedGrid = null;
     }
     // 延迟复裁的挂起帧/定时器（_mtScheduleRetrim 排的）：一并撤掉，不留迟到的重裁
-    if (this._mtRetrimRaf != null) cancelAnimationFrame(this._mtRetrimRaf);
-    if (this._mtRetrimTimer != null) clearTimeout(this._mtRetrimTimer);
+    if (this._mtRetrimRaf != null) window.cancelAnimationFrame(this._mtRetrimRaf);
+    if (this._mtRetrimTimer != null) window.clearTimeout(this._mtRetrimTimer);
     this._mtRetrimRaf = null;
     this._mtRetrimTimer = null;
     // 1.7.11：格子平移的惯性/合帧句柄（当前平移者）随视图一并撤掉，
@@ -3693,8 +4020,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     for (const cls of [DatePickerModal, CategoryFilterModal, ViewMenuModal, CreateTaskModal]) {
       if (cls.activeInstances) {
         for (const inst of Array.from(cls.activeInstances)) {
-          try { inst.close(); } catch (e) {
-          }
+          try { inst.close(); } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
         }
       }
     }
@@ -3721,16 +4047,14 @@ var MonthlyView = class extends import_obsidian.ItemView {
   renderViewMenuPopup(anchorEl) {
     if (ViewMenuModal.activeInstances && ViewMenuModal.activeInstances.size > 0) {
       for (const inst of Array.from(ViewMenuModal.activeInstances)) {
-        try { inst.close(); } catch (e) {
-        }
+        try { inst.close(); } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
       return;
     }
     for (const cls of [CategoryFilterModal, DatePickerModal]) {
       if (cls.activeInstances) {
         for (const inst of Array.from(cls.activeInstances)) {
-          try { inst.close(); } catch (e) {
-          }
+          try { inst.close(); } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
         }
       }
     }
@@ -3742,15 +4066,13 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 再点漏斗 = 收起（沿用浮层时代的交互）；与日期弹窗互斥
     if (CategoryFilterModal.activeInstances && CategoryFilterModal.activeInstances.size > 0) {
       for (const inst of Array.from(CategoryFilterModal.activeInstances)) {
-        try { inst.close(); } catch (e) {
-        }
+        try { inst.close(); } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
       return;
     }
     if (DatePickerModal.activeInstances) {
       for (const inst of Array.from(DatePickerModal.activeInstances)) {
-        try { inst.close(); } catch (e) {
-        }
+        try { inst.close(); } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
     }
     new CategoryFilterModal(this.app, this, anchorEl).open();
@@ -3859,7 +4181,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.headerEl = this.rootEl.createDiv("monthly-header");
     const leftGroup = this.headerEl.createDiv("header-btn-group");
     const prevBtn = leftGroup.createDiv("nav-btn prev-btn");
-    prevBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+    setSvgIcon(prevBtn, ICON_CHEVRON_LEFT);
     prevBtn.setAttribute("aria-label", this.isWeekFamily()
       ? tr("view.header.prevWeek")
       : this.isTimeGrid() ? tr("view.header.prevThreeDay") : tr("view.header.prevMonth"));
@@ -3871,7 +4193,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     titleEl.addEventListener("click", () => this.openDatePicker());
     const rightGroup = this.headerEl.createDiv("header-btn-group");
     const nextBtn = rightGroup.createDiv("nav-btn next-btn");
-    nextBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>';
+    setSvgIcon(nextBtn, ICON_CHEVRON_RIGHT);
     nextBtn.setAttribute("aria-label", this.isWeekFamily()
       ? tr("view.header.nextWeek")
       : this.isTimeGrid() ? tr("view.header.nextThreeDay") : tr("view.header.nextMonth"));
@@ -3892,7 +4214,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     this.filterBtnEl = null;
     if (this.scanCategories().length > 0) {
       const funnelBtn = rightGroup.createDiv("nav-btn filter-btn");
-      funnelBtn.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>';
+      setSvgIcon(funnelBtn, ICON_FUNNEL);
       funnelBtn.setAttribute("aria-label", tr("modal.filter.title"));
       funnelBtn.setAttribute("title", tr("modal.filter.title"));
       funnelBtn.addEventListener("click", (e) => {
@@ -3939,8 +4261,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 系统返回键/Esc/遮罩点击天然关闭；锚定浮层不自带这套生命周期，手机上关不掉
     if (CategoryFilterModal.activeInstances) {
       for (const inst of Array.from(CategoryFilterModal.activeInstances)) {
-        try { inst.close(); } catch (e) {
-        }
+        try { inst.close(); } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
     }
     const modal = new DatePickerModal(this.app, this.currentYear, this.currentMonth, async (year, month) => {
@@ -3976,7 +4297,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 一一对应，星期写在每格抬头（见 renderDayCell 的 bigWeek 分支）。
     // 三天视图自带「星期 + 日期」列头（要跟小时轴同宽对齐），也不用这条公共表头。
     if (this.isBigWeek() || this.isTimeGrid()) return;
-    const weekdayEl = document.createElement("div");
+    const weekdayEl = activeDocument.createElement("div");
     weekdayEl.className = "weekday-header";
     const firstDayOfWeek = this.plugin.settings.firstDayOfWeek;
     for (let i = 0; i < 7; i++) {
@@ -4031,7 +4352,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     }
     if (wantModal) {
       // 「该日已有 N 个任务」列表，挂在 body 上的弹窗里，只能全局扫
-      apply(document.querySelectorAll(".existing-task-item.completed"));
+      apply(activeDocument.querySelectorAll(".existing-task-item.completed"));
     }
   }
 
@@ -4107,8 +4428,74 @@ var MonthlyView = class extends import_obsidian.ItemView {
       this._mtMeasureMobileCells("render");
       // 渲染后延迟复量，不依赖观察器报信（老 WebView 上信号靠不住）
       this._mtScheduleRetrim();
+      // 选中圆标就地复量（见方法注释）：启动探针只能代表「那一刻」的字体
+      this._calibrateSelectedBadge();
+      this._watchBadgeFonts();
     }
     return true;
+  }
+  /**
+   * 选中圆标就地校准。
+   *
+   * 启动时那次测量把探针挂在 body 上，量的是「那一刻」的样式。以下三种情况下
+   * 探针与真身会不一致，圆心就会偏：
+   *   1. 主题用 @font-face 加载自定义字体，插件 onload 时字体还没到（回退字体的
+   *      度量被记了下来，字体到齐后数字换了字形，偏移量却还是旧的）；
+   *   2. 主题把 `.day-number` 限定在容器内换字体/字号，body 上的探针吃不到；
+   *   3. 视图开在弹出窗口里，变量写的是另一个文档的 documentElement。
+   * 这里改成在选中日号**自己身上**量行盒与字形墨迹，算出的三个变量写到该元素上，
+   * 局部覆盖 documentElement 的全局值。每次重绘都量一次，代价只有一次布局读取。
+   */
+  _calibrateSelectedBadge() {
+    const el = this.rootEl && this.rootEl.querySelector(".day-cell.sel .day-number");
+    if (!el || !el.isConnected) return;
+    try {
+      const doc = el.ownerDocument;
+      // 用元素所在文档的 window 取计算样式：视图可能在弹出窗口里
+      const cs = (doc.defaultView || window).getComputedStyle(el);
+      const fontSize = parseFloat(cs.fontSize);
+      if (!(fontSize > 0)) return;
+      const family = cs.fontFamily || "sans-serif";
+      // 基线探针必须挂在日号内部：行高、字体、字号全部与真身同源
+      const bl = doc.createElement("span");
+      bl.className = "mt-measure-block";
+      el.appendChild(bl);
+      const er = el.getBoundingClientRect();
+      const br = bl.getBoundingClientRect();
+      const baselineFromTop = br.bottom - er.top;
+      const lineBoxH = er.height;
+      bl.remove();
+      // 视图在未激活页签里时布局为 0，量不出真值就跳过，别把 0 写进变量
+      if (!(lineBoxH > 0) || !(baselineFromTop > 0)) return;
+      const ctx = doc.createElement("canvas").getContext("2d");
+      if (!ctx) return;
+      ctx.font = `${cs.fontWeight || "700"} ${fontSize}px ${family}`;
+      const m = ctx.measureText(el.textContent || "0");
+      // 字形墨迹中心在基线上方的距离（px）
+      const inkCenter = (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+      // dy = 字形墨迹中心相对行盒中心的偏移（向上为正）
+      const dyPx = lineBoxH / 2 - baselineFromTop + inkCenter;
+      // 直接写入圆心的 top（em），CSS 侧不再做 50% ∓ dy 的减法：
+      // 少一次带符号的自定义属性运算，老 WebView 上也不会因
+      // `calc(50% - -0.0156em)` 这类双符号写法解析失败而退回 top:auto
+      el.style.setProperty("--mt-badge-top", ((lineBoxH / 2 - dyPx) / fontSize).toFixed(4) + "em");
+      el.style.setProperty("--mt-badge-ink", ((m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) / fontSize).toFixed(4) + "em");
+      el.style.setProperty("--mt-badge-w2", (ctx.measureText("00").width / fontSize).toFixed(4) + "em");
+    } catch { /* 失败就沿用启动时写在 documentElement 的全局值 */ }
+  }
+  /**
+   * 主题字体晚到：document.fonts.ready 在本次渲染触发的字体加载完成后兑现，
+   * 届时再量一次，避免「加载时用回退字体量、之后一直偏着」。每个视图只挂一次。
+   */
+  _watchBadgeFonts() {
+    if (this._badgeFontsHooked || !this.rootEl) return;
+    const doc = this.rootEl.ownerDocument;
+    if (!doc.fonts || !doc.fonts.ready) return;
+    this._badgeFontsHooked = true;
+    doc.fonts.ready.then(() => {
+      if (this.viewClosed) return;
+      this._calibrateSelectedBadge();
+    }).catch(() => {});
   }
   /**
    * 审计 L5：不阻塞调用方地重画网格，并把 reject 收敛成一条 console.error。
@@ -4499,7 +4886,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
             row.toggleClass("completed-strike", !this.plugin.settings.showCompletedStrike);
           }
           row.createSpan({ cls: "tg-allday-title", text: task.content });
-          row.setAttribute("title", task.category ? `${task.content} \u00b7 #${task.category}` : task.content);
+          row.setAttribute("title", task.category ? `${task.content} · #${task.category}` : task.content);
           row.addEventListener("click", (e) => {
             e.stopPropagation();
             this.openCreateTaskModal(this._tgTaskAnchor(task, day.date), tasks, task);
@@ -4556,7 +4943,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
 
     // 列头留在滚动容器里吸顶，宽度天然与小时网格一致；
     // 只有首帧要按窗口决定停在哪一小时，之后刷新沿用用户当前的滚动位置
-    requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       // 以滚动容器自己是否还在文档里为准：同一帧内若又画了一轮，旧容器的
       // scrollTop 写回去只会覆盖新一轮的首屏定位
       if (!scrollEl.isConnected) return;
@@ -4585,7 +4972,10 @@ var MonthlyView = class extends import_obsidian.ItemView {
   /** 清掉草稿条与 document 上的丢弃监听（重画、切视图、关视图都要走） */
   _tgClearDraft() {
     if (this._tgDraftDismiss) {
-      document.removeEventListener("click", this._tgDraftDismiss, true);
+      // 与安装时同一个文档：视图在弹出窗口里时 activeDocument 可能已经切走，
+      // 那样这里摘的是另一个文档上的监听，原监听就泄漏了
+      const doc = (this._tgDraftEl && this._tgDraftEl.ownerDocument) || activeDocument;
+      doc.removeEventListener("click", this._tgDraftDismiss, true);
       this._tgDraftDismiss = null;
     }
     if (this._tgDraftEl) {
@@ -4612,7 +5002,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       cls: "tg-draft-add",
       attr: { type: "button", "aria-label": tr("view.timegrid.addTask"), title: tr("view.timegrid.addTask") }
     });
-    add.innerHTML = AGENDA_ADD_ICON;
+    setSvgIcon(add, AGENDA_ADD_ICON);
     el.createDiv("tg-resize tg-resize-top").setAttribute("aria-hidden", "true");
     el.createDiv("tg-resize tg-resize-bottom").setAttribute("aria-hidden", "true");
     const paint = () => {
@@ -4620,7 +5010,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       el.style.height = `${((curEnd - curStart) / 1440) * 100}%`;
       el.toggleClass("is-short", curEnd - curStart < 45);
       el.querySelector(".tg-draft-time").textContent =
-        `${this._tgFmtMinutes(curStart)}\u2013${this._tgFmtMinutes(curEnd)}`;
+        `${this._tgFmtMinutes(curStart)}–${this._tgFmtMinutes(curEnd)}`;
     };
     const snap = (m) => Math.round(m / 15) * 15;
     const hourPx = () => {
@@ -4646,7 +5036,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       window.removeEventListener("pointercancel", onUp);
       el.removeClass("is-dragging");
       if (pointerId != null) {
-        try { el.releasePointerCapture(pointerId); } catch (e) {}
+        try { el.releasePointerCapture(pointerId); } catch { /* 元素已从文档分离时释放指针捕获会抛，忽略即可 */ }
         pointerId = null;
       }
       active = false;
@@ -4704,7 +5094,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
         const r = c.getBoundingClientRect();
         return { col: c, left: r.left, right: r.right };
       }) : [];
-      try { el.setPointerCapture(pointerId); } catch (e) {}
+      try { el.setPointerCapture(pointerId); } catch { /* 部分 WebView 不支持指针捕获，退化为普通拖动 */ }
       el.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
       window.addEventListener("pointercancel", onUp);
@@ -4719,14 +5109,14 @@ var MonthlyView = class extends import_obsidian.ItemView {
     paint();
     // 建草稿的这一下点击还会继续冒泡到列上；监听器挪到下一帧再挂，
     // 免得刚建出来的草稿被自己这一下丢掉
-    requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       if (this._tgDraftEl !== el) return;
       this._tgDraftDismiss = (e) => {
         if (!this._tgDraftEl) return;
         if (e.target && e.target.closest && e.target.closest(".tg-draft")) return;
         this._tgClearDraft();
       };
-      document.addEventListener("click", this._tgDraftDismiss, true);
+      el.ownerDocument.addEventListener("click", this._tgDraftDismiss, true);
     });
   }
   /** 编辑弹窗的锚点：跨天任务用开始日，单日任务用截止日 */
@@ -4826,9 +5216,9 @@ var MonthlyView = class extends import_obsidian.ItemView {
     el.style.width = `calc(${100 / lanes}% - 4px)`;
     el.createDiv("tg-block-time").textContent = item.single
       ? this._tgFmtMinutes(item.start)
-      : `${this._tgFmtMinutes(item.start)}\u2013${this._tgFmtMinutes(item.end)}`;
+      : `${this._tgFmtMinutes(item.start)}–${this._tgFmtMinutes(item.end)}`;
     el.createDiv("tg-block-title").textContent = task.content;
-    el.setAttribute("title", task.category ? `${task.content} \u00b7 #${task.category}` : task.content);
+    el.setAttribute("title", task.category ? `${task.content} · #${task.category}` : task.content);
     if (item.invalid) {
       el.addClass("is-badtime");
       el.setAttribute("title", `${el.getAttribute("title")} — ${tr("view.timegrid.badTime")}`);
@@ -4853,7 +5243,6 @@ var MonthlyView = class extends import_obsidian.ItemView {
    * 松手后只改行内 ⏰ 段（updateTaskTime），不重建任务行、不动行号。
    */
   _tgAttachBlockDrag(el, item, task) {
-    const view = this;
     let mode = null;
     let active = false;
     let pointerId = null;
@@ -4885,13 +5274,13 @@ var MonthlyView = class extends import_obsidian.ItemView {
       const t = el.querySelector(".tg-block-time");
       if (t) {
         t.textContent = item.single && mode === "move"
-          ? view._tgFmtMinutes(previewStart)
-          : `${view._tgFmtMinutes(previewStart)}\u2013${view._tgFmtMinutes(previewEnd)}`;
+          ? this._tgFmtMinutes(previewStart)
+          : `${this._tgFmtMinutes(previewStart)}–${this._tgFmtMinutes(previewEnd)}`;
       }
     };
     const cancelLongPress = () => {
       if (longPress != null) {
-        clearTimeout(longPress);
+        window.clearTimeout(longPress);
         longPress = null;
       }
     };
@@ -4902,21 +5291,23 @@ var MonthlyView = class extends import_obsidian.ItemView {
       if (active) return;
       active = true;
       el.addClass("is-dragging");
-      // 长按期间手机可能判定成纵向滚动；进入拖拽后先关掉本元素的 touch-action，
+      // 长按期间手机可能判定成纵向滚动；进入拖拽后先关掉本元素的 touch-action
+      // （见 styles.css 的 .tg-block.is-dragging），
       // 再用非 passive 的 document touchmove 兜底（后者对已开始的滚动才拦得住）
-      el.style.touchAction = "none";
-      document.addEventListener("touchmove", onTouchMove, { passive: false });
+      // 用元素自己所在文档：视图开在弹出窗口时，activeDocument 可能指的是主窗口，
+      // 装到主窗口上的监听在清理阶段就摘不掉了
+      el.ownerDocument.addEventListener("touchmove", onTouchMove, { passive: false });
     };
     const cleanup = () => {
       cancelLongPress();
       el.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       window.removeEventListener("pointercancel", onCancel);
-      document.removeEventListener("touchmove", onTouchMove);
+      el.ownerDocument.removeEventListener("touchmove", onTouchMove);
       el.removeClass("is-dragging");
       el.style.touchAction = "";
       if (pointerId != null) {
-        try { el.releasePointerCapture(pointerId); } catch (e) {}
+        try { el.releasePointerCapture(pointerId); } catch { /* 元素已从文档分离时释放指针捕获会抛，忽略即可 */ }
         pointerId = null;
       }
       active = false;
@@ -4987,21 +5378,21 @@ var MonthlyView = class extends import_obsidian.ItemView {
       el._tgSuppressClick = true;
       // 拉过任意一条边就写区间：只有「整体平移 + 原本只有一个时间点」才维持单点写法
       const newTime = mode === "move" && item.single
-        ? view._tgFmtMinutes(previewStart)
-        : `${view._tgFmtMinutes(previewStart)}~${view._tgFmtMinutes(previewEnd)}`;
+        ? this._tgFmtMinutes(previewStart)
+        : `${this._tgFmtMinutes(previewStart)}~${this._tgFmtMinutes(previewEnd)}`;
       try {
         if (dayChanged) {
-          const ok = await view.taskParser.updateTaskSchedule(task, newDateKey, newTime);
+          const ok = await this.taskParser.updateTaskSchedule(task, newDateKey, newTime);
           if (!ok) throw new Error("updateTaskSchedule returned false");
           // 🛫 与 📅 在单日任务里是同一天，内存里一起改，避免刷新前的下一帧又画回旧日子
           if (task.dueDate) task.dueDate = newDateKey;
           if (task.startDate) task.startDate = newDateKey;
         } else {
-          const ok = await view.taskParser.updateTaskTime(task, newTime);
+          const ok = await this.taskParser.updateTaskTime(task, newTime);
           if (!ok) throw new Error("updateTaskTime returned false");
         }
         task.time = newTime;
-        await view.refresh(true);
+        await this.refresh(true);
       } catch (err) {
         console.error(err);
         // 拖拽失败没有 refresh，元素还留在屏幕上：把点按拦截解掉，把块送回原来那一列，
@@ -5029,12 +5420,12 @@ var MonthlyView = class extends import_obsidian.ItemView {
         const r = c.getBoundingClientRect();
         return { col: c, left: r.left, right: r.right };
       }) : [];
-      try { el.setPointerCapture(pointerId); } catch (e) {}
+      try { el.setPointerCapture(pointerId); } catch { /* 部分 WebView 不支持指针捕获，退化为普通拖动 */ }
       el.addEventListener("pointermove", onMove);
       window.addEventListener("pointerup", onUp);
       window.addEventListener("pointercancel", onCancel);
       if (ev.pointerType === "touch" && mode === "move") {
-        longPress = setTimeout(() => {
+        longPress = window.setTimeout(() => {
           longPress = null;
           activate();
         }, 220);
@@ -5149,11 +5540,11 @@ var MonthlyView = class extends import_obsidian.ItemView {
         r.tasksEl.classList.toggle("mt-pan-hint", r.clipped && pannable);
         if (r.remainingByLimit > 0) {
           const chip = r.chip || this._mtEnsureMoreChip(r.tasksEl);
-          if (chip.style.display === "none") chip.style.display = "";
+          if (chip.hasClass("is-hidden")) chip.removeClass("is-hidden");
           chip.textContent = `+${r.remainingByLimit}`;
         } else if (r.chip) {
           // 条数余量为 0：渲染期不会建「+N」，能走到这里的只会是本方法上一轮建的，藏掉
-          r.chip.style.display = "none";
+          r.chip.addClass("is-hidden");
         }
       }
     } catch (err) {
@@ -5185,7 +5576,6 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // .day-tasks 的 overflow:hidden 已生效、原生滚动条被结构消除，却没有平移监听，
     // 被裁任务彻底不可达；窄→宽时旧监听又与原生内滚互抢。改为常驻挂载，
     // 媒体条件挪进 touchstart 逐次判定，来回穿越都正确。
-    const view = this;
     const m = { sy: 0, sx: 0, top0: 0, max: 0, want: 0, armed: false, panning: false };
     let raf = null;
     let momentum = null;
@@ -5198,16 +5588,16 @@ var MonthlyView = class extends import_obsidian.ItemView {
       el.classList.toggle("mt-pan-scrolled", el.scrollTop > 0);
     };
     const stopAll = () => {
-      if (raf != null) { cancelAnimationFrame(raf); raf = null; }
-      if (momentum != null) { cancelAnimationFrame(momentum); momentum = null; }
-      if (expireTimer != null) { clearTimeout(expireTimer); expireTimer = null; }
+      if (raf != null) { window.cancelAnimationFrame(raf); raf = null; }
+      if (momentum != null) { window.cancelAnimationFrame(momentum); momentum = null; }
+      if (expireTimer != null) { window.clearTimeout(expireTimer); expireTimer = null; }
       m.armed = false;
       m.panning = false;
     };
     const commit = () => {
       // 落账已排队但未写出的位移。旧实现在 touchend 里直接撤掉 rAF，末段位移被丢弃，
       // 抬手瞬间内容回跳约一帧
-      if (raf != null) { cancelAnimationFrame(raf); raf = null; }
+      if (raf != null) { window.cancelAnimationFrame(raf); raf = null; }
       if (!m.armed) return;
       const target = Math.max(0, Math.min(m.max, m.want));
       if (el.scrollTop !== target) el.scrollTop = target;
@@ -5219,8 +5609,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
       stopAll();
       // 惯性/合帧句柄是闭包私有的：在 A 格甩出惯性后立刻按 B 格，只停得下 B 的，
       // A 会在用户看不见的地方继续滑。用视图上的「当前平移者」互相顶掉。
-      if (view._mtPanStop && view._mtPanStop !== stopAll) view._mtPanStop();
-      view._mtPanStop = stopAll;
+      if (this._mtPanStop && this._mtPanStop !== stopAll) this._mtPanStop();
+      this._mtPanStop = stopAll;
       m.max = el.scrollHeight - el.clientHeight;
       if (m.max <= 1) return; // 本格无溢出：不接管，armed 保持 false（见 touchmove 守卫）
       const t = e.touches[0];
@@ -5254,7 +5644,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
           commit();
         }
         stopAll();
-        if (view._mtPanStop === stopAll) view._mtPanStop = null;
+        if (this._mtPanStop === stopAll) this._mtPanStop = null;
         return;
       }
       m.panning = true;
@@ -5265,7 +5655,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       lastT = now;
       m.want = nextWant;
       if (Math.abs(dy) > 6) el._mtPanMoved = true; // 交给 capture click 监听判定误触
-      if (raf == null) raf = requestAnimationFrame(commit); // 合帧写入：一帧最多一次
+      if (raf == null) raf = window.requestAnimationFrame(commit); // 合帧写入：一帧最多一次
       e.preventDefault(); // 必须在同步路径：事件到 rAF 回调时已不可取消
     }, { passive: false });
     const end = () => {
@@ -5287,19 +5677,19 @@ var MonthlyView = class extends import_obsidian.ItemView {
           }
           el.scrollTop = next;
           hint();
-          momentum = requestAnimationFrame(step);
+          momentum = window.requestAnimationFrame(step);
         };
-        momentum = requestAnimationFrame(step);
+        momentum = window.requestAnimationFrame(step);
       }
       m.panning = false;
       m.armed = false;
-      if (view._mtPanStop === stopAll) view._mtPanStop = null;
+      if (this._mtPanStop === stopAll) this._mtPanStop = null;
       // click 在 touchend 之后派发。这台老 WebView 上该间隔可以超过 100ms（长按后抬手、
       // 双击缩放判定窗口），旧值 100ms 会先过期、导致滑完格子仍误开新建弹窗；放宽到
       // 300ms，并在下一次起手/停止时清掉，不留悬空定时器
       if (el._mtPanMoved) {
-        if (expireTimer != null) clearTimeout(expireTimer);
-        expireTimer = setTimeout(() => { el._mtPanMoved = false; expireTimer = null; }, 300);
+        if (expireTimer != null) window.clearTimeout(expireTimer);
+        expireTimer = window.setTimeout(() => { el._mtPanMoved = false; expireTimer = null; }, 300);
       }
     };
     el.addEventListener("touchend", end, { passive: true });
@@ -5320,8 +5710,8 @@ var MonthlyView = class extends import_obsidian.ItemView {
   _mtScheduleRetrim() {
     try {
       if (this.viewClosed) return;
-      if (this._mtRetrimRaf != null) cancelAnimationFrame(this._mtRetrimRaf);
-      if (this._mtRetrimTimer != null) clearTimeout(this._mtRetrimTimer);
+      if (this._mtRetrimRaf != null) window.cancelAnimationFrame(this._mtRetrimRaf);
+      if (this._mtRetrimTimer != null) window.clearTimeout(this._mtRetrimTimer);
       this._mtRetrimRaf = null;
       this._mtRetrimTimer = null;
       const tick = (p) => {
@@ -5330,11 +5720,11 @@ var MonthlyView = class extends import_obsidian.ItemView {
         if (!this.viewClosed) this._mtMeasureMobileCells(p);
       };
       if (typeof requestAnimationFrame === "function") {
-        this._mtRetrimRaf = requestAnimationFrame(() => {
-          this._mtRetrimRaf = requestAnimationFrame(() => tick("raf"));
+        this._mtRetrimRaf = window.requestAnimationFrame(() => {
+          this._mtRetrimRaf = window.requestAnimationFrame(() => tick("raf"));
         });
       }
-      this._mtRetrimTimer = setTimeout(() => tick("timer"), 1200);
+      this._mtRetrimTimer = window.setTimeout(() => tick("timer"), 1200);
     } catch (err) {
       console.error("[monthly-tasks] retrim schedule failed:", err);
     }
@@ -5461,7 +5851,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
         if (!this.rootEl || !this.rootEl.isConnected) return true;
         // 跟踪定时器 ID 供 onClose 清理，避免视图关闭后仍向已分离 DOM 渲染
         if (!this.pendingTimers) this.pendingTimers = /* @__PURE__ */ new Set();
-        const timerId = setTimeout(async () => {
+        const timerId = window.setTimeout(async () => {
           if (this.pendingTimers) this.pendingTimers.delete(timerId);
           // try/catch 防止 refresh 抛错变成未处理 Promise rejection 污染控制台
           try {
@@ -5647,7 +6037,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     const el = btn || this.viewToggleBtnEl;
     if (!el) return;
     const mode = VIEW_MODES.includes(this.plugin.settings.viewMode) ? this.plugin.settings.viewMode : "list";
-    el.innerHTML = AGENDA_TOGGLE_ICONS[mode] || AGENDA_TOGGLE_ICONS.list;
+    setSvgIcon(el, AGENDA_TOGGLE_ICONS[mode] || AGENDA_TOGGLE_ICONS.list);
     const label = tr("view.header.pickView") + " · " + viewModeLabel(mode);
     el.setAttribute("aria-label", label);
     el.setAttribute("title", label);
@@ -5811,7 +6201,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     titleRow.textContent = tr("modal.create.dateLine", { m, day: d, weekday });
     const holidayInfo = this.plugin.settings.showHoliday ? this.plugin.holidayManager.getHolidayInfo(dayDate) : null;
     if (holidayInfo) {
-      titleRow.createSpan({ text: ` \xB7 ${translateHolidayName(holidayInfo.name)}` });
+      titleRow.createSpan({ text: ` · ${translateHolidayName(holidayInfo.name)}` });
     }
     // 筛选中的类别以小 pill 挂在吸顶行右侧（＋ 添加左边）：不新增横条、不占额外高度，
     // 点它等于清除筛选（计划 §四.3 的防呆三处之一）。不用顶部横条是因为横条要从明细区扣 28px
@@ -5855,7 +6245,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
     addBtn.setAttribute("role", "button");
     addBtn.setAttribute("tabindex", "0");
     addBtn.setAttribute("aria-label", addBtnLabel);
-    addBtn.innerHTML = hasTasks ? AGENDA_MANAGE_ICON : AGENDA_ADD_ICON;
+    setSvgIcon(addBtn, hasTasks ? AGENDA_MANAGE_ICON : AGENDA_ADD_ICON);
     addBtn.createSpan({ text: addBtnLabel });
     const startCreate = () => this.openCreateTaskModal(dayDate, tasks);
     addBtn.addEventListener("click", (e) => {
@@ -5881,7 +6271,7 @@ var MonthlyView = class extends import_obsidian.ItemView {
       const emptyAdd = emptyEl.createDiv("agenda-add-btn");
       emptyAdd.setAttribute("role", "button");
       emptyAdd.setAttribute("tabindex", "0");
-      emptyAdd.innerHTML = AGENDA_ADD_ICON;
+      setSvgIcon(emptyAdd, AGENDA_ADD_ICON);
       emptyAdd.createSpan({ text: tr("modal.create.add") });
       emptyAdd.addEventListener("click", startCreate);
       emptyAdd.addEventListener("keydown", (e) => {
@@ -6052,17 +6442,11 @@ var DatePickerModal = class extends import_obsidian.Modal {
     this.currentMonth = now.getMonth();
   }
   
-  // 检测是否为暗色模式
-  isDarkMode() {
-    return document.body.classList.contains('theme-dark');
-  }
-  
   onOpen() {
     // 登记活动实例：onunload 时关闭仍打开的弹窗，避免卸载后残留可交互但已失联的 DOM
     if (!DatePickerModal.activeInstances) DatePickerModal.activeInstances = /* @__PURE__ */ new Set();
     DatePickerModal.activeInstances.add(this);
     const { contentEl, modalEl } = this;
-    const isDark = this.isDarkMode();
     
     modalEl.addClass("date-picker-modal");
     // 与 CreateTaskModal 一致：收掉框架自带的 X 关闭按钮与空头部占位（新版弹窗结构
@@ -6076,99 +6460,31 @@ var DatePickerModal = class extends import_obsidian.Modal {
       if (header) header.remove();
     };
     sweepChrome();
-    requestAnimationFrame(sweepChrome);
-    setTimeout(sweepChrome, 100);
-    modalEl.style.background = "var(--background-primary)";
-    modalEl.style.padding = "32px";
-    modalEl.style.borderRadius = "24px";
-    modalEl.style.width = "420px";
-    modalEl.style.maxWidth = "92vw";
-    modalEl.style.border = "none";
-    modalEl.style.boxShadow = isDark 
-      ? "0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)"
-      : "0 25px 80px rgba(0, 0, 0, 0.35)";
-    modalEl.style.margin = "auto";
+    window.requestAnimationFrame(sweepChrome);
+    window.setTimeout(sweepChrome, 100);
+    // 弹窗自身外观（底色/内边距/圆角/宽度/阴影）全在 styles.css 的
+    // .modal.date-picker-modal 里；原先按亮暗两套内联配色写在 JS 里，
+    // 既过不了审核（禁静态行内样式），也跟主题色脱钩
     contentEl.empty();
     
-    // 颜色配置
-    const colors = isDark ? {
-      text: '#e2e8f0',
-      textMuted: '#94a3b8',
-      bg: '#1e293b',
-      bgLight: '#334155',
-      border: '#475569',
-      inputBg: '#1e293b',
-      inputBorder: '#475569',
-      btnBg: '#334155',
-      btnHover: '#475569',
-      btnCancel: '#334155',
-      btnCancelHover: '#475569',
-      wrapperBg: '#334155',
-      wrapperBorder: '#475569'
-    } : {
-      text: '#374151',
-      textMuted: '#6B7280',
-      bg: '#F9FAFB',
-      bgLight: '#F3F4F6',
-      border: '#E5E7EB',
-      inputBg: 'white',
-      inputBorder: '#D1D5DB',
-      btnBg: '#F9FAFB',
-      btnHover: '#F3F4F6',
-      btnCancel: '#F1F5F9',
-      btnCancelHover: '#E2E8F0',
-      wrapperBg: '#F9FAFB',
-      wrapperBorder: '#E5E7EB'
-    };
-    
+    // 颜色不再在 JS 里按亮暗分支写死：styles.css 用 --dp-* 变量承接，
+    // 暗色值在 .theme-dark .modal.date-picker-modal 里换一套
+
     // 标题
     const titleEl = contentEl.createDiv("modal-title");
     titleEl.textContent = tr("modal.date.title");
-    titleEl.style.fontSize = "20px";
-    titleEl.style.fontWeight = "700";
-    titleEl.style.textAlign = "center";
-    titleEl.style.marginBottom = "28px";
-    titleEl.style.paddingBottom = "20px";
-    titleEl.style.borderBottom = "2px solid var(--background-modifier-border)";
-    titleEl.style.color = "var(--text-normal)";
     
     // 年份区域
     const yearSection = contentEl.createDiv("picker-section");
-    yearSection.style.marginBottom = "28px";
     
-    const yearLabel = yearSection.createEl("div", { text: tr("modal.date.year") });
-    yearLabel.style.fontSize = "13px";
-    yearLabel.style.fontWeight = "600";
-    yearLabel.style.color = colors.textMuted;
-    yearLabel.style.textAlign = "center";
-    yearLabel.style.marginBottom = "16px";
+    yearSection.createEl("div", { text: tr("modal.date.year"), cls: "dp-label" });
     
     const yearInputWrapper = yearSection.createDiv("year-input-wrapper");
-    yearInputWrapper.style.display = "flex";
-    yearInputWrapper.style.alignItems = "center";
-    yearInputWrapper.style.justifyContent = "center";
-    yearInputWrapper.style.gap = "16px";
-    yearInputWrapper.style.padding = "8px";
     
-    const yearDecBtn = yearInputWrapper.createEl("button", { text: "\u2212" });
-    yearDecBtn.style.width = "40px";
-    yearDecBtn.style.flexShrink = "0";
-    yearDecBtn.style.height = "40px";
-    yearDecBtn.style.fontSize = "18px";
-    yearDecBtn.style.fontWeight = "600";
-    yearDecBtn.style.color = colors.text;
-    yearDecBtn.style.background = colors.inputBg;
-    yearDecBtn.style.border = `2px solid ${colors.inputBorder}`;
-    yearDecBtn.style.borderRadius = "10px";
-    yearDecBtn.style.cursor = "pointer";
-    yearDecBtn.style.display = "flex";
-    yearDecBtn.style.alignItems = "center";
-    yearDecBtn.style.justifyContent = "center";
-    yearDecBtn.style.transition = "all 0.2s ease";
-    yearDecBtn.style.outline = "none";
-    yearDecBtn.style.boxShadow = "none";
+    const yearDecBtn = yearInputWrapper.createEl("button", { text: "−", cls: "year-step-btn" });
     
     const yearInput = yearInputWrapper.createEl("input", {
+      cls: "year-input",
       attr: {
         type: "number",
         value: String(this.year),
@@ -6176,64 +6492,15 @@ var DatePickerModal = class extends import_obsidian.Modal {
         max: "2100"
       }
     });
-    yearInput.style.width = "120px";
-    yearInput.style.minWidth = "0";
-    yearInput.style.flex = "1 1 90px";
-    yearInput.style.height = "40px";
-    yearInput.style.padding = "0 14px";
-    yearInput.style.fontSize = "20px";
-    yearInput.style.fontWeight = "700";
-    yearInput.style.textAlign = "center";
-    yearInput.style.color = colors.text;
-    yearInput.style.background = colors.inputBg;
-    yearInput.style.border = `2px solid ${colors.inputBorder}`;
-    yearInput.style.borderRadius = "10px";
-    yearInput.style.outline = "none";
-    yearInput.style.transition = "all 0.2s ease";
-    yearInput.style.boxSizing = "border-box";
     
-    const yearIncBtn = yearInputWrapper.createEl("button", { text: "+" });
-    yearIncBtn.style.width = "40px";
-    yearIncBtn.style.flexShrink = "0";
-    yearIncBtn.style.height = "40px";
-    yearIncBtn.style.fontSize = "18px";
-    yearIncBtn.style.fontWeight = "600";
-    yearIncBtn.style.color = colors.text;
-    yearIncBtn.style.background = colors.inputBg;
-    yearIncBtn.style.border = `2px solid ${colors.inputBorder}`;
-    yearIncBtn.style.borderRadius = "10px";
-    yearIncBtn.style.cursor = "pointer";
-    yearIncBtn.style.display = "flex";
-    yearIncBtn.style.alignItems = "center";
-    yearIncBtn.style.justifyContent = "center";
-    yearIncBtn.style.transition = "all 0.2s ease";
-    yearIncBtn.style.outline = "none";
-    yearIncBtn.style.boxShadow = "none";
+    const yearIncBtn = yearInputWrapper.createEl("button", { text: "+", cls: "year-step-btn" });
     
-    const currentYearHint = yearSection.createEl("div", {
-      text: tr("modal.date.currentYear", { year: this.currentYear })
+    yearSection.createEl("div", {
+      text: tr("modal.date.currentYear", { year: this.currentYear }),
+      cls: "dp-hint"
     });
-    currentYearHint.style.textAlign = "center";
-    currentYearHint.style.fontSize = "12px";
-    currentYearHint.style.color = colors.textMuted;
-    currentYearHint.style.marginTop = "12px";
-    currentYearHint.style.fontWeight = "500";
     
-    // 按钮悬停效果
-    const btnHoverStyle = (btn) => {
-      btn.addEventListener("mouseenter", () => {
-        btn.style.background = isDark ? "rgba(59, 130, 246, 0.2)" : "#EFF6FF";
-        btn.style.borderColor = isDark ? "rgba(59, 130, 246, 0.5)" : "#93C5FD";
-        btn.style.color = "#60a5fa";
-      });
-      btn.addEventListener("mouseleave", () => {
-        btn.style.background = colors.inputBg;
-        btn.style.borderColor = colors.inputBorder;
-        btn.style.color = colors.text;
-      });
-    };
-    btnHoverStyle(yearDecBtn);
-    btnHoverStyle(yearIncBtn);
+    // 悬停效果改由 CSS 的 :hover 负责（见 .year-step-btn:hover），不再监听鼠标事件
     
     yearDecBtn.addEventListener("click", () => {
       this.year = Math.max(1900, this.year - 1);
@@ -6256,84 +6523,26 @@ var DatePickerModal = class extends import_obsidian.Modal {
     
     // 月份区域
     const monthSection = contentEl.createDiv("picker-section");
-    monthSection.style.marginBottom = "28px";
     
-    const monthLabel = monthSection.createEl("div", { text: tr("modal.date.month") });
-    monthLabel.style.fontSize = "13px";
-    monthLabel.style.fontWeight = "600";
-    monthLabel.style.color = colors.textMuted;
-    monthLabel.style.textAlign = "center";
-    monthLabel.style.marginBottom = "16px";
+    monthSection.createEl("div", { text: tr("modal.date.month"), cls: "dp-label" });
     
     const monthGrid = monthSection.createDiv("month-grid");
-    monthGrid.style.display = "grid";
-    monthGrid.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
-    monthGrid.style.gap = "12px";
     
     const monthLabels = monthNames();
     
     // 月份按钮着色集中在这里：绿色=当前选中，蓝色=今天所在月（仅当年）。
     // 年份 +/- 、输入变化、点击选中后都调用它整体重绘，
-    // 否则旧高亮会残留在已切换走的年份视图上
+    // 否则旧高亮会残留在已切换走的年份视图上。
+    // 只切状态类，配色全在 styles.css（.month-btn.is-selected / .is-current）
     const refreshMonthStyles = () => {
       monthGrid.querySelectorAll("button").forEach((btn, idx) => {
-        btn.style.color = colors.text;
-        btn.style.background = colors.wrapperBg;
-        btn.style.borderColor = "transparent";
-        btn.style.boxShadow = "none";
-        btn.style.transform = "none";
-        if (idx === this.month) {
-          // 选中月份 - 绿色（与今天所在月重合时优先显示选中）
-          btn.style.color = "white";
-          btn.style.background = "linear-gradient(135deg, #10b981, #059669)";
-          btn.style.borderColor = "#34d399";
-          btn.style.boxShadow = "0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35)";
-          btn.style.transform = "scale(1.05)";
-        } else if (this.year === this.currentYear && idx === this.currentMonth) {
-          // 今天所在月（须同年）- 蓝色
-          btn.style.color = "white";
-          btn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
-          btn.style.borderColor = "#60a5fa";
-          btn.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35)";
-          btn.style.transform = "scale(1.05)";
-        }
+        btn.toggleClass("is-current", this.year === this.currentYear && idx === this.currentMonth);
+        btn.toggleClass("is-selected", idx === this.month);
       });
     };
 
     for (let m = 0; m < 12; m++) {
-      const monthBtn = monthGrid.createEl("button", { text: monthLabels[m] });
-      monthBtn.style.minWidth = "0";
-      monthBtn.style.overflowWrap = "anywhere";
-      monthBtn.style.lineHeight = "1.2";
-      monthBtn.style.padding = "12px 4px";
-      monthBtn.style.fontSize = "14px";
-      monthBtn.style.fontWeight = "600";
-      monthBtn.style.borderRadius = "12px";
-      monthBtn.style.cursor = "pointer";
-      monthBtn.style.border = "2px solid transparent";
-      monthBtn.style.transition = "all 0.2s ease";
-      monthBtn.style.display = "flex";
-      monthBtn.style.alignItems = "center";
-      monthBtn.style.justifyContent = "center";
-      monthBtn.style.outline = "none";
-      monthBtn.style.boxShadow = "none";
-      
-      monthBtn.addEventListener("mouseenter", () => {
-        if (!(this.year === this.currentYear && m === this.currentMonth) && m !== this.month) {
-          monthBtn.style.background = colors.btnHover;
-          monthBtn.style.transform = "translateY(-2px)";
-          monthBtn.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.1)";
-        }
-      });
-      
-      monthBtn.addEventListener("mouseleave", () => {
-        if (!(this.year === this.currentYear && m === this.currentMonth) && m !== this.month) {
-          monthBtn.style.background = colors.wrapperBg;
-          monthBtn.style.transform = "none";
-          monthBtn.style.boxShadow = "none";
-        }
-      });
-      
+      const monthBtn = monthGrid.createEl("button", { text: monthLabels[m], cls: "month-btn" });
       monthBtn.addEventListener("click", () => {
         this.month = m;
         refreshMonthStyles();
@@ -6343,56 +6552,13 @@ var DatePickerModal = class extends import_obsidian.Modal {
     
     // 按钮组
     const btnGroup = contentEl.createDiv("modal-buttons");
-    btnGroup.style.display = "flex";
-    btnGroup.style.gap = "16px";
-    btnGroup.style.justifyContent = "center";
-    btnGroup.style.marginTop = "8px";
     
-    const cancelBtn = btnGroup.createEl("button", { text: tr("modal.create.cancel") });
-    cancelBtn.style.padding = "14px 32px";
-    cancelBtn.style.fontSize = "15px";
-    cancelBtn.style.fontWeight = "600";
-    cancelBtn.style.borderRadius = "12px";
-    cancelBtn.style.cursor = "pointer";
-    cancelBtn.style.border = "none";
-    cancelBtn.style.minWidth = "100px";
-    cancelBtn.style.background = colors.btnCancel;
-    cancelBtn.style.color = isDark ? "#94a3b8" : "#64748B";
-    cancelBtn.style.transition = "all 0.2s ease";
+    const cancelBtn = btnGroup.createEl("button", { text: tr("modal.create.cancel"), cls: "btn-cancel" });
     
-    cancelBtn.addEventListener("mouseenter", () => {
-      cancelBtn.style.background = colors.btnCancelHover;
-      cancelBtn.style.color = isDark ? "#e2e8f0" : "#475569";
-    });
-    cancelBtn.addEventListener("mouseleave", () => {
-      cancelBtn.style.background = colors.btnCancel;
-      cancelBtn.style.color = isDark ? "#94a3b8" : "#64748B";
-    });
     cancelBtn.addEventListener("click", () => this.close());
     
-    const confirmBtn = btnGroup.createEl("button", { text: tr("modal.date.confirm") });
-    confirmBtn.style.padding = "14px 32px";
-    confirmBtn.style.fontSize = "15px";
-    confirmBtn.style.fontWeight = "600";
-    confirmBtn.style.borderRadius = "12px";
-    confirmBtn.style.cursor = "pointer";
-    confirmBtn.style.border = "none";
-    confirmBtn.style.minWidth = "100px";
-    confirmBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
-    confirmBtn.style.color = "white";
-    confirmBtn.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
-    confirmBtn.style.transition = "all 0.2s ease";
+    const confirmBtn = btnGroup.createEl("button", { text: tr("modal.date.confirm"), cls: "btn-confirm" });
     
-    confirmBtn.addEventListener("mouseenter", () => {
-      confirmBtn.style.background = "linear-gradient(135deg, #2563eb, #1d4ed8)";
-      confirmBtn.style.transform = "translateY(-1px)";
-      confirmBtn.style.boxShadow = "0 6px 20px rgba(59, 130, 246, 0.45)";
-    });
-    confirmBtn.addEventListener("mouseleave", () => {
-      confirmBtn.style.background = "linear-gradient(135deg, #3b82f6, #2563eb)";
-      confirmBtn.style.transform = "none";
-      confirmBtn.style.boxShadow = "0 4px 14px rgba(59, 130, 246, 0.35)";
-    });
     confirmBtn.addEventListener("click", async () => {
       // 防止双击导致 onSubmit 触发两次（close 异步前仍可接收点击）
       if (confirmBtn.disabled) return;
@@ -6457,7 +6623,7 @@ var DatePickerModal = class extends import_obsidian.Modal {
 function CF_MOTION_OFF() {
   try {
     return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -6469,10 +6635,13 @@ function CF_MOTION_OFF() {
  */
 function CF_KICK(anim) {
   try {
-    if (anim && anim.startTime === null)
-      anim.startTime = document.timeline.currentTime;
-  } catch (e) {
-  }
+    if (anim && anim.startTime === null) {
+      // 时间线是按文档算的：动画元素在弹出窗口里时，得对它自己那个文档校时
+      const target = anim.effect && anim.effect.target;
+      const doc = (target && target.ownerDocument) || activeDocument;
+      anim.startTime = doc.timeline.currentTime;
+    }
+  } catch { /* 旧 WebView 没有 Web Animations 时间线，跳过校正 */ }
   return anim;
 }
 
@@ -6499,11 +6668,14 @@ function unwatchPopupPosition(owner) {
 
 function closeInlineDatePicker(owner) {
   unwatchPopupPosition(owner);
+  // 浮层挂在弹窗所在文档的 body 上，摘监听/找浮层也必须回同一个文档：
+  // 弹窗可能开着弹窗（Obsidian 的弹出窗口），此时 activeDocument 未必是它
+  const doc = (owner.modalEl && owner.modalEl.ownerDocument) || activeDocument;
   if (owner.datePickerCloseHandler) {
-    document.removeEventListener("click", owner.datePickerCloseHandler);
+    doc.removeEventListener("click", owner.datePickerCloseHandler);
     owner.datePickerCloseHandler = null;
   }
-  const popup = document.body.querySelector(":scope > .date-picker-popup");
+  const popup = doc.body.querySelector(":scope > .date-picker-popup");
   if (popup) popup.remove();
   // 恢复弹窗输入框的软键盘能力与聚焦高亮（浮层打开时禁用过）
   try {
@@ -6511,7 +6683,7 @@ function closeInlineDatePicker(owner) {
       el.removeAttribute("inputmode");
       el.classList.remove("mt-no-focus-fx");
     });
-  } catch (e) {}
+  } catch { /* 弹窗已卸载，恢复软键盘能力无从谈起 */ }
 }
 
 var CategoryFilterModal = class extends import_obsidian.Modal {
@@ -6532,8 +6704,8 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
       if (header) header.remove();
     };
     sweepChrome();
-    requestAnimationFrame(sweepChrome);
-    setTimeout(sweepChrome, 100);
+    window.requestAnimationFrame(sweepChrome);
+    window.setTimeout(sweepChrome, 100);
     // v1.5.3 流畅性：先量尺寸再定位。旧序是「定位→画行→rAF 再修正」，
     // 面板会先跳到一个偏小的位置再撑开，观感上是一次突兀的位移。
     // 现在按行数预估尺寸，同帧完成定位，行渲染不再改变盒尺寸位置。
@@ -6556,30 +6728,24 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
             if (!el) return;
             el.getAnimations().forEach((a) => {
               if (a !== this._enterAnim) {
-                try { a.cancel(); } catch (e) {}
+                try { a.cancel(); } catch { /* 动画已结束或已被取消，再 cancel 会抛 */ }
               }
             });
           });
-        } catch (e) {}
+        } catch { /* 容器已卸载，扫不到动画属正常路径 */ }
       };
-      requestAnimationFrame(sweep);
-      setTimeout(sweep, 80);
-      setTimeout(sweep, 260);
+      window.requestAnimationFrame(sweep);
+      window.setTimeout(sweep, 80);
+      window.setTimeout(sweep, 260);
     }
   }
   /** 锚定到漏斗按钮正下方；越界翻到上方 / 收进屏内 */
   positionAt(modalEl, prefill = false) {
-    modalEl.style.position = "fixed";
-    modalEl.style.margin = "0";
-    modalEl.style.top = "auto";
-    modalEl.style.left = "auto";
-    modalEl.style.width = "auto";
-    modalEl.style.maxWidth = "92vw";
-
+    // 定位基线（position/top/left/width/min-width）在 styles.css 的
+    // .modal.category-filter-modal 里；这里只补随锚点变化的动态值
     // 预估尺寸（首帧定位前）：宽度=内容 min-width 180 + 内边距，高度=标题+行高×行数
     if (prefill) {
       const rows = (this.view.scanCategories().length || 0) + 2;
-      modalEl.style.minWidth = "196px";
       modalEl.style.minHeight = `${Math.min(8 + 30 + rows * 34, window.innerHeight - 16)}px`;
     }
     const rect = this.anchorEl && this.anchorEl.getBoundingClientRect();
@@ -6611,7 +6777,7 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
       modalEl.style.minHeight = "";
     };
     render();
-    requestAnimationFrame(render);
+    window.requestAnimationFrame(render);
   }
   renderRows() {
     if (this.isClosed) return;  // v1.5.3：淡出期间不再重渲染（动画期网格可能仍在刷新）
@@ -6651,7 +6817,7 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
       row.createDiv("category-name").textContent = label;
       const checkEl = row.createDiv("category-check");
       if (checked)
-        checkEl.textContent = "\u2713";
+        checkEl.textContent = "✓";
       row.addEventListener("click", (e) => {
         e.stopPropagation();
         onPick();
@@ -6699,7 +6865,7 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
         { opacity: 0, transform: "translateY(-6px) scale(0.96)" },
         { opacity: 1, transform: "none" },
       ], { duration: 160, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)" }));
-    } catch (e) {
+    } catch {
       return null;
     }
   }
@@ -6715,8 +6881,7 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
         CF_KICK(bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: "ease", fill: "forwards" }));
       // 保持可见直到动画结束（fill:forwards 已停在终态），随后由 close() 的定时器卸载
       void a1;
-    } catch (e) {
-    }
+    } catch { /* 出场动画不被支持时直接跳过，由定时器负责卸载 */ }
   }
   /**
    * v1.5.3 流畅性：接管收起动画。
@@ -6743,9 +6908,8 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
       if (container && container.isConnected && !CF_MOTION_OFF()) {
         // 面板淡出微缩 + 遮罩淡出并行；两者都播完（或最迟 LEAVE_MS 超时兜底）才真正卸载
         this.playLeave(this.modalEl, container);
-        setTimeout(() => {
-          try { super.close(); } catch (e) {
-          }
+        window.setTimeout(() => {
+          try { super.close(); } catch { /* 父类已自行清理过就跳过，不能让异常冒到定时器 */ }
         }, 160);
         return;
       }
@@ -6793,8 +6957,8 @@ var ViewMenuModal = class extends import_obsidian.Modal {
       if (header) header.remove();
     };
     sweepChrome();
-    requestAnimationFrame(sweepChrome);
-    setTimeout(sweepChrome, 100);
+    window.requestAnimationFrame(sweepChrome);
+    window.setTimeout(sweepChrome, 100);
     this.renderRows();
     this.positionAt(modalEl, true);
     watchPopupPosition(this, () => this.positionAt(modalEl));
@@ -6809,28 +6973,22 @@ var ViewMenuModal = class extends import_obsidian.Modal {
             if (!el) return;
             el.getAnimations().forEach((a) => {
               if (a !== this._enterAnim) {
-                try { a.cancel(); } catch (e) {}
+                try { a.cancel(); } catch { /* 动画已结束或已被取消，再 cancel 会抛 */ }
               }
             });
           });
-        } catch (e) {}
+        } catch { /* 容器已卸载，扫不到动画属正常路径 */ }
       };
-      requestAnimationFrame(sweep);
-      setTimeout(sweep, 80);
-      setTimeout(sweep, 260);
+      window.requestAnimationFrame(sweep);
+      window.setTimeout(sweep, 80);
+      window.setTimeout(sweep, 260);
     }
   }
   positionAt(modalEl, prefill = false) {
-    modalEl.style.position = "fixed";
-    modalEl.style.margin = "0";
-    modalEl.style.top = "auto";
-    modalEl.style.left = "auto";
-    modalEl.style.width = "auto";
-    modalEl.style.maxWidth = "92vw";
+    // 定位基线在 styles.css 的 .modal.category-filter-modal 里（视图菜单沿用同一套外壳）
     if (prefill) {
       // 预估尺寸只为压掉首帧跳动：行数 = 视图数 + 标题
       const rows = VIEW_MODES.length + 1;
-      modalEl.style.minWidth = "232px";
       modalEl.style.minHeight = `${Math.min(8 + 30 + rows * 46, window.innerHeight - 16)}px`;
     }
     const rect = this.anchorEl && this.anchorEl.getBoundingClientRect();
@@ -6858,7 +7016,7 @@ var ViewMenuModal = class extends import_obsidian.Modal {
       modalEl.style.minHeight = "";
     };
     render();
-    requestAnimationFrame(render);
+    window.requestAnimationFrame(render);
   }
   renderRows() {
     if (this.isClosed) return;
@@ -6877,13 +7035,13 @@ var ViewMenuModal = class extends import_obsidian.Modal {
         row.addClass("selected");
       row.style.setProperty("--mt-cat-color", "var(--primary-500)");
       const iconEl = row.createDiv("vm-icon");
-      iconEl.innerHTML = AGENDA_TOGGLE_ICONS[mode] || AGENDA_TOGGLE_ICONS.list;
+      setSvgIcon(iconEl, AGENDA_TOGGLE_ICONS[mode] || AGENDA_TOGGLE_ICONS.list);
       const textBox = row.createDiv("vm-text");
       textBox.createDiv("vm-name").textContent = viewModeLabel(mode);
       textBox.createDiv("vm-desc").textContent = tr("view.mode.desc." + mode);
       const checkEl = row.createDiv("category-check");
       if (on)
-        checkEl.textContent = "\u2713";
+        checkEl.textContent = "✓";
       row.setAttribute("role", "button");
       row.setAttribute("aria-pressed", on ? "true" : "false");
       row.addEventListener("click", (e) => {
@@ -6901,7 +7059,7 @@ var ViewMenuModal = class extends import_obsidian.Modal {
         { opacity: 0, transform: "translateY(-6px) scale(0.96)" },
         { opacity: 1, transform: "none" },
       ], { duration: 160, easing: "cubic-bezier(0.2, 0.8, 0.3, 1)" }));
-    } catch (e) {
+    } catch {
       return null;
     }
   }
@@ -6915,8 +7073,7 @@ var ViewMenuModal = class extends import_obsidian.Modal {
       if (bg)
         CF_KICK(bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: "ease", fill: "forwards" }));
       void a1;
-    } catch (e) {
-    }
+    } catch { /* 出场动画不被支持时直接跳过，由定时器负责卸载 */ }
   }
   close() {
     if (this.closing)
@@ -6928,9 +7085,8 @@ var ViewMenuModal = class extends import_obsidian.Modal {
     const container = this.containerEl;
     if (container && container.isConnected && !CF_MOTION_OFF()) {
       this.playLeave(this.modalEl, container);
-      setTimeout(() => {
-        try { super.close(); } catch (e) {
-        }
+      window.setTimeout(() => {
+        try { super.close(); } catch { /* 父类已自行清理过就跳过，不能让异常冒到定时器 */ }
       }, 160);
     } else {
       super.close();
@@ -6979,10 +7135,9 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     // 移除当前聚焦的铅笔按钮、再重跑 onOpen，此刻 activeElement 已退回 document.body；
     // 若照旧无条件覆盖，onClose 就会把键盘用户丢回文档开头。已登记过则保持不变。
     if (!this.previouslyFocused) {
-      const ae = document.activeElement;
-      if (ae && ae !== document.body) this.previouslyFocused = ae;
+      const ae = activeDocument.activeElement;
+      if (ae && ae !== activeDocument.body) this.previouslyFocused = ae;
     }
-    const self = this;
     this.modalEl.addClass("create-task-modal");
     // 收掉 Modal 框架自带的空标题/内容占位（移动端会撑出弹窗顶部一大块空白）
     // 与右上角关闭按钮（已有取消按钮 + 返回键 + 点遮罩三种关闭方式，X 冗余）。
@@ -6999,11 +7154,11 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       this.containerEl.querySelectorAll(".modal-header-button, .modal-header, .modal-title, .modal-content, .modal-close-button").forEach((el) => el.remove());
     };
     killCloseBtns();
-    requestAnimationFrame(killCloseBtns);
-    setTimeout(killCloseBtns, 100);
-    setTimeout(killCloseBtns, 500);
+    window.requestAnimationFrame(killCloseBtns);
+    window.setTimeout(killCloseBtns, 100);
+    window.setTimeout(killCloseBtns, 500);
     // 框架在移动端会给 .modal 预留内边距，弹窗内容自带留白，归零以复用原设计的间距
-    this.modalEl.style.padding = "0";
+    // （归零在 styles.css 的 .modal.create-task-modal 里，不再写内联样式）
     // v1.6.0 手机端反馈版：备注编辑从「明细区就地编辑」迁到本弹窗。
     // 声明提到函数级：日期抬头（下方）与备注区（任务输入框之后）两段都要读写它
     let noteHasContent = !!(this.editingTask && this.editingTask.note);
@@ -7017,7 +7172,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     const dateMainEl = dateInfoEl.createDiv("date-main");
     dateMainEl.textContent = tr("modal.create.dateLine", { m: this.date.getMonth() + 1, day: this.date.getDate(), weekday: weekday });
     if (holidayInfo) {
-      dateMainEl.createSpan({ text: ` \xB7 ${translateHolidayName(holidayInfo.name)}` });
+      dateMainEl.createSpan({ text: ` · ${translateHolidayName(holidayInfo.name)}` });
     }
     if (this.existingTasks.length > 0) {
       const existingTasksEl = this.modalEl.createDiv("modal-existing-tasks");
@@ -7088,7 +7243,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
               if (!ok) {
                 checkboxEl.checked = task.completed;
                 new import_obsidian.Notice(tr("modal.create.toggleFail"));
-                setTimeout(() => renderTasks(), 200);
+                window.setTimeout(() => renderTasks(), 200);
                 return;
               }
               task.completed = !task.completed;
@@ -7112,7 +7267,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
             }
           });
           // 任务文字
-          const textEl = taskEl.createEl("span", { cls: "task-text", text: task.content });
+          taskEl.createEl("span", { cls: "task-text", text: task.content });
           // 类别标签：这条宽列表是 #标签 文字的唯一去处（v1.5.4 起格子里只剩色带），
           // 用户在这里对照着看当日都有哪些类别，筛选面板用的也是同一批名字
           if (task.category) {
@@ -7130,7 +7285,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
           // 就地切换编辑目标：以前是 close() 再开一个新弹窗，两副几乎一样的界面
           // 在同一位置前后闪过，用户读作「点了编辑又跳出创建界面」。
           const editBtn = actionsEl.createEl("button", { cls: "task-action-btn task-edit-btn", attr: { title: tr("modal.create.edit"), "aria-label": tr("modal.create.edit") } });
-          editBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`;
+          setSvgIcon(editBtn, ICON_EDIT);
           editBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             const anchorStr = task.startDate || task.dueDate;
@@ -7149,7 +7304,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
           });
           // 跳转按钮
           const gotoBtn = actionsEl.createEl("button", { cls: "task-action-btn task-goto-btn", attr: { title: tr("modal.create.goto") } });
-          gotoBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
+          setSvgIcon(gotoBtn, ICON_GOTO);
           gotoBtn.addEventListener("click", async (e) => {
             e.stopPropagation();
             const file = this.app.vault.getAbstractFileByPath(task.filePath);
@@ -7158,16 +7313,16 @@ var CreateTaskModal = class extends import_obsidian.Modal {
               await leaf.openFile(file);
               // openFile 返回时编辑器可能尚未就绪，短暂重试，避免静默跳过定位
               let tries = 10;
-              const focusTimer = setInterval(() => {
+              const focusTimer = window.setInterval(() => {
                 const view = leaf.view;
                 // containerEl 不在文档里 = 这个 leaf 已被分离或切走，
                 // 再 setCursor / scrollIntoView 操作的是废弃 view
                 if (view && view.editor && view.containerEl?.isConnected) {
-                  clearInterval(focusTimer);
+                  window.clearInterval(focusTimer);
                   view.editor.setCursor({ line: task.lineNumber, ch: 0 });
                   view.editor.scrollIntoView({ from: { line: task.lineNumber, ch: 0 }, to: { line: task.lineNumber, ch: 0 } }, true);
                 } else if (--tries <= 0) {
-                  clearInterval(focusTimer);
+                  window.clearInterval(focusTimer);
                 }
               }, 100);
             }
@@ -7175,7 +7330,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
           });
           // 删除按钮
           const deleteBtn = actionsEl.createEl("button", { cls: "task-action-btn task-delete-btn", attr: { title: tr("modal.create.delete") } });
-          deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4h6v2"></path></svg>`;
+          setSvgIcon(deleteBtn, ICON_DELETE);
           deleteBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             if (deleteBtn.disabled) return;
@@ -7190,7 +7345,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
               const res = await this.plugin.taskParser.deleteTask(task);
               if (res) {
                 taskEl.addClass("task-deleting");
-                await new Promise((r) => setTimeout(r, 200));
+                await new Promise((r) => window.setTimeout(r, 200));
                 const idx = this.existingTasks.indexOf(task);
                 if (idx > -1) this.existingTasks.splice(idx, 1);
                 // 修复：删除后同文件中行号大于被删行的任务，行号按真实位移补偿，
@@ -7217,7 +7372,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
                 new import_obsidian.Notice(tr("modal.create.deleteFail"), 3e3);
                 deleteBtn.disabled = false;
                 if (this.modalEl && this.modalEl.isConnected) {
-                  setTimeout(() => {
+                  window.setTimeout(() => {
                     if (this.modalEl && this.modalEl.isConnected) renderTasks();
                   }, 200);
                 }
@@ -7274,7 +7429,9 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     });
     noteText.value = noteHasContent ? this.editingTask.note : "";
     const autosizeNote = () => {
-      noteText.style.height = "auto";
+      // 先清掉内联高度，让 styles.css 的 .note-textarea { height: auto } 生效，
+      // 量到的 scrollHeight 才是真实内容高度；再写回像素值
+      noteText.style.height = "";
       noteText.style.height = Math.max(noteText.scrollHeight + 2, 36) + "px";
     };
     noteText.addEventListener("input", autosizeNote);
@@ -7385,7 +7542,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // 「+ 设置时间」：全天态下唯一的加时间入口，坐在勾选行右侧；
       // 时间框组默认折叠（display:none = 不进布局，手机上不再"跳出时间选择器"）
       const showTimeBtn = allDayToggle.createEl("button", { cls: "time-show-btn", type: "button", text: tr("modal.create.setTime") });
-      showTimeBtn.style.display = "none";
+      showTimeBtn.style.display = isAllDay ? "" : "none";
       // 折叠开合：全天=「时间」标签与时间框整组隐藏，只剩勾选与加时间按钮
       setTimeOpen = () => {
         timeWrapper.style.display = isAllDay ? "none" : "flex";
@@ -7481,19 +7638,19 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     const PICKER_MIN_YEAR = 1900;
     const PICKER_MAX_YEAR = 2100;
     /** 把 pickerYear/pickerMonth 整体钳回合法区间：只钳年份会把月份留在越界侧 */
-    function clampPicker() {
+    const clampPicker = () => {
       if (pickerYear < PICKER_MIN_YEAR) { pickerYear = PICKER_MIN_YEAR; pickerMonth = 0; }
       else if (pickerYear > PICKER_MAX_YEAR) { pickerYear = PICKER_MAX_YEAR; pickerMonth = 11; }
-    }
+    };
     // 初值也过一道：this.date 正常来自日历格子（本就在界内），但编辑一条**此前**
     // 越界写入的任务时锚点可能带进来，先收敛掉比事后在网格里画出空月份稳妥。
     clampPicker();
-    function formatDisplayDate(y, m, d) {
+    const formatDisplayDate = (y, m, d) => {
       return tr("modal.create.displayDate", { y: y, m: m + 1, d: d });
-    }
+    };
     // 批次三：编辑跨天任务 → 勾上跨天、展开触发器、预填结束日期。
     // 开始日期不单独进表单（本期只做结束日期一侧，3.3⑥）：this.date 已是
-    // 打开弹窗时传入的任务锚点，结束日期校验基准 self.date 天然正确
+    // 打开弹窗时传入的任务锚点，结束日期校验基准 this.date 天然正确
     //
     // 审计 L11：手改文件能造出 📅 早于 🛫 的任务。选择器一侧（updateGrid 里 cell
     // 点击的 endBeforeStart 校验）拒绝挑这种日期，预填这一侧原来却照单全收，于是
@@ -7526,12 +7683,12 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // 选择器。属被砍掉的功能残留，删掉以免后来者以为它是权威值源而去读它。
     }
     // 更新日期网格（年月切换时调用，不重建弹出层）
-    function updateGrid(popup) {
+    const updateGrid = (popup) => {
       const existingGrid = popup.querySelector(".date-picker-grid");
       if (existingGrid) existingGrid.remove();
       const grid = popup.createDiv("date-picker-grid");
       // 起始空格按设置「每周第一天」偏移，与主月历及上方星期标题保持一致
-      const fdow = self.plugin.settings.firstDayOfWeek || 0;
+      const fdow = this.plugin.settings.firstDayOfWeek || 0;
       const firstDay = (new Date(pickerYear, pickerMonth, 1).getDay() - fdow + 7) % 7;
       const daysInMonth = new Date(pickerYear, pickerMonth + 1, 0).getDate();
       const today = new Date();
@@ -7540,14 +7697,13 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       for (let d = 1; d <= daysInMonth; d++) {
         const cell = grid.createDiv("picker-cell");
         cell.textContent = String(d);
-        const cellDate = new Date(pickerYear, pickerMonth, d);
         const cellKey = `${pickerYear}-${pickerMonth}-${d}`;
         if (cellKey === todayStr) cell.addClass("picker-cell-today");
         // 允许选择任意日期（包括过去的日期）
         cell.addEventListener("click", () => {
           const newEndDate = new Date(pickerYear, pickerMonth, d);
-          // 校验结束日期不早于开始日期（self.date 为开始日期，self 在 open() 开头绑定 this）
-          if (newEndDate < new Date(self.date.getFullYear(), self.date.getMonth(), self.date.getDate())) {
+          // 校验结束日期不早于开始日期（this.date 为开始日期；onOpen 里的 this 就是本弹窗）
+          if (newEndDate < new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate())) {
             new import_obsidian.Notice(tr("modal.create.endBeforeStart"), 3e3);
             return;
           }
@@ -7555,11 +7711,11 @@ var CreateTaskModal = class extends import_obsidian.Modal {
           endDateTrigger.textContent = formatDisplayDate(pickerYear, pickerMonth, d);
           // 审计 L16：这里原先还会 setAttribute("data-value", `${pickerYear}-${m}-${dd}`)
           // （连带两个只为它存在的 m/dd 局部变量），全文无人读取，一并删掉。
-          closeInlineDatePicker(self);
+          closeInlineDatePicker(this);
         });
       }
-    }
-    function syncSelects(popup) {
+    };
+    const syncSelects = (popup) => {
       const yearSelect = popup.querySelector(".picker-select-year");
       const monthSelect = popup.querySelector(".picker-select-month");
       if (yearSelect) {
@@ -7571,7 +7727,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
           // 审计 L10：选项也按 1900-2100 截断，免得下拉里出现 1899/2101 这类
           // 选上去立刻被钳回、看着像"选了没反应"的年份
           for (let y = Math.max(PICKER_MIN_YEAR, pickerYear - 1); y <= Math.min(PICKER_MAX_YEAR, pickerYear + 1); y++) {
-            const opt = document.createElement("option");
+            const opt = endDateTrigger.ownerDocument.createElement("option");
             opt.value = String(y);
             opt.text = tr("modal.date.yearSuffix", { y: y });
             yearSelect.appendChild(opt);
@@ -7582,12 +7738,14 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       if (monthSelect) {
         Array.from(monthSelect.options).forEach(o => { o.selected = o.value === String(pickerMonth); });
       }
-    }
-    function buildPopup() {
+    };
+    const buildPopup = () => {
       // 挂到 document.body：modal 带 transform 会成为 fixed 后代的包含块，
-      // 挂在 modal 内时「居中」相对 modal 而非视口，且会被 modal 的 overflow:hidden 裁掉
-      const popup = document.body.createDiv("date-picker-popup");
-      popup.style.display = "block";
+      // 挂在 modal 内时「居中」相对 modal 而非视口，且会被 modal 的 overflow:hidden 裁掉。
+      // 必须用弹窗自己所在的文档（弹出窗口场景下 activeDocument 可能是主窗口）
+      const doc = endDateTrigger.ownerDocument;
+      const popup = doc.body.createDiv("date-picker-popup");
+      // 显示由 styles.css 的 .date-picker-popup { display: block } 负责
       // 手机端：浮层存续期间禁止弹窗输入框唤起软键盘（inputmode=none 保留焦点
       // 能力但不弹键盘），并加 mt-no-focus-fx 摘掉聚焦高亮（焦点被系统焦点管理
       // 拉回时不再亮框）；关闭浮层时统一恢复
@@ -7610,21 +7768,21 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         popup.style.top = `${top}px`;
       };
       reposition();
-      watchPopupPosition(self, reposition);
+      watchPopupPosition(this, reposition);
       // 手机端：翻月/改年月的原生 select 系统选择器关闭后，焦点会被 Obsidian
       // 焦点管理拉回弹窗的任务输入框，软键盘跟着弹出；交互后主动摘掉输入焦点
       const killSoftKb = () => {
         try {
-          const ae = document.activeElement;
+          const ae = activeDocument.activeElement;
           if (ae && (ae.tagName === "INPUT" || ae.tagName === "TEXTAREA")) ae.blur();
-        } catch (e) {}
+        } catch { /* 原焦点元素可能已随弹窗卸载，聚焦恢复失败可忽略 */ }
       };
       // 年月导航
       const navRow = popup.createDiv("date-picker-nav");
-      const prevBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "\u25C0" });
+      const prevBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "◀" });
       const yearSelect = navRow.createEl("select", { cls: "picker-select picker-select-year" });
       const monthSelect = navRow.createEl("select", { cls: "picker-select picker-select-month" });
-      const nextBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "\u25B6" });
+      const nextBtn = navRow.createEl("button", { cls: "picker-nav-btn", text: "▶" });
       for (let y = Math.max(PICKER_MIN_YEAR, pickerYear - 1); y <= Math.min(PICKER_MAX_YEAR, pickerYear + 1); y++) {
         const opt = yearSelect.createEl("option", { value: String(y), text: tr("modal.date.yearSuffix", { y: y }) });
         if (y === pickerYear) opt.selected = true;
@@ -7642,7 +7800,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         clampPicker();
         syncSelects(popup);
         updateGrid(popup);
-        killSoftKb(); setTimeout(killSoftKb, 80);
+        killSoftKb(); window.setTimeout(killSoftKb, 80);
       });
       nextBtn.addEventListener("click", () => {
         pickerMonth++;
@@ -7650,7 +7808,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         clampPicker();
         syncSelects(popup);
         updateGrid(popup);
-        killSoftKb(); setTimeout(killSoftKb, 80);
+        killSoftKb(); window.setTimeout(killSoftKb, 80);
       });
       yearSelect.addEventListener("change", () => {
         pickerYear = parseInt(yearSelect.value, 10);
@@ -7658,12 +7816,12 @@ var CreateTaskModal = class extends import_obsidian.Modal {
         // 钳制若真发生了，下拉框显示的还是刚选的越界年份，必须回写一次才与网格一致
         syncSelects(popup);
         updateGrid(popup);
-        killSoftKb(); setTimeout(killSoftKb, 80);
+        killSoftKb(); window.setTimeout(killSoftKb, 80);
       });
-      monthSelect.addEventListener("change", () => { pickerMonth = parseInt(monthSelect.value, 10); updateGrid(popup); killSoftKb(); setTimeout(killSoftKb, 80); });
+      monthSelect.addEventListener("change", () => { pickerMonth = parseInt(monthSelect.value, 10); updateGrid(popup); killSoftKb(); window.setTimeout(killSoftKb, 80); });
       // 星期标题（跟随设置「每周第一天」轮转，与主月历一致）
       const weekRow = popup.createDiv("date-picker-week");
-      const fdowHeader = self.plugin.settings.firstDayOfWeek || 0;
+      const fdowHeader = this.plugin.settings.firstDayOfWeek || 0;
       const weekLabels = weekdayNames();
       weekLabels.slice(fdowHeader).concat(weekLabels.slice(0, fdowHeader)).forEach(d => {
         weekRow.createDiv("picker-week-day").textContent = d;
@@ -7673,8 +7831,8 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // 内容构建完毕后宽度才稳定，重算一次定位（手机端居中依赖准确宽度）
       reposition();
       // 点击外部关闭（popup 已挂 document.body，需显式排除 popup 与触发按钮自身）
-      // 审计 L13：原来是 `self.datePickerCloseHandler = (e) => {...}` 再
-      // `setTimeout(() => document.addEventListener("click", self.datePickerCloseHandler), 0)`。
+      // 审计 L13：原来是 `this.datePickerCloseHandler = (e) => {...}` 再
+      // `setTimeout(() => document.addEventListener("click", this.datePickerCloseHandler), 0)`。
       // 若弹层在这同一个 tick 内被关掉（onClose 会摘监听并把该字段置 null），定时器
       // 摘掉的是一个从未装上的监听，随后 addEventListener("click", null) 按规范是
       // 空操作——不泄漏，但纯粹是靠那次 null 读取侥幸活下来的。改成闭包持有
@@ -7682,31 +7840,31 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       // （没有被新弹层取代），② 弹层还在文档里。任一不成立就不装。
       const closeHandler = (e) => {
         if (!popup.contains(e.target) && !endDateTrigger.contains(e.target)) {
-          closeInlineDatePicker(self);
+          closeInlineDatePicker(this);
         }
       };
-      self.datePickerCloseHandler = closeHandler;
-      setTimeout(() => {
-        if (self.datePickerCloseHandler !== closeHandler) return;
+      this.datePickerCloseHandler = closeHandler;
+      window.setTimeout(() => {
+        if (this.datePickerCloseHandler !== closeHandler) return;
         if (!popup.isConnected) return;
-        document.addEventListener("click", closeHandler);
+        popup.ownerDocument.addEventListener("click", closeHandler);
       }, 0);
       return popup;
-    }
-    function renderDatePicker() {
-      const existing = document.body.querySelector(":scope > .date-picker-popup");
+    };
+    const renderDatePicker = () => {
+      const existing = endDateTrigger.ownerDocument.body.querySelector(":scope > .date-picker-popup");
       if (existing) {
-        closeInlineDatePicker(self);
+        closeInlineDatePicker(this);
         return;
       }
       buildPopup();
-    }
+    };
     endDateTrigger.addEventListener("click", (e) => {
       e.stopPropagation();
       // 置灰态被点到：抖一下勾选框，别让人以为按钮坏了
       if (!isMultiDay) {
         multiDayToggle.addClass("hint-shake");
-        setTimeout(() => multiDayToggle.removeClass("hint-shake"), 450);
+        window.setTimeout(() => multiDayToggle.removeClass("hint-shake"), 450);
         return;
       }
       renderDatePicker();
@@ -7832,7 +7990,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       const apply = () => {
         hidden.forEach((c) => { c.style.display = open ? "" : "none"; });
         toggle.setAttribute("aria-expanded", open ? "true" : "false");
-        toggle.textContent = open ? tr("modal.create.collapse") + " \u2303" : tr("modal.create.catMore") + " " + hidden.length + " \u2304";
+        toggle.textContent = open ? tr("modal.create.collapse") + " ⌃" : tr("modal.create.catMore") + " " + hidden.length + " ⌄";
         toggle.toggleClass("is-open", open);
       };
       toggle.addEventListener("click", (e) => {
@@ -7842,7 +8000,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
       });
       apply();
     };
-    requestAnimationFrame(foldCategoryGroup);
+    window.requestAnimationFrame(foldCategoryGroup);
     const btnGroup = this.modalEl.createDiv("modal-buttons");
     const cancelBtn = btnGroup.createEl("button", {
       cls: "btn-cancel",
@@ -7952,7 +8110,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     // 仅桌面端自动聚焦输入框：移动端聚焦会立即拉起输入法，遮挡弹窗且不易收起；
     // 移动端由用户点击输入框时再唤起键盘
     if (!import_obsidian.Platform.isMobile) {
-      setTimeout(() => {
+      window.setTimeout(() => {
         inputEl.focus();
       }, 100);
     }
@@ -7995,8 +8153,7 @@ var CreateTaskModal = class extends import_obsidian.Modal {
     if (this.previouslyFocused && typeof this.previouslyFocused.focus === "function") {
       try {
         this.previouslyFocused.focus();
-      } catch (e) {
-      }
+      } catch { /* 原焦点元素已不在文档里，跳过聚焦恢复 */ }
     }
   }
 };
@@ -8078,8 +8235,8 @@ var DEFAULT_SETTINGS = {
   // 已知类别列表（名称 + 颜色，顺序即弹窗/漏斗的显示顺序）。
   // 类别真身是内容里的 #tag：这里只是显示顺序与配色，删除此处条目不碰任何笔记
   categories: [
-    { name: "\u751F\u6D3B", color: "#3b82f6" },
-    { name: "\u5B66\u4E60", color: "#8b5cf6" }
+    { name: "生活", color: "#3b82f6" },
+    { name: "学习", color: "#8b5cf6" }
   ]
 };
 
@@ -8119,10 +8276,10 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
    *  复用加固过的 createTask（preserveFromRawLine 保住 createdAt/优先级等低频标记，
    *  按排序位插回正确的月份节）；写盘后经 vault modify 事件自动刷新视图。 */
   showDeleteUndo(task) {
-    const old = document.querySelector(".mt-undo-toast");
+    const old = activeDocument.querySelector(".mt-undo-toast");
     if (old) old.remove();
-    if (this._undoToastTimer) { clearTimeout(this._undoToastTimer); this._undoToastTimer = null; }
-    const toast = document.body.createDiv({ cls: "mt-undo-toast" });
+    if (this._undoToastTimer) { window.clearTimeout(this._undoToastTimer); this._undoToastTimer = null; }
+    const toast = activeDocument.body.createDiv({ cls: "mt-undo-toast" });
     toast.createSpan({ cls: "mt-undo-toast-text", text: tr("task.deletedToast") });
     const btn = toast.createEl("button", { cls: "mt-undo-toast-btn", attr: { type: "button" } });
     btn.textContent = tr("task.undo");
@@ -8134,39 +8291,39 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
         task.note || "", task.rawLine
       );
       toast.remove();
-      if (this._undoToastTimer) { clearTimeout(this._undoToastTimer); this._undoToastTimer = null; }
+      if (this._undoToastTimer) { window.clearTimeout(this._undoToastTimer); this._undoToastTimer = null; }
       if (!ok) new import_obsidian.Notice(tr("task.undoFail"));
     });
-    this._undoToastTimer = setTimeout(() => { toast.remove(); this._undoToastTimer = null; }, 6000);
+    this._undoToastTimer = window.setTimeout(() => { toast.remove(); this._undoToastTimer = null; }, 6000);
   }
 
   async onload() {
     // 选中圆标的字形偏移校准：不同字体里数字字形在行盒中的垂直位置不同，
     // 写死的 em 补偿只在特定字体下成立。这里用 canvas measureText 实测当前
-    // 字体里数字墨迹中心相对行盒中心的偏移（em 单位），写入 --mt-badge-dy，
-    // styles.css 的选中圆 ::before 用它把圆心对准字形中心，任何字体下数字
-    // 都落在圆内正中。测量失败时 styles.css 有兜底值，不影响功能。
+    // 字体里数字墨迹中心的位置，写入 --mt-badge-top（圆心 top，em），
+    // styles.css 的选中圆 ::before 直接取用。这只是启动时的兜底值；
+    // 每次画完网格还会在选中日号本身上复量一次（见视图的 _calibrateSelectedBadge）。
+    // 测量失败时 styles.css 按行盒中心兜底，不影响功能。
     try {
-      const probe = document.createElement("span");
-      probe.className = "day-number";
-      probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;font-weight:700;";
+      const probe = activeDocument.createElement("span");
+      probe.className = "day-number mt-measure-probe";
       probe.textContent = "0";
-      document.body.appendChild(probe);
-      const cs = getComputedStyle(probe);
+      activeDocument.body.appendChild(probe);
+      const cs = (activeDocument.defaultView || activeWindow).getComputedStyle(probe);
       const fontSize = parseFloat(cs.fontSize);
       const family = cs.fontFamily;
       // 基线探针：空 inline-block 的底边正好坐在文本基线上。Chromium 的 CSS
       // 行盒度量与 canvas fontBoundingBoxAscent 用的是两套字体度量，基线
       // 位置必须在真实 DOM 里量，不能靠 canvas。
-      const bl = document.createElement("span");
-      bl.style.cssText = "display:inline-block;width:0;height:0;";
+      const bl = activeDocument.createElement("span");
+      bl.className = "mt-measure-block";
       probe.appendChild(bl);
       const pr = probe.getBoundingClientRect();
       const br = bl.getBoundingClientRect();
       const baselineFromTop = br.bottom - pr.top;
       const lineBoxH = pr.height;
       probe.remove();
-      const ctx = document.createElement("canvas").getContext("2d");
+      const ctx = activeDocument.createElement("canvas").getContext("2d");
       if (ctx) {
         ctx.font = `700 ${fontSize}px ${family}`;
         const m = ctx.measureText("0");
@@ -8174,16 +8331,17 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
         const inkCenter = (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
         // dy = 字形墨迹中心相对行盒中心的偏移（向上为正）
         const dyPx = lineBoxH / 2 - baselineFromTop + inkCenter;
-        document.documentElement.style.setProperty("--mt-badge-dy", (dyPx / fontSize).toFixed(4) + "em");
+        // 圆心 top 直接写成 em，CSS 侧不做 50% ∓ dy 的带符号运算（见就地校准方法的注释）
+        activeDocument.documentElement.style.setProperty("--mt-badge-top", ((lineBoxH / 2 - dyPx) / fontSize).toFixed(4) + "em");
         // 字形墨迹高度（em）：选中圆直径以此为基准，让圆紧贴数字
         const ink = (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) / fontSize;
-        document.documentElement.style.setProperty("--mt-badge-ink", ink.toFixed(4) + "em");
+        activeDocument.documentElement.style.setProperty("--mt-badge-ink", ink.toFixed(4) + "em");
         // 双位数字形宽度（em）：选中圆直径取它与墨迹高度的较大者，
         // 否则圆按字高取直径时「10」–「31」这些双位数会露到圆外
         const w2 = ctx.measureText("00").width / fontSize;
-        document.documentElement.style.setProperty("--mt-badge-w2", w2.toFixed(4) + "em");
+        activeDocument.documentElement.style.setProperty("--mt-badge-w2", w2.toFixed(4) + "em");
       }
-    } catch (e) { /* 兜底值在 styles.css */ }
+    } catch { /* 兜底值在 styles.css */ }
 
     // 初始化节假日管理器（每个插件实例独立）
     this.holidayManager = new HolidayManager();
@@ -8260,8 +8418,8 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     // refreshTimer 提升为实例字段，便于 onunload 中清理
     this.refreshTimer = null;
     const debouncedRefresh = () => {
-      if (this.refreshTimer) clearTimeout(this.refreshTimer);
-      this.refreshTimer = setTimeout(() => {
+      if (this.refreshTimer) window.clearTimeout(this.refreshTimer);
+      this.refreshTimer = window.setTimeout(() => {
         this.taskParser.invalidateCache();
         this.refreshView();
         // 同步清除设置面板的文件夹列表缓存，确保新建/移动文件夹后选项及时更新
@@ -8321,14 +8479,16 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
   /**
    * 插件卸载
    * - 清理防抖定时器，避免卸载后定时器仍触发操作已销毁的视图
-   * - 拆除本插件的视图叶子（detachLeavesOfType）：Obsidian 不会在禁用/重载插件时
-   *   自动关闭视图，不拆会残留一个失联的死视图（与 important-days 同款处理）
+   * - 这里**故意不调用** detachLeavesOfType：用户主动禁用插件时，宿主自己会拆掉该插件
+   *   注册的视图叶子（registerView 的清理逻辑带 _userDisabled 判断）；而更新/重载这条
+   *   路径宿主是刻意保留叶子的，好让「侧栏里拖到哪」这个位置活下来。我们再拆一次，
+   *   就变成每次更新都把用户的月历面板拽回默认位置。
    */
   onunload() {
     // 标记卸载，中止后台 IIFE（节假日自动刷新）
     this.unloaded = true;
     if (this.refreshTimer) {
-      clearTimeout(this.refreshTimer);
+      window.clearTimeout(this.refreshTimer);
       this.refreshTimer = null;
     }
     // 清理可能残留的 CreateTaskModal：调用 close() 完整回收 modalEl、overlay、全局 click 监听器
@@ -8339,8 +8499,7 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       for (const inst of instances) {
         try {
           inst.close();
-        } catch (e) {
-        }
+        } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
     }
     // 真机反馈回退：类别筛选面板同样挂 Modal，卸载时关闭仍打开的实例
@@ -8350,8 +8509,7 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       for (const inst of cfInstances) {
         try {
           inst.close();
-        } catch (e) {
-        }
+        } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
     }
     // 真机反馈回退：日期跳转恢复整屏 DatePickerModal，卸载时同样关闭仍打开的实例，
@@ -8362,8 +8520,7 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       for (const inst of dpInstances) {
         try {
           inst.close();
-        } catch (e) {
-        }
+        } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
     }
     // 视图菜单弹窗与其他三类弹窗一致，卸载时关闭仍打开的实例
@@ -8373,19 +8530,16 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       for (const inst of vmInstances) {
         try {
           inst.close();
-        } catch (e) {
-        }
+        } catch { /* 单个实例关闭失败不阻断其余实例的清理 */ }
       }
     }
     // 兜底清理：弹窗现宿主于 Obsidian Modal 容器内，卸载时残留实例已由上方 close() 回收，
     // 这里再扫一遍全文档防止异常路径漏网
-    document.querySelectorAll(".create-task-modal").forEach((el) => {
+    activeDocument.querySelectorAll(".create-task-modal").forEach((el) => {
       const container = el.closest(".modal-container");
       if (container) container.remove();
       else el.remove();
     });
-    // 拆除本插件的所有视图叶子：禁用/重载后不残留失联的死视图
-    this.app.workspace.detachLeavesOfType(VIEW_TYPE_MONTHLY);
   }
   /**
    * 判断文件是否可能包含任务（用于过滤 metadataCache changed 事件）
@@ -8402,7 +8556,7 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     const taskFolders = [];
     const custom = this.settings && this.settings.customTaskFolder;
     if (custom) taskFolders.push(custom);
-    taskFolders.push("\u4EFB\u52A1");
+    taskFolders.push("任务");
     for (const folder of taskFolders) {
       if (p === folder || p.startsWith(folder + "/")) return true;
     }
@@ -8413,12 +8567,11 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
         const folder2 = inst.options.folder.replace(/\/+$/, "");
         if (folder2 && (p === folder2 || p.startsWith(folder2 + "/"))) return true;
       }
-    } catch (e) {
-    }
+    } catch { /* 日记插件未启用或配置不可读，按默认目录规则继续 */ }
     const base = file.basename || "";
     if (/^\d{4}-\d{2}-\d{2}$/.test(base)) return true;
-    if (/^\d{4}\u5E74\u4EFB\u52A1\u5217\u8868$/.test(base)) return true;
-    if (/^\d{4}\u5E74\d{2}\u6708\u4EFB\u52A1\u5217\u8868$/.test(base)) return true;
+    if (/^\d{4}年任务列表$/.test(base)) return true;
+    if (/^\d{4}年\d{2}月任务列表$/.test(base)) return true;
     return false;
   }
   /**
@@ -8583,27 +8736,38 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     await this.loadBuiltinHolidays();
   }
   /**
-   * 读取插件目录下的内置节假日兜底数据（holidays.json，2022-2026 官方数据）。
-   * 数据与代码分离：更新内置数据只需替换该 JSON 文件，不动代码；官方未发布年份不写预测，
-   * 新年份由网络数据源（holiday-cn / timor.tech）自动覆盖。
-   * 读取失败不阻塞插件（文件缺失/损坏时告警），对应年份退化为「无内置数据、依赖网络源」
+   * 灌入内置节假日兜底数据（2022-2026 官方数据）。
+   * 主来源是随 main.js 分发的 BUILTIN_HOLIDAYS 块：社区目录安装只下载
+   * main.js / manifest.json / styles.css，插件目录里不会有 holidays.json，
+   * 只读外部文件会让目录安装的用户整段失去离线兜底。
+   * 插件目录里若另放了 holidays.json，按年覆盖内置副本（自行更新数据的入口）；
+   * 该文件不存在是正常路径，不告警；存在却解析不动才告警。
+   * 官方未发布年份不写预测数据，新年份由网络源（holiday-cn / timor.tech）覆盖。
    */
   async loadBuiltinHolidays() {
+    let data = BUILTIN_HOLIDAYS;
+    let raw = null;
     try {
-      const raw = await this.app.vault.adapter.read(`${this.manifest.dir}/holidays.json`);
-      const data = JSON.parse(raw);
-      for (const [year, holidays] of Object.entries(data)) {
-        const y = parseInt(year, 10);
-        if (!Array.isArray(holidays) || !holidays.every((h) => h && typeof h.date === "string" && typeof h.name === "string" && typeof h.isOff === "boolean" && (h.type === "legal" || h.type === "workday"))) {
-          console.warn(tr("error.holidaysJsonFormat", { year: year }));
-          continue;
-        }
-        if (!this.holidayManager.cache.has(y)) {
-          this.holidayManager.cache.set(y, holidays);
-        }
+      raw = await this.app.vault.adapter.read(`${this.manifest.dir}/holidays.json`);
+    } catch {
+      // 目录安装时这份文件根本不存在，属正常路径；不告警也不阻塞启动
+    }
+    if (raw !== null) {
+      try {
+        data = { ...BUILTIN_HOLIDAYS, ...JSON.parse(raw) };
+      } catch (e) {
+        console.warn(tr("error.builtinHoliday"), e);
       }
-    } catch (e) {
-      console.warn(tr("error.builtinHoliday"), e);
+    }
+    for (const [year, holidays] of Object.entries(data)) {
+      const y = parseInt(year, 10);
+      if (!Array.isArray(holidays) || !holidays.every((h) => h && typeof h.date === "string" && typeof h.name === "string" && typeof h.isOff === "boolean" && (h.type === "legal" || h.type === "workday"))) {
+        console.warn(tr("error.holidaysJsonFormat", { year: year }));
+        continue;
+      }
+      if (!this.holidayManager.cache.has(y)) {
+        this.holidayManager.cache.set(y, holidays);
+      }
     }
   }
   /**
@@ -8647,7 +8811,8 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     // Plugin 上没有 this.adapter（旧写法因此必抛、备份从未生效），必须走 vault.adapter；
     // 路径也要带插件目录——saveData 写的是 manifest.dir 下的 data.json，不是库根那份。
     const adapter = this.app.vault.adapter;
-    const dir = this.manifest.dir || `.obsidian/plugins/${this.manifest.id}`;
+    // 兜底路径不能写死 .obsidian：用户可能改过配置目录名（官方规则 hardcoded-config-path）
+    const dir = this.manifest.dir || `${this.app.vault.configDir}/plugins/${this.manifest.id}`;
     const dataPath = `${dir}/data.json`;
     try {
       const raw = await adapter.read(dataPath);
@@ -8660,7 +8825,7 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       // 存在却读/写不动时返回 false，由调用方中止覆盖。
       try {
         if (!(await adapter.exists(dataPath))) return true;
-      } catch (e2) {
+      } catch {
         // exists 也失败：按"不能确认"处理，不放行
       }
       console.error(tr("error.settingsLoad"), e);
@@ -8757,6 +8922,22 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
  * 任务存储位置、节假日数据刷新等），此处不再罗列键名，避免注释与实现脱节。
  * ============================================================
  */
+// 官方原生分区：Obsidian 1.11+ 用 SettingGroup（组标题 + 组内分隔线都由宿主画），
+// 返回"该往哪儿 append 设置行"的容器。旧版本没有 SettingGroup 时回退成
+// Setting.setHeading() 标题行，行仍直接落在页面上，形状一致、不自己写 CSS。
+// 四个插件共用同一段写法，改一处即可对齐。
+function settingsSection(containerEl, title) {
+  const Group = import_obsidian.SettingGroup;
+  if (typeof Group === "function") {
+    const group = new Group(containerEl);
+    group.setHeading(title);
+    return group.listEl;
+  }
+  const heading = new import_obsidian.Setting(containerEl).setName(title);
+  if (typeof heading.setHeading === "function") heading.setHeading();
+  return containerEl;
+}
+
 var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -8772,14 +8953,15 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
     // v1.7.2：原来这里是一整块「使用提示」（10 条），手机端打开设置要先划一整屏
     // 才看到真正的开关。核心交互已随视图自带（点格子、明细区按钮有 aria-label、
     // 当天面板有占位文案），长文说明归 README。设置页只留设置。
-    // 显示设置
-    containerEl.createEl("h3", { text: tr("settings.section.display") });
+
+    // ---------- 显示 ----------
+    const displayEl = settingsSection(containerEl, tr("settings.section.display"));
     // v1.7.2：界面语言不再出现在设置页——插件文案直接跟随 Obsidian 的界面语言。
     // 少一个选项，也少一类「选了中文但 Obsidian 是英文」的错位；
     // setLanguage() 仍保留在插件实例上，供测试与将来需要时复用。
-    // 默认视图（v1.7.0）：只管「下次打开月历是哪一档」；顶栏菜单切的是当前状态，
-    // 不回写这里，避免用户点一下按钮就悄悄改掉了自己的默认设置
-    new import_obsidian.Setting(containerEl).setName(tr("settings.view.name")).setDesc(tr("settings.view.desc")).addDropdown((dropdown) => {
+    // 默认视图（v1.7.0）：顶栏菜单与命令都走 MonthlyView.setViewMode()，那里会回写
+    // settings.viewMode，所以这里显示的就是你最后用的那一档（原注释说「不回写」，与代码相反）
+    new import_obsidian.Setting(displayEl).setName(tr("settings.view.name")).setDesc(tr("settings.view.desc")).addDropdown((dropdown) => {
       for (const m of VIEW_MODES) {
         dropdown.addOption(m, viewModeLabel(m));
       }
@@ -8800,65 +8982,113 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
         }
       });
     });
-    new import_obsidian.Setting(containerEl).setName(tr("settings.showCompleted.name")).setDesc(tr("settings.showCompleted.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedTasks).onChange(async (value) => {
+    new import_obsidian.Setting(displayEl).setName(tr("settings.showCompleted.name")).setDesc(tr("settings.showCompleted.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedTasks).onChange(async (value) => {
       this.plugin.settings.showCompletedTasks = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian.Setting(containerEl).setName(tr("settings.hideStrike.name")).setDesc(tr("settings.hideStrike.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
+    new import_obsidian.Setting(displayEl).setName(tr("settings.hideStrike.name")).setDesc(tr("settings.hideStrike.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showCompletedStrike).onChange(async (value) => {
       this.plugin.settings.showCompletedStrike = value;
       await this.plugin.saveSettings();
       this.plugin._applyStrikeToViews();
     }));
-    new import_obsidian.Setting(containerEl).setName(tr("settings.showLunar.name")).setDesc(tr("settings.showLunar.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showLunar).onChange(async (value) => {
+    new import_obsidian.Setting(displayEl).setName(tr("settings.showLunar.name")).setDesc(tr("settings.showLunar.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showLunar).onChange(async (value) => {
       this.plugin.settings.showLunar = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian.Setting(containerEl).setName(tr("settings.showHoliday.name")).setDesc(tr("settings.showHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showHoliday).onChange(async (value) => {
+    new import_obsidian.Setting(displayEl).setName(tr("settings.showHoliday.name")).setDesc(tr("settings.showHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showHoliday).onChange(async (value) => {
       this.plugin.settings.showHoliday = value;
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    // 任务与存储设置
-    containerEl.createEl("h3", { text: tr("settings.section.storage") });
-    new import_obsidian.Setting(containerEl).setName(tr("settings.defaultAllDay.name")).setDesc(tr("settings.defaultAllDay.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.defaultAllDayTask).onChange(async (value) => {
-      this.plugin.settings.defaultAllDayTask = value;
-      await this.plugin.saveSettings();
-      this.plugin.refreshView();
-    }));
-    new import_obsidian.Setting(containerEl).setName(tr("settings.firstDow.name")).setDesc(tr("settings.firstDow.desc")).addDropdown((dropdown) => dropdown.addOption("0", tr("modal.create.weekday.sun")).addOption("1", tr("modal.create.weekday.mon")).addOption("6", tr("modal.create.weekday.sat")).setValue(String(this.plugin.settings.firstDayOfWeek)).onChange(async (value) => {
+    new import_obsidian.Setting(displayEl).setName(tr("settings.firstDow.name")).setDesc(tr("settings.firstDow.desc")).addDropdown((dropdown) => dropdown.addOption("0", tr("modal.create.weekday.sun")).addOption("1", tr("modal.create.weekday.mon")).addOption("6", tr("modal.create.weekday.sat")).setValue(String(this.plugin.settings.firstDayOfWeek)).onChange(async (value) => {
       this.plugin.settings.firstDayOfWeek = parseInt(value, 10);
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
-    new import_obsidian.Setting(containerEl).setName(tr("settings.tasksLimit.name")).setDesc(tr("settings.tasksLimit.desc")).addDropdown((dropdown) => dropdown.addOption("3", "3").addOption("4", "4").addOption("5", "5").addOption("6", "6").addOption("7", "7").addOption("8", "8").addOption("9", "9").addOption("10", "10").setValue(String(this.plugin.settings.tasksPerDayLimit)).onChange(async (value) => {
+    new import_obsidian.Setting(displayEl).setName(tr("settings.tasksLimit.name")).setDesc(tr("settings.tasksLimit.desc")).addDropdown((dropdown) => dropdown.addOption("3", "3").addOption("4", "4").addOption("5", "5").addOption("6", "6").addOption("7", "7").addOption("8", "8").addOption("9", "9").addOption("10", "10").setValue(String(this.plugin.settings.tasksPerDayLimit)).onChange(async (value) => {
       this.plugin.settings.tasksPerDayLimit = parseInt(value, 10);
       await this.plugin.saveSettings();
       this.plugin.refreshView();
     }));
+
+    // ---------- 任务 ----------
+    // 原来这一档叫「任务与存储」，里面却只有三个显示/创建默认值；而真正的存储两项
+    //（归档周期、任务文件夹）落在下面「类别管理」标题底下——中间没有任何新标题，
+    // 打开设置会以为改类别顺带改了归档。现在存储两项归位到这一档，档名随之改成「任务」
+    const taskEl = settingsSection(containerEl, tr("settings.section.storage"));
+    new import_obsidian.Setting(taskEl).setName(tr("settings.defaultAllDay.name")).setDesc(tr("settings.defaultAllDay.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.defaultAllDayTask).onChange(async (value) => {
+      this.plugin.settings.defaultAllDayTask = value;
+      await this.plugin.saveSettings();
+      this.plugin.refreshView();
+    }));
+    // 示例文件名跟着当天走，且复用 getPeriodId()——插件真正写盘用的就是它，
+    // 另算一份或写死「2026年10月」都会跟实际文件名对不上
+    const egNow = new Date();
+    const egYear = `${getPeriodId(egNow, "year")}年任务列表.md`;
+    const egMonth = `${getPeriodId(egNow, "month")}任务列表.md`;
+    // 任务归档周期：决定新任务写入哪个文件；切换不影响已有文件
+    new import_obsidian.Setting(taskEl).setName(tr("settings.section.archive")).setDesc(tr("settings.archive.desc")).addDropdown((dropdown) => dropdown.addOption("year", tr("settings.archive.year", { file: egYear })).addOption("month", tr("settings.archive.month", { file: egMonth })).setValue(this.plugin.settings.taskFilePeriod).onChange(async (value) => {
+      this.plugin.settings.taskFilePeriod = value === "month" ? "month" : "year";
+      await this.plugin.saveSettings();
+      // 粒度切换后必须清路径缓存，否则新任务会写回旧粒度的文件
+      this.plugin.taskParser.taskFileCache.clear();
+      this.plugin.taskParser.invalidateCache();
+      this.plugin.refreshView();
+    }));
+    // 自定义任务文件夹设置
+    const folderOptions = this.getFolderOptions();
+    new import_obsidian.Setting(taskEl).setName(tr("settings.section.folder")).setDesc(tr("settings.folder.desc")).addDropdown((dropdown) => {
+      dropdown.addOption("", tr("settings.folder.default"));
+      for (const [path, name] of Object.entries(folderOptions)) {
+        dropdown.addOption(path, name);
+      }
+      // 已保存的文件夹可能已被删除：补一个「已失效」占位项回显原路径——
+      // 否则 setValue 选不中任何项，界面空白但旧值仍留在设置里，用户难以察觉
+      const savedFolder = this.plugin.settings.customTaskFolder;
+      if (savedFolder && !(savedFolder in folderOptions)) {
+        dropdown.addOption(savedFolder, tr("settings.folder.dead", { folder: savedFolder }));
+      }
+      dropdown.setValue(savedFolder);
+      dropdown.onChange(async (value) => {
+        this.plugin.settings.customTaskFolder = value;
+        await this.plugin.saveSettings();
+        // 清除缓存，以便下次创建任务时重新查找
+        this.plugin.taskParser.invalidateCache();
+      });
+    });
+
+    // ---------- 类别管理 ----------
     // 类别管理（批次二⑦）：只维护「已知类别列表 + 顺序 + 颜色」。
     // 类别真身是任务行尾的 #tag：这里增删改都不碰任何笔记；删掉某类别只是取消它的排序与配色，
     // 笔记里残留的标签仍会被解析、仍出现在筛选面板（自动补到列表尾部）
-    containerEl.createEl("h3", { text: tr("settings.section.category") });
-    new import_obsidian.Setting(containerEl).setName(tr("settings.catKnown.name")).setDesc(tr("settings.catKnown.desc"));
-    const categoryListEl = containerEl.createDiv("mt-category-list");
+    const catEl = settingsSection(containerEl, tr("settings.section.category"));
+    new import_obsidian.Setting(catEl).setName(tr("settings.catKnown.name")).setDesc(tr("settings.catKnown.desc"));
+    const categoryListEl = catEl.createDiv("mt-category-list");
     const renderCategoryList = () => {
       categoryListEl.empty();
       const cats = this.plugin.settings.categories;
       if (cats.length === 0) {
-        categoryListEl.createDiv("mt-category-empty").textContent = tr("settings.catEmpty");
+        // setting-item 类：内边距/分隔线交给宿主，裸 div 在手机端会顶到卡片边
+        categoryListEl.createDiv("setting-item mt-category-empty").textContent = tr("settings.catEmpty");
       }
       cats.forEach((cat, index) => {
-        const row = categoryListEl.createDiv("mt-category-row");
+        const row = categoryListEl.createDiv("setting-item mt-category-row");
         const dot = row.createDiv("mt-category-dot");
         dot.style.setProperty("--mt-cat-color", cat.color);
         row.createDiv("mt-category-name").textContent = `#${cat.name}`;
         // 颜色只从固定色板轮换选择，不开放自由取色（控制复杂度，并保证暗色模式可辨）
-        const colorSel = row.createEl("select", { cls: "mt-category-color", attr: { "aria-label": tr("settings.catColor", { name: cat.name }) } });
+        // dropdown 类必须带：手机端 Obsidian 把原生 select 箭头隐掉，只给 .dropdown
+        // 补绘小箭头（真机截图里「按年」「笔记/任务」有箭头、裸 select 没有）
+        const colorSel = row.createEl("select", { cls: "dropdown mt-category-color", attr: { "aria-label": tr("settings.catColor", { name: cat.name }) } });
+        // 选项文字直接用颜色名（2026-11-07 真机反馈：「色号 1」既没信息量又占宽，
+        // 手机端把类别行挤成两行）。名字与 CATEGORY_PALETTE 按序一一对应，
+        // 三语各给一条逗号分隔串；万一某语缺项回退成序号
+        const colorNames = tr("settings.catColorNames").split(",");
         CATEGORY_PALETTE.forEach((c, ci) => {
           const opt = colorSel.createEl("option", { value: c });
-          opt.textContent = tr("settings.catSwatch", { n: ci + 1 });
+          opt.textContent = colorNames[ci] || String(ci + 1);
           if (c === cat.color)
             opt.selected = true;
         });
@@ -8870,7 +9100,10 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
           await this.plugin.saveSettings();
           this.plugin.refreshView();
         });
-        const upBtn = row.createEl("button", { cls: "mt-category-btn", text: "↑", attr: { "aria-label": tr("settings.catUp", { name: cat.name }) } });
+        // 三个操作按钮收进一组：桌面端仍与圆点/名称/色板同一行、间距不变；
+        // 手机端整行放不下时整组随 flex-wrap 换到第二行（CSS 见窄屏规则）
+        const actions = row.createDiv("mt-category-actions");
+        const upBtn = actions.createEl("button", { cls: "mt-category-btn", text: "↑", attr: { "aria-label": tr("settings.catUp", { name: cat.name }) } });
         upBtn.disabled = index === 0;
         upBtn.addEventListener("click", async () => {
           const arr = this.plugin.settings.categories;
@@ -8880,7 +9113,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
           await this.plugin.saveSettings();
           renderCategoryList();
         });
-        const downBtn = row.createEl("button", { cls: "mt-category-btn", text: "↓", attr: { "aria-label": tr("settings.catDown", { name: cat.name }) } });
+        const downBtn = actions.createEl("button", { cls: "mt-category-btn", text: "↓", attr: { "aria-label": tr("settings.catDown", { name: cat.name }) } });
         downBtn.disabled = index === cats.length - 1;
         downBtn.addEventListener("click", async () => {
           const arr = this.plugin.settings.categories;
@@ -8890,7 +9123,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
           await this.plugin.saveSettings();
           renderCategoryList();
         });
-        const delBtn = row.createEl("button", { cls: "mt-category-btn mt-category-del", text: tr("settings.catDelete"), attr: { "aria-label": tr("settings.catDeleteAria", { name: cat.name }) } });
+        const delBtn = actions.createEl("button", { cls: "mt-category-btn mt-category-del", text: tr("settings.catDelete"), attr: { "aria-label": tr("settings.catDeleteAria", { name: cat.name }) } });
         delBtn.addEventListener("click", async () => {
           this.plugin.settings.categories.splice(index, 1);
           await this.plugin.saveSettings();
@@ -8898,7 +9131,7 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
           renderCategoryList();
         });
       });
-      const addRow = categoryListEl.createDiv("mt-category-row mt-category-add");
+      const addRow = categoryListEl.createDiv("setting-item mt-category-row mt-category-add");
       const nameInput = addRow.createEl("input", { cls: "mt-category-input", attr: { type: "text", placeholder: tr("settings.catPlaceholder") } });
       const addBtn = addRow.createEl("button", { cls: "mt-category-btn mt-category-addbtn", text: tr("settings.catAdd") });
       const doAdd = async () => {
@@ -8926,43 +9159,14 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
       });
     };
     renderCategoryList();
-    // 任务归档周期：决定新任务写入哪个文件；切换不影响已有文件
-    new import_obsidian.Setting(containerEl).setName(tr("settings.section.archive")).setDesc(tr("settings.archive.desc")).addDropdown((dropdown) => dropdown.addOption("year", tr("settings.archive.year")).addOption("month", tr("settings.archive.month")).setValue(this.plugin.settings.taskFilePeriod).onChange(async (value) => {
-      this.plugin.settings.taskFilePeriod = value === "month" ? "month" : "year";
-      await this.plugin.saveSettings();
-      // 粒度切换后必须清路径缓存，否则新任务会写回旧粒度的文件
-      this.plugin.taskParser.taskFileCache.clear();
-      this.plugin.taskParser.invalidateCache();
-      this.plugin.refreshView();
-    }));
-    // 自定义任务文件夹设置
-    const folderOptions = this.getFolderOptions();
-    new import_obsidian.Setting(containerEl).setName(tr("settings.section.folder")).setDesc(tr("settings.folder.desc")).addDropdown((dropdown) => {
-      dropdown.addOption("", tr("settings.folder.default"));
-      for (const [path, name] of Object.entries(folderOptions)) {
-        dropdown.addOption(path, name);
-      }
-      // 已保存的文件夹可能已被删除：补一个「已失效」占位项回显原路径——
-      // 否则 setValue 选不中任何项，界面空白但旧值仍留在设置里，用户难以察觉
-      const savedFolder = this.plugin.settings.customTaskFolder;
-      if (savedFolder && !(savedFolder in folderOptions)) {
-        dropdown.addOption(savedFolder, tr("settings.folder.dead", { folder: savedFolder }));
-      }
-      dropdown.setValue(savedFolder);
-      dropdown.onChange(async (value) => {
-        this.plugin.settings.customTaskFolder = value;
-        await this.plugin.saveSettings();
-        // 清除缓存，以便下次创建任务时重新查找
-        this.plugin.taskParser.invalidateCache();
-      });
-    });
-    // 节假日数据设置
-    containerEl.createEl("h3", { text: tr("settings.section.holiday") });
-    new import_obsidian.Setting(containerEl).setName(tr("settings.autoHoliday.name")).setDesc(tr("settings.autoHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.autoUpdateHolidays).onChange(async (value) => {
+
+    // ---------- 节假日数据 ----------
+    const holidayEl = settingsSection(containerEl, tr("settings.section.holiday"));
+    new import_obsidian.Setting(holidayEl).setName(tr("settings.autoHoliday.name")).setDesc(tr("settings.autoHoliday.desc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.autoUpdateHolidays).onChange(async (value) => {
       this.plugin.settings.autoUpdateHolidays = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName(tr("settings.refreshHoliday.name")).setDesc(tr("settings.refreshHoliday.desc")).addButton((button) => {
+    new import_obsidian.Setting(holidayEl).setName(tr("settings.refreshHoliday.name")).setDesc(tr("settings.refreshHoliday.desc")).addButton((button) => {
       button.setButtonText(tr("settings.refreshBtn"));
       button.buttonEl.addEventListener("click", async () => {
         const currentYear = new Date().getFullYear();
@@ -9020,7 +9224,6 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
         }
       });
     });
-
   }
 
   /**

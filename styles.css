@@ -304,6 +304,21 @@
 	opacity: 0.4;
 }
 
+/* 字体度量探针（main.js onload 里量数字墨迹偏移与基线用）：
+   不参与布局、不可见，只为拿到当前主题/字号下的真实度量 */
+.mt-measure-probe {
+	position: absolute;
+	visibility: hidden;
+	white-space: nowrap;
+	font-weight: 700;
+}
+
+.mt-measure-block {
+	display: inline-block;
+	width: 0;
+	height: 0;
+}
+
 /* 今天 - 简洁高亮显示（描边 + 轻投影，不再用外圈光晕强调）。
    1px 边框 + inset 内描边凑出 2px 观感，外盒与其他格子的 1px 边框对齐 */
 .day-cell.today {
@@ -728,6 +743,11 @@
 	flex-shrink: 0;
 }
 
+/* 手机端量测发现「+N」已不需要时收起（JS 加/去这个类） */
+.more-tasks.is-hidden {
+	display: none;
+}
+
 /* 跨天任务样式 */
 .task-item.multi-day-task {
 	position: relative;
@@ -786,6 +806,210 @@ body:not(.is-mobile) .modal-container .modal-bg {
 
 .modal.date-picker-modal {
 	box-sizing: border-box;
+}
+
+/* ============================================================
+   日期跳转弹窗（DatePickerModal）
+   ------------------------------------------------------------
+   这一整套原先写在 JS 的内联样式里（158 处静态行内样式，过不了上架审核；
+   且亮暗两套 slate 配色硬编码在代码中，跟主题色脱钩）。现按类收敛：
+   颜色走 --dp-* 变量，暗色在 .theme-dark 里换一套，尺寸照抄原值。
+   ============================================================ */
+.modal.date-picker-modal {
+	--dp-text: #374151;
+	--dp-muted: #6b7280;
+	--dp-input-bg: #ffffff;
+	--dp-input-border: #d1d5db;
+	--dp-chip-bg: #f9fafb;
+	--dp-chip-hover: #f3f4f6;
+	--dp-accent-weak: #eff6ff;
+	--dp-accent-border: #93c5fd;
+	background: var(--background-primary);
+	padding: 32px;
+	border-radius: 24px;
+	width: 420px;
+	max-width: 92vw;
+	border: none;
+	margin: auto;
+	box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+}
+
+.theme-dark .modal.date-picker-modal {
+	--dp-text: #e2e8f0;
+	--dp-muted: #94a3b8;
+	--dp-input-bg: #1e293b;
+	--dp-input-border: #475569;
+	--dp-chip-bg: #334155;
+	--dp-chip-hover: #475569;
+	--dp-accent-weak: rgba(59, 130, 246, 0.2);
+	--dp-accent-border: rgba(59, 130, 246, 0.5);
+	box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.date-picker-modal .modal-title {
+	font-size: 20px;
+	font-weight: 700;
+	text-align: center;
+	margin-bottom: 28px;
+	padding-bottom: 20px;
+	border-bottom: 2px solid var(--background-modifier-border);
+	color: var(--text-normal);
+}
+
+.date-picker-modal .picker-section {
+	margin-bottom: 28px;
+}
+
+.date-picker-modal .dp-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--dp-muted);
+	text-align: center;
+	margin-bottom: 16px;
+}
+
+.date-picker-modal .year-input-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	padding: 8px;
+}
+
+.date-picker-modal .year-step-btn {
+	width: 40px;
+	flex-shrink: 0;
+	height: 40px;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--dp-text);
+	background: var(--dp-input-bg);
+	border: 2px solid var(--dp-input-border);
+	border-radius: 10px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	outline: none;
+	box-shadow: none;
+}
+
+.date-picker-modal .year-step-btn:hover {
+	background: var(--dp-accent-weak);
+	border-color: var(--dp-accent-border);
+	color: #60a5fa;
+}
+
+.date-picker-modal .year-input {
+	width: 120px;
+	min-width: 0;
+	flex: 1 1 90px;
+	height: 40px;
+	padding: 0 14px;
+	font-size: 20px;
+	font-weight: 700;
+	text-align: center;
+	color: var(--dp-text);
+	background: var(--dp-input-bg);
+	border: 2px solid var(--dp-input-border);
+	border-radius: 10px;
+	outline: none;
+	transition: all 0.2s ease;
+	box-sizing: border-box;
+}
+
+.date-picker-modal .dp-hint {
+	text-align: center;
+	font-size: 12px;
+	color: var(--dp-muted);
+	margin-top: 12px;
+	font-weight: 500;
+}
+
+.date-picker-modal .month-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.date-picker-modal .month-btn {
+	min-width: 0;
+	overflow-wrap: anywhere;
+	line-height: 1.2;
+	padding: 12px 4px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 12px;
+	cursor: pointer;
+	border: 2px solid transparent;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	outline: none;
+	box-shadow: none;
+	color: var(--dp-text);
+	background: var(--dp-chip-bg);
+}
+
+.date-picker-modal .month-btn:not(.is-selected):not(.is-current):hover {
+	background: var(--dp-chip-hover);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 今天所在月（须同年）- 蓝色。写在选中态之前：两者同时命中时绿色优先，
+   与原来 JS 里 if(选中) else if(今天) 的分支顺序一致 */
+.date-picker-modal .month-btn.is-current {
+	color: white;
+	background: linear-gradient(135deg, #3b82f6, #2563eb);
+	border-color: #60a5fa;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), 0 4px 12px rgba(59, 130, 246, 0.35);
+	transform: scale(1.05);
+}
+
+/* 选中月份 - 绿色 */
+.date-picker-modal .month-btn.is-selected {
+	color: white;
+	background: linear-gradient(135deg, #10b981, #059669);
+	border-color: #34d399;
+	box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2), 0 4px 12px rgba(16, 185, 129, 0.35);
+	transform: scale(1.05);
+}
+
+.date-picker-modal .modal-buttons {
+	gap: 16px;
+	margin-top: 8px;
+}
+
+.date-picker-modal .btn-cancel,
+.date-picker-modal .btn-confirm {
+	padding: 14px 32px;
+	font-size: 15px;
+	border-radius: 12px;
+	min-width: 100px;
+}
+
+/* 取消键的原配色就是 slate 两档，与 .btn-cancel 的通用值略有出入，这里按原值收紧 */
+.date-picker-modal .btn-cancel {
+	background: #f1f5f9;
+	color: #64748b;
+}
+
+.date-picker-modal .btn-cancel:hover {
+	background: #e2e8f0;
+	color: #475569;
+}
+
+.theme-dark .date-picker-modal .btn-cancel {
+	background: #334155;
+	color: #94a3b8;
+}
+
+.theme-dark .date-picker-modal .btn-cancel:hover {
+	background: #475569;
+	color: #e2e8f0;
 }
 
 /* 收掉框架自带元素：右上角关闭按钮、空的标题/内容占位（移动端会撑出弹窗顶部空白）。
@@ -1618,6 +1842,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 .date-picker-popup {
 	position: fixed;
 	z-index: 9999;
+	display: block;
 	background: var(--background-primary);
 	border-radius: 16px;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -1670,10 +1895,17 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 真机反馈：类别筛选面板由 body 浮层改挂 Obsidian Modal（系统返回键/Esc/遮罩可关）。
-   .modal 负责容器外观，行结构沿用 .category-filter-popup 一族；锚定位置由 JS 写死 */
+   .modal 负责容器外观，行结构沿用 .category-filter-popup 一族；锚定位置由 JS 写死。
+   定位基线（fixed + top/left:auto）必须在类上：这几条要压过框架给 .modal 的居中定位，
+   而上方随锚点算出来的 top/left 是内联动态值，两者分工不能互换 */
 .modal.category-filter-modal {
+	position: fixed;
+	margin: 0;
+	top: auto;
+	left: auto;
 	padding: 0;
 	width: auto;
+	min-width: 196px;
 	max-width: 92vw;
 	border-radius: 16px;
 	background: var(--background-primary);
@@ -3146,15 +3378,17 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* ========== 设置页：类别管理（批次二⑦） ========== */
+/* 行/新增行/空态都带原生 setting-item 类：内边距、行间分隔线、上下节奏全部
+   跟宿主走（2026-11-07 真机：裸 div 没内边距，左右下顶到卡片边、上方空一块）。
+   因此这里不再自写 padding/margin，写了反而会盖掉原生值 */
 .mt-category-list {
-	margin: 4px 0 12px;
+	margin: 0;
 }
 
 .mt-category-row {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 4px 0;
 }
 
 .mt-category-dot {
@@ -3189,8 +3423,88 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-size: var(--font-ui-small);
 }
 
+/* 三个操作按钮收成一组：桌面端仍与圆点/名称/色板同一行，间距与此前一致；
+   手机端整行放不下时整组随 flex-wrap 换行（见下面的窄屏规则） */
+.mt-category-actions {
+	display: flex;
+	flex-shrink: 0;
+	gap: 8px;
+}
+
+/* 窄屏按内容自然排布：所有元素紧挨着不拉伸，一行放不下时按钮组换到第二行。
+   起因（2026-11-07 真机反馈两轮）：
+   1. 旧布局一行塞五个控件，原生控件内边距一加就把「删除」顶出容器；
+   2. 第一版改成两行网格后，名称列 minmax(0,1fr) 把中间撑出大段空白。
+   这版改回 flex 自然流：名称不再伸展（flex 0 1 auto），圆点/名称/色板紧挨；
+   按钮组是最后一个元素，放不下才整体换行，换行后左对齐紧接排布，不造空白。
+   超长类别名仍在行内省略号截断（基类 min-width:0 + ellipsis 保留）。 */
+@media (max-width: 600px) {
+	.mt-category-row {
+		flex-wrap: wrap;
+		row-gap: 4px;
+	}
+	.mt-category-name {
+		flex: 0 1 auto;
+	}
+	/* 手机端胶囊圆角等于半高，4px 左色边会被圆角切成一片悬空的「月牙」，
+	   和胶囊底色之间还留白缝（2026-11-07 真机截图 2× 放大确认）。窄屏去掉
+	   这条边：颜色由行首圆点表示，改色时圆点同步刷新。width:auto 是兜底——
+	   防止 .dropdown 在手机端带 width:100% 之类规则把胶囊拉满整行 */
+	body.is-mobile .mt-category-color {
+		width: auto;
+		max-width: 100%;
+		border-left-width: 0;
+	}
+	.mt-category-actions {
+		flex-wrap: wrap;
+	}
+	/* 新增行（输入框 + 添加按钮）只有两个控件，不需要换行 */
+	.mt-category-row.mt-category-add {
+		flex-wrap: nowrap;
+	}
+}
+
 .mt-category-del:hover {
 	color: var(--text-error);
+}
+
+/* 宿主把 setting-item 在手机端/窄容器端纵排（原生设置行节奏），真值取自
+   安装包 obsidian.asar 的 app.css（Obsidian 1.15.0，只读提取）：
+     .is-phone .modal .setting-item:not(:is(.mod-toggle,.mod-navigable,
+       .mod-action,.setting-item-heading)) { flex-direction:column;
+       align-items:flex-start }                        优先级 (0,4,0)
+     @container (max-width:400px){ .setting-item:not(:is(...,
+       .mod-list *)) { flex-direction:column } }       优先级 (0,2,0)
+   类别行是自定义横排行：上一轮为拿内边距加了 setting-item 类后连纵排一起
+   继承（14:10/14:18 真机四行）。宿主自己的 hotkeys 行也是靠逐条覆盖回 row
+   的，照此办理：选择器叠 body/.modal/.mod-settings 把优先级压过 (0,4,0)；
+   裸 .setting-item.mt-category-row 一条用于桌面窄容器与容器查询打平靠后赢。
+   宿主 hotkeys 行同款先例：.is-mobile .modal.mod-settings .setting-group
+   .mod-hotkeys .setting-item{flex-direction:row} */
+.setting-item.mt-category-row,
+body.is-mobile .modal.mod-settings .setting-item.mt-category-row,
+body.is-phone .modal .setting-item.mt-category-row {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	row-gap: 4px;
+}
+/* 新增行只有输入框 + 添加按钮，保持一行 */
+.setting-item.mt-category-row.mt-category-add,
+body.is-mobile .modal.mod-settings .setting-item.mt-category-row.mt-category-add,
+body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
+	flex-wrap: nowrap;
+}
+
+/* 宿主给每个 setting-item 的第一个直接子元素加 16px 尾随外边距
+   （app.css 真值：.setting-item>*:first-child{margin-inline-end:var(--size-4-4)}，
+   优先级 (0,2,0)），叠上我们自己的 gap:8px 后圆点→名称变成 24px
+   （2026-11-07 14:37 真机截图 3× 放大实测）。类别行内部间距统一由 gap 管，
+   这条把继承来的外边距清零；(0,3,0) 压过宿主 (0,2,0) */
+.setting-item.mt-category-row > *:first-child {
+	margin-inline-end: 0;
 }
 
 .mt-category-input {
@@ -3199,7 +3513,6 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 .mt-category-empty {
-	padding: 4px 0 8px;
 	font-size: var(--font-ui-small);
 	color: var(--text-muted);
 }
@@ -3296,6 +3609,16 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	gap: 0;
 }
 
+/* 手机端再压扁一档（2026-11-07 真机反馈：小月视图网格整体偏高、挤明细区，
+   且非本轮引入）。52→44：六行省 48px；格子内容自然高约 28px（日号行 ~18 +
+   底部圆点 4 + 上下内边距 6），44 仍留得住「圆点沉底」的呼吸；选中圆直径
+   约 1.3em（≈17px）绝对定位在日号行上，不受行高压扁影响 */
+@media (max-width: 600px) {
+	.monthly-tasks-container.view-agenda .day-cell {
+		min-height: 44px;
+	}
+}
+
 /* ---------- 桌面端：选中圆标修正 ---------- */
 @media (min-width: 768px) {
 	.monthly-tasks-container.view-agenda .day-cell {
@@ -3366,11 +3689,13 @@ body:not(.is-mobile) .modal-container .modal-bg {
 
 /* 手机端：布局不动（数字位置只随等宽统一对齐），圆缩小到不顶边框——
    直径 = max(字形墨迹高度, 双数字形宽度) + 0.15em，单双数都正好包住。
-   圆心用 --mt-badge-dy 对准字形中心 */
+   圆心取 --mt-badge-top（main.js 在选中日号本身上实测的 top，em）；该变量
+   不存在时按 50%（行盒中心）放——数字字形在多数字体里就落在行盒中心 ±0.1em 内，
+   比写死一个字体专属的偏移更稳 */
 .monthly-tasks-container.view-agenda .day-cell.sel .day-number::before {
 	content: "";
 	position: absolute;
-	top: calc(50% - var(--mt-badge-dy, 0.113em));
+	top: var(--mt-badge-top, 50%);
 	left: 50%;
 	width: calc(max(var(--mt-badge-ink, 0.75em), var(--mt-badge-w2, 1.15em)) + 0.15em);
 	height: calc(max(var(--mt-badge-ink, 0.75em), var(--mt-badge-w2, 1.15em)) + 0.15em);
@@ -3801,11 +4126,16 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 展开态：盒模型走统一组（与任务框同一个控件）。高度由 JS 按 scrollHeight
-   自动撑（配合 rows=1），禁止手动拖出第二个尺寸 */
+   自动撑（配合 rows=1），禁止手动拖出第二个尺寸。
+   height:auto 是自适应前的基准值：JS 先清掉内联高度，再量 scrollHeight */
 .note-textarea {
 	resize: none;
 	overflow: hidden;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-container .modal.create-task-modal .note-textarea {
+	height: auto;
 }
 
 .modal-container .modal.create-task-modal .note-textarea:focus:not(.mt-no-focus-fx) {
@@ -4705,6 +5035,9 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	cursor: grabbing;
 	box-shadow: var(--shadow-md);
 	opacity: 0.92;
+	/* 长按进入拖拽后关掉本元素的 touch-action，否则手机把纵向移动判成页面滚动。
+	   原先由 JS 写内联样式，挪到这里：同一个状态类本来就只管这一件事 */
+	touch-action: none;
 }
 
 .tg-block.completed {
