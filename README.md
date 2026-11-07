@@ -2,11 +2,19 @@
 
 一款为 Obsidian 打造的滴答清单风格月视图任务管理插件，支持农历显示、节假日标注和调休信息展示。
 
+> **English speakers:** see the [English section](#english) below for installation, usage, the task file format, and privacy details.
+
 ---
 
 ## 安装
 
-### 方式一：手动安装（最简单）
+### 方式一：社区插件市场（推荐）
+
+Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ 安装 → 启用。插件已在官方社区目录里，之后的更新也在这个页面点一下就能拿到。
+
+> 社区目录安装时，客户端只逐个下载 Release 里的 `main.js`、`manifest.json`、`styles.css` 三份文件——节假日兜底数据就打包在 `main.js` 里，所以离线也能显示已内置年份。
+
+### 方式二：手动安装
 
 1. 打开本仓库 [Releases 页面](https://github.com/duany2026/obsidian-monthly-tasks/releases/latest)，下载最新的 `monthly-tasks-*.zip`
 2. 解压，得到文件夹 `monthly-tasks`
@@ -14,7 +22,7 @@
 4. 把解压出的 `monthly-tasks` 文件夹整个放进去，变成 `.obsidian/plugins/monthly-tasks/`（里面应有 `main.js`、`manifest.json`、`styles.css`）
 5. 重启 Obsidian → 设置 → 第三方插件 → 关闭「安全模式」→ 在已安装插件列表中启用「Monthly Tasks」（列表显示 manifest 里的英文名；应用内视图与命令仍是中文「月历任务」）
 
-### 方式二：BRAT（可自动更新）
+### 方式三：BRAT（可自动更新）
 
 1. 安装 [BRAT](https://github.com/TfTHacker/obsidian42-brat) 插件
 2. 在 BRAT 设置中添加本仓库地址：`duany2026/obsidian-monthly-tasks`
@@ -211,6 +219,82 @@
 
 ---
 
+## English
+
+### Overview
+
+Monthly Tasks is a TickTick-style task view for Obsidian. It lays your tasks out on a month grid, a single week, or a three-day hour-by-hour timeline, and marks Chinese lunar dates, statutory holidays, and make-up workdays on the calendar. Tasks are stored as ordinary Obsidian checklist lines in a Markdown note inside your vault — there is no database and no account. The interface follows Obsidian's own language (Simplified Chinese, Traditional Chinese, or English); the view title and the command palette entries stay in Chinese.
+
+### Installation
+
+**From the community directory:** Settings → Community plugins → Browse, search for "Monthly Tasks", install, then enable. Updates are one click on the same page.
+
+**Manual installation:**
+
+1. Download `monthly-tasks-<version>.zip` from the [Releases page](https://github.com/duany2026/obsidian-monthly-tasks/releases/latest).
+2. Unzip it. You get a folder named `monthly-tasks` containing `main.js`, `manifest.json`, `styles.css`, `holidays.json`, `versions.json`, `README.md`, and `LICENSE`.
+3. Copy that folder into your vault's `.obsidian/plugins/` directory, so you end up with `.obsidian/plugins/monthly-tasks/`.
+4. Restart Obsidian, go to Settings → Community plugins, turn off Restricted mode, and enable **Monthly Tasks**.
+
+Installing from the directory downloads only `main.js`, `manifest.json`, and `styles.css`. The offline holiday fallback (2022–2026) is embedded in `main.js` for exactly that reason, so a directory install still shows built-in years with no network. You can also install [BRAT](https://github.com/TfTHacker/obsidian42-brat) and add `duany2026/obsidian-monthly-tasks`.
+
+### Views
+
+Switch views from the menu in the view's top bar. The English labels are:
+
+| Label | What you get |
+|-------|--------------|
+| **Month · Cells** | The whole month, tasks written inside each day cell |
+| **Month · Agenda** | The whole month, cells show dots only, tasks listed below |
+| **Week · Cells** | One week only, tasks written in the cells |
+| **Week · Agenda** | One week only, tasks listed below |
+| **3-Day Timeline** | Three days × 24 hours, timed tasks drawn as draggable blocks |
+
+Which one opens by default is the "Default View" setting; the menu writes your last choice back into it.
+
+### Usage
+
+1. Click the calendar icon in the left ribbon, or run the command "打开月历任务视图" (Open Monthly Tasks View). There are also "Refresh" and "Cycle view" commands.
+2. Click any day cell to add a task. In the dialog you can set a due date, a time range (only shown when the "Default All Day Task" setting is off), a priority (high / medium / normal), a start date for multi-day tasks, and a category. Press Enter or confirm.
+3. Mark done, edit, or delete from the task row. Deleting is undoable for 6 seconds via the "撤销" (undo) button in the popup, which writes the line back exactly as it was, notes and markers included.
+4. In the 3-Day Timeline, click empty space to pull out a draft block, drag its top or bottom edge for the time range, drag the body to move it (including sideways into another day), then press the ＋ inside the block to open the create dialog pre-filled from the draft. Saved blocks can be dragged the same way; dragging only rewrites the `⏰` segment of that task line and never touches your notes or their order. Timed tasks snap to the nearest 15 minutes. Tasks without a time — or with a broken range such as `22:00~02:00` — collect in the sticky all-day strip under the column headers, collapsed to one line showing the per-day counts.
+
+### Task file format
+
+Tasks are standard Obsidian checklist lines with emoji markers:
+
+```markdown
+- [ ] Task 📅 2026-04-22
+- [x] Done task 📅 2026-04-21
+- [ ] Multi-day task 🛫 2026-04-22 📅 2026-04-25
+- [ ] Timed task ⏰ 09:00~12:00 📅 2026-04-22
+- [ ] High priority task 🔴 📅 2026-04-22
+- [ ] Medium priority task 🟡 📅 2026-04-22
+- [ ] Task with a category 📅 2026-04-22 #生活
+```
+
+`📅` is the due date, `🛫` the start date of a multi-day task (it then shows on every day in between), `⏰` the time range, `🔴` / `🟡` the priority, and a trailing `#tag` the category. Because these are plain checklist lines, tasks written by other plugins and by hand are read and displayed too.
+
+Everything goes into one archive note rather than into your daily notes: `任务/YYYY年任务列表.md` by year, or `任务/YYYY年MM月任务列表.md` by month ("Archive Period" setting). The folder is the "Location" setting. **Those file names are always Simplified Chinese**, whatever your interface language is, because that is literally what gets written to disk. Your own headings and unrelated content in the note are left alone.
+
+### Settings
+
+Four groups: **Display** (default view, show completed tasks, hide strikethrough for completed, show lunar dates, show holidays, first day of week, how many tasks each day cell shows before collapsing), **Tasks** (default all-day task, archive period, location), **Category Management** (order and colour of the categories shown in the create dialog and the filter panel — a category is just a `#tag` on the task line, so adding or deleting one here never edits a note), and **Holiday Data** (auto-refresh on startup, manual refresh button).
+
+### Holidays, network use, and privacy
+
+The plugin only goes online to fetch holiday data, and only to the sources listed in the [节假日数据](#节假日数据) section: the `holiday-cn` CDN mirrors, then `timor.tech`, then the built-in fallback. A request carries nothing but a year — no note content, no paths, no settings, no identity. There is no account, no paid feature, no telemetry, and nothing is uploaded.
+
+Prefetching on startup is **off by default**. Otherwise data is fetched on demand when you browse to a year that is neither cached nor built in (2022–2026 are built in; `holiday-cn` covers 2007 onward). Failures back off for 5 minutes. Offline, everything still works for cached and built-in years. Reads and writes stay inside your vault (the task notes) and the plugin's own folder (`data.json` for settings and the holiday cache, an optional `holidays.json` that overrides built-in data year by year).
+
+### Compatibility and license
+
+Obsidian 0.15.0 or newer, desktop and mobile (no `isDesktopOnly`). Mobile is a first-class layout, not a squeezed desktop view: cells scroll in place without a scrollbar and fade at the bottom to hint there is more, and the time input is a single pill that opens the system time picker wherever you tap it. Lunar conversion covers 1900–2100.
+
+MIT License — see [LICENSE](./LICENSE).
+
+---
+
 ## 更新日志
 
 完整版本历史见 [CHANGELOG.md](./CHANGELOG.md)——GitHub Release 的说明也从同一处提取，本文不再重复维护一份。
@@ -221,7 +305,9 @@
 
 ## 发布打包
 
-仓库根目录即插件目录，`.github/workflows/release.yml` 在推送 `v*` 标签时自动打包：zip 内含 `main.js`、`manifest.json`、`styles.css`、`holidays.json`、`versions.json`、`README.md`、`LICENSE` 七个文件，**不含 `data.json`**（`.gitignore` 已排除）——其中存有作者本机的设置（如节假日自动刷新开关）与节假日缓存，会让新用户安装后即继承作者设置、启动就联网预取。插件的联网口径是：**默认不预取**（启动预取由「启动时自动刷新」控制，默认关）；浏览到未内置年份（2022-2026 以外）时会**按需**向在线数据源请求该年数据（源链与已知状况见「节假日数据」一节）。
+仓库根目录即插件目录，`.github/workflows/release.yml` 在推送标签时自动打包，但先卡一道门禁：**标签必须与 `manifest.json` 的 `version` 逐字相同、不带 `v` 前缀**，且版本号是 `x.y.z` 三段式，`versions.json` 里必须登记了这一版——不满足就直接失败退出，而不是产出一个社区目录永远认不到的发行版（目录是按「tag == manifest.version」去找 Release 再下载资产的，`v1.8.4` 这种写法它匹配不上）。
+
+Release 里挂四个资产：`main.js`、`manifest.json`、`styles.css` 三份独立文件（客户端安装时逐个下载的就是这三份），外加一个手动安装用的 zip。zip 内含 `main.js`、`manifest.json`、`styles.css`、`holidays.json`、`versions.json`、`README.md`、`LICENSE` 七个文件，**不含 `data.json`**（`.gitignore` 已排除）——其中存有作者本机的设置（如节假日自动刷新开关）与节假日缓存，会让新用户安装后即继承作者设置、启动就联网预取。插件的联网口径是：**默认不预取**（启动预取由「启动时自动刷新」控制，默认关）；浏览到未内置年份（2022-2026 以外）时会**按需**向在线数据源请求该年数据（源链与已知状况见「节假日数据」一节）。
 
 ---
 
