@@ -11,6 +11,14 @@
 > 原样抓取作为 GitHub Release 说明，因此面向用户读不到的开发细节请写到文件顶部
 > 「仓库运营记录」一节，不要写进版本条目。
 
+## [1.8.6] - 2026-11-17
+
+### 修复
+- **手机端「切换视图」「类别筛选」菜单一闪就消失**：1.8.4 为压制手机端底部弹层加的动画清扫，与新版 Obsidian 的弹层滑入动画冲突——菜单实际已打开却被留在屏幕外，表现为遮罩变暗、菜单一闪就没了。现在改为从源头关掉滑入动画，两个菜单在手机上正常弹出并稳定在按钮下方
+- **面板开着过夜时「今天」不更新**：跨零点后今日高亮、周区间与三天视图锚点都停在昨天，要等下一次文件变动才刷新。现在每小时检查一次日期，跨天自动重绘
+- **任务会写进月份小节内用户自加的标题下面**：在「## 2026年11月」里手写「# 备忘」「### 纪要」这类标题后，新增任务会越过标题混排进去。现在任何级别的标题都视为小节边界
+- **2100 年 12 月以后的日期显示错误农历**：农历表只到 2100 年，超出的日期会算出一个看似正常但错误的农历日，现在按超出范围处理、不再显示
+
 ## [1.8.5] - 2026-11-07
 
 ### 变更
@@ -35,6 +43,10 @@
 - **日程视图选中日期的蓝色圆标位置不正**：圆标偏在格子左上角、压着边框，数字也不在圆内正中。现在圆紧贴数字并均匀放大，任何字体下数字都落在圆内正中，圆完整留在格子里；手机端布局不变，圆缩小到不顶边框且单双数日期都能完整覆盖
 
 ## 仓库运营记录（不属于插件变更，不计入 Release 说明）
+
+### 2026-11-17
+- **1.8.6 手机端弹窗闪没修复的技术细节**：闪没根因是 v1.8.4 的 `getAnimations().cancel()` 清扫与新 Obsidian（≥1.9 系）的手机端 Modal 实现冲突。新实现里 `canAnimate() → Platform.isPhone`，进场 `animateOpen → y6` 先 `motion.set(0)` 给 modalEl 写内联 `transform: translateY(一屏高)` 推出屏幕，再 `animateTo(1)` 用 WAAPI（fill:forwards）弹回。清扫在 rAF/80ms/260ms 三个时点 cancel modalEl 上「非本人创建」的动画——动画带 startAfterPaint 延迟（约 2 帧），80ms 的清扫恰落在飞行中段，cancel 后 WAAPI 效果消失、内联 translateY 永久留下 → 面板停在屏幕外，遮罩（bgEl 不在清扫范围）正常淡入 → 遮罩在、菜单闪没。另有次生坑：260ms 内关弹窗时清扫会把 close 的 k6 滑出动画一起杀掉，`animateClose().then(r)` 永不结算、容器永不卸载。修法：构造器设 `shouldAnimateOpen=false`（open() 走 v6 无动画落位），整段清扫删除。复现与验证走桌面模拟手机路径（body.is-phone + 同款 WAAPI 注入），DOM 探针确认 bug 时 modalEl 停在 translateY(约一屏)
+- 另带三项攒版小修：跨午夜 60s 巡检换日重绘（registerInterval 托管）、solarToLunar 越界补 offset<0 与 lunarYear>2100 两道抛错、月节边界正则 `## ` → `#{1,6}`
 
 ### 2026-11-07
 - **1.8.5 发布（上架合规批次 + 手机端类别管理七轮真机修正 + 改名）**：合规批次把官方 eslint-plugin-obsidianmd 从 30 error / 78 warn 清到 0/0，12 处 innerHTML 拼 SVG 改 DOM 构建，158 处内联样式搬进 styles.css，设置页四分区统一原生 SettingGroup（见交接文档 §3）；发布脚手架改官方口径（tag 与 manifest.version 逐字相同且无 v 前缀、三独立资产 + ZIP、actions/attest 来源证明）。类别管理七轮真机：flex 自然流 → 去色板左色边 + 补 dropdown 类 → 借 setting-item 拿内边距 → 覆盖宿主手机端纵排（真值取自安装包 app.css）→ 清零宿主 first-child 外边距 → 选项改颜色名后单行成立；小月视图手机端 min-height 52→44。改名依据官方 manifest 参考（Basic Latin、无效名除名；community-plugins.json 10,051 条实证非 ASCII 名 0 个），新名 Monthly Tasks 量过全目录唯一性。**首支无 v 前缀 tag `1.8.5`**；RELEASE_TOKEN 仍失效，发布人预计仍是 github-actions[bot]。本地 zip 与 Release 资产同源核对；实际笔记库测试部署在发版前已铺（data.json 未碰）
