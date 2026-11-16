@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.8.5
+ * 版本：1.8.6
  * 作者：duany
  * 许可证：MIT
  *
@@ -2232,7 +2232,9 @@ var TaskParser = class {
           const sectionBodyStart = sectionIdx + sectionMatch[0].length;
           const afterSection = fileContent.slice(sectionBodyStart);
           // 从当前标题之后找边界，避免把当前标题自己当成下一月。
-          const boundaryMatch = afterSection.match(/^(?:##[ \t]+.*|(?:-{3,}|\*{3,}|_{3,})[ \t]*)\r?$/m);
+          // 边界认所有级标题（#{1,6}）：用户在月节内手写「# 备忘」「### 纪要」
+          // 都算新分节，其下的 - [ ] 行不应再算进本月的排序区
+          const boundaryMatch = afterSection.match(/^(?:#{1,6}[ \t]+.*|(?:-{3,}|\*{3,}|_{3,})[ \t]*)\r?$/m);
           const sectionEnd = boundaryMatch ? sectionBodyStart + boundaryMatch.index : fileContent.length;
           const sectionContent = fileContent.slice(sectionIdx, sectionEnd);
           const newTime = time && !isAllDay ? time.split("~")[0] : null;
@@ -2964,12 +2966,22 @@ function solarToLunar(date) {
   const dateUtcMs = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
   const baseUtcMs = Date.UTC(1900, 0, 31);
   let offset = Math.floor((dateUtcMs - baseUtcMs) / 864e5);
+  // 1900-01-31（农历表首日）之前没有数据，year<=1900 的入口校验挡不住这几天，
+  // 不拦会按负 offset 算出 day<=0 的垃圾对象
+  if (offset < 0) {
+    throw new Error(tr("lunar.rangeError"));
+  }
   let lunarYear = 1900;
   let daysInYear = getLunarYearDays(lunarYear);
   while (offset >= daysInYear) {
     offset -= daysInYear;
     lunarYear++;
     daysInYear = getLunarYearDays(lunarYear);
+  }
+  // 农历表只到 2100：入口允许 year<=2100，但公历 2100 年末几天会跨过表尾，
+  // 不拦会按 undefined 表项（每月恒 29 天）算出一个看似正常的错误日期
+  if (lunarYear > 2100) {
+    throw new Error(tr("lunar.rangeError"));
   }
   const leapMonth = getLeapMonth(lunarYear);
   let isLeap = false;
@@ -3970,6 +3982,17 @@ var MonthlyView = class extends import_obsidian.ItemView {
     // 周/三天视图可能是冷启动默认值，锚点必须在首帧前就位
     this.ensurePeriodAnchor();
     await this.render();
+    // 跨午夜刷新：面板开着过夜时，「今天」高亮/周区间/三天锚点都是按渲染时的
+    // new Date() 算的旧值，没有文件事件就一直不刷。60s 巡一次，换日才重绘；
+    // registerInterval 由视图生命周期托管，onClose 后自动摘，不需手写清理。
+    this._todayStamp = new Date().toDateString();
+    this.registerInterval(window.setInterval(() => {
+      const stamp = new Date().toDateString();
+      if (stamp !== this._todayStamp) {
+        this._todayStamp = stamp;
+        this.renderCalendarGridSafe("midnight-rollover");
+      }
+    }, 60 * 1000));
   }
   /**
    * 视图关闭
@@ -6691,6 +6714,13 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
     super(app);
     this.view = view;
     this.anchorEl = anchorEl;
+    // 手机端：直接关掉 Obsidian 底部弹层的滑入动画，走 v6 无动画落位（位置由
+    // --vm-top/--vm-left 锚定到按钮下方）。此前版本靠 getAnimations() 定时
+    // cancel 掉 Obsidian 的滑入 WAAPI：那套动画先 set(0) 把面板内联
+    // translateY(一屏高) 再 animateTo(1) 弹回，中途 cancel 会把面板永远留在
+    // 屏幕外（表现为菜单闪一下就没了）；且 260ms 内关闭时连 close 的滑出动画
+    // 也被杀，animateClose 的承诺永不结算、容器永不卸载。源头关掉最干净。
+    this.shouldAnimateOpen = false;
   }
   onOpen() {
     if (!CategoryFilterModal.activeInstances) CategoryFilterModal.activeInstances = /* @__PURE__ */ new Set();
@@ -6718,26 +6748,9 @@ var CategoryFilterModal = class extends import_obsidian.Modal {
     // 当作首帧样式直接结算，过渡不触发（getAnimations() 为空、opacity 从 1 直接跳到 0）。
     // WAAPI 是显式时间线，动画一定跑，且能被 getAnimations() 验证，也便于减少动效时跳过。
     this._enterAnim = this.playEnter(modalEl);
-    // 手机端：Obsidian 底部弹层的滑入动画可能是 CSS transition 也可能是 WAAPI，
-    // styles.css 的 animation/transition 禁用管不到 WAAPI，这里再把 modal 与
-    // 容器上非本人创建的动画全部 cancel（覆盖 CSS 动画/transition/WAAPI 三种来源）
-    if (import_obsidian.Platform.isPhone) {
-      const sweep = () => {
-        try {
-          [this.containerEl, modalEl].forEach((el) => {
-            if (!el) return;
-            el.getAnimations().forEach((a) => {
-              if (a !== this._enterAnim) {
-                try { a.cancel(); } catch { /* 动画已结束或已被取消，再 cancel 会抛 */ }
-              }
-            });
-          });
-        } catch { /* 容器已卸载，扫不到动画属正常路径 */ }
-      };
-      window.requestAnimationFrame(sweep);
-      window.setTimeout(sweep, 80);
-      window.setTimeout(sweep, 260);
-    }
+    // 手机端不再做 WAAPI 清扫：Obsidian 底部弹层的滑入动画已在构造器里用
+    // shouldAnimateOpen=false 从源头关掉（理由见其注释），CSS 侧的
+    // animation/transition 禁用留作老版本兜底。
   }
   /** 锚定到漏斗按钮正下方；越界翻到上方 / 收进屏内 */
   positionAt(modalEl, prefill = false) {
@@ -6943,6 +6956,8 @@ var ViewMenuModal = class extends import_obsidian.Modal {
     super(app);
     this.view = view;
     this.anchorEl = anchorEl;
+    // 同 CategoryFilterModal：手机端关掉 Obsidian 底部弹层滑入动画（详见其构造器注释）。
+    this.shouldAnimateOpen = false;
   }
   onOpen() {
     if (!ViewMenuModal.activeInstances) ViewMenuModal.activeInstances = /* @__PURE__ */ new Set();
@@ -6963,26 +6978,8 @@ var ViewMenuModal = class extends import_obsidian.Modal {
     this.positionAt(modalEl, true);
     watchPopupPosition(this, () => this.positionAt(modalEl));
     this._enterAnim = this.playEnter(modalEl);
-    // 手机端：Obsidian 底部弹层的滑入动画可能是 CSS transition 也可能是 WAAPI，
-    // styles.css 的 animation/transition 禁用管不到 WAAPI，这里再把 modal 与
-    // 容器上非本人创建的动画全部 cancel（覆盖 CSS 动画/transition/WAAPI 三种来源）
-    if (import_obsidian.Platform.isPhone) {
-      const sweep = () => {
-        try {
-          [this.containerEl, modalEl].forEach((el) => {
-            if (!el) return;
-            el.getAnimations().forEach((a) => {
-              if (a !== this._enterAnim) {
-                try { a.cancel(); } catch { /* 动画已结束或已被取消，再 cancel 会抛 */ }
-              }
-            });
-          });
-        } catch { /* 容器已卸载，扫不到动画属正常路径 */ }
-      };
-      window.requestAnimationFrame(sweep);
-      window.setTimeout(sweep, 80);
-      window.setTimeout(sweep, 260);
-    }
+    // 手机端不做 WAAPI 清扫：Obsidian 底部弹层滑入动画已在构造器用
+    // shouldAnimateOpen=false 从源头关掉（理由见 CategoryFilterModal 构造器注释）。
   }
   positionAt(modalEl, prefill = false) {
     // 定位基线在 styles.css 的 .modal.category-filter-modal 里（视图菜单沿用同一套外壳）

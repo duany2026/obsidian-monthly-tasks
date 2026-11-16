@@ -1,7 +1,7 @@
 {
 	"id": "monthly-tasks",
 	"name": "Monthly Tasks",
-	"version": "1.8.5",
+	"version": "1.8.6",
 	"minAppVersion": "0.15.0",
 	"description": "Manage tasks in a TickTick-style month, week, and three-day timeline, with Chinese lunar dates, public holidays, and makeup workdays.",
 	"author": "duany",
