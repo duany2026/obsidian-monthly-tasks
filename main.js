@@ -1438,7 +1438,9 @@ function buildTaskBody(f) {
  * 父行一删，留下的 4 空格缩进行前面只要是空行或标题，就会被 Markdown 当成缩进代码块，
  * 里面的任务从此不再是任务、也从月历上消失。左移不增删行，行号位移不受影响。
  * 范围：紧跟任务行自己的备注块（> 行）之后、直到第一条缩进不深于被删行的非空行为止。
- * @returns 被左移的行数
+ * @returns {{ moved: number, promoted: Array<{before: string, after: string}> }}
+ *   promoted 记录每条被左移行的改写前后文——上层界面手里的任务快照 rawLine 是
+ *   改写前的样子，不回写的话下一次勾选/删除过不了「行号 + 原文」身份校验。
  */
 function promoteChildLines(lines, taskIdx) {
   const indentOf = (s) => s.match(/^[ \t]*/)[0];
@@ -1457,8 +1459,10 @@ function promoteChildLines(lines, taskIdx) {
     end = i + 1;
   }
   let moved = 0;
+  const promoted = [];
   for (let i = start; i < end; i++) {
     if (isBlank(lines[i])) continue;
+    const before = lines[i];
     let ws = indentOf(lines[i]);
     const rest = lines[i].slice(ws.length);
     let removed = 0;
@@ -1467,9 +1471,10 @@ function promoteChildLines(lines, taskIdx) {
       ws = ws.slice(1);
     }
     lines[i] = ws + rest;
+    promoted.push({ before, after: lines[i] });
     moved++;
   }
-  return moved;
+  return { moved, promoted };
 }
 
 /**
@@ -1983,6 +1988,7 @@ var TaskParser = class {
         return false;
       }
       let deltaOut = 0; // 回调内算出的真实位移，写成功后再交出去
+      let promotedOut = []; // 被左移的缩进子项（before/after），供调用方回写任务快照
       const wrote = await this._mutateFile(file, (content) => {  // v1.7.11
       const lines = content.split("\n");
       // 审计 M4：记录删除前的总行数，末尾用 lines.length 之差把**真实位移**返回给调用方。
@@ -2009,7 +2015,7 @@ var TaskParser = class {
       const hadCRLF = /\r$/.test(lineToDelete);
       const blankLine = hadCRLF ? "\r" : "";
       // 手写的缩进子项先提升到被删行的层级，再摘父行（见 promoteChildLines）
-      promoteChildLines(lines, task.lineNumber);
+      promotedOut = promoteChildLines(lines, task.lineNumber).promoted;
       lines.splice(task.lineNumber, 1);
       // v1.6.0 批次三：删任务不连带删备注——内容丢了最心疼。紧跟它的 > 块
       // 去掉前缀降级成普通段落留在原地。行间补空行：连续两个非空行会被 Markdown
@@ -2041,7 +2047,7 @@ var TaskParser = class {
       });
       if (!wrote) return false;
       this.invalidateCache();
-      return { ok: true, delta: deltaOut };
+      return { ok: true, delta: deltaOut, promoted: promotedOut };
     } catch (error) {
       console.error(tr("error.deleteFail"), error);
       return false;
@@ -7899,6 +7905,18 @@ var CreateTaskModal = class extends import_obsidian.Modal {
                   for (const t of this.existingTasks) {
                     if (t.filePath === deletedFilePath && t.lineNumber > deletedLineNumber) {
                       t.lineNumber += delta;
+                    }
+                  }
+                }
+                // 被左移的缩进子项：磁盘上的行文本变了（少了被删父行那一级缩进），
+                // 快照里的 rawLine 不回写就过不了下一次操作的身份校验
+                if (Array.isArray(res.promoted)) {
+                  for (const p of res.promoted) {
+                    const before = String(p.before).replace(/\s+$/, "");
+                    for (const t of this.existingTasks) {
+                      if (t.filePath === deletedFilePath && t.rawLine && t.rawLine.replace(/\s+$/, "") === before) {
+                        t.rawLine = p.after;
+                      }
                     }
                   }
                 }
