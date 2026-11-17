@@ -3,7 +3,7 @@
  * 月历任务插件样式 (Monthly Tasks Plugin)
  * ============================================================
  *
- * 版本：1.8.6
+ * 版本：1.9.0
  * 作者：duany
  *
  * 样式架构：
@@ -13,6 +13,13 @@
  * - 模态框：任务创建、日期选择器
  * - 响应式：移动端适配
  * - 深色模式：自动适配 Obsidian 主题
+ *
+ * 作用域约定：凡是通用类名（.task-item、.day-cell、.nav-btn、.modal-buttons…）的规则，
+ * 一律前置 :where(.mt-scope)。.mt-scope 由 main.js 挂在插件的每个根上（月历视图根、
+ * 四个弹窗、body 上的日期浮层），所以这些规则只在插件自己的界面里生效，不会和主题或
+ * 别的插件的同名类互相影响。:where() 不增加特异性，层叠顺序与不加时完全一样。
+ * 新增规则照此写；自带 mt- 前缀或已含根类（.monthly-tasks-container、.create-task-modal…）
+ * 的选择器不用再加。
  *
  * ============================================================
  */
@@ -104,7 +111,7 @@
 }
 
 /* ========== 头部导航 ========== */
-.monthly-header {
+:where(.mt-scope) .monthly-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -117,14 +124,14 @@
 	box-shadow: var(--shadow-sm);
 }
 
-.header-btn-group {
+:where(.mt-scope) .header-btn-group {
 	display: flex;
 	align-items: center;
 	gap: 6px;
 	flex-shrink: 0;
 }
 
-.nav-btn {
+:where(.mt-scope) .nav-btn {
 	width: 32px;
 	height: 32px;
 	display: flex;
@@ -138,32 +145,41 @@
 	user-select: none;
 }
 
-.nav-btn svg {
+:where(.mt-scope) .nav-btn svg {
 	stroke-width: 2;
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.nav-btn:hover {
+	:where(.mt-scope) .nav-btn:hover {
 		background: var(--primary-100);
 		color: var(--primary-600);
 		transform: scale(1.05);
 	}
 }
 
-.nav-btn:active {
+:where(.mt-scope) .nav-btn:active {
 	transform: scale(0.95);
+}
+
+/* 顶栏按钮可用键盘操作（Tab 聚焦，Enter/空格触发）：键盘聚焦时给一圈可见的焦点环；
+   鼠标、触屏点击不触发 :focus-visible，观感不变 */
+:where(.mt-scope) .nav-btn:focus-visible,
+:where(.mt-scope) .today-btn:focus-visible,
+:where(.mt-scope) .month-title.clickable:focus-visible {
+	outline: 2px solid var(--primary-500);
+	outline-offset: 2px;
 }
 
 /* 视图切换按钮（v1.6.0 批次一）：原 .nav-btn.close-btn 的两条规则随 × 按钮一并删除
    （Obsidian 标签页自带关闭，插件再放一个 × 既冗余又容易误触）。切换按钮沿用 .nav-btn
    的全部基础样式（尺寸/圆角/hover/active），这里只补一条「当前处于日程视图」的弱强调，
    让用户不看格子也能知道自己在哪个视图——不改变按钮位置，避免顶栏抖动。 */
-.nav-btn.view-toggle-btn.is-agenda {
+:where(.mt-scope) .nav-btn.view-toggle-btn.is-agenda {
 	color: var(--primary-600);
 	background: var(--primary-100);
 }
 
-.month-title {
+:where(.mt-scope) .month-title {
 	font-size: 17px;
 	font-weight: 600;
 	color: var(--gray-900);
@@ -182,12 +198,12 @@
 	margin: 0 4px;
 }
 
-.month-title.clickable:hover {
+:where(.mt-scope) .month-title.clickable:hover {
 	background: var(--primary-50);
 	color: var(--primary-600);
 }
 
-.today-btn {
+:where(.mt-scope) .today-btn {
 	display: flex;
 	align-items: center;
 	flex-shrink: 0;
@@ -203,13 +219,13 @@
 	border: 1px solid var(--primary-100);
 }
 
-.today-btn:hover {
+:where(.mt-scope) .today-btn:hover {
 	background: var(--primary-100);
 	border-color: var(--primary-200);
 	transform: translateY(-1px);
 }
 
-.today-btn:active {
+:where(.mt-scope) .today-btn:active {
 	transform: translateY(0);
 	/* 按下时的深色反馈（触屏修复 hover 粘滞后，按压反馈由 :active 承担，不会粘住） */
 	background: var(--primary-100);
@@ -220,12 +236,12 @@
 
 /* 批次二⑤：漏斗筛选按钮 —— 与 .nav-btn 同尺寸，激活筛选时右上角挂一个色点角标，
    不展开面板也能看出「当前不是全部」 */
-.nav-btn.filter-btn.filter-active {
+:where(.mt-scope) .nav-btn.filter-btn.filter-active {
 	position: relative;
 	color: var(--primary-600);
 }
 
-.nav-btn.filter-btn.filter-active::after {
+:where(.mt-scope) .nav-btn.filter-btn.filter-active::after {
 	content: "";
 	position: absolute;
 	top: 3px;
@@ -238,14 +254,14 @@
 }
 
 /* ========== 星期标题 ========== */
-.weekday-header {
+:where(.mt-scope) .weekday-header {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	gap: 4px;
 	margin-bottom: 8px;
 }
 
-.weekday-cell {
+:where(.mt-scope) .weekday-cell {
 	text-align: center;
 	padding: 8px 4px;
 	font-size: 12px;
@@ -256,13 +272,13 @@
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.weekday-cell.weekend {
+:where(.mt-scope) .weekday-cell.weekend {
 	color: var(--danger);
 	background: var(--holiday-bg);
 }
 
 /* ========== 日历网格 ========== */
-.calendar-grid {
+:where(.mt-scope) .calendar-grid {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	/* 行数随实际渲染的周数（5 或 6 周）生成，配合 generateMonthCalendar 不再固定 6 行 */
@@ -273,7 +289,7 @@
 }
 
 /* ========== 日期格子 ========== */
-.day-cell {
+:where(.mt-scope) .day-cell {
 	display: flex;
 	flex-direction: column;
 	padding: 4px 5px;
@@ -290,17 +306,17 @@
 	overflow: hidden;
 }
 
-.day-cell:hover {
+:where(.mt-scope) .day-cell:hover {
 	box-shadow: var(--shadow-md);
 	transform: translateY(-2px);
 }
 
-.day-cell:active {
+:where(.mt-scope) .day-cell:active {
 	transform: scale(0.98);
 }
 
 /* 其他月份 */
-.day-cell.other-month {
+:where(.mt-scope) .day-cell.other-month {
 	opacity: 0.4;
 }
 
@@ -321,7 +337,7 @@
 
 /* 今天 - 简洁高亮显示（描边 + 轻投影，不再用外圈光晕强调）。
    1px 边框 + inset 内描边凑出 2px 观感，外盒与其他格子的 1px 边框对齐 */
-.day-cell.today {
+:where(.mt-scope) .day-cell.today {
 	border: 1px solid var(--primary-500);
 	box-shadow: inset 0 0 0 1px var(--primary-500), 0 1px 4px rgba(59, 130, 246, 0.15);
 	background: linear-gradient(135deg, var(--primary-50) 0%, #dbeafe 100%);
@@ -329,62 +345,62 @@
 
 /* 不再覆盖字号：此前固定 15px 会在移动端（13px）放大日期、桌面端（17/19px）缩小日期，
    两端观感不一致；今天与其他日期同字号，仅用颜色和加粗区分 */
-.day-cell.today .day-number {
+:where(.mt-scope) .day-cell.today .day-number {
 	color: var(--primary-700);
 	font-weight: 600;
 }
 
 /* 当日高亮优先级最高，覆盖节假日样式 */
-.day-cell.today.holiday .day-number,
-.day-cell.today.weekend .day-number {
+:where(.mt-scope) .day-cell.today.holiday .day-number,
+:where(.mt-scope) .day-cell.today.weekend .day-number {
 	font-weight: 600;
 }
 
 /* 普通工作日 */
-.day-cell.weekday {
+:where(.mt-scope) .day-cell.weekday {
 	background: var(--weekday-bg);
 }
 
-.day-cell.weekday .day-number {
+:where(.mt-scope) .day-cell.weekday .day-number {
 	color: var(--gray-900);
 }
 
 /* 周末 - 温和蓝色 */
-.day-cell.weekend {
+:where(.mt-scope) .day-cell.weekend {
 	background: var(--weekend-bg);
 	border: 1px solid var(--weekend-border);
 }
 
-.day-cell.weekend .day-number {
+:where(.mt-scope) .day-cell.weekend .day-number {
 	color: var(--weekend-text);
 	font-weight: 600;
 }
 
 /* 节假日 - 醒目红色 */
-.day-cell.holiday {
+:where(.mt-scope) .day-cell.holiday {
 	background: var(--holiday-bg);
 	border: 1px solid var(--holiday-border);
 }
 
-.day-cell.holiday .day-number {
+:where(.mt-scope) .day-cell.holiday .day-number {
 	color: var(--holiday-text);
 	font-weight: 700;
 }
 
 /* 调休上班日 - 醒目蓝色 */
-.day-cell.workday {
+:where(.mt-scope) .day-cell.workday {
 	background: var(--workday-bg);
 	border: 1px solid var(--workday-border);
 }
 
-.day-cell.workday .day-number {
+:where(.mt-scope) .day-cell.workday .day-number {
 	color: var(--workday-text);
 	font-weight: 600;
 }
 
 /* 调休标识 - 左下角。文案走 CSS 变量：伪元素 content 是编译期常量、i18n 够不着，
    由 main.js 的 applyBadgeLocale() 按界面语言写入，'班' 只是兜底值 */
-.day-cell.workday::after {
+:where(.mt-scope) .day-cell.workday::after {
 	content: var(--mt-badge-work, '班');
 	position: absolute;
 	bottom: 4px;
@@ -409,19 +425,19 @@
 
 /* 今天同时是周末/节假日/调休日时保持蓝色外框：.day-cell.today 与类型规则同优先级且在前，
    外框色会被类型色覆盖；复合选择器提权，与暗色主题（today 规则在后天然胜出）对齐 */
-.day-cell.today.weekend,
-.day-cell.today.holiday,
-.day-cell.today.workday {
+:where(.mt-scope) .day-cell.today.weekend,
+:where(.mt-scope) .day-cell.today.holiday,
+:where(.mt-scope) .day-cell.today.workday {
 	border-color: var(--primary-500);
 }
 
 /* hover 的 box-shadow 会整体替换 today 的内描边，悬停时补回 */
-.day-cell.today:hover {
+:where(.mt-scope) .day-cell.today:hover {
 	box-shadow: inset 0 0 0 1px var(--primary-500), var(--shadow-md);
 }
 
 /* ========== 日期头部 ========== */
-.day-header {
+:where(.mt-scope) .day-header {
 	display: flex;
 	flex-direction: column;
 	margin-bottom: 2px;
@@ -429,13 +445,14 @@
 	gap: 2px;
 }
 
-.day-header-row {
+:where(.mt-scope) .day-header-row {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 }
 
-.day-number {
+:where(.mt-scope) .day-number,
+.day-number.mt-measure-probe {
 	font-size: 15px;
 	font-weight: 600;
 	color: var(--gray-900);
@@ -444,7 +461,7 @@
 }
 
 /* 农历信息 - 优化字体，单行显示 */
-.lunar-info {
+:where(.mt-scope) .lunar-info {
 	font-size: 10px;
 	color: var(--gray-600);
 	line-height: 1.2;
@@ -457,13 +474,13 @@
 	flex-shrink: 0;
 }
 
-.lunar-info.special-lunar {
+:where(.mt-scope) .lunar-info.special-lunar {
 	color: var(--primary-600);
 	font-weight: 500;
 }
 
 /* 节假日名称（如"春节"、"国庆"） */
-.holiday-name {
+:where(.mt-scope) .holiday-name {
 	font-size: 10px;
 	font-weight: 500;
 	color: var(--holiday-text);
@@ -475,7 +492,7 @@
 }
 
 /* ========== 任务列表 ========== */
-.day-tasks {
+:where(.mt-scope) .day-tasks {
 	display: flex;
 	flex-direction: column;
 	gap: 1px;
@@ -505,7 +522,7 @@
    一并删除，免得后来者以为改这里能调出细滚动条。
    真要恢复「3px 细条」方案，需把 scrollbar-width 与 scrollbar-color 一起归 auto
    （只归一个更糟：条会退回原生默认 15px），再把那三段配色加回来。 */
-.day-tasks::-webkit-scrollbar {
+:where(.mt-scope) .day-tasks::-webkit-scrollbar {
 	width: 0;
 	height: 0;
 	/* 2026-10-10 真机补丁：Android WebView（<Chromium 121）上 width:0 仍给经典滚动条
@@ -515,7 +532,7 @@
 	display: none;
 }
 
-.task-item {
+:where(.mt-scope) .task-item {
 	display: flex;
 	align-items: center;
 	padding: 2px 4px;
@@ -530,7 +547,7 @@
 	flex-shrink: 0;
 }
 
-.task-time {
+:where(.mt-scope) .task-time {
 	font-size: 9px;
 	color: #64748b;
 	white-space: nowrap;
@@ -543,7 +560,7 @@
 /* 任务内容：v1.5.4 全审合并——原先此处与暗色区之前各有一条 .task-content，
    同特异度下后者靠源码顺序截胡（font-size/padding-left/font-family 全靠它生效），
    合并为一条后字号收口规则（见移动端 ⑨）的覆盖面也更清楚 */
-.task-content {
+:where(.mt-scope) .task-content {
 	flex: 1;
 	min-width: 0;
 	color: var(--gray-700);
@@ -559,11 +576,11 @@
    桌面端留在右侧：同一批数据两种读法，且右侧那一列要常年占着宽度、挤短标题。
    现在把手机端这套升为全局：色带 + 标题一行读到底，时间/N天 在上方小字。
    字号仍分端（桌面沿用基处 9px，手机端 480 块里另压到 8px）。 */
-.day-cell .task-item {
+:where(.mt-scope) .day-cell .task-item {
 	flex-wrap: wrap;
 }
 
-.day-cell .task-item .task-time {
+:where(.mt-scope) .day-cell .task-item .task-time {
 	order: -1;
 	flex-basis: 100%;
 	margin-left: 0;
@@ -574,8 +591,8 @@
    左缘色带，两者不同时出现。文字标签如今只剩创建弹窗的已有任务行（.existing-task-item）
    一条路径——那里整行宽，够放；格子里渲染器已不再产出 .task-category，下面的
    .task-item .task-category 选择器保留作防御，真出现文字也由色带段的规则统一隐藏。 */
-.task-item .task-category,
-.existing-task-item .task-category {
+:where(.mt-scope) .task-item .task-category,
+:where(.mt-scope) .existing-task-item .task-category {
 	flex-shrink: 0;
 	font-size: 9px;
 	line-height: 1.3;
@@ -586,8 +603,8 @@
 	cursor: default;
 }
 
-.theme-dark .task-item .task-category,
-.theme-dark .existing-task-item .task-category {
+.theme-dark :where(.mt-scope) .task-item .task-category,
+.theme-dark :where(.mt-scope) .existing-task-item .task-category {
 	color: #6b7280;
 }
 
@@ -599,15 +616,15 @@
    左缘槽位让给色带后，优先级与跨天的 border-left 一并取消——优先级仍有背景渐变 + 文字色，
    跨天仍有时间行的「N天」，信息不丢，只是不再和色带抢同一条线。
    选择器一律带 .day-cell 前缀：只作用于日历格子，不碰弹窗列表。 */
-.day-cell .task-item .task-category {
+:where(.mt-scope) .day-cell .task-item .task-category {
 	display: none;
 }
 
-.day-cell .task-item.has-category {
+:where(.mt-scope) .day-cell .task-item.has-category {
 	padding-left: 4px;
 }
 
-.day-cell .task-item.has-category::after {
+:where(.mt-scope) .day-cell .task-item.has-category::after {
 	content: '';
 	position: absolute;
 	left: 0;
@@ -620,23 +637,23 @@
 
 /* 过期红条（.task-item.overdue::before）同在 left:0，两者同时出现时红条留在 0、
    色带右移避让并补内边距，否则过期信号被色带盖掉 */
-.day-cell .task-item.overdue.has-category::after {
+:where(.mt-scope) .day-cell .task-item.overdue.has-category::after {
 	left: 2px;
 }
 
-.day-cell .task-item.overdue.has-category {
+:where(.mt-scope) .day-cell .task-item.overdue.has-category {
 	padding-left: 7px;
 }
 
 /* 左缘让位给类别色带：优先级与跨天不再画 border-left */
-.day-cell .task-item[class*="priority-bg-"],
-.day-cell .task-item.multi-day-task {
+:where(.mt-scope) .day-cell .task-item[class*="priority-bg-"],
+:where(.mt-scope) .day-cell .task-item.multi-day-task {
 	border-left-width: 0;
 }
 
 /* 跨天的 3px 蓝色 ::before 竖条同样占 left:0（与色带完全重叠），且窄格里遮挡文字，
    一并取消；跨天延续由时间行「N天」表意（v1.5.0 起跨天无时间任务也会建时间行） */
-.day-cell .task-item.multi-day-task::before {
+:where(.mt-scope) .day-cell .task-item.multi-day-task::before {
 	display: none;
 }
 
@@ -645,7 +662,7 @@
    优先级归零同样限定 .day-cell，弹窗/其他列表里的任务条边框保持原样）。 */
 
 @media (hover: hover) and (pointer: fine) {
-	.task-item:hover {
+	:where(.mt-scope) .task-item:hover {
 		background: var(--primary-50);
 	}
 }
@@ -658,15 +675,15 @@
    压灰规则实际不生效，与其留一段死代码，不如只调 opacity。
    v1.5.3 通道归还：手机端那条专用灰竖条取消（它与删除线开关联动时出现"双反馈"、
    又与左缘类别色带抢槽位），完成态反馈收敛为「变暗 + （可选）删除线」。 */
-.task-item.completed {
+:where(.mt-scope) .task-item.completed {
 	opacity: 0.7;
 }
 
-.task-item.completed-strike .task-content {
+:where(.mt-scope) .task-item.completed-strike .task-content {
 	text-decoration: line-through;
 }
 
-.task-item.overdue::before {
+:where(.mt-scope) .task-item.overdue::before {
 	content: '';
 	position: absolute;
 	left: 0;
@@ -679,60 +696,60 @@
 
 /* 优先级背景色 - 整个任务（更紧凑） */
 /* 0=普通(绿), 2=中(黄), 3=高(红) */
-.task-item.priority-bg-0 {
+:where(.mt-scope) .task-item.priority-bg-0 {
 	background: linear-gradient(135deg, #dcfce7, #bbf7d0);
 	border-left: 2px solid #22c55e;
 }
 
-.task-item.priority-bg-0 .task-content {
+:where(.mt-scope) .task-item.priority-bg-0 .task-content {
 	color: #15803d;
 }
 
-.task-item.priority-bg-2 {
+:where(.mt-scope) .task-item.priority-bg-2 {
 	background: linear-gradient(135deg, #fffbeb, #fef3c7);
 	border-left: 2px solid var(--warning);
 }
 
-.task-item.priority-bg-2 .task-content {
+:where(.mt-scope) .task-item.priority-bg-2 .task-content {
 	color: #92400e;
 }
 
-.task-item.priority-bg-3 {
+:where(.mt-scope) .task-item.priority-bg-3 {
 	background: linear-gradient(135deg, #fef2f2, #fee2e2);
 	border-left: 2px solid var(--danger);
 }
 
-.task-item.priority-bg-3 .task-content {
+:where(.mt-scope) .task-item.priority-bg-3 .task-content {
 	color: #991b1b;
 }
 
 /* 深色模式适配 */
-.theme-dark .task-item.priority-bg-0 {
+.theme-dark :where(.mt-scope) .task-item.priority-bg-0 {
 	background: rgba(34, 197, 94, 0.15);
 }
 
-.theme-dark .task-item.priority-bg-0 .task-content {
+.theme-dark :where(.mt-scope) .task-item.priority-bg-0 .task-content {
 	color: #86efac;
 }
 
-.theme-dark .task-item.priority-bg-2 {
+.theme-dark :where(.mt-scope) .task-item.priority-bg-2 {
 	background: rgba(217, 119, 6, 0.15);
 }
 
-.theme-dark .task-item.priority-bg-2 .task-content {
+.theme-dark :where(.mt-scope) .task-item.priority-bg-2 .task-content {
 	color: #fcd34d;
 }
 
-.theme-dark .task-item.priority-bg-3 {
+.theme-dark :where(.mt-scope) .task-item.priority-bg-3 {
 	background: rgba(220, 38, 38, 0.15);
 }
 
-.theme-dark .task-item.priority-bg-3 .task-content {
+.theme-dark :where(.mt-scope) .task-item.priority-bg-3 .task-content {
 	color: #fca5a5;
 }
 
 /* 更多任务 */
-.more-tasks {
+:where(.mt-scope) .more-tasks {
 	text-align: center;
 	font-size: 10px;
 	color: var(--gray-400);
@@ -744,17 +761,17 @@
 }
 
 /* 手机端量测发现「+N」已不需要时收起（JS 加/去这个类） */
-.more-tasks.is-hidden {
+:where(.mt-scope) .more-tasks.is-hidden {
 	display: none;
 }
 
 /* 跨天任务样式 */
-.task-item.multi-day-task {
+:where(.mt-scope) .task-item.multi-day-task {
 	position: relative;
 	border-left: 3px solid var(--primary-500);
 }
 
-.task-item.multi-day-task::before {
+:where(.mt-scope) .task-item.multi-day-task::before {
 	content: '';
 	position: absolute;
 	left: 0;
@@ -764,7 +781,7 @@
 	background: linear-gradient(180deg, var(--primary-500) 0%, var(--primary-400) 100%);
 }
 
-.task-item.multi-day-task .task-content {
+:where(.mt-scope) .task-item.multi-day-task .task-content {
 	font-weight: 600;
 	color: var(--primary-700);
 }
@@ -774,25 +791,28 @@
    尾日记号保留，见下。 */
 
 /* 跨天任务尾日：左侧渐变条改浅收尾，与首日形成首尾区分 */
-.task-item.multi-day-end::before {
+:where(.mt-scope) .task-item.multi-day-end::before {
 	background: linear-gradient(180deg, var(--primary-200) 0%, var(--primary-100) 100%);
 }
 
 /* 跨天任务 - 深色模式 */
-.theme-dark .task-item.multi-day-task .task-content {
+.theme-dark :where(.mt-scope) .task-item.multi-day-task .task-content {
 	color: var(--primary-400);
 }
 
-.theme-dark .task-item.multi-day-end::before {
+.theme-dark :where(.mt-scope) .task-item.multi-day-end::before {
 	background: linear-gradient(180deg, var(--primary-600) 0%, var(--primary-400) 100%);
 }
 
 /* 遮罩层：由 Obsidian Modal 基类的 .modal-bg 提供，这里仅补充与原设计一致的模糊效果。
+   只作用于本插件自己的弹窗：.modal-container 是 Obsidian 所有弹窗共用的容器，不限定的话
+   设置页、命令面板、别的插件的弹窗遮罩都会被一起加上模糊。mt-modal-host 由四个弹窗在
+   onOpen 里挂到各自的容器上（不用 :has()，旧版 Obsidian 的内核不认）。
    v1.7.5：只在桌面端加模糊。backdrop-filter 是全屏实时高斯模糊，手机 GPU 要先做一次
    整屏快照才能出结果，于是它必然比弹窗晚一两帧生效（用户读作「点下去、过一瞬背景才糊」），
    而弹窗进/出场那 150~160ms 里它每帧都要重算，把动画帧挤掉——低端机直接就是掉帧卡顿。
    手机端沿用框架自带的半透明遮罩（--background-modifier-cover），观感只差没有糊，不丢层次。 */
-body:not(.is-mobile) .modal-container .modal-bg {
+body:not(.is-mobile) .modal-container.mt-modal-host .modal-bg {
 	backdrop-filter: blur(6px);
 }
 
@@ -1044,8 +1064,11 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	min-height: 0 !important;
 }
 
-/* Modal 挂在 body，继承不到 .monthly-tasks-container 内的插件变量。 */
-.modal-container {
+/* Modal 挂在 body，继承不到 .monthly-tasks-container 内的插件变量。
+   变量挂在本插件自己的弹窗上，不挂 .modal-container——那是所有弹窗共用的容器。 */
+.modal.create-task-modal,
+.modal.date-picker-modal,
+.modal.category-filter-modal {
 	--primary-500: #3B82F6;
 }
 
@@ -1062,12 +1085,12 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	width: 420px;
 	max-width: 92vw;
 	max-height: 90vh;
-	animation: modalSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+	animation: mt-modal-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 	overflow: hidden;
 	overflow-y: auto;
 }
 
-@keyframes modalSlideIn {
+@keyframes mt-modal-slide-in {
 	from {
 		opacity: 0;
 		transform: scale(0.9);
@@ -1079,7 +1102,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 日期信息 - 作为弹窗头部 */
-.modal-date-info {
+:where(.mt-scope) .modal-date-info {
 	font-size: 14px;
 	color: var(--text-normal);
 	text-align: center;
@@ -1087,7 +1110,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	position: relative;
 }
 
-.modal-date-info .date-main {
+:where(.mt-scope) .modal-date-info .date-main {
 	font-size: 22px;
 	font-weight: 600;
 	color: #1e293b;
@@ -1100,7 +1123,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
    任务框当外环用的，而那十条盒声明全被 Obsidian 的 input[type='text']（0-1-1）顶掉、
    从来没有渲染出来过——于是这 4px 内边距只剩一个副作用：把任务框挤得比备注框窄 8px、
    左边缘还差 4px（实测 362 vs 370）。v1.7.5 统一盒模型后必须一起删，两框才真等宽 */
-.task-input-wrapper {
+:where(.mt-scope) .task-input-wrapper {
 	margin: 12px 24px 12px;
 	position: relative;
 }
@@ -1111,7 +1134,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
    input[type='text']（0-1-1），是看着扎眼、实际不生效的死声明，删。
    注意不要在这里"留一条边框/背景"当差异：0-1-0 压不过 0-3-0，留了也是死代码。
    要单独改任务框，就走下面 .modal-container .modal.create-task-modal 的 0-3-0/0-4-0 组 */
-.task-input {
+:where(.mt-scope) .task-input {
 	transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -1123,7 +1146,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	transform: translateY(-1px);
 }
 
-.task-input::placeholder {
+:where(.mt-scope) .task-input::placeholder {
 	color: #94a3b8;
 	font-weight: 400;
 }
@@ -1169,15 +1192,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 按钮组 */
-.modal-buttons {
+:where(.mt-scope) .modal-buttons {
 	display: flex;
 	gap: 12px;
 	justify-content: center;
 	padding: 0 24px 14px;
 }
 
-.btn-cancel,
-.btn-confirm {
+:where(.mt-scope) .btn-cancel,
+:where(.mt-scope) .btn-confirm {
 	padding: 12px 24px;
 	font-size: 14px;
 	font-weight: 600;
@@ -1189,36 +1212,36 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.btn-cancel {
+:where(.mt-scope) .btn-cancel {
 	background: #f1f5f9;
 	color: #64748b;
 }
 
-.btn-cancel:hover {
+:where(.mt-scope) .btn-cancel:hover {
 	background: #e2e8f0;
 	color: #475569;
 	transform: translateY(-1px);
 }
 
-.btn-confirm {
+:where(.mt-scope) .btn-confirm {
 	background: linear-gradient(135deg, #3b82f6, #2563eb);
 	color: white;
 	box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
 }
 
-.btn-confirm:hover {
+:where(.mt-scope) .btn-confirm:hover {
 	background: linear-gradient(135deg, #2563eb, #1d4ed8);
 	transform: translateY(-1px);
 	box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
 }
 
-.btn-confirm:active,
-.btn-cancel:active {
+:where(.mt-scope) .btn-confirm:active,
+:where(.mt-scope) .btn-cancel:active {
 	transform: translateY(0);
 }
 
 /* 时间选择器 */
-.modal-time-container {
+:where(.mt-scope) .modal-time-container {
 	margin: 0 24px 16px;
 	padding: 16px 20px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -1226,7 +1249,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	border: 1px solid #e2e8f0;
 }
 
-.time-label {
+:where(.mt-scope) .time-label {
 	font-size: 13px;
 	font-weight: 600;
 	color: #475569;
@@ -1236,7 +1259,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	letter-spacing: 0.5px;
 }
 
-.time-input-wrapper {
+:where(.mt-scope) .time-input-wrapper {
 	display: flex;
 	align-items: center;
 	gap: 6px;
@@ -1244,7 +1267,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	flex-wrap: nowrap;
 }
 
-.time-separator {
+:where(.mt-scope) .time-separator {
 	font-size: 14px;
 	color: #9ca3af;
 	font-weight: 500;
@@ -1252,7 +1275,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	user-select: none;
 }
 
-.time-native-input {
+:where(.mt-scope) .time-native-input {
 	padding: 8px 12px;
 	border: 1px solid #d1d5db;
 	border-radius: 8px;
@@ -1267,45 +1290,45 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	min-width: 110px;
 	transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
 }
-.time-native-input::-webkit-calendar-picker-indicator {
+:where(.mt-scope) .time-native-input::-webkit-calendar-picker-indicator {
 	opacity: 0.5;
 	cursor: pointer;
 	transition: opacity 0.15s;
 }
-.time-native-input:hover {
+:where(.mt-scope) .time-native-input:hover {
 	border-color: #3b82f6;
 	background-color: #f8fafc;
 }
-.time-native-input:hover::-webkit-calendar-picker-indicator {
+:where(.mt-scope) .time-native-input:hover::-webkit-calendar-picker-indicator {
 	opacity: 0.8;
 }
-.time-native-input:focus {
+:where(.mt-scope) .time-native-input:focus {
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 	outline: none;
 }
-.time-native-input:disabled {
+:where(.mt-scope) .time-native-input:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 	background-color: #f3f4f6;
 }
-.time-native-input:disabled::-webkit-calendar-picker-indicator {
+:where(.mt-scope) .time-native-input:disabled::-webkit-calendar-picker-indicator {
 	cursor: not-allowed;
 }
 
 /* 时间框外壳：桌面端不产生盒子，原生输入照旧自己显示时间与拾取器箭头；
    触屏端才变成自绘框（见下方 @media (pointer: coarse)），值和箭头由插件画，
    不再受系统 WebView 给原生时间框定多宽的摆布 */
-.time-field {
+:where(.mt-scope) .time-field {
 	display: contents;
 }
 
-.time-field-value,
-.time-field-chevron {
+:where(.mt-scope) .time-field-value,
+:where(.mt-scope) .time-field-chevron {
 	display: none;
 }
 
-.all-day-toggle {
+:where(.mt-scope) .all-day-toggle {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -1319,7 +1342,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	width: fit-content;
 }
 
-.all-day-toggle:hover {
+:where(.mt-scope) .all-day-toggle:hover {
 	background: #f0f7ff;
 	border-color: #3b82f6;
 }
@@ -1327,8 +1350,8 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* 复选框自绘：Obsidian 自带的对勾按原始 16px 框绘制，手机端把框抬到 20px 后
    图形仍贴在左上，看上去没居中。方框与对勾分开画，对勾按 viewBox 居中，
    任何尺寸都不偏；未选中态保持主题的方框观感 */
-.all-day-toggle input[type="checkbox"],
-.multi-day-toggle input[type="checkbox"] {
+:where(.mt-scope) .all-day-toggle input[type="checkbox"],
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"] {
 	-webkit-appearance: none;
 	appearance: none;
 	box-sizing: border-box;
@@ -1343,8 +1366,8 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	transition: background-color 0.15s, border-color 0.15s;
 }
 
-.all-day-toggle input[type="checkbox"]:checked,
-.multi-day-toggle input[type="checkbox"]:checked {
+:where(.mt-scope) .all-day-toggle input[type="checkbox"]:checked,
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"]:checked {
 	border-color: var(--interactive-accent);
 	background-color: var(--interactive-accent);
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4.5 10.5 8.2 14 15.5 5.8' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -1353,14 +1376,14 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* Obsidian 主题的对勾画在 :checked::before（mask 着色）上：appearance:none
    管不到它，不单独中和就会和上面自绘的 background-image 对勾叠成两个。
    连 :after 一起压掉，content/display/background/mask 四路全断 */
-.all-day-toggle input[type="checkbox"]::before,
-.all-day-toggle input[type="checkbox"]::after,
-.all-day-toggle input[type="checkbox"]:checked::before,
-.all-day-toggle input[type="checkbox"]:checked::after,
-.multi-day-toggle input[type="checkbox"]::before,
-.multi-day-toggle input[type="checkbox"]::after,
-.multi-day-toggle input[type="checkbox"]:checked::before,
-.multi-day-toggle input[type="checkbox"]:checked::after {
+:where(.mt-scope) .all-day-toggle input[type="checkbox"]::before,
+:where(.mt-scope) .all-day-toggle input[type="checkbox"]::after,
+:where(.mt-scope) .all-day-toggle input[type="checkbox"]:checked::before,
+:where(.mt-scope) .all-day-toggle input[type="checkbox"]:checked::after,
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"]::before,
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"]::after,
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"]:checked::before,
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"]:checked::after {
 	content: none;
 	display: none;
 	background: none;
@@ -1368,18 +1391,18 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	mask-image: none;
 }
 
-.all-day-toggle input[type="checkbox"]:not(:checked):hover,
-.multi-day-toggle input[type="checkbox"]:not(:checked):hover {
+:where(.mt-scope) .all-day-toggle input[type="checkbox"]:not(:checked):hover,
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"]:not(:checked):hover {
 	border-color: var(--checkbox-border-color-hover, #3b82f6);
 }
 
-.all-day-toggle input[type="checkbox"]:focus-visible,
-.multi-day-toggle input[type="checkbox"]:focus-visible {
+:where(.mt-scope) .all-day-toggle input[type="checkbox"]:focus-visible,
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"]:focus-visible {
 	outline: 2px solid var(--interactive-accent);
 	outline-offset: 2px;
 }
 
-.all-day-toggle input[type="checkbox"] {
+:where(.mt-scope) .all-day-toggle input[type="checkbox"] {
 	width: 16px;
 	height: 16px;
 }
@@ -1387,7 +1410,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* v1.5.2 真机反馈：全天态时间区折叠——「+ 设置时间」按钮坐在「全天」勾选行右侧，
    未展开时两个 <input type="time"> 整组 display:none（不进布局，手机上不再
    "跳出时间选择器"） */
-.time-show-btn {
+:where(.mt-scope) .time-show-btn {
 	background: none;
 	border: 1px dashed #94a3b8;
 	border-radius: 8px;
@@ -1399,72 +1422,72 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	white-space: nowrap;
 }
 
-.theme-dark .time-show-btn {
+.theme-dark :where(.mt-scope) .time-show-btn {
 	border-color: rgba(148, 163, 184, 0.5);
 	color: #cbd5e1;
 }
 
-.all-day-toggle span {
+:where(.mt-scope) .all-day-toggle span {
 	font-size: 13px;
 	font-weight: 500;
 	color: #475569;
 }
 
 /* 深色模式 - 时间选择器 */
-.theme-dark .modal-time-container {
+.theme-dark :where(.mt-scope) .modal-time-container {
 	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
 	border-color: rgba(71, 85, 105, 0.4);
 }
 
-.theme-dark .time-label {
+.theme-dark :where(.mt-scope) .time-label {
 	color: #94a3b8;
 }
 
-.theme-dark .time-separator {
+.theme-dark :where(.mt-scope) .time-separator {
 	background: none;
 	color: #6b7280;
 }
 
-.theme-dark .time-native-input {
+.theme-dark :where(.mt-scope) .time-native-input {
 	background: #1e293b;
 	border-color: #475569;
 	color: #e2e8f0;
 }
 
-.theme-dark .time-native-input:hover {
+.theme-dark :where(.mt-scope) .time-native-input:hover {
 	border-color: #60a5fa;
 	background-color: #263344;
 }
 
-.theme-dark .time-native-input:focus {
+.theme-dark :where(.mt-scope) .time-native-input:focus {
 	border-color: #3b82f6;
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-.theme-dark .time-native-input:disabled {
+.theme-dark :where(.mt-scope) .time-native-input:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 	background-color: #1e293b;
 }
 
-.theme-dark .all-day-toggle {
+.theme-dark :where(.mt-scope) .all-day-toggle {
 	background: rgba(30, 41, 59, 0.6);
 	border-color: rgba(71, 85, 105, 0.4);
 	color: #e2e8f0;
 }
 
-.theme-dark .all-day-toggle:hover {
+.theme-dark :where(.mt-scope) .all-day-toggle:hover {
 	background: rgba(59, 130, 246, 0.15);
 	border-color: #3b82f6;
 }
 
-.theme-dark .all-day-toggle span {
+.theme-dark :where(.mt-scope) .all-day-toggle span {
 	color: #cbd5e1;
 }
 
 /* 优先级选择 - 颜色块样式 */
 /* 已有任务列表 */
-.modal-existing-tasks {
+:where(.mt-scope) .modal-existing-tasks {
 	margin: 16px 24px 16px;
 	padding: 12px 14px 10px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -1475,7 +1498,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	   统一滚动；>5 条的「查看全部」折叠逻辑保持不变 */
 }
 
-.existing-tasks-title-row {
+:where(.mt-scope) .existing-tasks-title-row {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -1484,7 +1507,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	border-bottom: 1px solid #e2e8f0;
 }
 
-.existing-tasks-title {
+:where(.mt-scope) .existing-tasks-title {
 	font-size: 12px;
 	font-weight: 600;
 	color: #64748b;
@@ -1494,7 +1517,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
    口径与 .category-chip 一致（同字号/同圆角/同边框），只是配色更淡一档——
    它是「列表开合」的次级控件，不该抢任务条的视觉重心。
    图标朝下=可展开，is-open 时整枚旋转 180°，比换字符更顺滑 */
-.existing-tasks-toggle {
+:where(.mt-scope) .existing-tasks-toggle {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
@@ -1510,41 +1533,41 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
-.existing-tasks-toggle svg {
+:where(.mt-scope) .existing-tasks-toggle svg {
 	width: 13px;
 	height: 13px;
 	stroke-width: 2.4;
 	transition: transform 0.16s ease;
 }
 
-.existing-tasks-toggle.is-open svg {
+:where(.mt-scope) .existing-tasks-toggle.is-open svg {
 	transform: rotate(180deg);
 }
 
-.existing-tasks-title-row:hover .existing-tasks-toggle {
+:where(.mt-scope) .existing-tasks-title-row:hover .existing-tasks-toggle {
 	border-color: #94a3b8;
 	color: #334155;
 	background: #f8fafc;
 }
 
-.existing-tasks-title-row:focus-visible {
+:where(.mt-scope) .existing-tasks-title-row:focus-visible {
 	outline: 2px solid var(--primary-500, #3b82f6);
 	outline-offset: 2px;
 }
 
-.existing-tasks-list {
+:where(.mt-scope) .existing-tasks-list {
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
 }
 
 /* 标题行可点折叠：手型 + 无文本选中 */
-.existing-tasks-title-row {
+:where(.mt-scope) .existing-tasks-title-row {
 	cursor: pointer;
 	user-select: none;
 }
 
-.existing-task-item {
+:where(.mt-scope) .existing-task-item {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -1561,35 +1584,35 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	position: relative;
 }
 
-.existing-task-item:hover {
+:where(.mt-scope) .existing-task-item:hover {
 	background: #f8fafc;
 	box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
-.existing-task-item:hover .task-item-actions {
+:where(.mt-scope) .existing-task-item:hover .task-item-actions {
 	opacity: 1;
 }
 
 /* 就地切换编辑目标后，"表单里预填的是哪一条"必须在列表里看得见：
    左侧色带换成主色 + 浅蓝底，与 hover 的灰底区分开，选中态优先于 hover */
-.existing-task-item.editing {
+:where(.mt-scope) .existing-task-item.editing {
 	background: #eff6ff;
 	border-left-color: #2563eb;
 	box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18);
 }
 
-.existing-task-item.editing .task-item-actions {
+:where(.mt-scope) .existing-task-item.editing .task-item-actions {
 	opacity: 1;
 }
 
-.theme-dark .existing-task-item.editing {
+.theme-dark :where(.mt-scope) .existing-task-item.editing {
 	background: rgba(37, 99, 235, 0.16);
 	border-left-color: #3b82f6;
 	box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
 }
 
 /* 勾选框 */
-.task-check-icon {
+:where(.mt-scope) .task-check-icon {
 	flex-shrink: 0;
 	width: 14px;
 	height: 14px;
@@ -1598,7 +1621,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 任务文本 */
-.existing-task-item .task-text {
+:where(.mt-scope) .existing-task-item .task-text {
 	flex: 1;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -1607,7 +1630,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 操作按钮组 */
-.task-item-actions {
+:where(.mt-scope) .task-item-actions {
 	display: flex;
 	align-items: center;
 	gap: 3px;
@@ -1617,7 +1640,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 通用操作按钮 */
-.task-action-btn {
+:where(.mt-scope) .task-action-btn {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1633,54 +1656,54 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 批次三：编辑按钮（铅笔）。中性蓝灰，不与跳转蓝/删除红抢语义 */
-.task-edit-btn:hover {
+:where(.mt-scope) .task-edit-btn:hover {
 	background: #f1f5f9;
 	color: #475569;
 }
 
 /* 跳转按钮 */
-.task-goto-btn:hover {
+:where(.mt-scope) .task-goto-btn:hover {
 	background: #eff6ff;
 	color: #3b82f6;
 }
 
 /* 删除按钮 */
-.task-delete-btn:hover {
+:where(.mt-scope) .task-delete-btn:hover {
 	background: #fef2f2;
 	color: #ef4444;
 }
 
-.existing-task-item.completed .task-text {
+:where(.mt-scope) .existing-task-item.completed .task-text {
 	opacity: 0.7;
 	color: #64748b;
 }
 
-.existing-task-item.completed-strike .task-text {
+:where(.mt-scope) .existing-task-item.completed-strike .task-text {
 	text-decoration: line-through;
 }
 
-.existing-task-item.completed .task-check-icon {
+:where(.mt-scope) .existing-task-item.completed .task-check-icon {
 	opacity: 0.5;
 }
 
 /* 删除动画 */
-.existing-task-item.task-deleting {
+:where(.mt-scope) .existing-task-item.task-deleting {
 	opacity: 0;
 	transform: translateX(8px);
 	transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
-.existing-task-item.priority-3 {
+:where(.mt-scope) .existing-task-item.priority-3 {
 	border-left-color: #ef4444;
 	background: linear-gradient(90deg, #fef2f2, white);
 }
 
-.existing-task-item.priority-2 {
+:where(.mt-scope) .existing-task-item.priority-2 {
 	border-left-color: #f59e0b;
 	background: linear-gradient(90deg, #fffbeb, white);
 }
 
-.existing-tasks-more {
+:where(.mt-scope) .existing-tasks-more {
 	font-size: 11px;
 	color: #6366f1;
 	text-align: center;
@@ -1691,14 +1714,14 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	transition: color 0.12s;
 }
 
-.existing-tasks-more:hover {
+:where(.mt-scope) .existing-tasks-more:hover {
 	color: #4f46e5;
 }
 
 
 
 /* 结束日期选择 */
-.modal-end-date {
+:where(.mt-scope) .modal-end-date {
 	margin: 0 24px 16px;
 	padding: 12px 20px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -1713,7 +1736,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* v1.6.3 真机反馈：勾选框 32px、结束日期框 40px，并排就是「大小眼」。两框改成
    读同一个 --mt-end-h（桌面 32、窄屏 34），谁的自然高度矮了由 min-height 补齐，
    高了由内边距压住——以后要调这行的高度只改这一个变量 */
-.end-date-wrapper {
+:where(.mt-scope) .end-date-wrapper {
 	--mt-end-h: 32px;
 	display: flex;
 	align-items: center;
@@ -1723,7 +1746,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	flex-wrap: wrap;
 }
 
-.multi-day-toggle {
+:where(.mt-scope) .multi-day-toggle {
 	box-sizing: border-box;
 	min-height: var(--mt-end-h, 32px);
 	display: flex;
@@ -1738,45 +1761,45 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	flex-shrink: 0;
 }
 
-.multi-day-toggle:hover {
+:where(.mt-scope) .multi-day-toggle:hover {
 	background: #f8fafc;
 	border-color: #cbd5e1;
 }
 
-.multi-day-toggle input[type="checkbox"] {
+:where(.mt-scope) .multi-day-toggle input[type="checkbox"] {
 	width: 18px;
 	height: 18px;
 	cursor: pointer;
 }
 
-.multi-day-toggle span {
+:where(.mt-scope) .multi-day-toggle span {
 	font-size: 13px;
 	font-weight: 500;
 	color: #475569;
 }
 
 /* 深色模式 - 结束日期 */
-.theme-dark .modal-end-date {
+.theme-dark :where(.mt-scope) .modal-end-date {
 	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
 	border-color: rgba(71, 85, 105, 0.4);
 }
 
 
-.theme-dark .multi-day-toggle {
+.theme-dark :where(.mt-scope) .multi-day-toggle {
 	background: rgba(30, 41, 59, 0.6);
 	border-color: rgba(71, 85, 105, 0.4);
 }
 
-.theme-dark .multi-day-toggle:hover {
+.theme-dark :where(.mt-scope) .multi-day-toggle:hover {
 	background: rgba(30, 41, 59, 0.8);
 }
 
-.theme-dark .multi-day-toggle span {
+.theme-dark :where(.mt-scope) .multi-day-toggle span {
 	color: #cbd5e1;
 }
 
 /* 自定义日期选择器触发按钮 */
-.end-date-trigger {
+:where(.mt-scope) .end-date-trigger {
 	box-sizing: border-box;
 	min-height: var(--mt-end-h, 32px);
 	display: flex;
@@ -1795,12 +1818,12 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
 	user-select: none;
 }
-.end-date-trigger:hover {
+:where(.mt-scope) .end-date-trigger:hover {
 	border-color: #3b82f6;
 	color: #3b82f6;
 	background: #f0f7ff;
 }
-.end-date-trigger::before {
+:where(.mt-scope) .end-date-trigger::before {
 	content: '📅 ';
 	margin-right: 6px;
 }
@@ -1809,21 +1832,21 @@ body:not(.is-mobile) .modal-container .modal-bg {
    就是"在这儿，但现在还不能用"——所以保留占位与尺寸（不跳动、不改版式），
    只把整块压灰 + 换 cursor。用 opacity 而不是只改 color，📅 是 emoji 字符，
    不吃 color。三条 :hover 规则靠 .is-disabled 的同权重后置覆盖回常态 */
-.end-date-trigger.is-disabled {
+:where(.mt-scope) .end-date-trigger.is-disabled {
 	opacity: 0.45;
 	cursor: default;
 	border-style: dashed;
 	background: transparent;
 }
 
-.end-date-trigger.is-disabled:hover {
+:where(.mt-scope) .end-date-trigger.is-disabled:hover {
 	border-color: #e2e8f0;
 	color: #334155;
 	background: transparent;
 }
 
 /* 点到置灰的触发器：抖一下旁边的勾选框，把视线引到"先做什么"上 */
-.multi-day-toggle.hint-shake {
+:where(.mt-scope) .multi-day-toggle.hint-shake {
 	animation: mt-hint-shake 0.45s ease;
 	border-color: #f59e0b;
 }
@@ -1854,14 +1877,14 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 导航行：年月切换 */
-.date-picker-nav {
+:where(.mt-scope) .date-picker-nav {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
 	margin-bottom: 12px;
 }
-.picker-nav-btn {
+:where(.mt-scope) .picker-nav-btn {
 	background: none;
 	border: none;
 	cursor: pointer;
@@ -1872,11 +1895,11 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	transition: all 0.15s;
 	font-family: inherit;
 }
-.picker-nav-btn:hover {
+:where(.mt-scope) .picker-nav-btn:hover {
 	background: #f1f5f9;
 	color: #3b82f6;
 }
-.picker-select {
+:where(.mt-scope) .picker-select {
 	padding: 6px 10px;
 	border: 1px solid #e2e8f0;
 	border-radius: 8px;
@@ -1889,7 +1912,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-family: inherit;
 	text-align: center;
 }
-.picker-select:hover {
+:where(.mt-scope) .picker-select:hover {
 	border-color: #3b82f6;
 	background: white;
 }
@@ -1929,7 +1952,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 面板内容：标题 + 分隔线 + 行 */
-.category-filter-title {
+:where(.mt-scope) .category-filter-title {
 	font-size: 11px;
 	font-weight: 600;
 	letter-spacing: 0.4px;
@@ -1938,13 +1961,13 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	user-select: none;
 }
 
-.category-filter-sep {
+:where(.mt-scope) .category-filter-sep {
 	height: 1px;
 	margin: 0 8px 6px;
 	background: #eef2f7;
 }
 
-.category-filter-count {
+:where(.mt-scope) .category-filter-count {
 	font-size: 11px;
 	font-weight: 500;
 	color: #94a3b8;
@@ -1952,12 +1975,12 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	margin-left: 6px;
 }
 
-.theme-dark .category-filter-title,
-.theme-dark .category-filter-count {
+.theme-dark :where(.mt-scope) .category-filter-title,
+.theme-dark :where(.mt-scope) .category-filter-count {
 	color: #64748b;
 }
 
-.theme-dark .category-filter-sep {
+.theme-dark :where(.mt-scope) .category-filter-sep {
 	background: rgba(71, 85, 105, 0.45);
 }
 
@@ -1970,7 +1993,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 
 /* v1.5.3 行外观：position:relative 供选中态左侧细条定位；间距/内边距/热区加大
    （min-height 32px，配 480 块的 9→10px 内边距即 ≥34px 触控高） */
-.category-filter-item {
+:where(.mt-scope) .category-filter-item {
 	display: flex;
 	position: relative;
 	align-items: center;
@@ -1984,16 +2007,16 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	color: #1e293b;
 }
 
-.category-filter-item:hover {
+:where(.mt-scope) .category-filter-item:hover {
 	background: #f1f5f9;
 }
 
-.category-filter-item.selected {
+:where(.mt-scope) .category-filter-item.selected {
 	background: #eff6ff;
 }
 
 /* v1.5.3 选中态：左侧 2px 类别色细条（无类别的行回落主色蓝），比整行蓝底更安静 */
-.category-filter-item.selected::before {
+:where(.mt-scope) .category-filter-item.selected::before {
 	content: '';
 	position: absolute;
 	left: 2px;
@@ -2004,7 +2027,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	background: var(--mt-cat-color, #2563eb);
 }
 
-.category-filter-item .category-dot {
+:where(.mt-scope) .category-filter-item .category-dot {
 	flex-shrink: 0;
 	width: 10px;
 	height: 10px;
@@ -2013,19 +2036,19 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 「全部」没有颜色真身：用空心圈与实色点区分，避免误读为某个类别 */
-.category-filter-item .category-dot.category-dot-all {
+:where(.mt-scope) .category-filter-item .category-dot.category-dot-all {
 	background: transparent;
 	border: 1.5px solid #94a3b8;
 }
 
 /* 「无标签」= 未带 #tag 的任务。用虚线圈与「全部」的实线圈区分：
    前者是筛选目标（一类内容），后者是「不筛」（全集） */
-.category-filter-item .category-dot.category-dot-none {
+:where(.mt-scope) .category-filter-item .category-dot.category-dot-none {
 	background: transparent;
 	border: 1.5px dashed #94a3b8;
 }
 
-.category-filter-item .category-name {
+:where(.mt-scope) .category-filter-item .category-name {
 	flex: 1;
 	min-width: 0;
 	overflow: hidden;
@@ -2034,7 +2057,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 勾选位固定占宽：有无勾选都对齐，不抖动 */
-.category-filter-item .category-check {
+:where(.mt-scope) .category-filter-item .category-check {
 	flex-shrink: 0;
 	width: 16px;
 	font-size: 13px;
@@ -2044,17 +2067,17 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* v1.5.3：未选中行的 ✓ 占位透明（保留占宽，行不抖动） */
-.category-filter-item:not(.selected) .category-check {
+:where(.mt-scope) .category-filter-item:not(.selected) .category-check {
 	color: transparent;
 }
 
 /* 星期标题行 */
-.date-picker-week {
+:where(.mt-scope) .date-picker-week {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	margin-bottom: 4px;
 }
-.picker-week-day {
+:where(.mt-scope) .picker-week-day {
 	text-align: center;
 	font-size: 11px;
 	font-weight: 600;
@@ -2065,12 +2088,12 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 日期网格 */
-.date-picker-grid {
+:where(.mt-scope) .date-picker-grid {
 	display: grid;
 	grid-template-columns: repeat(7, 1fr);
 	gap: 2px;
 }
-.picker-cell {
+:where(.mt-scope) .picker-cell {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -2083,41 +2106,41 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	cursor: pointer;
 	transition: all 0.15s;
 }
-.picker-cell:hover {
+:where(.mt-scope) .picker-cell:hover {
 	background: #3b82f6;
 	color: white;
 }
-.picker-cell.picker-empty {
+:where(.mt-scope) .picker-cell.picker-empty {
 	cursor: default;
 }
-.picker-cell.picker-cell-today {
+:where(.mt-scope) .picker-cell.picker-cell-today {
 	color: #3b82f6;
 	font-weight: 700;
 }
-.picker-cell.picker-cell-today:hover {
+:where(.mt-scope) .picker-cell.picker-cell-today:hover {
 	background: #3b82f6;
 	color: white;
 }
 
 /* 深色模式 - 日期选择器 */
-.theme-dark .end-date-trigger {
+.theme-dark :where(.mt-scope) .end-date-trigger {
 	background: rgba(30, 41, 59, 0.9);
 	border-color: rgba(71, 85, 105, 0.5);
 	color: #e2e8f0;
 }
-.theme-dark .end-date-trigger:hover {
+.theme-dark :where(.mt-scope) .end-date-trigger:hover {
 	border-color: #3b82f6;
 	color: #60a5fa;
 	background: rgba(59, 130, 246, 0.1);
 }
 /* 深色置灰态：亮色版靠 background:transparent 就够，深色底要跟着压暗，
    并把 :hover 的蓝边还原——置灰块在深色里 hover 变蓝更像"可点"，正好相反 */
-.theme-dark .end-date-trigger.is-disabled {
+.theme-dark :where(.mt-scope) .end-date-trigger.is-disabled {
 	background: rgba(30, 41, 59, 0.4);
 	border-color: rgba(71, 85, 105, 0.5);
 	color: #94a3b8;
 }
-.theme-dark .end-date-trigger.is-disabled:hover {
+.theme-dark :where(.mt-scope) .end-date-trigger.is-disabled:hover {
 	border-color: rgba(71, 85, 105, 0.5);
 	color: #94a3b8;
 	background: rgba(30, 41, 59, 0.4);
@@ -2127,21 +2150,21 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	border-color: rgba(71, 85, 105, 0.5);
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
-.theme-dark .picker-nav-btn { color: #94a3b8; }
-.theme-dark .picker-nav-btn:hover { background: rgba(71, 85, 105, 0.4); color: #60a5fa; }
-.theme-dark .picker-select { background: rgba(30, 41, 59, 0.8); border-color: rgba(71, 85, 105, 0.5); color: #e2e8f0; }
-.theme-dark .picker-select:hover { border-color: #3b82f6; background: rgba(51, 65, 85, 0.9); }
-.theme-dark .category-filter-item { color: #e2e8f0; }
-.theme-dark .category-filter-item:hover { background: rgba(51, 65, 85, 0.7); }
-.theme-dark .category-filter-item.selected { background: rgba(59, 130, 246, 0.2); }
-.theme-dark .category-filter-item .category-check { color: #60a5fa; }
-.theme-dark .picker-week-day { color: #64748b; }
-.theme-dark .picker-cell { color: #e2e8f0; }
-.theme-dark .picker-cell:hover { background: #3b82f6; }
-.theme-dark .picker-cell.picker-cell-today { color: #60a5fa; }
-.theme-dark .picker-cell.picker-cell-today:hover { background: #3b82f6; }
+.theme-dark :where(.mt-scope) .picker-nav-btn { color: #94a3b8; }
+.theme-dark :where(.mt-scope) .picker-nav-btn:hover { background: rgba(71, 85, 105, 0.4); color: #60a5fa; }
+.theme-dark :where(.mt-scope) .picker-select { background: rgba(30, 41, 59, 0.8); border-color: rgba(71, 85, 105, 0.5); color: #e2e8f0; }
+.theme-dark :where(.mt-scope) .picker-select:hover { border-color: #3b82f6; background: rgba(51, 65, 85, 0.9); }
+.theme-dark :where(.mt-scope) .category-filter-item { color: #e2e8f0; }
+.theme-dark :where(.mt-scope) .category-filter-item:hover { background: rgba(51, 65, 85, 0.7); }
+.theme-dark :where(.mt-scope) .category-filter-item.selected { background: rgba(59, 130, 246, 0.2); }
+.theme-dark :where(.mt-scope) .category-filter-item .category-check { color: #60a5fa; }
+.theme-dark :where(.mt-scope) .picker-week-day { color: #64748b; }
+.theme-dark :where(.mt-scope) .picker-cell { color: #e2e8f0; }
+.theme-dark :where(.mt-scope) .picker-cell:hover { background: #3b82f6; }
+.theme-dark :where(.mt-scope) .picker-cell.picker-cell-today { color: #60a5fa; }
+.theme-dark :where(.mt-scope) .picker-cell.picker-cell-today:hover { background: #3b82f6; }
 
-.theme-dark .task-time { color: #94a3b8; }
+.theme-dark :where(.mt-scope) .task-time { color: #94a3b8; }
 
 /* ===== v1.6.2 优先级：恢复大圆点，但横向单行 =====
    v1.6.0 曾把圆点缩成胶囊里的 10px 色点，省了 60px 高度，代价是三个圆点
@@ -2153,7 +2176,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* v1.6.4：卡片是整宽的，内容左对齐会在右边空出一大块（手机上尤其明显）。
    改成「优先级 + 三组圆点」作为一个整体居中；.priority-group 不再 flex:1 吃满，
    否则居中的是它、看起来仍是圆点靠左 */
-.modal-priority {
+:where(.mt-scope) .modal-priority {
 	margin: 0 24px 16px;
 	padding: 10px 20px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -2166,7 +2189,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	flex-wrap: wrap;
 }
 
-.priority-label {
+:where(.mt-scope) .priority-label {
 	font-size: 13px;
 	font-weight: 600;
 	color: #475569;
@@ -2174,7 +2197,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	flex-shrink: 0;
 }
 
-.priority-group {
+:where(.mt-scope) .priority-group {
 	display: flex;
 	gap: 18px;
 	flex-wrap: wrap;
@@ -2183,7 +2206,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 一组 = 圆点 + 下方文字，纵向居中 */
-.priority-btn-wrapper {
+:where(.mt-scope) .priority-btn-wrapper {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -2191,7 +2214,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	cursor: pointer;
 }
 
-.priority-btn {
+:where(.mt-scope) .priority-btn {
 	width: 40px;
 	height: 40px;
 	border-radius: 50%;
@@ -2203,16 +2226,16 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.priority-btn:hover {
+:where(.mt-scope) .priority-btn:hover {
 	transform: scale(1.12);
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-.priority-btn.selected {
+:where(.mt-scope) .priority-btn.selected {
 	transform: scale(1.08);
 }
 
-.priority-btn.selected::after {
+:where(.mt-scope) .priority-btn.selected::after {
 	content: '✓';
 	position: absolute;
 	top: 50%;
@@ -2224,7 +2247,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
-.priority-btn-text {
+:where(.mt-scope) .priority-btn-text {
 	font-size: 11px;
 	font-weight: 500;
 	color: #64748b;
@@ -2232,48 +2255,48 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	transition: color 0.2s ease;
 }
 
-.priority-btn-wrapper:hover .priority-btn-text {
+:where(.mt-scope) .priority-btn-wrapper:hover .priority-btn-text {
 	color: #475569;
 }
 
-.priority-btn-wrapper.selected .priority-btn-text {
+:where(.mt-scope) .priority-btn-wrapper.selected .priority-btn-text {
 	color: #334155;
 	font-weight: 600;
 }
 
 /* 普通 = 浅绿渐变 + 绿描边（不是实色块，选中态才用深色描边和绿勾） */
-.priority-btn.priority-none {
+:where(.mt-scope) .priority-btn.priority-none {
 	background: linear-gradient(135deg, #dcfce7, #bbf7d0);
 	border: 2px solid #22c55e;
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.priority-btn.priority-none.selected {
+:where(.mt-scope) .priority-btn.priority-none.selected {
 	border-color: #15803d;
 	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.priority-btn.priority-none.selected::after {
+:where(.mt-scope) .priority-btn.priority-none.selected::after {
 	color: #15803d;
 	text-shadow: none;
 }
 
-.priority-btn.priority-high {
+:where(.mt-scope) .priority-btn.priority-high {
 	background: linear-gradient(135deg, #ef4444, #dc2626);
 	border-color: #fca5a5;
 }
 
-.priority-btn.priority-high.selected {
+:where(.mt-scope) .priority-btn.priority-high.selected {
 	border-color: #991b1b;
 	box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
 }
 
-.priority-btn.priority-medium {
+:where(.mt-scope) .priority-btn.priority-medium {
 	background: linear-gradient(135deg, #f59e0b, #d97706);
 	border-color: #fcd34d;
 }
 
-.priority-btn.priority-medium.selected {
+:where(.mt-scope) .priority-btn.priority-medium.selected {
 	border-color: #92400e;
 	box-shadow: 0 4px 16px rgba(217, 119, 6, 0.4);
 }
@@ -2283,7 +2306,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
    999px 与优先级方块区分开，色点复用 --mt-cat-color（与日历/漏斗/设置同色） */
 /* v1.6.4：跨天行与优先级行居中后，类别行仍左对齐会在同一屏里出现两种对齐基线。
    三张卡片统一居中；胶囊换行时每行各自居中，展开态读起来是一团而不是左倾的堆 */
-.modal-category {
+:where(.mt-scope) .modal-category {
 	margin: 0 24px 20px;
 	padding: 14px 20px;
 	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -2296,21 +2319,21 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	flex-wrap: wrap;
 }
 
-.modal-category .category-label {
+:where(.mt-scope) .modal-category .category-label {
 	font-size: 13px;
 	font-weight: 600;
 	color: #475569;
 	flex-shrink: 0;
 }
 
-.category-group {
+:where(.mt-scope) .category-group {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
 	flex: 1 1 auto;
 }
 
-.category-chip {
+:where(.mt-scope) .category-chip {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
@@ -2325,18 +2348,18 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
-.category-chip:hover {
+:where(.mt-scope) .category-chip:hover {
 	border-color: #94a3b8;
 }
 
-.category-chip.selected {
+:where(.mt-scope) .category-chip.selected {
 	border-color: #2563eb;
 	background: #eff6ff;
 	color: #1d4ed8;
 	font-weight: 600;
 }
 
-.category-chip .category-chip-dot {
+:where(.mt-scope) .category-chip .category-chip-dot {
 	flex-shrink: 0;
 	width: 8px;
 	height: 8px;
@@ -2345,7 +2368,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 }
 
 /* 「无标签」没有颜色真身：空心圈，和漏斗面板的空心点同一语汇 */
-.category-chip .category-chip-dot.category-chip-dot-none {
+:where(.mt-scope) .category-chip .category-chip-dot.category-chip-dot-none {
 	background: transparent;
 	border: 1.5px solid #94a3b8;
 }
@@ -2353,7 +2376,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* v1.6.2：类别超过两行时挂在尾部的开合开关。复用 .category-chip 的尺寸与圆角
    （它本来就是这排里的一个成员），但虚线边框 + 灰字表明"我不是一个类别"；
    flex-shrink:0 保证窄屏换行时它不会被挤扁 */
-.category-more-btn {
+:where(.mt-scope) .category-more-btn {
 	flex-shrink: 0;
 	border-style: dashed;
 	border-color: #cbd5e1;
@@ -2362,19 +2385,19 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	font-weight: 500;
 }
 
-.category-more-btn:hover {
+:where(.mt-scope) .category-more-btn:hover {
 	border-color: #94a3b8;
 	color: #334155;
 }
 
-.category-more-btn.is-open {
+:where(.mt-scope) .category-more-btn.is-open {
 	border-style: solid;
 	border-color: #2563eb;
 	background: #eff6ff;
 	color: #1d4ed8;
 }
 
-.theme-dark .category-more-btn {
+.theme-dark :where(.mt-scope) .category-more-btn {
 	border-color: rgba(100, 116, 139, 0.7);
 	background: transparent;
 	color: #94a3b8;
@@ -2383,13 +2406,13 @@ body:not(.is-mobile) .modal-container .modal-bg {
 /* v1.7.11 补：浅色 hover 把文字压到 #334155（近黑），深色块此前只覆写了常态与
    .is-open 两态，漏了 hover——深色界面下鼠标一悬停，「更多 ▾」就变成
    深底上的近黑字，等于点一下就消失 */
-.theme-dark .category-more-btn:hover {
+.theme-dark :where(.mt-scope) .category-more-btn:hover {
 	border-color: #cbd5e1;
 	background: rgba(100, 116, 139, 0.18);
 	color: #e2e8f0;
 }
 
-.theme-dark .category-more-btn.is-open {
+.theme-dark :where(.mt-scope) .category-more-btn.is-open {
 	border-color: #3b82f6;
 	background: rgba(59, 130, 246, 0.18);
 	color: #93c5fd;
@@ -2403,53 +2426,54 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		padding: 16px;
 	}
 	
-	.monthly-header {
+	:where(.mt-scope) .monthly-header {
 		padding: 10px 12px;
 	}
 	
-	.nav-btn {
+	:where(.mt-scope) .nav-btn {
 		width: 36px;
 		height: 36px;
 	}
 	
-	.nav-btn svg {
+	:where(.mt-scope) .nav-btn svg {
 		width: 22px;
 		height: 22px;
 	}
 	
-	.month-title {
+	:where(.mt-scope) .month-title {
 		font-size: 18px;
 		padding: 8px 20px;
 	}
 	
-	.today-btn {
+	:where(.mt-scope) .today-btn {
 		padding: 8px 14px;
 		font-size: 13px;
 	}
 	
-	.weekday-cell {
+	:where(.mt-scope) .weekday-cell {
 		padding: 10px 6px;
 		font-size: 13px;
 	}
 	
-	.calendar-grid {
+	:where(.mt-scope) .calendar-grid {
 		gap: 6px;
 	}
 	
-	.day-cell {
+	:where(.mt-scope) .day-cell {
 		padding: 6px 8px;
 		min-height: 115px;
 	}
 	
-	.day-number {
+	:where(.mt-scope) .day-number,
+.day-number.mt-measure-probe {
 		font-size: 17px;
 	}
 	
-	.lunar-info {
+	:where(.mt-scope) .lunar-info {
 		font-size: 11px;
 	}
 	
-	.task-item {
+	:where(.mt-scope) .task-item {
 		padding: 3px 5px;
 		font-size: 11px;
 	}
@@ -2461,66 +2485,67 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		padding: 20px;
 	}
 	
-	.monthly-header {
+	:where(.mt-scope) .monthly-header {
 		padding: 12px 16px;
 		margin-bottom: 16px;
 	}
 	
-	.nav-btn {
+	:where(.mt-scope) .nav-btn {
 		width: 40px;
 		height: 40px;
 	}
 	
-	.nav-btn svg {
+	:where(.mt-scope) .nav-btn svg {
 		width: 24px;
 		height: 24px;
 	}
 	
-	.month-title {
+	:where(.mt-scope) .month-title {
 		font-size: 20px;
 		padding: 10px 24px;
 	}
 	
-	.today-btn {
+	:where(.mt-scope) .today-btn {
 		padding: 8px 16px;
 		font-size: 13px;
 	}
 	
-	.weekday-cell {
+	:where(.mt-scope) .weekday-cell {
 		padding: 12px 8px;
 		font-size: 14px;
 	}
 	
-	.calendar-grid {
+	:where(.mt-scope) .calendar-grid {
 		gap: 8px;
 	}
 	
-	.day-cell {
+	:where(.mt-scope) .day-cell {
 		min-height: 160px;
 		padding: 10px 12px;
 		border-radius: 14px;
 	}
 	
-	.day-number {
+	:where(.mt-scope) .day-number,
+.day-number.mt-measure-probe {
 		font-size: 19px;
 	}
 	
-	.lunar-info {
+	:where(.mt-scope) .lunar-info {
 		font-size: 12px;
 	}
 	
-	.task-item {
+	:where(.mt-scope) .task-item {
 		padding: 4px 6px;
 		font-size: 12px;
 		min-height: 20px;
 	}
 	
-	.task-content {
+	:where(.mt-scope) .task-content {
 		font-size: 12px;
 		line-height: 1.4;
 	}
 
-	.day-tasks {
+	:where(.mt-scope) .day-tasks {
 		gap: 2px;
 	}
 }
@@ -2572,7 +2597,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 
 /* ========== 动画 ========== */
 /* 网格切换动画 - 更柔和的淡入效果 */
-@keyframes fadeIn {
+@keyframes mt-fade-in {
 	from {
 		opacity: 0;
 	}
@@ -2581,15 +2606,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	}
 }
 
-.calendar-grid {
-	animation: fadeIn 0.2s ease-out;
+:where(.mt-scope) .calendar-grid {
+	animation: mt-fade-in 0.2s ease-out;
 }
 
 /* 加载失败兜底态（main.js 在网格与明细区各建一个 .error-hint）。
    v1.7.11 补：此前 CSS 里根本没有这条规则，而 .calendar-grid 是 7 列 grid，
    裸 div 会掉进第 1 列——「任务加载失败」被压成 1/7 宽的左上角一小坨，
    最需要被用户看见的状态反而最难读。跨整行居中后两种宿主（网格／明细）都成立。 */
-.error-hint {
+:where(.mt-scope) .error-hint {
 	grid-column: 1 / -1;
 	align-self: center;
 	padding: 14px 10px;
@@ -2630,246 +2655,246 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	--workday-badge: #3b82f6;
 }
 
-.theme-dark .task-item {
+.theme-dark :where(.mt-scope) .task-item {
 	background: rgba(255, 255, 255, 0.03);
 	border-left-color: rgba(255, 255, 255, 0.1);
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.theme-dark .task-item:hover {
+	.theme-dark :where(.mt-scope) .task-item:hover {
 		background: rgba(59, 130, 246, 0.1);
 	}
 }
 
 /* 深色模式 - 日期格子 */
-.theme-dark .day-cell {
+.theme-dark :where(.mt-scope) .day-cell {
 	background: var(--bg-primary);
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.theme-dark .day-cell:hover {
+.theme-dark :where(.mt-scope) .day-cell:hover {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 /* 深色同理：hover 不丢 today 的内描边 */
-.theme-dark .day-cell.today:hover {
+.theme-dark :where(.mt-scope) .day-cell.today:hover {
 	box-shadow: inset 0 0 0 1px #3b82f6, 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.theme-dark .day-cell.weekend {
+.theme-dark :where(.mt-scope) .day-cell.weekend {
 	background: var(--weekend-bg);
 	border: 1px solid var(--weekend-border);
 }
 
-.theme-dark .day-cell.weekend .day-number {
+.theme-dark :where(.mt-scope) .day-cell.weekend .day-number {
 	color: #60a5fa;
 }
 
-.theme-dark .day-cell.holiday {
+.theme-dark :where(.mt-scope) .day-cell.holiday {
 	background: var(--holiday-bg);
 	border: 1px solid var(--holiday-border);
 }
 
-.theme-dark .day-cell.holiday .day-number {
+.theme-dark :where(.mt-scope) .day-cell.holiday .day-number {
 	color: #f87171;
 }
 
-.theme-dark .day-cell.workday {
+.theme-dark :where(.mt-scope) .day-cell.workday {
 	background: var(--workday-bg);
 	border: 1px solid var(--workday-border);
 }
 
-.theme-dark .day-cell.workday .day-number {
+.theme-dark :where(.mt-scope) .day-cell.workday .day-number {
 	color: #60a5fa;
 }
 
-.theme-dark .day-cell.other-month {
+.theme-dark :where(.mt-scope) .day-cell.other-month {
 	opacity: 0.25;
 }
 
 /* 深色模式 - 今天高亮（同亮色：1px 边框 + inset 内描边，与其他格子外盒对齐） */
-.theme-dark .day-cell.today {
+.theme-dark :where(.mt-scope) .day-cell.today {
 	border: 1px solid #3b82f6;
 	box-shadow: inset 0 0 0 1px #3b82f6, 0 1px 4px rgba(59, 130, 246, 0.2);
 	background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%);
 }
 
-.theme-dark .day-cell.today .day-number {
+.theme-dark :where(.mt-scope) .day-cell.today .day-number {
 	color: #60a5fa;
 	font-weight: 600;
 }
 
 /* 深色模式 - 当日高亮覆盖节假日 */
-.theme-dark .day-cell.today.holiday .day-number,
-.theme-dark .day-cell.today.weekend .day-number {
+.theme-dark :where(.mt-scope) .day-cell.today.holiday .day-number,
+.theme-dark :where(.mt-scope) .day-cell.today.weekend .day-number {
 	font-weight: 600;
 }
 
 /* 深色模式 - 星期标题 */
-.theme-dark .weekday-cell {
+.theme-dark :where(.mt-scope) .weekday-cell {
 	background: var(--bg-primary);
 	color: #9ca3af;
 }
 
-.theme-dark .weekday-cell.weekend {
+.theme-dark :where(.mt-scope) .weekday-cell.weekend {
 	background: rgba(220, 38, 38, 0.1);
 	color: #f87171;
 }
 
 /* 深色模式 - 头部导航 */
-.theme-dark .monthly-header {
+.theme-dark :where(.mt-scope) .monthly-header {
 	background: var(--bg-primary);
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-.theme-dark .nav-btn {
+.theme-dark :where(.mt-scope) .nav-btn {
 	background: var(--bg-secondary);
 	color: #9ca3af;
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.theme-dark .nav-btn:hover {
+	.theme-dark :where(.mt-scope) .nav-btn:hover {
 		background: rgba(59, 130, 246, 0.15);
 		color: #60a5fa;
 	}
 }
 
-.theme-dark .nav-btn.view-toggle-btn.is-agenda {
+.theme-dark :where(.mt-scope) .nav-btn.view-toggle-btn.is-agenda {
 	color: #60a5fa;
 	background: rgba(59, 130, 246, 0.16);
 }
 
-.theme-dark .month-title {
+.theme-dark :where(.mt-scope) .month-title {
 	background: var(--bg-secondary);
 	color: #e5e7eb;
 }
 
-.theme-dark .month-title.clickable:hover {
+.theme-dark :where(.mt-scope) .month-title.clickable:hover {
 	background: rgba(59, 130, 246, 0.15);
 	color: #60a5fa;
 }
 
-.theme-dark .today-btn {
+.theme-dark :where(.mt-scope) .today-btn {
 	background: rgba(59, 130, 246, 0.1);
 	border-color: rgba(59, 130, 246, 0.2);
 	color: #60a5fa;
 }
 
-.theme-dark .today-btn:hover {
+.theme-dark :where(.mt-scope) .today-btn:hover {
 	background: rgba(59, 130, 246, 0.2);
 	border-color: rgba(59, 130, 246, 0.3);
 }
 
-.theme-dark .today-btn:active {
+.theme-dark :where(.mt-scope) .today-btn:active {
 	background: rgba(59, 130, 246, 0.2);
 	border-color: rgba(59, 130, 246, 0.3);
 }
 
 /* 深色模式 - 农历信息 */
-.theme-dark .lunar-info {
+.theme-dark :where(.mt-scope) .lunar-info {
 	color: #9ca3af;
 }
 
-.theme-dark .lunar-info.special-lunar {
+.theme-dark :where(.mt-scope) .lunar-info.special-lunar {
 	color: #60a5fa;
 }
 
-.theme-dark .holiday-name {
+.theme-dark :where(.mt-scope) .holiday-name {
 	color: #f87171;
 }
 
 /* 深色模式 - 任务内容 */
-.theme-dark .task-content {
+.theme-dark :where(.mt-scope) .task-content {
 	color: #d1d5db;
 }
 
 /* 深色模式 - 更多任务 */
-.theme-dark .more-tasks {
+.theme-dark :where(.mt-scope) .more-tasks {
 	color: #6b7280;
 }
 
 /* 深色模式 - 优先级大圆点（v1.6.2 恢复）：描边压暗、投影加深，
    普通档改为半透明绿渐变——原浅绿块在暗底上发灰 */
-.theme-dark .priority-btn.priority-high {
+.theme-dark :where(.mt-scope) .priority-btn.priority-high {
 	background: linear-gradient(135deg, #dc2626, #b91c1c);
 	border-color: #fca5a5;
 }
 
-.theme-dark .priority-btn.priority-high.selected {
+.theme-dark :where(.mt-scope) .priority-btn.priority-high.selected {
 	border-color: #7f1d1d;
 	box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
 }
 
-.theme-dark .priority-btn.priority-medium {
+.theme-dark :where(.mt-scope) .priority-btn.priority-medium {
 	background: linear-gradient(135deg, #d97706, #b45309);
 	border-color: #fcd34d;
 }
 
-.theme-dark .priority-btn.priority-medium.selected {
+.theme-dark :where(.mt-scope) .priority-btn.priority-medium.selected {
 	border-color: #78350f;
 	box-shadow: 0 4px 12px rgba(217, 119, 6, 0.5);
 }
 
-.theme-dark .priority-btn.priority-none {
+.theme-dark :where(.mt-scope) .priority-btn.priority-none {
 	background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(21, 128, 61, 0.15));
 	border: 2px solid #22c55e;
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.theme-dark .priority-btn.priority-none.selected {
+.theme-dark :where(.mt-scope) .priority-btn.priority-none.selected {
 	border-color: #4ade80;
 	box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* 深色底上亮绿勾：沿用亮色的 #15803d 几乎不可见 */
-.theme-dark .priority-btn.priority-none.selected::after {
+.theme-dark :where(.mt-scope) .priority-btn.priority-none.selected::after {
 	color: #4ade80;
 }
 
-.theme-dark .priority-btn-text {
+.theme-dark :where(.mt-scope) .priority-btn-text {
 	color: #94a3b8;
 }
 
-.theme-dark .priority-btn-wrapper:hover .priority-btn-text {
+.theme-dark :where(.mt-scope) .priority-btn-wrapper:hover .priority-btn-text {
 	color: #cbd5e1;
 }
 
-.theme-dark .priority-btn-wrapper.selected .priority-btn-text {
+.theme-dark :where(.mt-scope) .priority-btn-wrapper.selected .priority-btn-text {
 	color: #e2e8f0;
 }
 
 /* 批次二③：深色模式类别行 */
-.theme-dark .modal-category {
+.theme-dark :where(.mt-scope) .modal-category {
 	background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%);
 	border-color: rgba(71, 85, 105, 0.4);
 }
 
-.theme-dark .modal-category .category-label {
+.theme-dark :where(.mt-scope) .modal-category .category-label {
 	color: #cbd5e1;
 }
 
-.theme-dark .category-chip {
+.theme-dark :where(.mt-scope) .category-chip {
 	background: rgba(15, 23, 42, 0.6);
 	border-color: rgba(71, 85, 105, 0.6);
 	color: #cbd5e1;
 }
 
-.theme-dark .category-chip:hover {
+.theme-dark :where(.mt-scope) .category-chip:hover {
 	border-color: #94a3b8;
 }
 
-.theme-dark .category-chip.selected {
+.theme-dark :where(.mt-scope) .category-chip.selected {
 	background: rgba(59, 130, 246, 0.18);
 	border-color: #3b82f6;
 	color: #93c5fd;
 }
 
-.theme-dark .category-chip .category-chip-dot.category-chip-dot-none {
+.theme-dark :where(.mt-scope) .category-chip .category-chip-dot.category-chip-dot-none {
 	border-color: #64748b;
 }
 
 /* 深色模式 - 日期头部（不设背景带，与亮色的干净头部保持一致） */
-.theme-dark .modal-date-info .date-main {
+.theme-dark :where(.mt-scope) .modal-date-info .date-main {
 	color: #e2e8f0;
 }
 
@@ -2886,160 +2911,160 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
-.theme-dark .task-input::placeholder {
+.theme-dark :where(.mt-scope) .task-input::placeholder {
 	color: #64748b;
 }
 
 /* 深色模式 - 优先级 */
-.theme-dark .modal-existing-tasks {
+.theme-dark :where(.mt-scope) .modal-existing-tasks {
 	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
 	border-color: rgba(71, 85, 105, 0.4);
 }
 
-.theme-dark .existing-tasks-title-row {
+.theme-dark :where(.mt-scope) .existing-tasks-title-row {
 	border-bottom-color: rgba(71, 85, 105, 0.4);
 }
 
-.theme-dark .existing-tasks-title {
+.theme-dark :where(.mt-scope) .existing-tasks-title {
 	color: #94a3b8;
 }
 
 /* v1.5.4：深色下胶囊用「面板底 + 半透明填充」，不用 #fff，避免在暗背景上炸成一块白斑 */
-.theme-dark .existing-tasks-toggle {
+.theme-dark :where(.mt-scope) .existing-tasks-toggle {
 	border-color: rgba(148, 163, 184, 0.32);
 	background: rgba(148, 163, 184, 0.12);
 	color: #94a3b8;
 }
 
-.theme-dark .existing-tasks-title-row:hover .existing-tasks-toggle {
+.theme-dark :where(.mt-scope) .existing-tasks-title-row:hover .existing-tasks-toggle {
 	border-color: rgba(148, 163, 184, 0.55);
 	background: rgba(148, 163, 184, 0.2);
 	color: #cbd5e1;
 }
 
-.theme-dark .existing-task-item {
+.theme-dark :where(.mt-scope) .existing-task-item {
 	background: rgba(30, 41, 59, 0.6);
 	color: #e2e8f0;
 	border-left-color: #475569;
 }
 
-.theme-dark .existing-task-item:hover {
+.theme-dark :where(.mt-scope) .existing-task-item:hover {
 	background: rgba(51, 65, 85, 0.7);
 }
 
-.theme-dark .existing-task-item.completed .task-text {
+.theme-dark :where(.mt-scope) .existing-task-item.completed .task-text {
 	color: #9ca3af;
 }
 
-.theme-dark .existing-task-item.priority-3 {
+.theme-dark :where(.mt-scope) .existing-task-item.priority-3 {
 	border-left-color: #ef4444;
 	background: linear-gradient(90deg, rgba(239, 68, 68, 0.15), rgba(30, 41, 59, 0.6));
 }
 
-.theme-dark .existing-task-item.priority-2 {
+.theme-dark :where(.mt-scope) .existing-task-item.priority-2 {
 	border-left-color: #f59e0b;
 	background: linear-gradient(90deg, rgba(245, 158, 11, 0.15), rgba(30, 41, 59, 0.6));
 }
 
-.theme-dark .task-action-btn {
+.theme-dark :where(.mt-scope) .task-action-btn {
 	color: #64748b;
 }
 
-.theme-dark .task-edit-btn:hover {
+.theme-dark :where(.mt-scope) .task-edit-btn:hover {
 	background: rgba(148, 163, 184, 0.15);
 	color: #cbd5e1;
 }
 
-.theme-dark .task-goto-btn:hover {
+.theme-dark :where(.mt-scope) .task-goto-btn:hover {
 	background: rgba(59, 130, 246, 0.15);
 	color: #60a5fa;
 }
 
-.theme-dark .task-delete-btn:hover {
+.theme-dark :where(.mt-scope) .task-delete-btn:hover {
 	background: rgba(239, 68, 68, 0.15);
 	color: #f87171;
 }
 
-.theme-dark .existing-tasks-more {
+.theme-dark :where(.mt-scope) .existing-tasks-more {
 	color: #818cf8;
 }
 
-.theme-dark .existing-tasks-more:hover {
+.theme-dark :where(.mt-scope) .existing-tasks-more:hover {
 	color: #a5b4fc;
 }
 
 
 
-.theme-dark .modal-priority {
+.theme-dark :where(.mt-scope) .modal-priority {
 	background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.4) 100%);
 	border-color: rgba(71, 85, 105, 0.4);
 }
 
-.theme-dark .priority-label {
+.theme-dark :where(.mt-scope) .priority-label {
 	color: #94a3b8;
 }
 
 /* 移动端适配 */
 @media (max-width: 600px) {
 	/* 弹窗内区块左右边距统一收窄（原 24px，与时间选择器的 12px 不一致） */
-	.modal-date-info {
+	:where(.mt-scope) .modal-date-info {
 		padding: 24px 16px 4px;
 	}
-	.task-input-wrapper {
+	:where(.mt-scope) .task-input-wrapper {
 		margin: 12px 16px;
 	}
-	.modal-existing-tasks {
+	:where(.mt-scope) .modal-existing-tasks {
 		margin: 16px;
 	}
-	.modal-time-container {
+	:where(.mt-scope) .modal-time-container {
 		margin: 0 16px 16px;
 		padding: 14px;
 	}
-	.modal-end-date {
+	:where(.mt-scope) .modal-end-date {
 		margin: 0 16px 16px;
 	}
-	.modal-priority {
+	:where(.mt-scope) .modal-priority {
 		margin: 0 16px 16px;
 		padding: 12px 14px;
 		gap: 10px;
 	}
 	/* 大圆点自带 40px 命中区，比胶囊更不用补 padding；窄屏只收一点间距 */
-	.priority-group {
+	:where(.mt-scope) .priority-group {
 		gap: 14px;
 	}
-	.priority-btn-text {
+	:where(.mt-scope) .priority-btn-text {
 		font-size: 12px;
 	}
-	.modal-category {
+	:where(.mt-scope) .modal-category {
 		margin: 0 16px 16px;
 		padding: 12px 14px;
 		gap: 10px;
 	}
 	/* 触屏点击区：5px 12px 的胶囊约 27px 高，拇指按不准，抬到 33px 以上 */
-	.category-chip {
+	:where(.mt-scope) .category-chip {
 		padding: 8px 14px;
 		font-size: 13px;
 		line-height: 1.3;
 	}
 	/* 同上：折叠胶囊在窄屏是唯一的列表开关，抬到拇指可稳定命中 */
-	.existing-tasks-toggle {
+	:where(.mt-scope) .existing-tasks-toggle {
 		padding: 6px 12px 6px 9px;
 		font-size: 12px;
 	}
-	.modal-buttons {
+	:where(.mt-scope) .modal-buttons {
 		padding: 0 16px 14px;
 	}
 
 	/* 两个时间框按内容取固有宽度，不再各占一半撑满整栏：
 	   定宽 108px 时时间码后面留一大截空白，原生拾取器的向下箭头被顶到框的
 	   最右边，看着离时间很远；取固有宽度后箭头就紧跟在时间码后面 */
-	.time-input-wrapper {
+	:where(.mt-scope) .time-input-wrapper {
 		gap: 10px;
 		flex-wrap: nowrap;
 		justify-content: center;
 		padding: 0 2px;
 	}
-	.time-input-wrapper .time-native-input {
+	:where(.mt-scope) .time-input-wrapper .time-native-input {
 		box-sizing: border-box;
 		flex: 0 0 auto;
 		width: auto;
@@ -3047,30 +3072,30 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		padding: 9px 8px;
 		font-size: 16px;
 	}
-	.time-input-wrapper .time-native-input::-webkit-calendar-picker-indicator {
+	:where(.mt-scope) .time-input-wrapper .time-native-input::-webkit-calendar-picker-indicator {
 		margin-left: 0;
 	}
-	.time-separator {
+	:where(.mt-scope) .time-separator {
 		flex: 0 0 auto;
 		margin: 0;
 		font-size: 13px;
 	}
-	.theme-dark .time-native-input {
+	.theme-dark :where(.mt-scope) .time-native-input {
 		font-size: 16px;
 		min-width: 0;
 	}
-	.all-day-toggle {
+	:where(.mt-scope) .all-day-toggle {
 		padding: 12px 20px;
 		margin: 14px auto 0;
 	}
-	.all-day-toggle span {
+	:where(.mt-scope) .all-day-toggle span {
 		font-size: 15px;
 	}
-	.all-day-toggle input[type="checkbox"] {
+	:where(.mt-scope) .all-day-toggle input[type="checkbox"] {
 		width: 20px;
 		height: 20px;
 	}
-	.time-label {
+	:where(.mt-scope) .time-label {
 		font-size: 13px;
 		margin-bottom: 10px;
 	}
@@ -3080,15 +3105,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		min-width: 260px;
 		padding: 12px;
 	}
-	.date-picker-nav {
+	:where(.mt-scope) .date-picker-nav {
 		justify-content: center;
 		gap: 6px;
 	}
-	.picker-select {
+	:where(.mt-scope) .picker-select {
 		font-size: 14px;
 		padding: 8px 6px;
 	}
-	.picker-nav-btn {
+	:where(.mt-scope) .picker-nav-btn {
 		font-size: 12px;
 		padding: 6px 10px;
 	}
@@ -3097,15 +3122,15 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	.category-filter-popup {
 		padding: 6px;
 	}
-	.category-filter-item {
+	:where(.mt-scope) .category-filter-item {
 		padding: 9px 8px;
 		font-size: 14px;
 	}
-	.picker-cell {
+	:where(.mt-scope) .picker-cell {
 		height: 36px;
 		font-size: 13px;
 	}
-	.picker-week-day {
+	:where(.mt-scope) .picker-week-day {
 		font-size: 10px;
 		padding: 2px 0;
 	}
@@ -3113,10 +3138,10 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	/* 结束日期行：--mt-end-h 抬到 34，两框同步。触发器内边距 10px 12px → 6px 10px、
 	   字号 14 → 13（改前这框自然高度 40px、勾选框 32px，正是「大小眼」）；
 	   日期同时改紧凑写法，393px 屏上勾选框 110 + 间距 8 + 日期框 109 = 227 ≤ 内容宽 288 */
-	.end-date-wrapper {
+	:where(.mt-scope) .end-date-wrapper {
 		--mt-end-h: 34px;
 	}
-	.end-date-trigger {
+	:where(.mt-scope) .end-date-trigger {
 		padding: 6px 10px;
 		/* font-size 基准已 13px，窄屏不必重报 */
 	}
@@ -3126,7 +3151,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
    时间码和拾取器箭头之间会空出一大截；这里把「时间 + 箭头」交给插件画，
    原生输入透明铺满整个框，点哪都还是弹出系统时间选择器 */
 @media (pointer: coarse) {
-	.time-field {
+	:where(.mt-scope) .time-field {
 		position: relative;
 		display: inline-flex;
 		align-items: center;
@@ -3140,7 +3165,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		cursor: pointer;
 	}
 
-	.time-field-value {
+	:where(.mt-scope) .time-field-value {
 		display: block;
 		font-size: 16px;
 		font-weight: 500;
@@ -3150,7 +3175,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		white-space: nowrap;
 	}
 
-	.time-field-chevron {
+	:where(.mt-scope) .time-field-chevron {
 		display: block;
 		flex: 0 0 auto;
 		width: 7px;
@@ -3160,7 +3185,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		transform: translateY(-2px) rotate(45deg);
 	}
 
-	.time-field .time-native-input {
+	:where(.mt-scope) .time-field .time-native-input {
 		position: absolute;
 		inset: 0;
 		z-index: 1;
@@ -3178,25 +3203,25 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		cursor: pointer;
 	}
 
-	.time-field:focus-within {
+	:where(.mt-scope) .time-field:focus-within {
 		border-color: #3b82f6;
 		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 	}
 
-	.time-field:has(.time-native-input:disabled) {
+	:where(.mt-scope) .time-field:has(.time-native-input:disabled) {
 		opacity: 0.4;
 	}
 
-	.theme-dark .time-field {
+	.theme-dark :where(.mt-scope) .time-field {
 		background: #1e293b;
 		border-color: #475569;
 	}
 
-	.theme-dark .time-field-value {
+	.theme-dark :where(.mt-scope) .time-field-value {
 		color: #e2e8f0;
 	}
 
-	.theme-dark .time-field-chevron {
+	.theme-dark :where(.mt-scope) .time-field-chevron {
 		border-color: #94a3b8;
 	}
 }
@@ -3205,26 +3230,26 @@ body:not(.is-mobile) .modal-container .modal-bg {
    → 再挤一档（内边距与间距同步收）。实测 100 + 6 + 105 = 211 ≤ 220 → 一行放得下，
    宁可紧凑也不让这行拆成两行 */
 @media (max-width: 380px) {
-	.end-date-wrapper {
+	:where(.mt-scope) .end-date-wrapper {
 		--mt-end-h: 32px;
 		gap: 6px;
 	}
-	.multi-day-toggle {
+	:where(.mt-scope) .multi-day-toggle {
 		padding: 5px 8px;
 		gap: 6px;
 	}
-	.end-date-trigger {
+	:where(.mt-scope) .end-date-trigger {
 		padding: 5px 8px;
 	}
 }
 
 /* 深色模式 - 按钮 */
-.theme-dark .btn-cancel {
+.theme-dark :where(.mt-scope) .btn-cancel {
 	background: rgba(71, 85, 105, 0.4);
 	color: #94a3b8;
 }
 
-.theme-dark .btn-cancel:hover {
+.theme-dark :where(.mt-scope) .btn-cancel:hover {
 	background: rgba(71, 85, 105, 0.6);
 	color: #e2e8f0;
 }
@@ -3236,26 +3261,26 @@ body:not(.is-mobile) .modal-container .modal-bg {
 		padding: 4px;
 	}
 	
-	.monthly-header {
+	:where(.mt-scope) .monthly-header {
 		padding: 6px 8px;
 		margin-bottom: 8px;
 	}
 	
-	.header-btn-group {
+	:where(.mt-scope) .header-btn-group {
 		gap: 4px;
 	}
 	
-	.nav-btn {
+	:where(.mt-scope) .nav-btn {
 		width: 28px;
 		height: 28px;
 	}
 	
-	.nav-btn svg {
+	:where(.mt-scope) .nav-btn svg {
 		width: 16px;
 		height: 16px;
 	}
 	
-	.month-title {
+	:where(.mt-scope) .month-title {
 		font-size: 15px;
 		padding: 4px 4px;
 		margin: 0 2px;
@@ -3263,23 +3288,23 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	
 	/* 真机反馈回退：「回到本月」恢复文本按钮（图标化并未省出标题区，flex:1 把省下的
 	   宽度全给了日期胶囊）；沿用 v1.4.2 手机端紧凑字号 */
-	.today-btn {
+	:where(.mt-scope) .today-btn {
 		padding: 4px 8px;
 		font-size: 11px;
 	}
 	
-	.weekday-cell {
+	:where(.mt-scope) .weekday-cell {
 		padding: 6px 2px;
 		font-size: 11px;
 	}
 	
 	/* 批次四②：网格间隙 2→1（+0.86px/格）。星期标题行必须同步降 gap，
 	   否则网格与标题列错位（实测只降网格时周六列偏 −2.57px，同步后 0.00px） */
-	.weekday-header {
+	:where(.mt-scope) .weekday-header {
 		gap: 1px;
 	}
 	
-	.calendar-grid {
+	:where(.mt-scope) .calendar-grid {
 		gap: 1px;
 		/* 手机端行高（2026-10-10 第二稿，替代同日早先的 auto 方案）：等高 1fr＋截断。
 		   auto 方案（满格撑高本行）能保住每行 4 字，但行高参差、总高超出时整屏滚动，
@@ -3294,22 +3319,23 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	}
 	
 	/* 批次四③：格子内边距横向 4→2（实测精确 +4px/格；纵向 3px 不动，不碰 min-height） */
-	.day-cell {
+	:where(.mt-scope) .day-cell {
 		padding: 3px 2px;
 		min-height: 80px;
 		border-radius: 8px;
 	}
 	
-	.day-number {
+	:where(.mt-scope) .day-number,
+.day-number.mt-measure-probe {
 		font-size: 13px;
 	}
 	
-	.lunar-info {
+	:where(.mt-scope) .lunar-info {
 		font-size: 9px;
 	}
 	
 	/* 批次四④：任务条内边距横向 2→1（实测精确 +2px/格） */
-	.task-item {
+	:where(.mt-scope) .task-item {
 		padding: 1px 1px;
 		font-size: 9px;
 	}
@@ -3330,7 +3356,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	   由 _mtEnableMobilePan 手动平移查看（hidden 元素脚本照样能滚、且不出条），
 	   底部那条渐隐（.mt-pan-hint）就是替代滚动条的「还能滑」提示。桌面端不进本媒体
 	   查询，维持 overflow-y:auto 内滚（scrollbar-width:none 在桌面 Chromium 上有效）。 */
-	.day-tasks {
+	:where(.mt-scope) .day-tasks {
 		overflow: hidden;
 	}
 	
@@ -3349,7 +3375,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	
 	/* 批次四⑦（v1.7.3 起布局上收全局，见「跨天/定时信息行统一置顶独占一行」段）：
 	   手机端只保留更小的字号与行高 */
-	.day-cell .task-item .task-time {
+	:where(.mt-scope) .day-cell .task-item .task-time {
 		font-size: 8px;
 		line-height: 1.1;
 	}
@@ -3359,7 +3385,7 @@ body:not(.is-mobile) .modal-container .modal-bg {
 	   同宽度字数 +11%（实测 3.9 → 4.3 字）。限 .day-cell 内，弹窗与桌面不动。
 	   纪律：只改 font-size，绝不顺手加 padding-left:0 —— 9px + padding-left:0 + ⑦ 的
 	   flex-wrap 三者同开时，带时间行的 .task-content 宽度实测坍缩为 0（保留那 1px，代价 0.1 字） */
-	.day-cell .task-item .task-content {
+	:where(.mt-scope) .day-cell .task-item .task-content {
 		font-size: 9px;
 	}
 	
@@ -3526,54 +3552,54 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	   排除 .selected：否则本条（位置靠后、同特异度）会压掉选中态的蓝边框。
 	   v1.6.2 再排除 .category-more-btn：它是开合开关不是类别，is-open 的实线蓝边
 	   如果被这条还原成灰边，"展开着"和"收着"就看不出区别了 */
-	.category-chip:not(.selected):not(.category-more-btn):hover {
+	:where(.mt-scope) .category-chip:not(.selected):not(.category-more-btn):hover {
 		border-color: #e2e8f0;
 	}
 
-	.theme-dark .category-chip:not(.selected):not(.category-more-btn):hover {
+	.theme-dark :where(.mt-scope) .category-chip:not(.selected):not(.category-more-btn):hover {
 		border-color: rgba(71, 85, 105, 0.6);
 	}
 
-	.day-cell:hover {
+	:where(.mt-scope) .day-cell:hover {
 		transform: none;
 		box-shadow: var(--shadow-sm);
 	}
 
-	.theme-dark .day-cell:hover {
+	.theme-dark :where(.mt-scope) .day-cell:hover {
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 	}
 
-	.nav-btn:hover,
-	.today-btn:hover,
-	.month-title.clickable:hover,
-	.priority-btn:hover,
-	.btn-confirm:hover,
-	.btn-cancel:hover {
+	:where(.mt-scope) .nav-btn:hover,
+	:where(.mt-scope) .today-btn:hover,
+	:where(.mt-scope) .month-title.clickable:hover,
+	:where(.mt-scope) .priority-btn:hover,
+	:where(.mt-scope) .btn-confirm:hover,
+	:where(.mt-scope) .btn-cancel:hover {
 		transform: none;
 	}
 
-	.today-btn:hover {
+	:where(.mt-scope) .today-btn:hover {
 		background: var(--primary-50);
 		border-color: var(--primary-100);
 	}
 
-	.theme-dark .today-btn:hover {
+	.theme-dark :where(.mt-scope) .today-btn:hover {
 		background: rgba(59, 130, 246, 0.1);
 		border-color: rgba(59, 130, 246, 0.2);
 	}
 
-	.month-title.clickable:hover {
+	:where(.mt-scope) .month-title.clickable:hover {
 		background: var(--bg-secondary);
 		color: var(--gray-900);
 	}
 
-	.theme-dark .month-title.clickable:hover {
+	.theme-dark :where(.mt-scope) .month-title.clickable:hover {
 		background: var(--bg-secondary);
 		color: #e5e7eb;
 	}
 
 	/* 已有任务列表的操作按钮（跳转/删除）触屏上常显：此前仅 hover 可见，手机上无法触及 */
-	.task-item-actions {
+	:where(.mt-scope) .task-item-actions {
 		opacity: 1;
 	}
 }
@@ -4063,14 +4089,14 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
       窄屏也不会自动抬到 16px，任务框在手机上仍是 13px；而本文件原先写死的 var(...,13px)
       恒走兜底值。字号真正与任务框同源的是 --font-ui-small（任务框就是被 Obsidian 的
       input[type=text] 规则按它渲染），所以备注字号改用它，桌面/窄屏都自动跟任务框一致 */
-.modal-note-container {
+:where(.mt-scope) .modal-note-container {
 	margin: 0 24px 14px;
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
 }
 
-.note-label {
+:where(.mt-scope) .note-label {
 	font-size: 12px;
 	font-weight: 600;
 	color: #64748b;
@@ -4090,7 +4116,7 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	color: var(--text-muted, #94a3b8);
 }
 
-.note-show-btn {
+:where(.mt-scope) .note-show-btn {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -4099,7 +4125,7 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.note-ghost-text {
+:where(.mt-scope) .note-ghost-text {
 	white-space: nowrap;
 	/* Obsidian 的 button 基样式会把 color 顶成 --text-normal，占位灰只能写在 span 上 */
 	color: var(--text-faint, #94a3b8);
@@ -4121,14 +4147,14 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	background: rgba(59, 130, 246, 0.12);
 }
 
-.theme-dark .note-label {
+.theme-dark :where(.mt-scope) .note-label {
 	color: #94a3b8;
 }
 
 /* 展开态：盒模型走统一组（与任务框同一个控件）。高度由 JS 按 scrollHeight
    自动撑（配合 rows=1），禁止手动拖出第二个尺寸。
    height:auto 是自适应前的基准值：JS 先清掉内联高度，再量 scrollHeight */
-.note-textarea {
+:where(.mt-scope) .note-textarea {
 	resize: none;
 	overflow: hidden;
 	transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -4143,7 +4169,7 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.note-textarea::placeholder {
+:where(.mt-scope) .note-textarea::placeholder {
 	color: var(--text-faint, #94a3b8);
 	font-weight: 400;
 }
@@ -4161,12 +4187,12 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
-.theme-dark .note-textarea::placeholder {
+.theme-dark :where(.mt-scope) .note-textarea::placeholder {
 	color: #64748b;
 }
 
 @media (max-width: 600px) {
-	.modal-note-container {
+	:where(.mt-scope) .modal-note-container {
 		margin: 0 16px 14px;
 	}
 	/* 窄屏：统一组已给出 16px 字号 + 9px 12px 内边距 + 38px 命中高度，
@@ -4281,14 +4307,14 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	min-width: 248px;
 }
 
-.category-filter-item.vm-row {
+:where(.mt-scope) .category-filter-item.vm-row {
 	align-items: center;
 	gap: 10px;
 	padding: 8px 10px;
 	min-height: 46px;
 }
 
-.vm-row .vm-icon {
+:where(.mt-scope) .vm-row .vm-icon {
 	flex-shrink: 0;
 	width: 20px;
 	height: 20px;
@@ -4298,13 +4324,13 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	color: var(--primary-500);
 }
 
-.vm-row .vm-icon svg {
+:where(.mt-scope) .vm-row .vm-icon svg {
 	width: 18px;
 	height: 18px;
 	display: block;
 }
 
-.vm-row .vm-text {
+:where(.mt-scope) .vm-row .vm-text {
 	flex: 1 1 auto;
 	min-width: 0;
 	display: flex;
@@ -4312,7 +4338,7 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	gap: 1px;
 }
 
-.vm-row .vm-name {
+:where(.mt-scope) .vm-row .vm-name {
 	flex: none;
 	min-width: 0;
 	overflow: hidden;
@@ -4323,7 +4349,7 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	line-height: 1.25;
 }
 
-.vm-row .vm-desc {
+:where(.mt-scope) .vm-row .vm-desc {
 	font-size: 11px;
 	line-height: 1.3;
 	color: var(--text-muted);
@@ -4334,7 +4360,7 @@ body.is-phone .modal .setting-item.mt-category-row.mt-category-add {
 	overflow: hidden;
 }
 
-.theme-dark .vm-row .vm-desc {
+.theme-dark :where(.mt-scope) .vm-row .vm-desc {
 	color: var(--text-faint);
 }
 
@@ -4615,7 +4641,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	gap: 0;
 }
 
-.tg-scroll {
+:where(.mt-scope) .tg-scroll {
 	flex: 1 1 auto;
 	min-height: 0;
 	overflow-y: auto;
@@ -4627,7 +4653,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 }
 
 /* ---------- 列头 ---------- */
-.tg-head {
+:where(.mt-scope) .tg-head {
 	position: sticky;
 	top: 0;
 	z-index: 6;
@@ -4639,25 +4665,25 @@ body.is-phone .modal-container .modal.category-filter-modal {
 
 /* 日期行只放星期与日期，固定高度；全天任务另起一条附在下面，
    不往这一行里塞东西，三列的日期就永远在同一条中线上 */
-.tg-head-row {
+:where(.mt-scope) .tg-head-row {
 	display: flex;
 	min-height: var(--tg-head-h);
 	box-sizing: border-box;
 }
 
-.tg-gutter-head {
+:where(.mt-scope) .tg-gutter-head {
 	width: var(--tg-gutter);
 	flex: 0 0 auto;
 }
 
-.tg-head-cols {
+:where(.mt-scope) .tg-head-cols {
 	flex: 1 1 auto;
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	min-width: 0;
 }
 
-.tg-day-head {
+:where(.mt-scope) .tg-day-head {
 	position: relative;
 	display: flex;
 	align-items: center;
@@ -4669,14 +4695,14 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	cursor: pointer;
 }
 
-.tg-head-weekday {
+:where(.mt-scope) .tg-head-weekday {
 	font-size: 11px;
 	line-height: 1.1;
 	color: var(--gray-600);
 	white-space: nowrap;
 }
 
-.tg-head-date {
+:where(.mt-scope) .tg-head-date {
 	font-size: 16px;
 	line-height: 1.2;
 	font-weight: 600;
@@ -4684,11 +4710,11 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	white-space: nowrap;
 }
 
-.tg-day-head.is-weekend .tg-head-weekday {
+:where(.mt-scope) .tg-day-head.is-weekend .tg-head-weekday {
 	color: var(--danger);
 }
 
-.tg-day-head.is-today .tg-head-date {
+:where(.mt-scope) .tg-day-head.is-today .tg-head-date {
 	padding: 1px 7px;
 	border-radius: 999px;
 	color: #fff;
@@ -4700,7 +4726,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
    计数丸说明不了「是哪几件事」，所以不折、不截成 +N。
    整条限高、内部可滚，某天堆多了也不会把时间轴压没；没有全天任务就不出现，
    有/没有时日期行都是固定高度，列头不会因为多了几条任务忽然变挤 */
-.tg-allday-band {
+:where(.mt-scope) .tg-allday-band {
 	display: flex;
 	/* 不拉伸成容器高：内容多时由条自己滚，列高按最长的一列算 */
 	align-items: flex-start;
@@ -4713,12 +4739,12 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	scrollbar-width: none;
 }
 
-.tg-allday-band::-webkit-scrollbar {
+:where(.mt-scope) .tg-allday-band::-webkit-scrollbar {
 	width: 0;
 	height: 0;
 }
 
-.tg-allday-gutter {
+:where(.mt-scope) .tg-allday-gutter {
 	position: sticky;
 	top: 0;
 	align-self: flex-start;
@@ -4735,7 +4761,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 
 /* 「全天」本身就是折叠开关：别让它长成 Obsidian 的默认按钮样，
    外观和旁边的小时标签一致，右侧加一个小箭头指示收/展 */
-.tg-allday-toggle {
+:where(.mt-scope) .tg-allday-toggle {
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
@@ -4758,25 +4784,25 @@ body.is-phone .modal-container .modal.category-filter-modal {
 
 /* 主题里的 button:hover / :active 背景和阴影特异性比裸类名高，
    这里一并压掉，不然鼠标悬停时「全天」会突然长出一块按钮底色 */
-.tg-allday-toggle:hover,
-.tg-allday-toggle:active,
-.tg-allday-toggle:focus {
+:where(.mt-scope) .tg-allday-toggle:hover,
+:where(.mt-scope) .tg-allday-toggle:active,
+:where(.mt-scope) .tg-allday-toggle:focus {
 	background: transparent;
 	box-shadow: none;
 	border: 0;
 	color: var(--gray-700);
 }
 
-.tg-allday-toggle:focus-visible {
+:where(.mt-scope) .tg-allday-toggle:focus-visible {
 	outline: 2px solid var(--interactive-accent, var(--primary-500));
 	outline-offset: -2px;
 }
 
-.tg-allday-toggle-label {
+:where(.mt-scope) .tg-allday-toggle-label {
 	white-space: nowrap;
 }
 
-.tg-allday-chevron {
+:where(.mt-scope) .tg-allday-chevron {
 	flex: 0 0 auto;
 	box-sizing: border-box;
 	width: 6px;
@@ -4787,12 +4813,12 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	transition: transform 0.15s ease;
 }
 
-.tg-allday-toggle[aria-expanded="true"] .tg-allday-chevron {
+:where(.mt-scope) .tg-allday-toggle[aria-expanded="true"] .tg-allday-chevron {
 	transform: translateY(2px) rotate(225deg);
 }
 
 /* 收起态只显示每日条数；展开态整组隐藏，回到逐条列表 */
-.tg-allday-counts {
+:where(.mt-scope) .tg-allday-counts {
 	display: none;
 	flex-wrap: wrap;
 	align-items: center;
@@ -4800,7 +4826,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	min-width: 0;
 }
 
-.tg-allday-count {
+:where(.mt-scope) .tg-allday-count {
 	display: inline-flex;
 	align-items: center;
 	box-sizing: border-box;
@@ -4814,7 +4840,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	white-space: nowrap;
 }
 
-.tg-allday-band.is-collapsed {
+:where(.mt-scope) .tg-allday-band.is-collapsed {
 	align-items: stretch;
 	max-height: none;
 	overflow: hidden;
@@ -4822,15 +4848,15 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	cursor: pointer;
 }
 
-.tg-allday-band.is-collapsed .tg-allday-item {
+:where(.mt-scope) .tg-allday-band.is-collapsed .tg-allday-item {
 	display: none;
 }
 
-.tg-allday-band.is-collapsed .tg-allday-counts {
+:where(.mt-scope) .tg-allday-band.is-collapsed .tg-allday-counts {
 	display: flex;
 }
 
-.tg-allday-band.is-collapsed .tg-allday-cell {
+:where(.mt-scope) .tg-allday-band.is-collapsed .tg-allday-cell {
 	flex-direction: row;
 	align-items: center;
 	gap: 4px;
@@ -4839,7 +4865,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 }
 
 /* 收起态条带只有一行，标签随行居中，不再按多行列表的顶端对齐 */
-.tg-allday-band.is-collapsed .tg-allday-gutter {
+:where(.mt-scope) .tg-allday-band.is-collapsed .tg-allday-gutter {
 	align-self: center;
 	padding-top: 0;
 }
@@ -4847,25 +4873,25 @@ body.is-phone .modal-container .modal.category-filter-modal {
 /* 手指点「全天」收回去时，别只让 30×17 的字面接住：上下各借 6px，
    左右不外扩，免得抢走第一列条带的点击 */
 @media (pointer: coarse) {
-	.tg-allday-toggle {
+	:where(.mt-scope) .tg-allday-toggle {
 		position: relative;
 	}
 
-	.tg-allday-toggle::after {
+	:where(.mt-scope) .tg-allday-toggle::after {
 		content: "";
 		position: absolute;
 		inset: -6px 0;
 	}
 }
 
-.tg-allday-cols {
+:where(.mt-scope) .tg-allday-cols {
 	flex: 1 1 auto;
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	min-width: 0;
 }
 
-.tg-allday-cell {
+:where(.mt-scope) .tg-allday-cell {
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
@@ -4875,7 +4901,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	border-left: 1px solid var(--tg-line);
 }
 
-.tg-allday-item {
+:where(.mt-scope) .tg-allday-item {
 	display: flex;
 	align-items: center;
 	box-sizing: border-box;
@@ -4892,41 +4918,41 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	user-select: none;
 }
 
-.tg-allday-title {
+:where(.mt-scope) .tg-allday-title {
 	min-width: 0;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
 
-.tg-allday-item.completed {
+:where(.mt-scope) .tg-allday-item.completed {
 	opacity: 0.55;
 }
 
-.tg-allday-item.completed.completed-strike .tg-allday-title {
+:where(.mt-scope) .tg-allday-item.completed.completed-strike .tg-allday-title {
 	text-decoration: line-through;
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.tg-allday-item:hover {
+	:where(.mt-scope) .tg-allday-item:hover {
 		box-shadow: var(--shadow-sm);
 	}
 }
 
 /* ---------- 小时网格 ---------- */
-.tg-canvas {
+:where(.mt-scope) .tg-canvas {
 	position: relative;
 	display: flex;
 	height: calc(var(--tg-hour) * 24);
 }
 
-.tg-gutter {
+:where(.mt-scope) .tg-gutter {
 	position: relative;
 	width: var(--tg-gutter);
 	flex: 0 0 auto;
 }
 
-.tg-hour-label {
+:where(.mt-scope) .tg-hour-label {
 	position: absolute;
 	right: 5px;
 	transform: translateY(-50%);
@@ -4937,18 +4963,18 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	pointer-events: none;
 }
 
-.tg-hour-label:first-child {
+:where(.mt-scope) .tg-hour-label:first-child {
 	transform: none;
 }
 
-.tg-days {
+:where(.mt-scope) .tg-days {
 	flex: 1 1 auto;
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	min-width: 0;
 }
 
-.tg-day-col {
+:where(.mt-scope) .tg-day-col {
 	position: relative;
 	min-width: 0;
 	cursor: pointer;
@@ -4961,15 +4987,15 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	background-repeat: repeat-y;
 }
 
-.tg-day-col.is-weekend {
+:where(.mt-scope) .tg-day-col.is-weekend {
 	background-color: rgba(148, 163, 184, 0.06);
 }
 
-.tg-day-col.is-today {
+:where(.mt-scope) .tg-day-col.is-today {
 	background-color: rgba(59, 130, 246, 0.05);
 }
 
-.tg-now {
+:where(.mt-scope) .tg-now {
 	position: absolute;
 	left: 0;
 	right: 0;
@@ -4978,7 +5004,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	pointer-events: none;
 }
 
-.tg-now::before {
+:where(.mt-scope) .tg-now::before {
 	content: "";
 	position: absolute;
 	left: -3px;
@@ -4990,7 +5016,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 }
 
 /* ---------- 时间块 ---------- */
-.tg-block {
+:where(.mt-scope) .tg-block {
 	position: absolute;
 	z-index: 2;
 	box-sizing: border-box;
@@ -5017,20 +5043,20 @@ body.is-phone .modal-container .modal.category-filter-modal {
 
 /* 没类别就没有类别色：默认蓝恰好是「生活」的色，会看着像被误分类。
    灰色中性条既说明「未分类」，也和草稿的虚线蓝区分得开 */
-.tg-block.is-uncategorized,
-.tg-allday-item.is-uncategorized {
+:where(.mt-scope) .tg-block.is-uncategorized,
+:where(.mt-scope) .tg-allday-item.is-uncategorized {
 	--tg-color: #94a3b8;
 	--tg-tint: rgba(148, 163, 184, 0.18);
 	--tg-tint-dark: rgba(148, 163, 184, 0.3);
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.tg-block:hover {
+	:where(.mt-scope) .tg-block:hover {
 		box-shadow: var(--shadow-sm);
 	}
 }
 
-.tg-block.is-dragging {
+:where(.mt-scope) .tg-block.is-dragging {
 	z-index: 6;
 	cursor: grabbing;
 	box-shadow: var(--shadow-md);
@@ -5040,15 +5066,15 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	touch-action: none;
 }
 
-.tg-block.completed {
+:where(.mt-scope) .tg-block.completed {
 	opacity: 0.55;
 }
 
-.tg-block.completed.completed-strike .tg-block-title {
+:where(.mt-scope) .tg-block.completed.completed-strike .tg-block-title {
 	text-decoration: line-through;
 }
 
-.tg-block-time {
+:where(.mt-scope) .tg-block-time {
 	max-width: 100%;
 	/* 空间不够时只压标题，时间行必须整行可读 */
 	flex-shrink: 0;
@@ -5061,7 +5087,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	text-overflow: ellipsis;
 }
 
-.tg-block-title {
+:where(.mt-scope) .tg-block-title {
 	max-width: 100%;
 	/* 居中布局下内容超高时两边一起裁，会把上面那行时间切掉；
 	   允许标题这个 item 自己压缩，时间行就始终留在块里 */
@@ -5075,45 +5101,47 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	-webkit-box-orient: vertical;
 }
 
-.tg-block.is-short {
+:where(.mt-scope) .tg-block.is-short {
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
-.tg-block.is-short .tg-block-time {
+:where(.mt-scope) .tg-block.is-short .tg-block-time {
 	display: none;
 }
 
-.tg-block.is-short .tg-block-title {
+:where(.mt-scope) .tg-block.is-short .tg-block-title {
 	font-size: 11px;
 	-webkit-line-clamp: 1;
 }
 
 /* 短块只剩一行标题，35% 高的上下热区会把它整个夹住：
    手指按在字上永远落在「改时间」，整块挪不动。短块热区收窄到边上 */
-.tg-block.is-short .tg-resize {
+:where(.mt-scope) .tg-block.is-short .tg-resize {
 	height: clamp(4px, 22%, 8px);
 }
 
 /* 上下两条边都能拉：热区按块高伸缩（短块不至于两边打架），横线只在悬停/拖拽时提示 */
-.tg-resize {
+:where(.mt-scope) .tg-resize {
 	position: absolute;
 	left: 0;
 	right: 0;
 	height: clamp(5px, 35%, 14px);
 	cursor: ns-resize;
-	touch-action: none;
+	/* 没选中的块，触屏上把手不单独起作用（见 main.js _tgAttachBlockDrag）：手指落在边上
+	   也要能照常滚动时间轴。选中（.is-lifted）后才接管触摸，规则在下面「拖动统一观感」一节 */
+	touch-action: pan-y;
 }
 
-.tg-resize-top {
+:where(.mt-scope) .tg-resize-top {
 	top: 0;
 }
 
-.tg-resize-bottom {
+:where(.mt-scope) .tg-resize-bottom {
 	bottom: 0;
 }
 
-.tg-resize::after {
+:where(.mt-scope) .tg-resize::after {
 	content: "";
 	position: absolute;
 	left: 50%;
@@ -5128,26 +5156,26 @@ body.is-phone .modal-container .modal.category-filter-modal {
 
 /* 常态不露线：满屏都是块时几十根短横纯属噪点 */
 @media (hover: hover) and (pointer: fine) {
-	.tg-block:hover .tg-resize::after {
+	:where(.mt-scope) .tg-block:hover .tg-resize::after {
 		opacity: 0.45;
 	}
 }
 
 /* 触屏没有悬停，按住开始拖时再把两条边显出来，说明抓的是哪一头 */
-.tg-block.is-dragging .tg-resize::after {
+:where(.mt-scope) .tg-block.is-dragging .tg-resize::after {
 	opacity: 0.45;
 }
 
-.tg-resize-top::after {
+:where(.mt-scope) .tg-resize-top::after {
 	top: 2px;
 }
 
-.tg-resize-bottom::after {
+:where(.mt-scope) .tg-resize-bottom::after {
 	bottom: 2px;
 }
 
 /* ---------- 草稿条：点空白格先出一根，不写盘 ---------- */
-.tg-draft {
+:where(.mt-scope) .tg-draft {
 	left: 2px;
 	right: 2px;
 	z-index: 4;
@@ -5170,64 +5198,181 @@ body.is-phone .modal-container .modal.category-filter-modal {
 }
 
 /* 草稿的上下边就是主操作，热区比普通块大方些；两条边加起来也不吃掉中间的 ＋ */
-.tg-draft .tg-resize {
+:where(.mt-scope) .tg-draft .tg-resize {
 	height: clamp(6px, 28%, 14px);
 }
 
-.tg-draft .tg-resize::after {
+:where(.mt-scope) .tg-draft .tg-resize::after {
 	opacity: 0.7;
 	width: 20px;
 	background: var(--primary-500);
 }
 
 /* 草稿的时间是唯一反馈，再矮也不能像普通短块那样省掉 */
-.tg-draft.is-short .tg-block-time {
+:where(.mt-scope) .tg-draft.is-short .tg-block-time {
 	display: block;
 }
 
-.tg-draft.is-short {
+:where(.mt-scope) .tg-draft.is-short {
 	min-height: 24px;
 	padding: 1px 6px;
 	gap: 4px;
 }
 
 /* 压到十几分钟时条里只剩一行字：横线会压在文字上，干脆收掉（虚线边框本身就说明可拉） */
-.tg-block.is-short .tg-resize-top::after,
-.tg-block.is-short .tg-resize-bottom::after {
+:where(.mt-scope) .tg-block.is-short .tg-resize-top::after,
+:where(.mt-scope) .tg-block.is-short .tg-resize-bottom::after {
 	opacity: 0;
 }
 
-/* 触屏没有悬停：两条边的抓手常显，否则看不出能拉、也看不出拉的是哪一头；
-   命中区比桌面厚一档——手指不是 1px 的光标，抓手再细一按就滑出去 */
-@media (pointer: coarse) {
-	.tg-block:not(.tg-draft) .tg-resize {
-		height: clamp(8px, 32%, 20px);
+/* ---------- 拖动统一观感：手机、电脑同一套（把手 / 浮起 / 时间轴读数） ----------
+   设备之间只有「怎么开始」不同——触屏长按拎起，鼠标按住就拖——看到的东西完全一样：
+   · 把手：上边靠右、下边靠左各一个圆点（两头错开，短块上也不会叠在一起）。
+     鼠标悬停时显示；块被拎起/选中（.is-lifted）或正在拖（.is-dragging）时显示；草稿条常显。
+   · 浮起：.is-lifted 的块抬高一层、加阴影和描边，并允许把手伸出块外。
+   · 时间轴读数：拖动时左侧时间轴上标出起止时刻，两条细线横贯三列对齐到块的上下沿。
+   这一节放在把手旧规则之后，同特异性下后写的生效；旧的短横线提示在这里统一收掉。
+   原先触屏专用的一套（@media (pointer: coarse) 下常显的粗横线、加厚的边）已删：
+   两端现在是同一套圆点，触屏的大命中区改由选中态提供。 */
+:where(.mt-scope) .tg-block .tg-resize::after {
+	left: auto;
+	width: 10px;
+	height: 10px;
+	box-sizing: border-box;
+	border-radius: 50%;
+	border: 2px solid var(--tg-color, var(--primary-500));
+	background: var(--background-primary, #fff);
+	opacity: 0;
+	transform: none;
+	transition: opacity 0.12s ease, transform 0.12s ease;
+	pointer-events: none;
+}
+
+:where(.mt-scope) .tg-block .tg-resize-top::after {
+	top: -5px;
+	right: 10px;
+}
+
+:where(.mt-scope) .tg-block .tg-resize-bottom::after {
+	bottom: -5px;
+	left: 10px;
+}
+
+:where(.mt-scope) .tg-block.tg-draft .tg-resize::after {
+	border-color: var(--primary-500);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	:where(.mt-scope) .tg-block:hover {
+		overflow: visible;
 	}
 
-	.tg-block:not(.tg-draft) .tg-resize::after {
-		opacity: 0.4;
-		width: 24px;
-		height: 3px;
-		border-radius: 2px;
-	}
-
-	/* 十几到半小时的块本来就矮：抓手再厚就没地方按正文了 */
-	.tg-block.is-short:not(.tg-draft) .tg-resize {
-		height: clamp(5px, 24%, 9px);
-	}
-
-	.tg-block.is-short:not(.tg-draft) .tg-resize::after {
-		opacity: 0.25;
-		width: 18px;
-		height: 2px;
-	}
-
-	.tg-block.is-dragging:not(.tg-draft) .tg-resize::after {
-		opacity: 0.75;
+	:where(.mt-scope) .tg-block:hover .tg-resize::after {
+		opacity: 1;
 	}
 }
 
-.tg-draft-time {
+:where(.mt-scope) .tg-block.is-lifted,
+:where(.mt-scope) .tg-block.is-dragging {
+	z-index: 7;
+	/* 把手圆点和放大的命中区都要伸到块外面去 */
+	overflow: visible;
+	box-shadow: var(--shadow-md), 0 0 0 1px var(--tg-color, var(--primary-500));
+}
+
+/* 选中的块整块接管触摸：拖块体、拖把手都直接跟手，不再和滚动时间轴抢手势 */
+:where(.mt-scope) .tg-block.is-lifted,
+:where(.mt-scope) .tg-block.is-lifted .tg-resize {
+	touch-action: none;
+}
+
+:where(.mt-scope) .tg-block.is-lifted .tg-resize::after,
+:where(.mt-scope) .tg-block.is-dragging .tg-resize::after,
+:where(.mt-scope) .tg-block.is-lifted.is-short .tg-resize::after,
+:where(.mt-scope) .tg-block.is-dragging.is-short .tg-resize::after {
+	opacity: 1;
+}
+
+:where(.mt-scope) .tg-block.is-dragging .tg-resize::after {
+	transform: scale(1.2);
+}
+
+/* 选中后的命中区：看到的是 10px 的圆点，能按的范围向块外再伸 26px（合计约 40px 高），
+   手指不必对准那条边。只向外伸、不向里占，块体中间仍留给「整块移动」。
+   没选中的块不放大：伸出去的命中区会盖住上下相邻的任务块和空白格 */
+:where(.mt-scope) .tg-block.is-lifted .tg-resize::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 26px;
+}
+
+:where(.mt-scope) .tg-block.is-lifted .tg-resize-top::before {
+	bottom: 100%;
+}
+
+:where(.mt-scope) .tg-block.is-lifted .tg-resize-bottom::before {
+	top: 100%;
+}
+
+/* overflow 放开后，块内文字自己负责不溢出 */
+:where(.mt-scope) .tg-block > .tg-block-time,
+:where(.mt-scope) .tg-block > .tg-block-title {
+	max-width: 100%;
+	max-height: 100%;
+	overflow: hidden;
+}
+
+/* 时间轴自成一个层叠上下文：拎起的块、拖动读数的 z-index 只在轴内部比大小，
+   滚到吸顶的列头（.tg-head）底下时照样被列头盖住，不会浮到列头上面 */
+:where(.mt-scope) .tg-canvas {
+	isolation: isolate;
+}
+
+/* 时间轴上的实时读数：胶囊压在小时刻度之上，宽度不够时向右伸出、不换行 */
+:where(.mt-scope) .tg-drag-time {
+	position: absolute;
+	left: 0;
+	z-index: 9;
+	box-sizing: border-box;
+	min-width: 100%;
+	padding: 2px 3px;
+	border-radius: 4px;
+	background: var(--primary-500);
+	color: #fff;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.2;
+	text-align: center;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+:where(.mt-scope) .tg-drag-line {
+	position: absolute;
+	left: var(--tg-gutter);
+	right: 0;
+	z-index: 6;
+	height: 0;
+	border-top: 1px dashed var(--primary-500);
+	opacity: 0.7;
+	pointer-events: none;
+}
+
+:where(.mt-scope) .tg-drag-time.is-hidden,
+:where(.mt-scope) .tg-drag-line.is-hidden {
+	display: none;
+}
+
+/* 拖动中小时刻度退后一档，读数才显眼 */
+:where(.mt-scope) .tg-canvas.is-drag-active .tg-hour-label {
+	opacity: 0.35;
+}
+
+:where(.mt-scope) .tg-draft-time {
 	min-width: 0;
 	/* 草稿里时间是横排长文，窄了要能省略号收尾 */
 	flex-shrink: 1;
@@ -5237,7 +5382,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	color: var(--primary-600);
 }
 
-.tg-draft-add {
+:where(.mt-scope) .tg-draft-add {
 	position: relative;
 	z-index: 2;
 	flex: 0 0 auto;
@@ -5255,7 +5400,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	box-shadow: var(--shadow-sm);
 }
 
-.tg-draft-add svg {
+:where(.mt-scope) .tg-draft-add svg {
 	pointer-events: none;
 }
 
@@ -5265,47 +5410,47 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	--tg-half-line: rgba(255, 255, 255, 0.06);
 }
 
-.theme-dark .tg-block {
+.theme-dark :where(.mt-scope) .tg-block {
 	background: var(--tg-tint-dark, rgba(59, 130, 246, 0.26));
 }
 
-.theme-dark .tg-allday-item {
+.theme-dark :where(.mt-scope) .tg-allday-item {
 	background: var(--tg-tint-dark, rgba(59, 130, 246, 0.26));
 }
 
-.theme-dark .tg-draft {
+.theme-dark :where(.mt-scope) .tg-draft {
 	background: rgba(59, 130, 246, 0.2);
 }
 
-.theme-dark .tg-hour-label {
+.theme-dark :where(.mt-scope) .tg-hour-label {
 	color: var(--gray-600);
 }
 
-.theme-dark .tg-allday-gutter {
+.theme-dark :where(.mt-scope) .tg-allday-gutter {
 	color: var(--gray-600);
 }
 
-.theme-dark .tg-allday-toggle:hover {
+.theme-dark :where(.mt-scope) .tg-allday-toggle:hover {
 	color: var(--gray-700);
 }
 
-.theme-dark .tg-draft-time {
+.theme-dark :where(.mt-scope) .tg-draft-time {
 	color: #93c5fd;
 }
 
-.theme-dark .tg-day-head.is-weekend .tg-head-weekday {
+.theme-dark :where(.mt-scope) .tg-day-head.is-weekend .tg-head-weekday {
 	color: #f87171;
 }
 
-.theme-dark .tg-day-col.is-weekend {
+.theme-dark :where(.mt-scope) .tg-day-col.is-weekend {
 	background-color: rgba(148, 163, 184, 0.09);
 }
 
-.theme-dark .tg-day-col.is-today {
+.theme-dark :where(.mt-scope) .tg-day-col.is-today {
 	background-color: rgba(59, 130, 246, 0.09);
 }
 
-.theme-dark .tg-scroll {
+.theme-dark :where(.mt-scope) .tg-scroll {
 	background: var(--bg-primary);
 }
 
@@ -5317,85 +5462,85 @@ body.is-phone .modal-container .modal.category-filter-modal {
 		--tg-head-h: 36px;
 	}
 
-	.tg-hour-label {
+	:where(.mt-scope) .tg-hour-label {
 		right: 3px;
 		font-size: 9px;
 	}
 
-	.tg-head-weekday {
+	:where(.mt-scope) .tg-head-weekday {
 		font-size: 10px;
 	}
 
-	.tg-head-date {
+	:where(.mt-scope) .tg-head-date {
 		font-size: 14px;
 	}
 
-	.tg-day-head.is-today .tg-head-date {
+	:where(.mt-scope) .tg-day-head.is-today .tg-head-date {
 		padding: 0 6px;
 	}
 
-	.tg-allday-band {
+	:where(.mt-scope) .tg-allday-band {
 		max-height: 90px;
 		padding: 3px 0 4px;
 	}
 
-	.tg-allday-gutter {
+	:where(.mt-scope) .tg-allday-gutter {
 		padding-top: 3px;
 		font-size: 9px;
 	}
 
-	.tg-allday-cell {
+	:where(.mt-scope) .tg-allday-cell {
 		gap: 2px;
 		padding: 0 3px;
 	}
 
-	.tg-allday-item {
+	:where(.mt-scope) .tg-allday-item {
 		padding: 2px 4px;
 		font-size: 11px;
 	}
 
-	.tg-allday-band.is-collapsed .tg-allday-cell {
+	:where(.mt-scope) .tg-allday-band.is-collapsed .tg-allday-cell {
 		gap: 3px;
 		min-height: 22px;
 		padding: 2px 3px;
 	}
 
-	.tg-allday-toggle {
+	:where(.mt-scope) .tg-allday-toggle {
 		gap: 1px;
 		padding-right: 4px;
 	}
 
-	.tg-allday-chevron {
+	:where(.mt-scope) .tg-allday-chevron {
 		width: 5px;
 		height: 5px;
 	}
 
-	.tg-allday-count {
+	:where(.mt-scope) .tg-allday-count {
 		min-height: 17px;
 		padding: 0 5px;
 		font-size: 10px;
 	}
 
-	.tg-block {
+	:where(.mt-scope) .tg-block {
 		/* 同上：2px 的竖条已经占了左边 */
 		padding: 1px 6px 1px 4px;
 		border-left-width: 2px;
 	}
 
 	/* 三列时单列只有百来像素，「11:00–12:00」加上草稿的 ＋ 就撑满了 */
-	.tg-block-time {
+	:where(.mt-scope) .tg-block-time {
 		font-size: 10px;
 	}
 
-	.tg-block-title {
+	:where(.mt-scope) .tg-block-title {
 		font-size: 13px;
 	}
 
-	.tg-block.is-short .tg-block-title {
+	:where(.mt-scope) .tg-block.is-short .tg-block-title {
 		font-size: 12px;
 	}
 
-	.tg-draft {
+	:where(.mt-scope) .tg-draft {
 		/* 三列一窄，草稿条往两边各再让 1px 出来，时段才不会被 ＋ 挤成省略号 */
 		left: 1px;
 		right: 1px;
@@ -5403,16 +5548,16 @@ body.is-phone .modal-container .modal.category-filter-modal {
 		padding: 1px 3px;
 	}
 
-	.tg-draft-time {
+	:where(.mt-scope) .tg-draft-time {
 		font-size: 10px;
 	}
 
-	.tg-draft-add {
+	:where(.mt-scope) .tg-draft-add {
 		width: 16px;
 		height: 16px;
 	}
 
-	.tg-draft-add svg {
+	:where(.mt-scope) .tg-draft-add svg {
 		width: 10px;
 		height: 10px;
 	}
@@ -5460,7 +5605,7 @@ body.is-phone .modal-container .modal.category-filter-modal {
 	}
 }
 /* 三天视图：结束不晚于开始的时间段压成 15 分钟示意并加红色虚线描边，提示去改 */
-.tg-block.is-badtime {
+:where(.mt-scope) .tg-block.is-badtime {
 	outline: 1.5px dashed var(--danger);
 	outline-offset: -1.5px;
 }

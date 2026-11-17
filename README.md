@@ -115,6 +115,8 @@ Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ �
 
 任务自动保存到 `任务/YYYY年任务列表.md` 文件中（统一归集，不写入日记文件）。
 
+**插件只认两种任务列表文件名**：`YYYY年任务列表.md`（按年）与 `YYYY年MM月任务列表.md`（按月），放在库里哪个文件夹都算数。默认「任务来源 = 只读任务列表文件」，只有这两类文件上月历；设置里可切到「读取全库」，此时所有笔记里带 📅/🛫 的清单行都会上月历——但注意，那一档下在月历里编辑、删除会直接改动原笔记。
+
 ---
 
 ## 设置选项
@@ -131,6 +133,7 @@ Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ �
 | 显示 | 每周第一天 | 周日 / 周一 / 周六 | 周日 |
 | 显示 | 每日任务显示数量 | 每个日期格子最多显示的任务数量；当天面板超过这个数默认收起，「查看全部」也按它出现 | 5（可选 3–10） |
 | 任务 | 默认全天任务 | 新建任务时默认为全天任务（不带具体时间） | 开启 |
+| 任务 | 任务来源 | 只读任务列表文件：只管 `YYYY年任务列表.md` / `YYYY年MM月任务列表.md`；读取全库：所有笔记里带 📅/🛫 的清单行都上月历（此时月历里的编辑、删除会直接改动原笔记） | 只读任务列表文件（老用户升级后保持「读取全库」） |
 | 任务 | 归档周期 | 决定新任务写入哪个文件（按年 `YYYY年任务列表.md` 或按月 `YYYY年MM月任务列表.md`）；切换不影响已有文件，历史任务仍全部显示。下拉里的示例文件名跟着当天走 | 按年 |
 | 任务 | 记录位置 | 任务文件的存放位置；若已有同名任务文件，插件优先使用它。已保存的文件夹被删掉时，下拉里会补一项「（已失效）」回显原路径 | 默认（`任务/`） |
 | 类别管理 | 已知类别 | 维护创建弹窗与漏斗面板里的顺序和颜色。类别本身是任务行尾的 `#标签`，在这里增删不会改动任何笔记 | 生活、学习 |
@@ -303,9 +306,11 @@ Tasks are standard Obsidian checklist lines with emoji markers:
 
 Everything goes into one archive note rather than into your daily notes: `任务/YYYY年任务列表.md` by year, or `任务/YYYY年MM月任务列表.md` by month ("Archive Period" setting). The folder is the "Location" setting. **Those file names are always Simplified Chinese**, whatever your interface language is, because that is literally what gets written to disk. Your own headings and unrelated content in the note are left alone.
 
+Only these two task-list file names count: `YYYY年任务列表.md` (yearly) and `YYYY年MM月任务列表.md` (monthly), in any folder. The default "Task source" setting reads **task list files only**; switch it to "Entire vault" and every dated `📅`/`🛫` checklist line in any note joins the calendar — in that mode, editing or deleting a task from the calendar modifies the original note directly. New tasks you create from the calendar are always written into a task-list file.
+
 ### Settings
 
-Four groups: **Display** (default view, show completed tasks, hide strikethrough for completed, show lunar dates, show holidays, first day of week, how many tasks each day cell shows before collapsing), **Tasks** (default all-day task, archive period, location), **Category Management** (order and colour of the categories shown in the create dialog and the filter panel — a category is just a `#tag` on the task line, so adding or deleting one here never edits a note), and **Holiday Data** (auto-refresh on startup, manual refresh button).
+Four groups: **Display** (default view, show completed tasks, hide strikethrough for completed, show lunar dates, show holidays, first day of week, how many tasks each day cell shows before collapsing), **Tasks** (default all-day task, task source — task list files only vs. entire vault — archive period, location), **Category Management** (order and colour of the categories shown in the create dialog and the filter panel — a category is just a `#tag` on the task line, so adding or deleting one here never edits a note), and **Holiday Data** (auto-refresh on startup, manual refresh button).
 
 ### Holidays, network use, and privacy
 
