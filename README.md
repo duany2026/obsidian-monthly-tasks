@@ -220,6 +220,12 @@ Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ �
 |---|---|---|
 | ![撤销浮层](docs/screenshots/undo-toast.png) | ![任务文件格式](docs/screenshots/task-file-format.png) | ![设置页](docs/screenshots/settings-page.png) |
 
+### 任务来源
+
+| 设置里的「任务来源」下拉 | 「读取全库」档：日记里的任务也上月历 |
+|---|---|
+| ![任务来源设置](docs/screenshots/settings-task-source.png) | ![全库档日记任务](docs/screenshots/vault-source-daily-tasks.png) |
+
 ---
 
 ## 技术架构
