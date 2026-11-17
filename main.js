@@ -1471,7 +1471,7 @@ function promoteChildLines(lines, taskIdx) {
       ws = ws.slice(1);
     }
     lines[i] = ws + rest;
-    promoted.push({ before, after: lines[i] });
+    promoted.push({ index: i, before, after: lines[i] });
     moved++;
   }
   return { moved, promoted };
@@ -7900,23 +7900,25 @@ var CreateTaskModal = class extends import_obsidian.Modal {
                 // 否则后续删除/跳转会按失效的 lineNumber 操作（跳转光标偏行、
                 // 下一次删除过不了身份校验而静默失败）。
                 // delta 取值：纯任务行 -1；带备注块（> 降级 + 补空行）净 0；孤儿空行自愈 -2。
+                // 被左移的缩进子项：磁盘上的行文本变了（少了被删父行那一级缩进），
+                // 快照里的 rawLine 不回写就过不了下一次操作的身份校验。
+                // 用「原始行号 + 原文」双校验定位——仅按原文会误写同文件里内容相同的重复任务。
+                if (Array.isArray(res.promoted)) {
+                  for (const p of res.promoted) {
+                    const before = String(p.before).replace(/\s+$/, "");
+                    for (const t of this.existingTasks) {
+                      if (t.filePath === deletedFilePath && t.lineNumber === p.index &&
+                          t.rawLine && t.rawLine.replace(/\s+$/, "") === before) {
+                        t.rawLine = p.after;
+                      }
+                    }
+                  }
+                }
                 const delta = typeof res.delta === "number" ? res.delta : -1;
                 if (delta !== 0) {
                   for (const t of this.existingTasks) {
                     if (t.filePath === deletedFilePath && t.lineNumber > deletedLineNumber) {
                       t.lineNumber += delta;
-                    }
-                  }
-                }
-                // 被左移的缩进子项：磁盘上的行文本变了（少了被删父行那一级缩进），
-                // 快照里的 rawLine 不回写就过不了下一次操作的身份校验
-                if (Array.isArray(res.promoted)) {
-                  for (const p of res.promoted) {
-                    const before = String(p.before).replace(/\s+$/, "");
-                    for (const t of this.existingTasks) {
-                      if (t.filePath === deletedFilePath && t.rawLine && t.rawLine.replace(/\s+$/, "") === before) {
-                        t.rawLine = p.after;
-                      }
                     }
                   }
                 }
