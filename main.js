@@ -1269,6 +1269,18 @@ function extractPreservedMarkers(rawLine) {
 }
 
 /**
+ * 行里「形状是时间、取值越界」的 ⏰ 段（如 `⏰ 25:99`）：extractTime 丢弃它按全天
+ * 显示，但重建任务行时不带走原文就等于静默删字段——只改个标题也会丢时间。
+ * 返回归一化后的片段（`⏰ HH:MM[~HH:MM]`），无越界时间返回空串。
+ */
+function extractInvalidTimeMarker(rawLine) {
+  const m = String(rawLine || "").match(/⏰\s*\d{1,2}:\d{1,2}(?:\s*[~～]\s*\d{1,2}:\d{1,2})?/u);
+  if (!m) return "";
+  const compact = m[0].replace(/^⏰/u, "").replace(/～/g, "~").replace(/\s*~\s*/g, "~").trim();
+  return isValidTimeValue(compact) ? "" : `⏰ ${compact}`;
+}
+
+/**
  * 提取截止日期（📅标记），归一化为 YYYY-MM-DD
  * @param rawLine - 原始任务行
  * @returns 日期字符串 YYYY-MM-DD 或 undefined
@@ -1409,7 +1421,10 @@ function buildTaskBody(f) {
   // cleanTaskContent 会把 🟢/⏳/➕/✅ 从正文里剥掉：不额外带走的话，改一次标题，
   // Tasks 插件的计划/创建/完成日期就静默消失（已复现）。
   const preservedMarker = f.preserveFromRawLine ? extractPreservedMarkers(f.preserveFromRawLine) : "";
-  const preservedSuffix = preservedMarker ? ` ${preservedMarker}` : "";
+  // ⏰ 越界值（`⏰ 25:99` 一类）：extractTime 丢弃、按全天显示，但重建行不带走原文
+  // 就是静默删字段——只改标题也会丢时间。用户没填新（合法）时间时原样保留
+  const invalidTime = !f.time && f.preserveFromRawLine ? extractInvalidTimeMarker(f.preserveFromRawLine) : "";
+  const preservedSuffix = (preservedMarker || invalidTime) ? ` ${[preservedMarker, invalidTime].filter(Boolean).join(" ")}` : "";
   // 标记顺序约定：内容 → 优先级emoji → 🛫 → ⏰ → 📅 → #标签（与解析层行尾取标签互为逆操作）
   const categoryMarker = f.category ? ` #${f.category}` : "";
   const blockId = f.preserveFromRawLine ? splitBlockId(f.preserveFromRawLine).blockId : "";
