@@ -2710,6 +2710,14 @@ var TaskParser = class {
   /**
    * 使缓存失效
    */
+  /**
+   * 作废单个文件的解析缓存（modify/create/changed/delete/rename 事件调用）。
+   * parseFile 会用到 metadataCache.listItems，而它比文件落盘晚一拍更新：第一次
+   * 读到的半成品结果若不定点作废，会被新 mtime 钉在缓存里，之后连强制刷新也不重读。
+   */
+  invalidateFile(file) {
+    if (file && file.path) this.fileTaskCache.delete(file.path);
+  }
   invalidateCache() {
     // 作废在途解析：序号+1 使「基于失效前快照」的在途结果被守卫拦截、不写缓存；
     // 清空在途引用，下次调用重新解析而非复用旧快照
@@ -8971,6 +8979,7 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     this.registerEvent(
       this.app.vault.on("modify", (file) => {
         if (file instanceof import_obsidian.TFile && file.extension === "md" && this.isPossibleTaskFile(file)) {
+          this.taskParser.invalidateFile(file);
           debouncedRefresh();
         }
       })
@@ -8980,6 +8989,7 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     this.registerEvent(
       this.app.vault.on("create", (file) => {
         if (file instanceof import_obsidian.TFile && file.extension === "md" && this.isPossibleTaskFile(file)) {
+          this.taskParser.invalidateFile(file);
           debouncedRefresh();
         } else if (file instanceof import_obsidian.TFolder && this.settingTab) {
           this.settingTab.folderOptionsCache = null;
@@ -8990,12 +9000,15 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
     // 删除/重命名保留全量兜底：事件中的路径可能已失效（rename 拿到的是旧路径），
     // 无法可靠判断是否任务文件，宁可信其有地刷一次
     this.registerEvent(
-      this.app.vault.on("delete", () => {
+      this.app.vault.on("delete", (file) => {
+        this.taskParser.invalidateFile(file);
         debouncedRefresh();
       })
     );
     this.registerEvent(
-      this.app.vault.on("rename", () => {
+      this.app.vault.on("rename", (file, oldPath) => {
+        this.taskParser.invalidateFile(file);
+        this.taskParser.invalidateFile({ path: oldPath });
         debouncedRefresh();
       })
     );
@@ -9007,6 +9020,8 @@ var MonthlyTasksPlugin = class extends import_obsidian.Plugin {
       this.app.metadataCache.on("changed", (file) => {
         if (!(file instanceof import_obsidian.TFile) || file.extension !== "md") return;
         if (this.isPossibleTaskFile(file)) {
+          // 元数据现在才算更新完：上一轮按旧 listItems 解析进缓存的结果定点作废重读
+          this.taskParser.invalidateFile(file);
           debouncedRefresh();
         }
       })
