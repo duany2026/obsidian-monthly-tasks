@@ -18,8 +18,8 @@
 
 | 文件 | 行尾 |
 |---|---|
-| `main.js`、`manifest.json` | **CRLF**（全文件，不得混入裸 LF） |
-| `styles.css`、`CHANGELOG.md`、`README.md`、`versions.json`、`holidays.json` | **LF** |
+| `main.js` | **CRLF**（全文件，不得混入裸 LF） |
+| `manifest.json`、`styles.css`、`CHANGELOG.md`、`README.md`、`versions.json`、`holidays.json` | **LF** |
 
 改 `main.js` 时若用会「按行重写」的工具，很容易把整文件或其中几行换成 LF，而文件内注释与代码风格仍按 CRLF 维护。**改完必须核字节**：`LF 总数 == CRLF 总数 == CR 总数`。
 
@@ -41,6 +41,7 @@ README 里**不留**「当前版本 vX.Y.Z」：重复一处，就多一处发�
 - **官方上架尺子**：`eslint-plugin-obsidianmd` 的 `recommended` 配置就是社区目录自动审核跑的东西（其 `validate-manifest` 规则源码注明对齐 `obsidianmd/community-workers` 的 `pluginManifest.ts`）。**error 必须为零，否则插件在 Obsidian 里装不上**；warn 不阻断但影响 Scorecard。该配置带 `eslint-comments/no-restricted-disable`，**禁止用 `eslint-disable` 关掉 `obsidianmd/*`**，违规只能真改。
 - **i18n 三套字典键数必须相同**（简中 / 繁中 / 英）。新增文案要三语同时加，否则缺语言时回退简中，界面会混语言。带 `{占位符}` 的文案，三语占位符名必须一致，调用处必须传参。
 - **JS 里用到的类名，CSS 里要有规则**。反过来（CSS 有、JS 不产生）通常无害，但动态切换的关键类（视图模式、选中态、提示类）拼写两端必须一致。
+- **CSS 作用域约定**：`styles.css` 里凡用通用类名的选择器，前面都要加 `:where(.mt-scope)`（零特异性，不改层叠顺序）；`mt-scope` 由 main.js 挂在月历视图根、各弹窗 `modalEl` 与 body 上的日期浮层。自带 `mt-` 前缀或已含根类的规则不用加。不能用 `:has()`（`minAppVersion` 0.15.0）。
 - **行为级验证优先于语法检查**。对纯函数（如任务行解析、元数据剥离），可以把函数从源码里抽出来落成临时模块用 node 跑用例——比读代码可靠，也能避免「终端显示吞字符」造成的误判。
 - 涉及手机端布局的改动，**必须真机验证**（见下）。
 

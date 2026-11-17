@@ -10,6 +10,7 @@ data.json
 AUDIT-*.md
 
 # 本地备份与临时产物
+.uploads/
 .workbuddy/
 *.bak
 *.zip
