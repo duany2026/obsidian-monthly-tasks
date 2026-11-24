@@ -4,27 +4,17 @@
 
 安装：Obsidian 设置 → 第三方插件 → 浏览，搜「Monthly Tasks」→ 安装启用。手动安装 / BRAT 方式见[文末](#安装)。
 
-> **English speakers:** see the [English section](#english) below.
+## English
 
----
+Monthly Tasks is a TickTick-style task calendar for Obsidian: month grid, week, or a three-day hour-by-hour timeline, with Chinese lunar dates, statutory holidays and make-up workdays marked. Tasks are plain Obsidian checklist lines in Markdown notes — no database, no account. The interface follows Obsidian's language (Simplified Chinese / Traditional Chinese / English); the view title and commands stay in Chinese.
 
-## 界面预览
+- **Views**: Month Cells / Month Agenda / Week Cells / Week Agenda / 3-Day Timeline — switch from the top bar; the last choice is remembered. In the 3-Day Timeline, drag empty space to draft a block, drag the body to move (across days too), drag edges to resize, 15-min snap; untimed tasks collect in a sticky all-day strip.
+- **Tasks**: click a day cell to create — 📅 due, ⏰ time range, 🔴/🟡 priority, 🛫 start date for multi-day, `#tag` category. Delete is undoable for 6 s.
+- **Task file**: everything is written into one archive note — `任务/YYYY年任务列表.md`, `任務/YYYY年任務列表.md`, or `Tasks/Tasks YYYY.md` (+ `-MM` monthly variants) following your interface language. **All three conventions are recognized**, in any folder; switching language never orphans existing files. "Task source" defaults to task-list files only; "Entire vault" mode reads dated checklist lines in every note (edits then touch the source notes directly).
+- **Settings**: Display (default view, completed tasks, strikethrough, lunar, holidays, first day of week, tasks per cell), Tasks (all-day default, source, archive period, folder), Category Management, Holiday Data (startup prefetch, manual refresh).
+- **Network & privacy**: online only for holiday data (holiday-cn CDN mirrors → timor.tech → built-in 2022–2026 fallback); requests carry just a year — no content, paths, settings or identity. No account, telemetry or uploads; works offline for cached/built-in years.
 
-| 大月（任务写在格子里） | 小月（圆点 + 下方明细） |
-|---|---|
-| ![大月视图](docs/screenshots/main-view-tasks.png) | ![小月视图](docs/screenshots/month-agenda-view.png) |
-| **大周（一周 × 任务在格子里）** | **小周（一周 × 圆点 + 列表）** |
-| ![大周视图](docs/screenshots/week-cells-view.png) | ![小周视图](docs/screenshots/week-agenda-view.png) |
-| **三天视图（24 小时时间轴）** | |
-| ![三天视图](docs/screenshots/timegrid-view.png) | |
-
-| 类别筛选 | 视图切换 | 新建任务 |
-|---|---|---|
-| ![类别筛选菜单](docs/screenshots/filter-menu-open.png) | ![视图切换菜单](docs/screenshots/view-menu-open.png) | ![新建任务弹窗](docs/screenshots/create-task-modal.png) |
-
-| 任务来源设置 | 「读取全库」档：日记里的任务也上月历 |
-|---|---|
-| ![任务来源设置](docs/screenshots/settings-task-source.png) | ![全库档日记任务](docs/screenshots/vault-source-daily-tasks.png) |
+Requires Obsidian 0.15.0+, desktop and mobile. MIT license.
 
 ---
 
@@ -105,20 +95,6 @@
 **联网与隐私**：插件只在取节假日数据时联网，请求只带年份，不含笔记内容、路径、设置或身份。无账号、无付费、无遥测。断网照常工作（已缓存与内置年份）。「启动时自动刷新」默认关，开则静默预取三年；浏览到未缓存年份时按需获取，失败退避 5 分钟。
 
 仓库里的 `holidays.json` 是可编辑数据源（`node scripts/sync-holidays.mjs` 同步进 `main.js`）；往插件目录另放一份同名文件可按年覆盖内置副本，格式见 `holidays.json`。
-
----
-
-## English
-
-Monthly Tasks is a TickTick-style task calendar for Obsidian: month grid, week, or a three-day hour-by-hour timeline, with Chinese lunar dates, statutory holidays and make-up workdays marked. Tasks are plain Obsidian checklist lines in Markdown notes — no database, no account. The interface follows Obsidian's language (Simplified Chinese / Traditional Chinese / English); the view title and commands stay in Chinese.
-
-- **Views**: Month Cells / Month Agenda / Week Cells / Week Agenda / 3-Day Timeline — switch from the top bar; the last choice is remembered. In the 3-Day Timeline, drag empty space to draft a block, drag the body to move (across days too), drag edges to resize, 15-min snap; untimed tasks collect in a sticky all-day strip.
-- **Tasks**: click a day cell to create — 📅 due, ⏰ time range, 🔴/🟡 priority, 🛫 start date for multi-day, `#tag` category. Delete is undoable for 6 s.
-- **Task file**: everything is written into one archive note — `任务/YYYY年任务列表.md`, `任務/YYYY年任務列表.md`, or `Tasks/Tasks YYYY.md` (+ `-MM` monthly variants) following your interface language. **All three conventions are recognized**, in any folder; switching language never orphans existing files. "Task source" defaults to task-list files only; "Entire vault" mode reads dated checklist lines in every note (edits then touch the source notes directly).
-- **Settings**: Display (default view, completed tasks, strikethrough, lunar, holidays, first day of week, tasks per cell), Tasks (all-day default, source, archive period, folder), Category Management, Holiday Data (startup prefetch, manual refresh).
-- **Network & privacy**: online only for holiday data (holiday-cn CDN mirrors → timor.tech → built-in 2022–2026 fallback); requests carry just a year — no content, paths, settings or identity. No account, telemetry or uploads; works offline for cached/built-in years.
-
-Requires Obsidian 0.15.0+, desktop and mobile. MIT license.
 
 ---
 
