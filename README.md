@@ -4,7 +4,7 @@
 
 安装：Obsidian 设置 → 第三方插件 → 浏览，搜「Monthly Tasks」→ 安装启用。手动安装 / BRAT 方式见[文末](#安装)。
 
-## English
+## Monthly Tasks
 
 Monthly Tasks is a TickTick-style task calendar for Obsidian: month grid, week, or a three-day hour-by-hour timeline, with Chinese lunar dates, statutory holidays and make-up workdays marked. Tasks are plain Obsidian checklist lines in Markdown notes — no database, no account. The interface follows Obsidian's language (Simplified Chinese / Traditional Chinese / English); the view title and commands stay in Chinese.
 
