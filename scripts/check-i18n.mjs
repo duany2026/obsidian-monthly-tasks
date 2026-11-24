@@ -61,13 +61,18 @@ const DYNAMIC_KEYS = {
 for (const [prefix, spec] of Object.entries(DYNAMIC_KEYS)) {
   let values;
   if (spec[0] === "var") {
-    const m = src.match(new RegExp(`var ${spec[1]} = \\[([^\\]]*)\\]`));
-    if (!m) { errors.push(`找不到动态 key 取值域 ${spec[1]}`); continue; }
-    values = [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+    // 取 `var NAME = {...}` 或 `var NAME = [...]` 的整个字面量（可能嵌套），抽出全部字符串
+    const vm = src.match(new RegExp(`var ${spec[1]} = `));
+    if (!vm) { errors.push(`找不到动态 key 取值域 ${spec[1]}`); continue; }
+    const openIdx = src.slice(vm.index).search(/[{[]/);
+    const lit = extractLiteral(src, vm.index + openIdx);
+    values = [...lit.matchAll(/"([^"]+)"/g)].map((x) => x[1]);
   } else {
     values = spec[1];
   }
-  for (const v of values) {
+  for (const raw of values) {
+    // 字面量里本身就可能带前缀，有则剥掉再拼
+    const v = raw.startsWith(prefix) ? raw.slice(prefix.length) : raw;
     if (!known.has(prefix + v)) errors.push(`词典缺动态 key: ${prefix + v}`);
   }
 }
@@ -81,15 +86,57 @@ for (const k of [...called].filter((k) => k.endsWith(".") && !registeredPrefixes
 // REQUIRE_ALL_THREE=true：映射必须三语齐全（本仓库约定）；
 // =false：允许"zh-CN 即源语言值、只补 zh-TW+en 翻译"的映射（此时要求 zh-TW 和 en 成对出现）
 const REQUIRE_ALL_THREE = true;
-for (const m of src.matchAll(/\{[^{}]*(?:"zh-CN"|"zh-TW"|"en"):[^{}]*\}/g)) {
-  const lit = m[0];
+// FILE_FORMATS 这类映射的值本身是对象：正则按 {…} 匹配会停在嵌套括号上，
+// 必须按"lang 键出现在哪个对象顶层"来还原映射（顺带兼容 `en :` 带空格的写法）
+const isKeyPos = (s, idx) => {
+  // 前面最近一个非空白字符必须是 { 或 ,——对象成员位，排除三元/字符串里的 "zh-CN" : 值
+  let i = idx - 1;
+  while (i >= 0 && /\s/.test(s[i])) i--;
+  return i >= 0 && (s[i] === "{" || s[i] === ",");
+};
+const seenMaps = new Set();
+for (const m of src.matchAll(/(?:"zh-CN"|"zh-TW"|"en"|en)\s*:/g)) {
+  if (!isKeyPos(src, m.index)) continue;
+  // 向前配平找包住它的对象
+  let depth = 0, open = -1;
+  for (let i = m.index - 1; i >= 0; i--) {
+    const c = src[i];
+    if (c === "}") depth++;
+    else if (c === "{") { if (depth === 0) { open = i; break; } depth--; }
+  }
+  if (open === -1 || seenMaps.has(open)) continue;
+  seenMaps.add(open);
+  const lit = extractLiteral(src, open);
+  // 只数这个对象顶层的 lang 键（嵌套对象里的 zh-CN: 不算）
+  const topKeys = new Set();
+  let d = 0;
+  for (const km of lit.matchAll(/(?:"zh-CN"|"zh-TW"|"en"|en)\s*:/g)) {
+    d = 0;
+    for (let i = 0; i < km.index; i++) {
+      if (lit[i] === "{") d++;
+      else if (lit[i] === "}") d--;
+    }
+    if (d === 1 && isKeyPos(lit, km.index)) topKeys.add(km[0].replace(/["\s:]/g, ""));
+  }
+  if (!topKeys.size) continue;
   const required = REQUIRE_ALL_THREE ? LANGS : ["zh-TW", "en"];
   for (const lang of required) {
-    if (!lit.includes(`"${lang}":`)) {
+    if (!topKeys.has(lang)) {
       errors.push(`语言映射缺 ${lang}: ${lit.slice(0, 80)}…`);
       break;
     }
   }
+}
+
+/** 从 open 位置的 { 或 [ 起配平到对应闭括号，返回整段字面量 */
+function extractLiteral(s, open) {
+  const OPEN = s[open], CLOSE = OPEN === "{" ? "}" : "]";
+  let d = 0;
+  for (let i = open; i < s.length; i++) {
+    if (s[i] === OPEN) d++;
+    else if (s[i] === CLOSE) { d--; if (d === 0) return s.slice(open, i + 1); }
+  }
+  return s.slice(open);
 }
 
 if (errors.length) {
