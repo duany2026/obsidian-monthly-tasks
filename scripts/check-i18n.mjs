@@ -51,10 +51,40 @@ const unknown = [...called].filter((k) => {
 });
 if (unknown.length) errors.push(`tr() 引用了不存在的 key: ${unknown.join(", ")}`);
 
-// ---- 3) 以 "zh-CN": 为键的映射对象必须三语齐全 ----
-for (const m of src.matchAll(/\{[^{}]*"zh-CN":\s*[^,{][^{}]*\}/g)) {
+// ---- 2b) 动态 key：前缀→取值域，逐值验证（表驱动，新增动态 tr() 模式在此登记） ----
+// key: tr("前缀." + 变量)；value: main.js 里提供取值列表的数组变量名
+const DYNAMIC_KEYS = {
+  // ["var", "数组变量名"]：从代码里的数组字面量取取值域；["list", [...]]：直接给取值域
+  "view.mode.": ["var", "VIEW_MODES"],
+  "view.mode.desc.": ["var", "VIEW_MODES"],
+};
+for (const [prefix, spec] of Object.entries(DYNAMIC_KEYS)) {
+  let values;
+  if (spec[0] === "var") {
+    const m = src.match(new RegExp(`var ${spec[1]} = \\[([^\\]]*)\\]`));
+    if (!m) { errors.push(`找不到动态 key 取值域 ${spec[1]}`); continue; }
+    values = [...m[1].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+  } else {
+    values = spec[1];
+  }
+  for (const v of values) {
+    if (!known.has(prefix + v)) errors.push(`词典缺动态 key: ${prefix + v}`);
+  }
+}
+const registeredPrefixes = Object.keys(DYNAMIC_KEYS);
+for (const k of [...called].filter((k) => k.endsWith(".") && !registeredPrefixes.includes(k))) {
+  // 未登记的动态前缀至少要求有真实 key 兜底
+  if (!baseKeys.some((real) => real.startsWith(k))) errors.push(`tr() 引用了不存在的 key: ${k}…`);
+}
+
+// ---- 3) 以任一语言为键的映射对象必须语言齐全（zh-CN 被整个删掉也能抓到） ----
+// REQUIRE_ALL_THREE=true：映射必须三语齐全（本仓库约定）；
+// =false：允许"zh-CN 即源语言值、只补 zh-TW+en 翻译"的映射（此时要求 zh-TW 和 en 成对出现）
+const REQUIRE_ALL_THREE = true;
+for (const m of src.matchAll(/\{[^{}]*(?:"zh-CN"|"zh-TW"|"en"):[^{}]*\}/g)) {
   const lit = m[0];
-  for (const lang of LANGS) {
+  const required = REQUIRE_ALL_THREE ? LANGS : ["zh-TW", "en"];
+  for (const lang of required) {
     if (!lit.includes(`"${lang}":`)) {
       errors.push(`语言映射缺 ${lang}: ${lit.slice(0, 80)}…`);
       break;
