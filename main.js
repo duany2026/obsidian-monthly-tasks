@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.9.0
+ * 版本：1.9.1
  * 作者：duany
  * 许可证：MIT
  *
@@ -108,9 +108,9 @@ var import_obsidian = require("obsidian");
  * ============================================================
  * 约定：
  * - zh-CN 是权威源语言，zh-TW/en 缺 key 时自动回退 zh-CN（不会白屏）
- * - 只翻译「界面显示」，凡是要写进笔记的格式串（`## 2026年10月` 月份节标题、
- *   `2026年任务列表.md` 文件名、默认「任务」文件夹名）一律不进表：
- *   这些一旦随 UI 语言变化，用户已有笔记立刻读不到
+ * - 只翻译「界面显示」。写进笔记的格式串（文件名、月份节标题、默认文件夹名）
+ *   规则相反：解析侧认全部语言写法（用户切语言不丢旧文件），写侧跟随界面语言，
+ *   且已有文件新增月份节时沿用文件自己的语言，不混排
  * - 占位符统一 {token}，不用裸 JS 表达式
  */
 var I18N = {
@@ -999,7 +999,7 @@ var I18N = {
     "settings.showHoliday.name": "Show Holidays",
     "settings.showLunar.desc": "Show lunar date and solar terms below date",
     "settings.showLunar.name": "Show Lunar Calendar",
-    "settings.taskSource.desc": "\"Task list files only\" manages only YYYY年任务列表.md / YYYY年MM月任务列表.md; \"Entire vault\" puts every note's dated 📅/🛫 lines on the calendar — edits and deletions in the calendar then modify the original notes directly",
+    "settings.taskSource.desc": "\"Task list files only\" manages only Tasks YYYY.md / Tasks YYYY-MM.md (the plugin also recognizes the Chinese 任务列表/任務列表 file names it may already have created); \"Entire vault\" puts every note's dated 📅/🛫 lines on the calendar — edits and deletions in the calendar then modify the original notes directly",
     "settings.taskSource.files": "Task list files only",
     "settings.taskSource.name": "Task source",
     "settings.taskSource.vault": "Entire vault",
@@ -1334,9 +1334,52 @@ function extractTime(rawLine) {
  * 月历**只**读写这两种文件：日记和其它笔记里带 📅 的清单不归插件管，不解析、不上月历，
  * 也就不会被月历里的删除/编辑改动到。
  */
+/**
+ * 任务列表文件的「格式语言」：文件名 / 月份节标题 / 默认文件夹三种写法随界面语言走。
+ * 解析侧不认语言——任何语言的写法都收（用户切语言后旧文件照常读写，永不改写老文件）。
+ *   zh-CN：任务/2026年任务列表.md（或 2026年10月任务列表.md）、## 2026年10月
+ *   zh-TW：任務/2026年任務列表.md（或 2026年10月任務列表.md）、## 2026年10月（年/月与简体同字）
+ *   en：   Tasks/Tasks 2026.md（或 Tasks 2026-10.md）、## October 2026
+ */
+const MONTH_NAMES_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTH_NAME_NUM = (() => { const m = {}; MONTH_NAMES_EN.forEach((n, i) => { m[n] = i + 1; }); return m; })();
+const TASK_FOLDER_NAMES = { "zh-CN": "任务", "zh-TW": "任務", "en": "Tasks" };
+
+/**
+ * 解析任务列表文件名 → { year, month(0=年度档), lang }；不是任务列表文件返回 null。
+ * 月度档在三种语言里都有月份位：中文 「2026年10月…」、英文 「Tasks 2026-10」。
+ */
+function parseTaskListName(name) {
+  const base = String(name || "").replace(/\.md$/i, "");
+  let m = base.match(/^(\d{4})年(?:(\d{2})月)?(任务列表|任務列表)$/);
+  if (m) return { year: +m[1], month: m[2] ? +m[2] : 0, lang: m[3] === "任務列表" ? "zh-TW" : "zh-CN" };
+  m = base.match(/^Tasks (\d{4})(?:-(\d{2}))?$/);
+  if (m) return { year: +m[1], month: m[2] ? +m[2] : 0, lang: "en" };
+  return null;
+}
+function isTaskListName(name) { return parseTaskListName(name) !== null; }
+
+/**
+ * 按语言生成任务列表文件名（仅新文件走这条路径；periodId 是内部中性的 "2026"/"2026年10月"）。
+ */
+function taskListFileName(periodId, period, lang) {
+  if (lang === "en") {
+    const mm = period === "month" ? `-${periodId.slice(5, 7)}` : "";
+    return `Tasks ${periodId.slice(0, 4)}${mm}.md`;
+  }
+  const suffix = lang === "zh-TW" ? "任務列表" : "任务列表";
+  return `${periodId}${period === "month" ? "" : "年"}${suffix}.md`;
+}
+/** 按语言生成默认任务文件夹名（customTaskFolder 为空时的归集位置） */
+function defaultTaskFolder(lang) { return TASK_FOLDER_NAMES[lang] || TASK_FOLDER_NAMES["zh-CN"]; }
+/** 按语言生成月份节标题（不含 ## 前缀）：en "October 2026"，中文 "2026年10月" */
+function monthSectionTitle(y, m, lang) {
+  return lang === "en" ? `${MONTH_NAMES_EN[parseInt(m, 10) - 1]} ${y}` : `${y}年${m}月`;
+}
+
 function isTaskListFile(file) {
   if (!file || file.extension !== "md") return false;
-  return /^\d{4}年(?:\d{2}月)?任务列表$/.test(file.basename || "");
+  return isTaskListName(file.basename || "");
 }
 
 /**
@@ -1346,7 +1389,7 @@ function isTaskListFile(file) {
 function isTaskListPath(path) {
   const name = String(path == null ? "" : path).split("/").pop() || "";
   if (!/\.md$/i.test(name)) return false;
-  return /^\d{4}年(?:\d{2}月)?任务列表$/.test(name.slice(0, -3));
+  return isTaskListName(name.slice(0, -3));
 }
 function isTaskLine(line) {
   return /^\s*[-*] \[[ x]\]\s*/i.test(line);
@@ -2419,21 +2462,32 @@ var TaskParser = class {
       
       if (sortDate) {
         const [y, m] = sortDate.split("-");
-        const monthSection = `## ${y}年${m}月`;
+        // 月份节标题的语言跟随文件自身：旧文件是哪种语言就续写哪种，保证一个文件里
+        // 不混排中英节标题；新文件建档时已按当时界面语言定了名字，这里正好接力
+        const fileLang = (parseTaskListName(file.name) || {}).lang || I18N_LANG;
+        const mNum = parseInt(m, 10);
+        const enMonth = MONTH_NAMES_EN[mNum - 1];
+        const monthSection = `## ${monthSectionTitle(y, m, fileLang)}`;
         // 查找月份section位置：兼容用户手动创建的无前导零月份标题（如 "## 2026年4月"），
         // 避免与插件生成的 "## 2026年04月" 重复创建同月 section。
         // 两处模式都必须锚定行尾（[ \t]*\r?$ 兼容 CRLF）：否则用户手写的日期级标题
-        // "## 2026年1月1日 元旦计划会" 会被当成 1 月节，新任务被塞进那段纪要下面
-        const sectionMatch = masked.match(new RegExp(`^## ${y}年0*${parseInt(m, 10)}月[ \\t]*\\r?$`, "m"));
+        // "## 2026年1月1日 元旦计划会" 会被当成 1 月节，新任务被塞进那段纪要下面。
+        // 同一月份认全部语言写法（## 2026年11月 / ## November 2026），用户手建英文节也不重开
+        const sectionMatch = masked.match(new RegExp(`^## (?:${y}年0*${mNum}月|${enMonth} ${y})[ \\t]*\\r?$`, "m"));
         const sectionIdx = sectionMatch ? sectionMatch.index : -1;
         if (sectionIdx === -1) {
           // 月份section不存在，需要创建
-          // 找到所有月份section的位置（锚定行首+行尾，避免误匹配 ### 、行中或日期级标题）
-          const monthRegex = /^## (\d{4})年(\d{1,2})月[ \t]*\r?$/gm;
+          // 找到所有月份section的位置（锚定行首+行尾，避免误匹配 ### 、行中或日期级标题）；
+          // 枚举同样认中英两种节标题，排序坐标是抽出年月后的数值
+          const monthRegex = /^## (?:(\d{4})年(\d{1,2})月|(January|February|March|April|May|June|July|August|September|October|November|December) (\d{4}))[ \t]*\r?$/gm;
           const months = [];
           let match;
           while ((match = monthRegex.exec(masked)) !== null) {
-            months.push({ year: parseInt(match[1], 10), month: parseInt(match[2], 10), pos: match.index });
+            months.push({
+              year: parseInt(match[1] || match[4], 10),
+              month: match[2] ? parseInt(match[2], 10) : MONTH_NAME_NUM[match[3]],
+              pos: match.index
+            });
           }
           const newYear = parseInt(y, 10);
           const newMonth = parseInt(m, 10);
@@ -2602,7 +2656,7 @@ var TaskParser = class {
     const now = date || new Date();
     const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
     const periodId = getPeriodId(now, period);
-    const targetFileName = `${periodId}${period === "month" ? "" : "年"}任务列表.md`;
+    const targetFileName = taskListFileName(periodId, period, I18N_LANG);
 
     // 1. 使用缓存查找已存在的任务文件（传入 customFolderPath 用于消歧）
     const existingPath = this.findTaskFile(periodId, customFolderPath);
@@ -2613,7 +2667,7 @@ var TaskParser = class {
     // 2. 如果没找到，在指定位置或默认位置创建
     // 自定义文件夹可能已被删除或父路径是文件，导致 ensureFolderExists 抛错；
     // 失败时回退到默认「任务」文件夹，保证任务仍可创建。
-    const candidates = customFolderPath ? [customFolderPath, `任务`] : [`任务`];
+    const candidates = customFolderPath ? [customFolderPath, defaultTaskFolder(I18N_LANG)] : [defaultTaskFolder(I18N_LANG)];
     for (const folderPath of candidates) {
       const filePath = `${folderPath}/${targetFileName}`;
       try {
@@ -2692,7 +2746,7 @@ var TaskParser = class {
     } catch {
       return "\n";
     }
-    let [crlf, lf] = await tally(all.filter((f) => f.name.endsWith("任务列表.md")));
+    let [crlf, lf] = await tally(all.filter((f) => isTaskListName(f.name)));
     if (crlf + lf === 0 && folderPath) {
       const norm = String(folderPath).replace(/\/+$/, "");
       [crlf, lf] = await tally(all.filter((f) => f.parent && f.parent.path === norm));
@@ -2745,8 +2799,16 @@ var TaskParser = class {
   findTaskFile(periodId, customFolderPath) {
     const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
     const cacheKey = `${period}|${periodId}`;
-    const targetFileName = `${periodId}${period === "month" ? "" : "年"}任务列表.md`;
     const normalizedCustom = customFolderPath ? customFolderPath.replace(/\/+$/, "") : "";
+    // 同周期认全部语言的任务列表文件名：用户切换界面语言后，旧语言的文件照旧被找到、
+    // 照旧写进去，不会另起一个新语言的文件把任务分裂开
+    const want = period === "month"
+      ? { year: parseInt(periodId.slice(0, 4), 10), month: parseInt(periodId.slice(5, 7), 10) }
+      : { year: parseInt(periodId, 10), month: 0 };
+    const samePeriodFile = (file) => {
+      const p = parseTaskListName(file.name);
+      return p !== null && p.year === want.year && p.month === want.month;
+    };
 
     // 1. 检查缓存
     if (this.taskFileCache.has(cacheKey)) {
@@ -2768,7 +2830,7 @@ var TaskParser = class {
     // 2a. 若指定了 customFolderPath，优先返回位于该文件夹下的同名文件
     if (normalizedCustom) {
       for (const file of files) {
-        if (file.name === targetFileName && this.isPathInFolder(file.path, normalizedCustom)) {
+        if (samePeriodFile(file) && this.isPathInFolder(file.path, normalizedCustom)) {
           this.taskFileCache.set(cacheKey, file.path);
           return file.path;
         }
@@ -2782,8 +2844,9 @@ var TaskParser = class {
     let fallback = null;
     let fallbackRank = Infinity;
     for (const file of files) {
-      if (file.name !== targetFileName) continue;
-      const rank = (file.path.startsWith("任务/") ? 0 : 1000) + file.path.split("/").length;
+      if (!samePeriodFile(file)) continue;
+      // 落在「任务 / 任務 / Tasks」任一默认文件夹下的命中优先，其次路径最浅
+      const rank = (/^(?:任务|任務|Tasks)\//.test(file.path) ? 0 : 1000) + file.path.split("/").length;
       if (rank < fallbackRank) {
         fallbackRank = rank;
         fallback = file;
@@ -9588,8 +9651,8 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
     // 示例文件名跟着当天走，且复用 getPeriodId()——插件真正写盘用的就是它，
     // 另算一份或写死「2026年10月」都会跟实际文件名对不上
     const egNow = new Date();
-    const egYear = `${getPeriodId(egNow, "year")}年任务列表.md`;
-    const egMonth = `${getPeriodId(egNow, "month")}任务列表.md`;
+    const egYear = taskListFileName(getPeriodId(egNow, "year"), "year", I18N_LANG);
+    const egMonth = taskListFileName(getPeriodId(egNow, "month"), "month", I18N_LANG);
     // 任务来源（v1.9.0）：只读任务列表文件 / 读取全库。老 data.json 由 loadSettings 迁移
     new import_obsidian.Setting(taskEl).setName(tr("settings.taskSource.name")).setDesc(tr("settings.taskSource.desc")).addDropdown((dropdown) => dropdown.addOption("files", tr("settings.taskSource.files")).addOption("vault", tr("settings.taskSource.vault")).setValue(this.plugin.settings.taskSource).onChange(async (value) => {
       this.plugin.settings.taskSource = value === "vault" ? "vault" : "files";

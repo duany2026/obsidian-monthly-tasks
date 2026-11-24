@@ -113,9 +113,9 @@ Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ �
 
 因为就是普通 checklist 行，手写或别的插件生成的任务行也会被读取显示；笔记里你自己写的标题和其它内容都不会被改动。
 
-任务自动保存到 `任务/YYYY年任务列表.md` 文件中（统一归集，不写入日记文件）。
+任务自动保存到任务列表文件中（统一归集，不写入日记文件）。
 
-**插件只认两种任务列表文件名**：`YYYY年任务列表.md`（按年）与 `YYYY年MM月任务列表.md`（按月），放在库里哪个文件夹都算数。默认「任务来源 = 只读任务列表文件」，只有这两类文件上月历；设置里可切到「读取全库」，此时所有笔记里带 📅/🛫 的清单行都会上月历——但注意，那一档下在月历里编辑、删除会直接改动原笔记。
+**任务列表文件名随界面语言走**：简体中文是 `YYYY年任务列表.md`（按年）/ `YYYY年MM月任务列表.md`（按月），繁体是 `…任務列表.md`，英文是 `Tasks YYYY.md` / `Tasks YYYY-MM.md`。**三种写法插件全都认**，放在库里哪个文件夹都算数——切换界面语言后旧文件照常读写，不会另起新文件；已有文件里新增的月份小节也沿用该文件自己的语言写法，不混排。默认「任务来源 = 只读任务列表文件」，只有任务列表文件上月历；设置里可切到「读取全库」，此时所有笔记里带 📅/🛫 的清单行都会上月历——但注意，那一档下在月历里编辑、删除会直接改动原笔记。
 
 ---
 
@@ -133,8 +133,8 @@ Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ �
 | 显示 | 每周第一天 | 周日 / 周一 / 周六 | 周日 |
 | 显示 | 每日任务显示数量 | 每个日期格子最多显示的任务数量；当天面板超过这个数默认收起，「查看全部」也按它出现 | 5（可选 3–10） |
 | 任务 | 默认全天任务 | 新建任务时默认为全天任务（不带具体时间） | 开启 |
-| 任务 | 任务来源 | 只读任务列表文件：只管 `YYYY年任务列表.md` / `YYYY年MM月任务列表.md`；读取全库：所有笔记里带 📅/🛫 的清单行都上月历（此时月历里的编辑、删除会直接改动原笔记） | 只读任务列表文件（老用户升级后保持「读取全库」） |
-| 任务 | 归档周期 | 决定新任务写入哪个文件（按年 `YYYY年任务列表.md` 或按月 `YYYY年MM月任务列表.md`）；切换不影响已有文件，历史任务仍全部显示。下拉里的示例文件名跟着当天走 | 按年 |
+| 任务 | 任务来源 | 只读任务列表文件：只管任务列表文件（文件名见上文，三种语言写法都认）；读取全库：所有笔记里带 📅/🛫 的清单行都上月历（此时月历里的编辑、删除会直接改动原笔记） | 只读任务列表文件（老用户升级后保持「读取全库」） |
+| 任务 | 归档周期 | 决定新任务写入哪个文件（按年或按月，文件名随界面语言）；切换不影响已有文件，历史任务仍全部显示。下拉里的示例文件名跟着当天走 | 按年 |
 | 任务 | 记录位置 | 任务文件的存放位置；若已有同名任务文件，插件优先使用它。已保存的文件夹被删掉时，下拉里会补一项「（已失效）」回显原路径 | 默认（`任务/`） |
 | 类别管理 | 已知类别 | 维护创建弹窗与漏斗面板里的顺序和颜色。类别本身是任务行尾的 `#标签`，在这里增删不会改动任何笔记 | 生活、学习 |
 | 节假日数据 | 启动时自动刷新节假日 | 启动时预取今年及前后各一年（共三年）的节假日数据 | 关闭 |
@@ -142,7 +142,7 @@ Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ �
 
 > 界面语言不提供单独选项：始终跟随 Obsidian 的界面语言（简体中文 / 繁体中文 / English）。
 >
-> 归档文件名始终是简体中文（`YYYY年任务列表.md` / `YYYY年MM月任务列表.md`），不随界面语言变——繁体和英文界面上看到的示例也是这个写法，因为插件真正写盘用的就是它。
+> 任务列表的文件名、月份小节标题、默认文件夹名也跟随界面语言（简体 `任务/…任务列表.md`、繁体 `任務/…任務列表.md`、英文 `Tasks/Tasks ….md`）。已有文件不受影响：插件对三种写法全部识别，切语言后照旧打开原来的文件。
 
 ---
 
@@ -150,7 +150,7 @@ Obsidian 设置 → 第三方插件 → 浏览，搜索「Monthly Tasks」→ �
 
 插件数据存储在插件设置中：
 - `data.json` - 用户设置和节假日缓存
-- `任务/YYYY年任务列表.md`（按年归档，默认）或 `任务/YYYY年MM月任务列表.md`（按月归档） - 任务内容文件
+- 任务内容文件：按年归档（默认）或按月归档，文件名与默认文件夹随界面语言（如简体 `任务/YYYY年任务列表.md`、英文 `Tasks/Tasks YYYY.md`）
 
 ---
 
@@ -310,9 +310,9 @@ Tasks are standard Obsidian checklist lines with emoji markers:
 
 `📅` is the due date, `🛫` the start date of a multi-day task (it then shows on every day in between), `⏰` the time range, `🔴` / `🟡` the priority, and a trailing `#tag` the category. Because these are plain checklist lines, tasks written by other plugins and by hand are read and displayed too.
 
-Everything goes into one archive note rather than into your daily notes: `任务/YYYY年任务列表.md` by year, or `任务/YYYY年MM月任务列表.md` by month ("Archive Period" setting). The folder is the "Location" setting. **Those file names are always Simplified Chinese**, whatever your interface language is, because that is literally what gets written to disk. Your own headings and unrelated content in the note are left alone.
+Everything goes into one archive note rather than into your daily notes: a yearly file (default) or monthly files ("Archive Period" setting), in the folder chosen by the "Location" setting. **File names, month-section headings and the default folder follow your interface language**: `任务/YYYY年任务列表.md` under Simplified Chinese, `任務/YYYY年任務列表.md` under Traditional Chinese, `Tasks/Tasks YYYY.md` and `Tasks/Tasks YYYY-MM.md` under English. All three conventions are recognized — switching the interface language never orphans your existing files, and new month sections added to an existing file keep that file's own convention. Your own headings and unrelated content in the note are left alone.
 
-Only these two task-list file names count: `YYYY年任务列表.md` (yearly) and `YYYY年MM月任务列表.md` (monthly), in any folder. The default "Task source" setting reads **task list files only**; switch it to "Entire vault" and every dated `📅`/`🛫` checklist line in any note joins the calendar — in that mode, editing or deleting a task from the calendar modifies the original note directly. New tasks you create from the calendar are always written into a task-list file.
+Any of these task-list file names counts, in any folder: `YYYY年任务列表.md`, `YYYY年任務列表.md`, `Tasks YYYY.md` (yearly) and `YYYY年MM月任务列表.md`, `YYYY年MM月任務列表.md`, `Tasks YYYY-MM.md` (monthly). The default "Task source" setting reads **task list files only**; switch it to "Entire vault" and every dated `📅`/`🛫` checklist line in any note joins the calendar — in that mode, editing or deleting a task from the calendar modifies the original note directly. New tasks you create from the calendar are always written into a task-list file.
 
 ### Settings
 
