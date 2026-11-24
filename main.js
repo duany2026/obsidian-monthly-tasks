@@ -1120,7 +1120,9 @@ function resolveLanguage(code) {
 /**
  * 依据设置项算出实际生效语言并写入 I18N_LANG。
  * getLanguage 自 Obsidian 1.8.7 才有，而本插件 minAppVersion 是 0.15.0，
- * 老版本上直接调用会 TypeError，故先判存在、缺失时退回 navigator.language
+ * 老版本上直接调用会 TypeError，故先判存在；缺失时退回 moment.locale()
+ * （Obsidian 内置的 moment 跟随界面语言设置，比 navigator.language 的系统
+ * 语言更接近用户实际看到的界面），最后才用系统语言。
  */
 function applyLanguage(setting) {
   let code;
@@ -1128,7 +1130,13 @@ function applyLanguage(setting) {
     code = setting;
   } else {
     try {
-      code = typeof import_obsidian.getLanguage === "function" ? import_obsidian.getLanguage() : (navigator.language || "zh-CN");
+      if (typeof import_obsidian.getLanguage === "function") {
+        code = import_obsidian.getLanguage();
+      } else if (typeof window !== "undefined" && window.moment && typeof window.moment.locale === "function") {
+        code = window.moment.locale();
+      } else {
+        code = navigator.language || "zh-CN";
+      }
     } catch {
       code = navigator.language || "zh-CN";
     }
