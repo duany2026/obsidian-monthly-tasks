@@ -1104,14 +1104,14 @@ function tr(key, vars) {
  * 把 Obsidian 的界面语言码归一到本插件支持的三种：zh-CN / zh-TW / en
  * - getLanguage() 在不同版本里可能是 "zh-CN"/"zh-cn"/"zh-Hant"/"zh-TW" 等写法，
  *   故先取语族再判书写：带 hant/tw/hk/mo 的一律繁体，其余 zh 走简体
- * - 未收录的语言（ja/de/...）回退 zh-CN：本项目文案以简中为源语言，
- *   回退到英文反而更差（英文条目是人工二次翻译，覆盖率与简中不对等）
+ * - 未收录或取不到的语言（ja/de/...）回退 en：1.9.1 起文件名/节标题也随界面语言，
+ *   非中文用户落到简中会同时拿到中文界面和中文文件名，英文是更通用的兜底
  */
 function resolveLanguage(code) {
-  if (!code || typeof code !== "string") return "zh-CN";
+  if (!code || typeof code !== "string") return "en";
   const lower = code.toLowerCase();
   if (lower.indexOf("zh") !== 0 && lower.indexOf("cn") !== 0 && lower.indexOf("tw") !== 0 && lower.indexOf("hk") !== 0) {
-    return lower.indexOf("en") === 0 ? "en" : "zh-CN";
+    return "en";
   }
   if (/hant|tw|hk|mo/.test(lower)) return "zh-TW";
   return "zh-CN";
@@ -1350,12 +1350,19 @@ const TASK_FOLDER_NAMES = { "zh-CN": "任务", "zh-TW": "任務", "en": "Tasks" 
  * 月度档在三种语言里都有月份位：中文 「2026年10月…」、英文 「Tasks 2026-10」。
  */
 function parseTaskListName(name) {
-  const base = String(name || "").replace(/\.md$/i, "");
+  // 入参约定为「不带扩展名的名字」（basename，或调用方已剥掉一层 .md 的文件名）。
+  // 函数内不再剥第二层：笔记 "Tasks 2026.md.md" 的 basename 是 "Tasks 2026.md"，
+  // 多剥一层会把普通笔记误判成任务档案（其任务会被当成档案任务搬写）
+  const base = String(name || "");
   let m = base.match(/^(\d{4})年(?:(\d{2})月)?(任务列表|任務列表)$/);
-  if (m) return { year: +m[1], month: m[2] ? +m[2] : 0, lang: m[3] === "任務列表" ? "zh-TW" : "zh-CN" };
-  m = base.match(/^Tasks (\d{4})(?:-(\d{2}))?$/);
-  if (m) return { year: +m[1], month: m[2] ? +m[2] : 0, lang: "en" };
-  return null;
+  if (!m) m = base.match(/^Tasks (\d{4})(?:-(\d{2}))?$/);
+  if (!m) return null;
+  // 月份位出现就必须是 1-12：「2026年00月任务列表」「Tasks 2026-00」的月份 0 会
+  // 混同年度档（month=0），年度新任务可能写进这个畸形月档文件
+  const month = m[2] ? +m[2] : 0;
+  if (m[2] && (month < 1 || month > 12)) return null;
+  const lang = m[3] === "任務列表" ? "zh-TW" : m[3] === "任务列表" ? "zh-CN" : "en";
+  return { year: +m[1], month, lang };
 }
 function isTaskListName(name) { return parseTaskListName(name) !== null; }
 
@@ -1426,6 +1433,26 @@ function isValidTimeValue(value) {
  * 围栏规则同 CommonMark：闭合行必须同字符且不短于开启行；反引号围栏的开启行里
  * 不能再出现反引号（那是行内代码）；没闭合的围栏一直算到文件尾。
  */
+/**
+ * 把开头 frontmatter 整段遮成方块（与 maskFences 同约定：等长替换，偏移不变）。
+ * 任务文件被用户加了属性后，YAML 注释 `## October 2026` 会被当成月份节、
+ * YAML 列表 `- [ ]` 会被当成任务行——不遮掉的话新任务会插进属性区，写坏笔记的 YAML。
+ */
+function maskFrontmatter(content) {
+  const lines = String(content == null ? "" : content).split("\n");
+  if (!/^---[ \t]*\r?$/.test(lines[0])) return content;
+  for (let i = 1; i < lines.length; i++) {
+    if (/^(?:---|\.\.\.)[ \t]*\r?$/.test(lines[i])) {
+      for (let j = 0; j <= i; j++) {
+        const cr = lines[j].endsWith("\r") ? "\r" : "";
+        lines[j] = "\u2588".repeat(lines[j].length - cr.length) + cr;
+      }
+      break;
+    }
+  }
+  return lines.join("\n");
+}
+
 function maskFences(content) {
   const lines = String(content == null ? "" : content).split("\n");
   let fence = null;
@@ -1893,7 +1920,7 @@ var TaskParser = class {
     } else {
       // metadataCache 未就绪（新建文件首次解析）或无 listItems 时，回退逐行扫描，
       // 避免任务创建后短时间内月历不显示
-      const masked = maskFences(content).split("\n");
+      const masked = maskFrontmatter(maskFences(content)).split("\n");
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         if (!isTaskLine(masked[i])) continue;
@@ -2451,7 +2478,7 @@ var TaskParser = class {
       let taskLine = createdLine = `- [${completed ? "x" : " "}] ${buildTaskBody({ content, priority, startDate, dueDate, time, isAllDay, category, preserveFromRawLine })}`.trimEnd();
       // 找标题、分节边界、排序候选行一律在遮掉围栏代码块的副本上找（与原文逐字符等长，
       // 偏移通用）：围栏里的 `## 2026年11月` 示例不是真月份节，里面的示例任务也不参与排序
-      const masked = maskFences(fileContent);
+      const masked = maskFrontmatter(maskFences(fileContent));
       // v1.6.0 批次三：编辑=删除+重建时备注必须跟着新行走（否则改一次日期备注就没了）。
       // 这里只把备注渲染成待写回的原文行数组，具体插入位置由各分支按 CRLF 补 \r。
       const noteBody = noteTextToLines(note);
@@ -2464,7 +2491,7 @@ var TaskParser = class {
         const [y, m] = sortDate.split("-");
         // 月份节标题的语言跟随文件自身：旧文件是哪种语言就续写哪种，保证一个文件里
         // 不混排中英节标题；新文件建档时已按当时界面语言定了名字，这里正好接力
-        const fileLang = (parseTaskListName(file.name) || {}).lang || I18N_LANG;
+        const fileLang = (parseTaskListName(file.name.replace(/\.md$/i, "")) || {}).lang || I18N_LANG;
         const mNum = parseInt(m, 10);
         const enMonth = MONTH_NAMES_EN[mNum - 1];
         const monthSection = `## ${monthSectionTitle(y, m, fileLang)}`;
@@ -2746,7 +2773,7 @@ var TaskParser = class {
     } catch {
       return "\n";
     }
-    let [crlf, lf] = await tally(all.filter((f) => isTaskListName(f.name)));
+    let [crlf, lf] = await tally(all.filter((f) => isTaskListName(f.name.replace(/\.md$/i, ""))));
     if (crlf + lf === 0 && folderPath) {
       const norm = String(folderPath).replace(/\/+$/, "");
       [crlf, lf] = await tally(all.filter((f) => f.parent && f.parent.path === norm));
@@ -2806,7 +2833,7 @@ var TaskParser = class {
       ? { year: parseInt(periodId.slice(0, 4), 10), month: parseInt(periodId.slice(5, 7), 10) }
       : { year: parseInt(periodId, 10), month: 0 };
     const samePeriodFile = (file) => {
-      const p = parseTaskListName(file.name);
+      const p = parseTaskListName(file.name.replace(/\.md$/i, ""));
       return p !== null && p.year === want.year && p.month === want.month;
     };
 
