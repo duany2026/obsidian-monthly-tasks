@@ -4,7 +4,7 @@
  * ============================================================
  *
  * 插件功能：滴答清单风格的月视图任务管理，支持农历、节假日和调休显示
- * 版本：1.9.0
+ * 版本：1.9.1
  * 作者：duany
  * 许可证：MIT
  *
@@ -108,9 +108,9 @@ var import_obsidian = require("obsidian");
  * ============================================================
  * 约定：
  * - zh-CN 是权威源语言，zh-TW/en 缺 key 时自动回退 zh-CN（不会白屏）
- * - 只翻译「界面显示」，凡是要写进笔记的格式串（`## 2026年10月` 月份节标题、
- *   `2026年任务列表.md` 文件名、默认「任务」文件夹名）一律不进表：
- *   这些一旦随 UI 语言变化，用户已有笔记立刻读不到
+ * - 只翻译「界面显示」。写进笔记的格式串（文件名、月份节标题、默认文件夹名）
+ *   规则相反：解析侧认全部语言写法（用户切语言不丢旧文件），写侧跟随界面语言，
+ *   且已有文件新增月份节时沿用文件自己的语言，不混排
  * - 占位符统一 {token}，不用裸 JS 表达式
  */
 var I18N = {
@@ -759,7 +759,7 @@ var I18N = {
   "en": {
     "cmd.open": "Open Monthly Tasks View",
     "cmd.refresh": "Refresh Monthly Tasks View",
-    "cmd.toggle": "Cycle monthly view (Month Cells / Month Agenda / Week Cells / Week Agenda / 3-Day Timeline)",
+    "cmd.toggle": "Cycle views (Month Cells / Month Agenda / Week Cells / Week Agenda / 3-Day Timeline)",
     "error.badDateConsole": "Monthly Tasks: Unrecognizable date task line ({path}:{line}): {text}",
     "error.builtinHoliday": "Monthly Tasks: Failed to parse holidays.json in the plugin folder; using the built-in holiday data instead.",
     "error.createFail": "Create task failed:",
@@ -888,30 +888,30 @@ var I18N = {
     "modal.create.delete": "Delete Task",
     "task.deletedToast": "Deleted",
     "task.undo": "Undo",
-    "task.undoFail": "Undo failed; please re-add manually",
-    "modal.create.deleteFail": "Delete failed, the task may have been modified; refreshing the list",
+    "task.undoFail": "Undo failed — re-add it manually",
+    "modal.create.deleteFail": "Delete failed — the task may have changed; refreshing",
     "modal.create.displayDate": "{m}/{d}/{y}",
     "modal.create.edit": "Edit Task",
-    "modal.create.empty": "Task content cannot be empty (metadata stripped)",
-    "modal.create.endBeforeStart": "End date cannot be earlier than start date",
+    "modal.create.empty": "Task text can't be empty (date markers don't count)",
+    "modal.create.endBeforeStart": "End date can't be earlier than start date",
     "modal.create.endBeforeStartTime": "End time must be later than start time",
-    "modal.create.endNeedToggle": "Tick multi-day first",
+    "modal.create.endNeedToggle": "Check multi-day first",
     "modal.create.existingCount": "{n} tasks on this day",
     "modal.create.expand": "Expand",
-    "modal.create.fail": "Create task failed, please retry",
-    "modal.create.fillBoth": "Please fill in both start and end time",
-    "modal.create.goto": "Jump to Document",
+    "modal.create.fail": "Couldn't create the task — try again",
+    "modal.create.fillBoth": "Fill in both start and end times",
+    "modal.create.goto": "Open note",
     "modal.create.high": "High",
     "modal.create.medium": "Medium",
     "modal.create.multiDay": "Multi-day Task",
-    "modal.create.noDateMark": "This task has no date marker, cannot locate for editing",
+    "modal.create.noDateMark": "This task has no date marker, so its line can't be located for editing",
     "modal.create.none": "Normal",
     "modal.create.note": "Note",
     "modal.create.noteAdd": "+ Add note",
     "modal.create.noteAria": "Add a note to this task",
-    "modal.create.notePlaceholder": "Write a note, multiple lines allowed...",
+    "modal.create.notePlaceholder": "Add a note (multiple lines)…",
     "modal.create.placeholder": "Enter task content…",
-    "modal.create.pleaseSelect": "Please select date",
+    "modal.create.pleaseSelect": "Select a date",
     "modal.create.priority": "Priority",
     "modal.create.save": "Save",
     "modal.create.setTime": "+ Set Time",
@@ -919,7 +919,7 @@ var I18N = {
     "modal.create.timeInvalidKept": "Time value {time} in this task is not a valid clock time, so it was kept as-is. Edit that line in the note to change it.",
     "modal.create.to": "to",
     "modal.create.toggleComplete": "Toggle completion status",
-    "modal.create.toggleFail": "Operation failed, task may have been modified, refreshing list",
+    "modal.create.toggleFail": "That didn't work — the task may have changed; refreshing",
     "modal.create.viewAll": "View all {n} tasks ▾",
     "modal.create.weekday.fri": "Friday",
     "modal.create.weekday.mon": "Monday",
@@ -939,27 +939,27 @@ var I18N = {
     "modal.filter.selected": "{n} Selected",
     "modal.filter.title": "Filter by Category",
     "modal.filter.untagged": "No Tag",
-    "notice.badDate": "Monthly Tasks: Found task with unrecognizable 📅/🛫 date (including invalid dates like 2026-02-30), ignored (see console)",
-    "notice.cantOpenView": "Monthly Tasks: Cannot open view, please restart Obsidian and try again",
+    "notice.badDate": "Monthly Tasks: skipped a task with an unreadable 📅/🛫 date (including invalid ones like 2026-02-30); see console",
+    "notice.cantOpenView": "Monthly Tasks: couldn't open the view — restart Obsidian and try again",
     "notice.catExists": "Category \"{name}\" already exists",
-    "notice.catInvalid": "Invalid category name: cannot be empty, cannot contain spaces or #, cannot be pure numbers",
-    "notice.createdRefreshFail": "Task created, refresh failed, please switch month manually",
-    "notice.editSavedBut": "Edit saved, but original task line could not be auto-deleted, please check for duplicates",
-    "notice.holidayPartial": "Holiday data refreshed ({ok}/{total} years successful)",
+    "notice.catInvalid": "Invalid category name: must not be empty, contain spaces or #, or be all digits",
+    "notice.createdRefreshFail": "Task created, but the view didn't refresh — switch months to see it",
+    "notice.editSavedBut": "Edit saved, but the original line couldn't be removed — check for duplicates",
+    "notice.holidayPartial": "Holiday data refreshed ({ok} of {total} years)",
     "notice.holidayNoData": "Holiday data updated; {years} not yet announced, skipped",
-    "notice.holidayRefreshFail": "Refresh holiday data failed, please check network",
+    "notice.holidayRefreshFail": "Couldn't refresh holiday data — check your connection",
     "notice.holidayRefreshed": "Holiday data refreshed!",
-    "notice.opFail": "Operation failed, please retry",
+    "notice.opFail": "That didn't work — try again",
     "notice.taskFileElsewhere": "Monthly Tasks: a task file with the same name already exists at \"{path}\", so tasks are written there (outside the configured location). Move that file to switch to the configured location",
     "notice.oversized": "Monthly Tasks: Multi-day range exceeds {limit} days, showing start and end only (see console)",
-    "notice.settingsLoadFail": "Settings load failed, reverted to defaults",
+    "notice.settingsLoadFail": "Settings couldn't be loaded — reverted to defaults",
     "notice.settingsBackup": "Settings failed to load and reverted to defaults; the original file was preserved as data.corrupt-<timestamp>.json",
     "notice.settingsBackupFail": "The damaged settings file could not be backed up. Saving was cancelled to protect it; check plugin-folder permissions and disk space",
-    "notice.settingsSaveFail": "Settings save failed, please check disk space and file permissions",
-    "settings.archive.desc": "Determines which file new tasks are written to. Switching doesn't affect existing files, historical tasks will still all display.",
+    "notice.settingsSaveFail": "Couldn't save settings — check disk space and file permissions",
+    "settings.archive.desc": "Which file new tasks are written to. Switching doesn't affect existing files; history still shows.",
     "settings.archive.month": "By Month ({file})",
     "settings.archive.year": "By Year ({file})",
-    "settings.autoHoliday.desc": "Prefetch holiday data for three years before and after this year on startup (data source: holiday-cn → timor.tech), runs silently with no popup; also fetch missing year data on demand when browsing other years",
+    "settings.autoHoliday.desc": "Prefetch this year's holiday data plus one year either side on startup (holiday-cn → timor.tech), silently; other years are fetched on demand while browsing",
     "settings.autoHoliday.name": "Auto-refresh Holidays on Startup",
     "settings.catAdd": "Add",
     "settings.catColor": "Color {name}",
@@ -967,25 +967,25 @@ var I18N = {
     "settings.catDelete": "Delete",
     "settings.catDeleteAria": "Delete Category {name}",
     "settings.catDown": "Move Down {name}",
-    "settings.catEmpty": "No known categories yet, add with input box below",
-    "settings.catKnown.desc": "Maintain order and color for create modal and filter panel. Categories themselves are #tags at end of task lines, adding/deleting here won't modify any notes.",
+    "settings.catEmpty": "No categories yet — add one below",
+    "settings.catKnown.desc": "Order and color used in the create dialog and filter panel. A category is just a #tag at the end of a task line — editing here never changes your notes.",
     "settings.catKnown.name": "Known Categories",
-    "settings.catPlaceholder": "New category name, e.g.: Fitness",
+    "settings.catPlaceholder": "New category name, e.g. Fitness",
     "settings.catUp": "Move Up {name}",
     "settings.defaultAllDay.desc": "New tasks default to all-day (no specific time)",
     "settings.defaultAllDay.name": "Default All Day Task",
     "settings.firstDow.desc": "Set calendar week start day",
     "settings.firstDow.name": "First Day of Week",
-    "settings.folder.dead": "{folder} (Invalid)",
+    "settings.folder.dead": "{folder} (missing)",
     "settings.folder.default": "Default (Tasks)",
-    "settings.folder.desc": "Select storage location for task files. If yearly task file already exists, plugin will prioritize using it.",
-    "settings.hideStrike.desc": "When enabled, hide strikethrough for completed tasks (also hides red vertical line for overdue tasks; completed state still has feedback: gray vertical bar on left edge + dimmed on mobile)",
+    "settings.folder.desc": "Where task files live. If a task file already exists somewhere else, it's used first.",
+    "settings.hideStrike.desc": "Hides the strikethrough on completed tasks (and the red overdue bar); completion still shows via a gray bar on the left and dimming on mobile",
     "settings.hideStrike.name": "Hide Strikethrough for Completed",
     // 语言选项名：三种语言里取值刻意相同（各自显示自己的写法），
     // 别"顺手"按当前语言翻译，否则英文界面下会出现 English -> 英文
     "settings.loading": "Loading…",
     "settings.refreshBtn": "Refresh",
-    "settings.refreshHoliday.desc": "Get latest holiday data from holiday-cn / timor.tech data source",
+    "settings.refreshHoliday.desc": "Fetch the latest holiday data (holiday-cn → timor.tech)",
     "settings.refreshHoliday.name": "Refresh Holiday Data",
     "settings.section.archive": "Archive Period",
     "settings.section.category": "Category Management",
@@ -995,39 +995,39 @@ var I18N = {
     "settings.section.storage": "Tasks",
     "settings.showCompleted.desc": "Show completed tasks in calendar",
     "settings.showCompleted.name": "Show Completed Tasks",
-    "settings.showHoliday.desc": "Mark legal holidays and make-up workday information",
+    "settings.showHoliday.desc": "Mark public holidays and make-up workdays",
     "settings.showHoliday.name": "Show Holidays",
-    "settings.showLunar.desc": "Show lunar date and solar terms below date",
+    "settings.showLunar.desc": "Show lunar dates and solar terms under each date",
     "settings.showLunar.name": "Show Lunar Calendar",
-    "settings.taskSource.desc": "\"Task list files only\" manages only YYYY年任务列表.md / YYYY年MM月任务列表.md; \"Entire vault\" puts every note's dated 📅/🛫 lines on the calendar — edits and deletions in the calendar then modify the original notes directly",
-    "settings.taskSource.files": "Task list files only",
+    "settings.taskSource.desc": "\"Task list files only\" manages only Tasks YYYY.md / Tasks YYYY-MM.md (the plugin also recognizes the Chinese 任务列表/任務列表 file names it may already have created); \"Entire vault\" puts every note's dated 📅/🛫 lines on the calendar — edits and deletions in the calendar then modify the original notes directly",
+    "settings.taskSource.files": "Task-list files only",
     "settings.taskSource.name": "Task source",
     "settings.taskSource.vault": "Entire vault",
-    "settings.tasksLimit.desc": "Maximum tasks shown per date cell; the day panel also collapses its task list beyond this number and shows \"View all\" at the same threshold",
-    "settings.tasksLimit.name": "Tasks Per Day Limit",
-    "settings.view.desc": "Which view the calendar opens with. Switching views from the header updates this to the one you last used.",
+    "settings.tasksLimit.desc": "Max tasks shown per day cell; lists beyond this number collapse behind \"View all\"",
+    "settings.tasksLimit.name": "Tasks per day",
+    "settings.view.desc": "Which view opens first. Picking a view in the header updates this.",
     "settings.view.name": "Default view",
     "view.agenda.addOne": "Add",
     "view.agenda.clearFilterAria": "Clear current category filter",
     "view.agenda.emptyDay": "Nothing planned",
     "view.agenda.emptyFiltered": "No tasks on this day under the current filter",
-    "view.agenda.hasTaskDot": "Plans on this day",
+    "view.agenda.hasTaskDot": "Has tasks on this day",
     "view.agenda.manageDay": "Manage",
     "view.agenda.overdueDot": "Overdue on this day",
     "view.cell.category": "Category: {category}",
     "view.cell.duration": "{days}d",
-    "view.cell.loadError": "Failed to load tasks, check console",
+    "view.cell.loadError": "Couldn't load tasks — see console",
     "view.cell.timeDuration": "{time} · {days}d",
     "view.header.nextMonth": "Next Month",
     "view.header.nextThreeDay": "Next 3 days",
     "view.header.nextWeek": "Next week",
     "view.header.pickView": "Switch view",
-    "view.header.prevMonth": "Prev Month",
+    "view.header.prevMonth": "Previous month",
     "view.header.prevThreeDay": "Previous 3 days",
-    "view.header.prevWeek": "Prev week",
+    "view.header.prevWeek": "Previous week",
     "view.header.thisWeek": "This week",
     "view.header.title": "Monthly Tasks",
-    "view.header.titleTip": "Click to jump to date",
+    "view.header.titleTip": "Click to pick a date",
     "view.header.today": "Today",
     "view.menu.title": "View",
     "view.mode.agenda": "Month · Agenda",
@@ -1054,7 +1054,7 @@ var I18N = {
     "view.month.9": "Sep",
     "view.month.title": "{monthName} {year}",
     "view.week.load": "{n} items · {m} done",
-    "view.week.loadHiddenHint": "{m} of them are done and hidden from the cells under the current setting",
+    "view.week.loadHiddenHint": "{m} done, hidden by the current setting",
     "view.week.number": "Week {n}",
     "view.week.relative.next": "Next week",
     "view.week.relative.prev": "Last week",
@@ -1104,14 +1104,14 @@ function tr(key, vars) {
  * 把 Obsidian 的界面语言码归一到本插件支持的三种：zh-CN / zh-TW / en
  * - getLanguage() 在不同版本里可能是 "zh-CN"/"zh-cn"/"zh-Hant"/"zh-TW" 等写法，
  *   故先取语族再判书写：带 hant/tw/hk/mo 的一律繁体，其余 zh 走简体
- * - 未收录的语言（ja/de/...）回退 zh-CN：本项目文案以简中为源语言，
- *   回退到英文反而更差（英文条目是人工二次翻译，覆盖率与简中不对等）
+ * - 未收录或取不到的语言（ja/de/...）回退 en：1.9.1 起文件名/节标题也随界面语言，
+ *   非中文用户落到简中会同时拿到中文界面和中文文件名，英文是更通用的兜底
  */
 function resolveLanguage(code) {
-  if (!code || typeof code !== "string") return "zh-CN";
+  if (!code || typeof code !== "string") return "en";
   const lower = code.toLowerCase();
   if (lower.indexOf("zh") !== 0 && lower.indexOf("cn") !== 0 && lower.indexOf("tw") !== 0 && lower.indexOf("hk") !== 0) {
-    return lower.indexOf("en") === 0 ? "en" : "zh-CN";
+    return "en";
   }
   if (/hant|tw|hk|mo/.test(lower)) return "zh-TW";
   return "zh-CN";
@@ -1120,7 +1120,9 @@ function resolveLanguage(code) {
 /**
  * 依据设置项算出实际生效语言并写入 I18N_LANG。
  * getLanguage 自 Obsidian 1.8.7 才有，而本插件 minAppVersion 是 0.15.0，
- * 老版本上直接调用会 TypeError，故先判存在、缺失时退回 navigator.language
+ * 老版本上直接调用会 TypeError，故先判存在；缺失时退回 moment.locale()
+ * （Obsidian 内置的 moment 跟随界面语言设置，比 navigator.language 的系统
+ * 语言更接近用户实际看到的界面），最后才用系统语言。
  */
 function applyLanguage(setting) {
   let code;
@@ -1128,7 +1130,13 @@ function applyLanguage(setting) {
     code = setting;
   } else {
     try {
-      code = typeof import_obsidian.getLanguage === "function" ? import_obsidian.getLanguage() : (navigator.language || "zh-CN");
+      if (typeof import_obsidian.getLanguage === "function") {
+        code = import_obsidian.getLanguage();
+      } else if (typeof window !== "undefined" && window.moment && typeof window.moment.locale === "function") {
+        code = window.moment.locale();
+      } else {
+        code = navigator.language || "zh-CN";
+      }
     } catch {
       code = navigator.language || "zh-CN";
     }
@@ -1334,9 +1342,59 @@ function extractTime(rawLine) {
  * 月历**只**读写这两种文件：日记和其它笔记里带 📅 的清单不归插件管，不解析、不上月历，
  * 也就不会被月历里的删除/编辑改动到。
  */
+/**
+ * 任务列表文件的「格式语言」：文件名 / 月份节标题 / 默认文件夹三种写法随界面语言走。
+ * 解析侧不认语言——任何语言的写法都收（用户切语言后旧文件照常读写，永不改写老文件）。
+ *   zh-CN：任务/2026年任务列表.md（或 2026年10月任务列表.md）、## 2026年10月
+ *   zh-TW：任務/2026年任務列表.md（或 2026年10月任務列表.md）、## 2026年10月（年/月与简体同字）
+ *   en：   Tasks/Tasks 2026.md（或 Tasks 2026-10.md）、## October 2026
+ */
+const MONTH_NAMES_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const MONTH_NAME_NUM = (() => { const m = {}; MONTH_NAMES_EN.forEach((n, i) => { m[n] = i + 1; }); return m; })();
+const TASK_FOLDER_NAMES = { "zh-CN": "任务", "zh-TW": "任務", "en": "Tasks" };
+
+/**
+ * 解析任务列表文件名 → { year, month(0=年度档), lang }；不是任务列表文件返回 null。
+ * 月度档在三种语言里都有月份位：中文 「2026年10月…」、英文 「Tasks 2026-10」。
+ */
+function parseTaskListName(name) {
+  // 入参约定为「不带扩展名的名字」（basename，或调用方已剥掉一层 .md 的文件名）。
+  // 函数内不再剥第二层：笔记 "Tasks 2026.md.md" 的 basename 是 "Tasks 2026.md"，
+  // 多剥一层会把普通笔记误判成任务档案（其任务会被当成档案任务搬写）
+  const base = String(name || "");
+  let m = base.match(/^(\d{4})年(?:(\d{2})月)?(任务列表|任務列表)$/);
+  if (!m) m = base.match(/^Tasks (\d{4})(?:-(\d{2}))?$/);
+  if (!m) return null;
+  // 月份位出现就必须是 1-12：「2026年00月任务列表」「Tasks 2026-00」的月份 0 会
+  // 混同年度档（month=0），年度新任务可能写进这个畸形月档文件
+  const month = m[2] ? +m[2] : 0;
+  if (m[2] && (month < 1 || month > 12)) return null;
+  const lang = m[3] === "任務列表" ? "zh-TW" : m[3] === "任务列表" ? "zh-CN" : "en";
+  return { year: +m[1], month, lang };
+}
+function isTaskListName(name) { return parseTaskListName(name) !== null; }
+
+/**
+ * 按语言生成任务列表文件名（仅新文件走这条路径；periodId 是内部中性的 "2026"/"2026年10月"）。
+ */
+function taskListFileName(periodId, period, lang) {
+  if (lang === "en") {
+    const mm = period === "month" ? `-${periodId.slice(5, 7)}` : "";
+    return `Tasks ${periodId.slice(0, 4)}${mm}.md`;
+  }
+  const suffix = lang === "zh-TW" ? "任務列表" : "任务列表";
+  return `${periodId}${period === "month" ? "" : "年"}${suffix}.md`;
+}
+/** 按语言生成默认任务文件夹名（customTaskFolder 为空时的归集位置） */
+function defaultTaskFolder(lang) { return TASK_FOLDER_NAMES[lang] || TASK_FOLDER_NAMES["zh-CN"]; }
+/** 按语言生成月份节标题（不含 ## 前缀）：en "October 2026"，中文 "2026年10月" */
+function monthSectionTitle(y, m, lang) {
+  return lang === "en" ? `${MONTH_NAMES_EN[parseInt(m, 10) - 1]} ${y}` : `${y}年${m}月`;
+}
+
 function isTaskListFile(file) {
   if (!file || file.extension !== "md") return false;
-  return /^\d{4}年(?:\d{2}月)?任务列表$/.test(file.basename || "");
+  return isTaskListName(file.basename || "");
 }
 
 /**
@@ -1346,7 +1404,7 @@ function isTaskListFile(file) {
 function isTaskListPath(path) {
   const name = String(path == null ? "" : path).split("/").pop() || "";
   if (!/\.md$/i.test(name)) return false;
-  return /^\d{4}年(?:\d{2}月)?任务列表$/.test(name.slice(0, -3));
+  return isTaskListName(name.slice(0, -3));
 }
 function isTaskLine(line) {
   return /^\s*[-*] \[[ x]\]\s*/i.test(line);
@@ -1383,6 +1441,26 @@ function isValidTimeValue(value) {
  * 围栏规则同 CommonMark：闭合行必须同字符且不短于开启行；反引号围栏的开启行里
  * 不能再出现反引号（那是行内代码）；没闭合的围栏一直算到文件尾。
  */
+/**
+ * 把开头 frontmatter 整段遮成方块（与 maskFences 同约定：等长替换，偏移不变）。
+ * 任务文件被用户加了属性后，YAML 注释 `## October 2026` 会被当成月份节、
+ * YAML 列表 `- [ ]` 会被当成任务行——不遮掉的话新任务会插进属性区，写坏笔记的 YAML。
+ */
+function maskFrontmatter(content) {
+  const lines = String(content == null ? "" : content).split("\n");
+  if (!/^---[ \t]*\r?$/.test(lines[0])) return content;
+  for (let i = 1; i < lines.length; i++) {
+    if (/^(?:---|\.\.\.)[ \t]*\r?$/.test(lines[i])) {
+      for (let j = 0; j <= i; j++) {
+        const cr = lines[j].endsWith("\r") ? "\r" : "";
+        lines[j] = "\u2588".repeat(lines[j].length - cr.length) + cr;
+      }
+      break;
+    }
+  }
+  return lines.join("\n");
+}
+
 function maskFences(content) {
   const lines = String(content == null ? "" : content).split("\n");
   let fence = null;
@@ -1850,7 +1928,7 @@ var TaskParser = class {
     } else {
       // metadataCache 未就绪（新建文件首次解析）或无 listItems 时，回退逐行扫描，
       // 避免任务创建后短时间内月历不显示
-      const masked = maskFences(content).split("\n");
+      const masked = maskFrontmatter(maskFences(content)).split("\n");
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         if (!isTaskLine(masked[i])) continue;
@@ -2408,7 +2486,7 @@ var TaskParser = class {
       let taskLine = createdLine = `- [${completed ? "x" : " "}] ${buildTaskBody({ content, priority, startDate, dueDate, time, isAllDay, category, preserveFromRawLine })}`.trimEnd();
       // 找标题、分节边界、排序候选行一律在遮掉围栏代码块的副本上找（与原文逐字符等长，
       // 偏移通用）：围栏里的 `## 2026年11月` 示例不是真月份节，里面的示例任务也不参与排序
-      const masked = maskFences(fileContent);
+      const masked = maskFrontmatter(maskFences(fileContent));
       // v1.6.0 批次三：编辑=删除+重建时备注必须跟着新行走（否则改一次日期备注就没了）。
       // 这里只把备注渲染成待写回的原文行数组，具体插入位置由各分支按 CRLF 补 \r。
       const noteBody = noteTextToLines(note);
@@ -2419,21 +2497,32 @@ var TaskParser = class {
       
       if (sortDate) {
         const [y, m] = sortDate.split("-");
-        const monthSection = `## ${y}年${m}月`;
+        // 月份节标题的语言跟随文件自身：旧文件是哪种语言就续写哪种，保证一个文件里
+        // 不混排中英节标题；新文件建档时已按当时界面语言定了名字，这里正好接力
+        const fileLang = (parseTaskListName(file.name.replace(/\.md$/i, "")) || {}).lang || I18N_LANG;
+        const mNum = parseInt(m, 10);
+        const enMonth = MONTH_NAMES_EN[mNum - 1];
+        const monthSection = `## ${monthSectionTitle(y, m, fileLang)}`;
         // 查找月份section位置：兼容用户手动创建的无前导零月份标题（如 "## 2026年4月"），
         // 避免与插件生成的 "## 2026年04月" 重复创建同月 section。
         // 两处模式都必须锚定行尾（[ \t]*\r?$ 兼容 CRLF）：否则用户手写的日期级标题
-        // "## 2026年1月1日 元旦计划会" 会被当成 1 月节，新任务被塞进那段纪要下面
-        const sectionMatch = masked.match(new RegExp(`^## ${y}年0*${parseInt(m, 10)}月[ \\t]*\\r?$`, "m"));
+        // "## 2026年1月1日 元旦计划会" 会被当成 1 月节，新任务被塞进那段纪要下面。
+        // 同一月份认全部语言写法（## 2026年11月 / ## November 2026），用户手建英文节也不重开
+        const sectionMatch = masked.match(new RegExp(`^## (?:${y}年0*${mNum}月|${enMonth} ${y})[ \\t]*\\r?$`, "m"));
         const sectionIdx = sectionMatch ? sectionMatch.index : -1;
         if (sectionIdx === -1) {
           // 月份section不存在，需要创建
-          // 找到所有月份section的位置（锚定行首+行尾，避免误匹配 ### 、行中或日期级标题）
-          const monthRegex = /^## (\d{4})年(\d{1,2})月[ \t]*\r?$/gm;
+          // 找到所有月份section的位置（锚定行首+行尾，避免误匹配 ### 、行中或日期级标题）；
+          // 枚举同样认中英两种节标题，排序坐标是抽出年月后的数值
+          const monthRegex = /^## (?:(\d{4})年(\d{1,2})月|(January|February|March|April|May|June|July|August|September|October|November|December) (\d{4}))[ \t]*\r?$/gm;
           const months = [];
           let match;
           while ((match = monthRegex.exec(masked)) !== null) {
-            months.push({ year: parseInt(match[1], 10), month: parseInt(match[2], 10), pos: match.index });
+            months.push({
+              year: parseInt(match[1] || match[4], 10),
+              month: match[2] ? parseInt(match[2], 10) : MONTH_NAME_NUM[match[3]],
+              pos: match.index
+            });
           }
           const newYear = parseInt(y, 10);
           const newMonth = parseInt(m, 10);
@@ -2602,7 +2691,7 @@ var TaskParser = class {
     const now = date || new Date();
     const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
     const periodId = getPeriodId(now, period);
-    const targetFileName = `${periodId}${period === "month" ? "" : "年"}任务列表.md`;
+    const targetFileName = taskListFileName(periodId, period, I18N_LANG);
 
     // 1. 使用缓存查找已存在的任务文件（传入 customFolderPath 用于消歧）
     const existingPath = this.findTaskFile(periodId, customFolderPath);
@@ -2613,7 +2702,7 @@ var TaskParser = class {
     // 2. 如果没找到，在指定位置或默认位置创建
     // 自定义文件夹可能已被删除或父路径是文件，导致 ensureFolderExists 抛错；
     // 失败时回退到默认「任务」文件夹，保证任务仍可创建。
-    const candidates = customFolderPath ? [customFolderPath, `任务`] : [`任务`];
+    const candidates = customFolderPath ? [customFolderPath, defaultTaskFolder(I18N_LANG)] : [defaultTaskFolder(I18N_LANG)];
     for (const folderPath of candidates) {
       const filePath = `${folderPath}/${targetFileName}`;
       try {
@@ -2692,7 +2781,7 @@ var TaskParser = class {
     } catch {
       return "\n";
     }
-    let [crlf, lf] = await tally(all.filter((f) => f.name.endsWith("任务列表.md")));
+    let [crlf, lf] = await tally(all.filter((f) => isTaskListName(f.name.replace(/\.md$/i, ""))));
     if (crlf + lf === 0 && folderPath) {
       const norm = String(folderPath).replace(/\/+$/, "");
       [crlf, lf] = await tally(all.filter((f) => f.parent && f.parent.path === norm));
@@ -2745,8 +2834,16 @@ var TaskParser = class {
   findTaskFile(periodId, customFolderPath) {
     const period = this.plugin ? this.plugin.settings.taskFilePeriod : "year";
     const cacheKey = `${period}|${periodId}`;
-    const targetFileName = `${periodId}${period === "month" ? "" : "年"}任务列表.md`;
     const normalizedCustom = customFolderPath ? customFolderPath.replace(/\/+$/, "") : "";
+    // 同周期认全部语言的任务列表文件名：用户切换界面语言后，旧语言的文件照旧被找到、
+    // 照旧写进去，不会另起一个新语言的文件把任务分裂开
+    const want = period === "month"
+      ? { year: parseInt(periodId.slice(0, 4), 10), month: parseInt(periodId.slice(5, 7), 10) }
+      : { year: parseInt(periodId, 10), month: 0 };
+    const samePeriodFile = (file) => {
+      const p = parseTaskListName(file.name.replace(/\.md$/i, ""));
+      return p !== null && p.year === want.year && p.month === want.month;
+    };
 
     // 1. 检查缓存
     if (this.taskFileCache.has(cacheKey)) {
@@ -2768,7 +2865,7 @@ var TaskParser = class {
     // 2a. 若指定了 customFolderPath，优先返回位于该文件夹下的同名文件
     if (normalizedCustom) {
       for (const file of files) {
-        if (file.name === targetFileName && this.isPathInFolder(file.path, normalizedCustom)) {
+        if (samePeriodFile(file) && this.isPathInFolder(file.path, normalizedCustom)) {
           this.taskFileCache.set(cacheKey, file.path);
           return file.path;
         }
@@ -2782,8 +2879,9 @@ var TaskParser = class {
     let fallback = null;
     let fallbackRank = Infinity;
     for (const file of files) {
-      if (file.name !== targetFileName) continue;
-      const rank = (file.path.startsWith("任务/") ? 0 : 1000) + file.path.split("/").length;
+      if (!samePeriodFile(file)) continue;
+      // 落在「任务 / 任務 / Tasks」任一默认文件夹下的命中优先，其次路径最浅
+      const rank = (/^(?:任务|任務|Tasks)\//.test(file.path) ? 0 : 1000) + file.path.split("/").length;
       if (rank < fallbackRank) {
         fallbackRank = rank;
         fallback = file;
@@ -9588,8 +9686,8 @@ var MonthlyTasksSettingTab = class extends import_obsidian.PluginSettingTab {
     // 示例文件名跟着当天走，且复用 getPeriodId()——插件真正写盘用的就是它，
     // 另算一份或写死「2026年10月」都会跟实际文件名对不上
     const egNow = new Date();
-    const egYear = `${getPeriodId(egNow, "year")}年任务列表.md`;
-    const egMonth = `${getPeriodId(egNow, "month")}任务列表.md`;
+    const egYear = taskListFileName(getPeriodId(egNow, "year"), "year", I18N_LANG);
+    const egMonth = taskListFileName(getPeriodId(egNow, "month"), "month", I18N_LANG);
     // 任务来源（v1.9.0）：只读任务列表文件 / 读取全库。老 data.json 由 loadSettings 迁移
     new import_obsidian.Setting(taskEl).setName(tr("settings.taskSource.name")).setDesc(tr("settings.taskSource.desc")).addDropdown((dropdown) => dropdown.addOption("files", tr("settings.taskSource.files")).addOption("vault", tr("settings.taskSource.vault")).setValue(this.plugin.settings.taskSource).onChange(async (value) => {
       this.plugin.settings.taskSource = value === "vault" ? "vault" : "files";

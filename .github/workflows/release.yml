@@ -53,6 +53,12 @@ jobs:
           node --check main.js
           node scripts/check-holidays-sync.mjs
 
+      - name: 校验 i18n 三语词典完整
+        run: |
+          set -euo pipefail
+          # 三套词典 key 一致 + tr() 调用点都有词条 + 语言映射三语齐全，缺了不发版
+          node scripts/check-i18n.mjs
+
       - name: 生成资产证明（官方上架流程要求的可验证构建来源）
         uses: actions/attest@v4
         with:
